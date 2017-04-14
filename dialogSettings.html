@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+    label {display:block; clear:both; margin:10px}
+    #output {padding: 5px; margin: 20px 5px 5px;}
+    input[type=button] {margin: 10px}
+    </style>
+    <script>
+      // Prevent forms from submitting.
+      function pageInit() {
+        var forms = document.querySelectorAll('form');
+        for (var i = 0; i < forms.length; i++) {
+          forms[i].addEventListener('submit', function(event) {
+            event.preventDefault();
+          });
+        }
+
+        google.script.run
+          .withSuccessHandler(getServerCfg)
+          .getServerCfg();
+      }
+      window.addEventListener('load', pageInit);
+
+      function getServerCfg(data) {
+        document.getElementById("jiraSettings").elements["jira_domain"].value = data.domain;
+        document.getElementById("jiraSettings").elements["jira_username"].value = data.username;
+        document.getElementById("jiraSettings").elements["jira_password"].value = data.password;
+      }
+
+      function handleFormSubmit(formObject) {
+        showOutput('saving ...');
+
+        google.script.run
+          .withSuccessHandler(onResponse)
+          .withFailureHandler(onResponse)
+          .saveSettings(formObject);
+      }
+
+      function onResponse(response) {
+        var msg = response.response;
+
+        if(response.status == true) {
+          google.script.host.close();
+        } else {
+          msg += '<br/><br/>Please try again.';
+        }
+        showOutput(msg);
+      }
+
+      function showOutput(msg) {
+        var div = document.getElementById('output');
+        div.innerHTML = msg;
+      }
+    </script>
+  </head>
+  <body>
+    <form id="jiraSettings" onsubmit="handleFormSubmit(this)">
+    <label>Jira Domain: 
+      <input type="text" name="jira_domain" value="" placeholder="YOURCOMPANY.atlassian.net" />
+    </label>
+    <label>Username: 
+      <input type="text" name="jira_username" value="" placeholder="yourname@domain.com" />
+    </label>
+    <label>Password: 
+      <input type="password" name="jira_password" value="" />
+    </label>
+
+    <input type="button" value="Cancel" onclick="google.script.host.close()" />
+    <input type="submit" value="Save" />
+    </form>
+    
+    <div id="output"></div>
+  </body>
+</html>
