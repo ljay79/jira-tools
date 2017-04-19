@@ -5,7 +5,8 @@
  */
 var restMethods = {
   'dashboard': '/dashboard',
-  'issueStatus': {method:'/issue/{issueIdOrKey}', fields:['status']}
+  'issueStatus': {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
+  'myFilters': {method: '/filter/my', queryparams: {includeFavourites: true}}
 };
 
 var httpErrorCodes = {
@@ -63,7 +64,7 @@ function Request() {
       username = getCfg('jira_username'),
       password = getCfg('jira_password'),
       jiraMethod = null,
-      jiraFields = [];
+      jiraQueryParams = {};
 
   this.init = function() {
     // prepare for initialization if necessary
@@ -90,17 +91,26 @@ function Request() {
 
     return fetchArgs;
   };
-  
+
   /**
-   * @desc Sets RESTfull api method and optional fields to request from Jira
-   * @param method {string}
-   * @return {this}  Allow chaining
+   * @desc 
    */
-  this.setMethodAndFields = function(reqMethod) {
-    jiraMethod = (typeof restMethods[reqMethod] === 'object') ? restMethods[reqMethod].method : restMethods[reqMethod];
-    jiraFields = (typeof restMethods[reqMethod] === 'object') ? restMethods[reqMethod].fields : [];
-    
-    return this;
+  this.prepareParams = function(urlParams, jiraQueryParams) {
+    for (var attr in jiraQueryParams) {
+      if (jiraQueryParams.hasOwnProperty(attr)) {
+        switch(true) {
+          case (Object.prototype.toString.call(jiraQueryParams[attr]) === '[object Array]'):
+            urlParams[attr] = jiraQueryParams[attr].join(',');
+            break;
+          case (typeof jiraQueryParams[attr] == 'object'):
+            this.prepareParams(urlParams, jiraQueryParams[attr]);
+            break;
+          case (typeof jiraQueryParams[attr] == 'string'):
+            urlParams[attr] = jiraQueryParams[attr];
+            break;
+        }
+      }
+    }
   };
 
   /**
@@ -121,14 +131,15 @@ function Request() {
       // dont bother trying to connect - use .withFailureHandler() to act on this failure
       return this;
     }
-    
-    this.setMethodAndFields(method);
+
+    jiraMethod = (typeof restMethods[method] === 'object') ? restMethods[method].method : restMethods[method];
+    jiraQueryParams = (typeof restMethods[method] === 'object') ? restMethods[method].queryparams : {};
+
+    var urlParams = {};
+    this.prepareParams(urlParams, jiraQueryParams);
 
     // RESTfull URL to request
     var fetchUrl = 'https://' + domain + '/rest/api/2' + jiraMethod;
-    var urlParams = {};
-
-    if(jiraFields.length > 0) urlParams.fields = jiraFields.join(',');
 
     // data payload vs. url params handling
     var temp, 
