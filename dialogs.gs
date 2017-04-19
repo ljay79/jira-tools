@@ -3,11 +3,34 @@
 /* Dialog: Settings */
 
 /**
+ * @desc Jira Settings Dialog preprocessor
+ */
+function getDialog(file, values) {
+  var template = HtmlService.createTemplateFromFile(file);
+  
+  Logger.log('Processing: %s.html with %s', file, JSON.stringify(values));
+  
+  for (var name in values) {
+    template[name] = values[name];
+  }
+  
+  return template.evaluate();
+}
+
+/**
  * @desc Jira Settings Dialog constructor
  */
 function dialogSettings() {
-  var html = HtmlService.createHtmlOutputFromFile('dialogSettings').setSandboxMode(HtmlService.SandboxMode.IFRAME);
-  SpreadsheetApp.getUi().showModalDialog(html, 'Jira Server Settings');
+  var dialog = getDialog('dialogSettings', getServerCfg());
+  
+  dialog
+    .setWidth(300)
+    .setHeight(280)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+  
+  Logger.log('Processed: %s', dialog);
+    
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'Jira Server Settings');
 }
 
 /**
@@ -37,7 +60,7 @@ function saveSettings(jsonFormData) {
 
   var test = testConnection();
 
-  return {status: test.status, response: test.response};
+  return {status: test.status, message: test.response};
 }
 
 /* Dialog: Settings - END */

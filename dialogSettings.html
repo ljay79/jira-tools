@@ -2,75 +2,105 @@
 <html>
   <head>
     <base target="_top">
+    
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.green-blue.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&lang=en">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <style>
-    label {display:block; clear:both; margin:10px}
-    #output {padding: 5px; margin: 20px 5px 5px;}
-    input[type=button] {margin: 10px}
+      .mdl-action-block{ margin-top: 1em; padding-top: 10px; border-top: 1px solid rgba(0,0,0,.12); text-align: right; }
+      .mdl-snackbar__action { color: white; }
     </style>
+  </head>
+  <body class="mdl-layout mdl-js-layout">
+    <form id="jiraServerSettings" action="" method="post" class="mdl-layout__content">
+      <div class="mdl-textfield mdl-js-textfield">
+        <input type="text" class="mdl-textfield__input" id="jira-domain" name="jira_domain" value="<?= domain ?>">
+        <label class="mdl-textfield__label" for="jira-domain">Jira Domain (YOURCOMPANY.atlassian.net)</label>
+      </div>
+      <div class="mdl-textfield mdl-js-textfield">
+        <input type="text" class="mdl-textfield__input" id="jira-username" name="jira_username" value="<?= username ?>">
+        <label class="mdl-textfield__label" for="jira-username">Username (yourname@domain.com)</label>
+      </div>
+      <div class="mdl-textfield mdl-js-textfield">
+        <input type="password" class="mdl-textfield__input" id="jira-password" name="jira_password" value="<?= password ?>">
+        <label class="mdl-textfield__label" for="jira-password">Password</label>
+      </div>
+      
+      <div class="mdl-action-block">
+        <button name="buttonreset" type="button" class="mdl-button mdl-js-button" onclick="google.script.host.close()">
+          <i class="material-icons">close</i> Cancel
+        </button>
+        <button name="buttonsubmit" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" disabled>
+          <i class="material-icons">save</i> Save
+        </button>
+      </div>
+    </form>
+    
+    <div id="response-message" class="mdl-js-snackbar mdl-snackbar" role="dialog">
+      <div class="mdl-snackbar__text"></div>
+      <button class="mdl-snackbar__action" type="button"></button>
+    </div>
+    
+    <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/mdlComponentHandler.js"></script>
+    <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/layout/layout.js"></script>
+    <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/button/button.js"></script>
+    <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/textfield/textfield.js"></script>
+    <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/snackbar/snackbar.js"></script>
     <script>
-      // Prevent forms from submitting.
-      function pageInit() {
-        var forms = document.querySelectorAll('form');
-        for (var i = 0; i < forms.length; i++) {
-          forms[i].addEventListener('submit', function(event) {
-            event.preventDefault();
-          });
-        }
+      var valid  = false;
+      var setup  = document.querySelector('form');
+      var input  = Array.prototype.slice.call(setup.getElementsByTagName('input'));
+      var alert  = document.getElementById('response-message');
+      var action = document.querySelector('[type=submit]');
 
-        google.script.run
-          .withSuccessHandler(getServerCfg)
-          .getServerCfg();
-      }
-      window.addEventListener('load', pageInit);
+      function formSubmitHandler(event) {
+        if (event) event.preventDefault();
+        
+        alert.MaterialSnackbar.hideSnackbar();
+        
+        if (!valid) return;
 
-      function getServerCfg(data) {
-        document.getElementById("jiraSettings").elements["jira_domain"].value = data.domain;
-        document.getElementById("jiraSettings").elements["jira_username"].value = data.username;
-        document.getElementById("jiraSettings").elements["jira_password"].value = data.password;
-      }
-
-      function handleFormSubmit(formObject) {
-        showOutput('saving ...');
+        alert.style.backgroundColor = 'rgb(139,195,74)';
+        alert.MaterialSnackbar.showSnackbar({
+          message: 'saving ...',
+          timeout: 1500
+        });
 
         google.script.run
           .withSuccessHandler(onResponse)
           .withFailureHandler(onResponse)
-          .saveSettings(formObject);
+          .saveSettings(this);
+      }
+      
+      function inputValidatyHandler() {
+        var validaty = true;
+        input.forEach(function(el){ return validaty && (validaty = el.value.length > 0); });
+        valid = validaty;
+        action.MaterialButton[valid?'enable':'disable']();
       }
 
       function onResponse(response) {
-        var msg = response.response;
+        var done = response.status === true;
 
-        if(response.status == true) {
+        alert.MaterialSnackbar.hideSnackbar();
+        
+        if(done) {
           google.script.host.close();
-        } else {
-          msg += '<br/><br/>Please try again.';
         }
-        showOutput(msg);
+        else {
+          response.actionText = 'Try again.';
+          response.actionHandler = function(){ setup.dispatchEvent(new Event('submit')); };
+        }
+        
+        response.timeout = 10000;
+        
+        alert.style.backgroundColor = done ? 'rgb(139,195,74)' : 'rgb(213,0,0)';
+        alert.MaterialSnackbar.showSnackbar(response);
       }
-
-      function showOutput(msg) {
-        var div = document.getElementById('output');
-        div.innerHTML = msg;
-      }
+      
+      setup.addEventListener('submit', formSubmitHandler);
+      input.forEach(function(el){ el.addEventListener('keyup', inputValidatyHandler); });
+      window.addEventListener('load', inputValidatyHandler);
     </script>
-  </head>
-  <body>
-    <form id="jiraSettings" onsubmit="handleFormSubmit(this)">
-    <label>Jira Domain: 
-      <input type="text" name="jira_domain" value="" placeholder="YOURCOMPANY.atlassian.net" />
-    </label>
-    <label>Username: 
-      <input type="text" name="jira_username" value="" placeholder="yourname@domain.com" />
-    </label>
-    <label>Password: 
-      <input type="password" name="jira_password" value="" />
-    </label>
-
-    <input type="button" value="Cancel" onclick="google.script.host.close()" />
-    <input type="submit" value="Save" />
-    </form>
-    
-    <div id="output"></div>
   </body>
 </html>
