@@ -1,37 +1,23 @@
-## Welcome to GitHub Pages
+## Jira Sheet Tools
 
-You can use the [editor on GitHub](https://github.com/ljay79/jira-tools/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+tbc...
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Jira Sheet Tools provides a few useful integrations of Jira REST api into Google Spreadsheet.
 
-### Markdown
+### Refresh Ticket Data
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Any Jira ticket Id in the form of "KEY-123" will be updated on the current active google sheet and extended with the current status of matching Jira ticket.
 
+Sample Data:
 ```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+| Before | After
+| KEY-123 | KEY-123 [Done]
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+Even with in text it will search for keys and adds the status.
+If Jira issue key used in a single cell, the value will be linked automatically to the Jira issue page.
 
-### Jekyll Themes
+### List Issues From Filter
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/ljay79/jira-tools/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+Allows you to add a table/list of all found Jira issues based on a Jira Filter.
+The dialog will let you choose from all your Jira filters and then insert all results into the active Google sheet.
