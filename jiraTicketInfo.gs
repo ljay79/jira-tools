@@ -30,17 +30,18 @@ function refreshTickets() {
   var ok = function(responseData, httpResponse, statusCode){
     // Check the data is valid and the Jira fields exist
     if(responseData && responseData.fields) {
-      var status = getIssueStatus(responseData.fields);
+      //var status = getIssueStatus(responseData.fields);
+      var status = unifyIssueAttrib('status', responseData);
       // dependent cell value update
       switch(jiraCell.type) {
         case CELLTYPE_JIRAID:
-          var link = '=HYPERLINK("https://' + getCfg('jira_domain') + '/browse/' + jiraCell.ticketId + '";"' + jiraCell.ticketId + ' [' + status.name + ']")';
+          var link = '=HYPERLINK("https://' + getCfg('jira_domain') + '/browse/' + jiraCell.ticketId + '";"' + jiraCell.ticketId + ' [' + status.value + ']")';
           rows.getCell(rowIdx, colIdx).setValue(link);
           break;
 
         case CELLTYPE_TEXT:
         default:
-          var newValue = jiraCell.ticketId + ' [' + status.name + ']';
+          var newValue = jiraCell.ticketId + ' [' + status.value + ']';
           newValue = jiraCell.value.replace(jiraCell.ticketId, newValue);
           rows.getCell(rowIdx, colIdx).setValue(newValue);
           break;
@@ -69,7 +70,7 @@ function refreshTickets() {
       jiraCell = grepJiraCell(values[r][c]);
       if(jiraCell.type == CELLTYPE_EMPTY || jiraCell.ticketId === null) continue;
 
-      request.call('issueStatus', {issueIdOrKey: jiraCell.ticketId})
+      request.call(method, {issueIdOrKey: jiraCell.ticketId})
         .withSuccessHandler(ok)
         .withFailureHandler(error);
       }

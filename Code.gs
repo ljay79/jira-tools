@@ -27,11 +27,11 @@ function addMenu() {
     .addItem('Refresh Ticket Data', 'refreshTicketsIds')
     
     // Add "Ïnsert ..." menu with submenu
-/*    .addSeparator()
+    .addSeparator()
     .addSubMenu(SpreadsheetApp.getUi().createMenu('Insert...')
-      .addItem('Worklog', 'mySecondFunction')
-      .addItem('Issues from Filter', 'myThirdFunction'))
-*/
+      //.addItem('Worklog', 'mySecondFunction')
+      .addItem('List Issues from Filter', 'dialogIssueFromFilter'))
+
     .addSeparator()
     .addItem('Settings', 'dialogSettings')
 

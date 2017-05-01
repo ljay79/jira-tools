@@ -15,7 +15,7 @@ function hasSettings(alert) {
                    '"Jira -> Settings"', Browser.Buttons.OK);
     return false;
   }
-  
+
   return true;
 }
 
@@ -38,3 +38,19 @@ function setCfg(key, value) {
 function getCfg(key) {
   return userProps.getProperty('serverConfig.' + key);
 }
+
+// default issue fields/columns for issue listings
+var jiraColumnDefault = [
+  'summary',
+  'issuetype',
+  'priority',
+  'status',
+  'updated',
+  'assignee',
+  'due'
+];
+
+if( userProps.getProperty('jiraColumnDefault') != null ) {
+  jiraColumnDefault = JSON.parse(userProps.getProperty('jiraColumnDefault'));
+}
+userProps.setProperty('jiraColumnDefault', JSON.stringify(jiraColumnDefault));

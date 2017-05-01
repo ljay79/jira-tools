@@ -2,7 +2,6 @@
 <html>
   <head>
     <base target="_top">
-    
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.green-blue.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&lang=en">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -47,6 +46,7 @@
     <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/textfield/textfield.js"></script>
     <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/snackbar/snackbar.js"></script>
     <script>
+      // The code in this function runs when the page is loaded.
       var valid  = false;
       var setup  = document.querySelector('form');
       var input  = Array.prototype.slice.call(setup.getElementsByTagName('input'));
@@ -97,7 +97,7 @@
         alert.style.backgroundColor = done ? 'rgb(139,195,74)' : 'rgb(213,0,0)';
         alert.MaterialSnackbar.showSnackbar(response);
       }
-      
+
       setup.addEventListener('submit', formSubmitHandler);
       input.forEach(function(el){ el.addEventListener('keyup', inputValidatyHandler); });
       window.addEventListener('load', inputValidatyHandler);
