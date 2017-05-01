@@ -5,7 +5,11 @@
  */
 var restMethods = {
   'dashboard': '/dashboard',
-  'issueStatus': {method:'/issue/{issueIdOrKey}', fields:['status']}
+  'issueStatus': {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
+  'myFilters': {method: '/filter/my', queryparams: {includeFavourites: 'false'}},
+  'filter': {method: '/filter/{filterId}'},
+  //'search': {method: '/search', queryparams: {jql:'', fields: [], properties: [], maxResults: 100, validateQuery: 'strict'}} // GET
+  'search': {method: '/search'} // POST
 };
 
 var httpErrorCodes = {
@@ -63,7 +67,7 @@ function Request() {
       username = getCfg('jira_username'),
       password = getCfg('jira_password'),
       jiraMethod = null,
-      jiraFields = [];
+      jiraQueryParams = {};
 
   this.init = function() {
     // prepare for initialization if necessary
@@ -90,17 +94,26 @@ function Request() {
 
     return fetchArgs;
   };
-  
+
   /**
-   * @desc Sets RESTfull api method and optional fields to request from Jira
-   * @param method {string}
-   * @return {this}  Allow chaining
+   * @desc Migrates jiraQueryParams properties into urlParams
    */
-  this.setMethodAndFields = function(reqMethod) {
-    jiraMethod = (typeof restMethods[reqMethod] === 'object') ? restMethods[reqMethod].method : restMethods[reqMethod];
-    jiraFields = (typeof restMethods[reqMethod] === 'object') ? restMethods[reqMethod].fields : [];
-    
-    return this;
+  this.prepareParams = function(urlParams, jiraQueryParams) {
+    for (var attr in jiraQueryParams) {
+      if (jiraQueryParams.hasOwnProperty(attr)) {
+        switch(true) {
+          case (Object.prototype.toString.call(jiraQueryParams[attr]) === '[object Array]'):
+            urlParams[attr] = jiraQueryParams[attr].join(',');
+            break;
+          case (typeof jiraQueryParams[attr] == 'object'):
+            this.prepareParams(urlParams, jiraQueryParams[attr]);
+            break;
+          case (typeof jiraQueryParams[attr] == 'string'):
+            urlParams[attr] = jiraQueryParams[attr];
+            break;
+        }
+      }
+    }
   };
 
   /**
@@ -108,33 +121,34 @@ function Request() {
    * @param method {string}    Name of method to call on api, see restMethods[] 
    *     for implemented api methods
    * @param data {mixed}    (prepared for later payload)
-   * @param args {object}    Optioal object of additional fetchArgs (see UrlFetchApp.fetch())
+   * @param fetchArgs {object}    Optional object of additional fetchArgs (see UrlFetchApp.fetch())
    * @return {this}    Allows chaining
    */
-  this.call = function(method, data, args) {
+  this.call = function(method, data, fetchArgs) {
     if( !hasSettings(false) ) {
       // check if server settings are available
       responseData = null;
       httpResponse = null;
       statusCode = -1;
-      
+
       // dont bother trying to connect - use .withFailureHandler() to act on this failure
       return this;
     }
-    
-    this.setMethodAndFields(method);
+
+    jiraMethod = (typeof restMethods[method] === 'object') ? restMethods[method].method : restMethods[method];
+    jiraQueryParams = (typeof restMethods[method] === 'object') ? restMethods[method].queryparams : {};
+
+    var fetchArgs = fetchArgs || {}, urlParams = {};
+    this.prepareParams(urlParams, jiraQueryParams);
 
     // RESTfull URL to request
     var fetchUrl = 'https://' + domain + '/rest/api/2' + jiraMethod;
-    var urlParams = {};
-
-    if(jiraFields.length > 0) urlParams.fields = jiraFields.join(',');
 
     // data payload vs. url params handling
     var temp, 
-        args = {}, 
         payload = {};
 
+    // fill URL placeholders with attributes from data object if passed and available
     for (var attr in data) {
       if (data.hasOwnProperty(attr)) {
         temp = fetchUrl.replace('{' + attr + '}', data[attr]);
@@ -147,12 +161,24 @@ function Request() {
       }
     }
 
-    args.payload = payload;
+    // fill URL queryparams with attributes from data/payload object if passed and available
+    for (var attr in payload) {
+      if(urlParams.hasOwnProperty(attr)) {
+        urlParams[attr] = payload[attr];
+        //payload.splice(attr, 1);
+        delete payload[attr];
+      }
+    }
+
+    fetchArgs.payload = JSON.stringify(payload);
+    // do not add empty payload
+    if(fetchArgs.payload == '{}') { delete fetchArgs['payload']; }
+
     // build full fetch URL    
     fetchUrl = buildUrl(fetchUrl, urlParams);
 
     responseData = null;
-    httpResponse = UrlFetchApp.fetch(fetchUrl, this.getFetchArgs(args));
+    httpResponse = UrlFetchApp.fetch(fetchUrl, this.getFetchArgs(fetchArgs));
     statusCode = parseInt( httpResponse.getResponseCode() );
 
     if (httpResponse) {
