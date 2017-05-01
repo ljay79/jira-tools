@@ -150,3 +150,23 @@ function insertIssuesFromFilter(jsonFormData) {
 }
 
 /* Dialog: Settings - END */
+
+/* Dialog: Settings */
+
+/**
+ * @desc Dialog "About"
+ */
+function dialogAbout() {
+  var dialog = getDialog('dialogAbout');
+
+  dialog
+    .setWidth(370)
+    .setHeight(310)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+
+  Logger.log('Processed: %s', dialog);
+
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'About');
+}
+
+/* Dialog: About - END */

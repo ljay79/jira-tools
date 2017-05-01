@@ -34,6 +34,7 @@ function addMenu() {
 
     .addSeparator()
     .addItem('Settings', 'dialogSettings')
+    .addItem('About', 'dialogAbout')
 
     .addToUi();
 }
