@@ -2,44 +2,96 @@
 <html>
   <head>
     <base target="_top">
-    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.green-blue.min.css">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&lang=en">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <style>
-      .mdl-action-block{ margin-top: 1em; padding-top: 10px; border-top: 1px solid rgba(0,0,0,.12); text-align: right; }
-      .mdl-snackbar__action { color: white; }
+    <style type="text/css">
+    body {
+      position: relative;
+    }
+
+    .error-container {
+      width: 100%;
+      position: absolute;
+      /*margin-top: -25px;*/
+      left: 0;
+      text-align: center;
+    }
+    .error-wrap {
+      display: inline-block; 
+      line-height: normal;
+    }
+    
+    .jfk-butterBar-warning {
+      background-color: #dd4b39;
+      border-color: #602019;
+      color: #fff;
+    }
+    .jfk-butterBar {
+      -webkit-border-radius: 2px;
+      -moz-border-radius: 2px;
+      border-radius: 2px;
+      -webkit-box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+      -moz-box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+      box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+      -webkit-transition: all 0s linear 1s,opacity 1s;
+      -moz-transition: all 0s linear 1s,opacity 1s;
+      -o-transition: all 0s linear 1s,opacity 1s;
+      transition: all 0s linear 1s,opacity 1s;
+      border-style: solid;
+      border-width: 0;
+      font-size: 11px;
+      height: 0;
+      /*opacity: 0;
+      visibility: hidden;
+      overflow: hidden;*/
+      padding: 0;
+      text-align: center;
+    }
+    .jfk-butterBar-shown {
+      -webkit-transition: opacity 0.218s;
+      -moz-transition: opacity 0.218s;
+      -o-transition: opacity 0.218s;
+      transition: opacity 0.218s;
+      border-width: 1px;
+      min-height: 14px;
+      height: auto;
+      opacity: 1;
+      visibility: visible;
+      padding: 2px 16px
+    }
     </style>
   </head>
-  <body class="mdl-layout mdl-js-layout">
-    <form id="jiraServerSettings" action="" method="post" class="mdl-layout__content">
-      <div class="mdl-textfield mdl-js-textfield">
-        <input type="text" class="mdl-textfield__input" id="jira-domain" name="jira_domain" value="<?= domain ?>">
-        <label class="mdl-textfield__label" for="jira-domain">Jira Domain (YOURCOMPANY.atlassian.net)</label>
+  <body class="">
+
+    <div id="response-message" class="error-container" role="dialog">
+      <div class="error-wrap">
+        <div class="error jfk-butterBar jfk-butterBar-warning jfk-butterBar-mini jfk-butterBar-shown" aria-live="assertive" aria-atomic="true">
+        Geben Sie einen gültigen Bereich ein.
+        </div>
       </div>
-      <div class="mdl-textfield mdl-js-textfield">
-        <input type="text" class="mdl-textfield__input" id="jira-username" name="jira_username" value="<?= username ?>">
-        <label class="mdl-textfield__label" for="jira-username">Username (yourname@domain.com)</label>
+    </div>
+
+    <form id="jiraServerSettings" action="" method="post">
+      <div class="form-group block">
+        <label for="jira-domain">Jira Domain</label>
+        <input type="text" id="jira-domain" name="jira_domain" placeholder="(YOURCOMPANY.atlassian.net)" value="<?= domain ?>">
       </div>
-      <div class="mdl-textfield mdl-js-textfield">
-        <input type="password" class="mdl-textfield__input" id="jira-password" name="jira_password" value="<?= password ?>">
-        <label class="mdl-textfield__label" for="jira-password">Password</label>
+      <div class="form-group block">
+        <label for="jira-username">Username</label>
+        <input type="text" id="jira-username" name="jira_username" value="<?= username ?>" placeholder="my username " />
+      </div>
+      <div class="form-group block">
+        <label for="jira-password">Password</label>
+        <input type="password" id="jira-password" name="jira_password" value="<?= password ?>">
       </div>
       
-      <div class="mdl-action-block">
-        <button name="buttonreset" type="button" class="mdl-button mdl-js-button" onclick="google.script.host.close()">
-          <i class="material-icons">close</i> Cancel
-        </button>
-        <button name="buttonsubmit" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" disabled>
-          <i class="material-icons">save</i> Save
-        </button>
+      <div class="block">
+        <button name="buttonsubmit" type="submit" class="action" disabled>Save</button>
+        <button name="buttonreset" type="button" onclick="google.script.host.close()">Cancel</button>
       </div>
     </form>
-    
-    <div id="response-message" class="mdl-js-snackbar mdl-snackbar" role="dialog">
-      <div class="mdl-snackbar__text"></div>
-      <button class="mdl-snackbar__action" type="button"></button>
-    </div>
-    
+
     <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/mdlComponentHandler.js"></script>
     <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/layout/layout.js"></script>
     <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/button/button.js"></script>
