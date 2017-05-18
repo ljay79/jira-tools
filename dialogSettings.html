@@ -3,120 +3,64 @@
   <head>
     <base target="_top">
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&lang=en">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <style type="text/css">
-    body {
-      position: relative;
-    }
-
-    .error-container {
-      width: 100%;
-      position: absolute;
-      /*margin-top: -25px;*/
-      left: 0;
-      text-align: center;
-    }
-    .error-wrap {
-      display: inline-block; 
-      line-height: normal;
-    }
-    
-    .jfk-butterBar-warning {
-      background-color: #dd4b39;
-      border-color: #602019;
-      color: #fff;
-    }
-    .jfk-butterBar {
-      -webkit-border-radius: 2px;
-      -moz-border-radius: 2px;
-      border-radius: 2px;
-      -webkit-box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
-      -moz-box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
-      box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
-      -webkit-transition: all 0s linear 1s,opacity 1s;
-      -moz-transition: all 0s linear 1s,opacity 1s;
-      -o-transition: all 0s linear 1s,opacity 1s;
-      transition: all 0s linear 1s,opacity 1s;
-      border-style: solid;
-      border-width: 0;
-      font-size: 11px;
-      height: 0;
-      /*opacity: 0;
-      visibility: hidden;
-      overflow: hidden;*/
-      padding: 0;
-      text-align: center;
-    }
-    .jfk-butterBar-shown {
-      -webkit-transition: opacity 0.218s;
-      -moz-transition: opacity 0.218s;
-      -o-transition: opacity 0.218s;
-      transition: opacity 0.218s;
-      border-width: 1px;
-      min-height: 14px;
-      height: auto;
-      opacity: 1;
-      visibility: visible;
-      padding: 2px 16px
-    }
+    <style>
+    .error-container { display: none; margin-bottom: 10px; padding: 5px 10px; text-align: center; color: #fff; }
     </style>
   </head>
-  <body class="">
+  <body>
+    <div id="response-message" class="error-container" role="dialog"></div>
 
-    <div id="response-message" class="error-container" role="dialog">
-      <div class="error-wrap">
-        <div class="error jfk-butterBar jfk-butterBar-warning jfk-butterBar-mini jfk-butterBar-shown" aria-live="assertive" aria-atomic="true">
-        Geben Sie einen gültigen Bereich ein.
-        </div>
-      </div>
-    </div>
-
-    <form id="jiraServerSettings" action="" method="post">
+    <form id="settings" action="" method="post">
       <div class="form-group block">
         <label for="jira-domain">Jira Domain</label>
-        <input type="text" id="jira-domain" name="jira_domain" placeholder="(YOURCOMPANY.atlassian.net)" value="<?= domain ?>">
+        <span class="inline grey">(YOURCOMPANY.atlassian.net)</span>
+        <input type="text" id="jira-domain" name="jira_domain" class="block" style="width:100%" value="<?= domain ?>">
       </div>
       <div class="form-group block">
         <label for="jira-username">Username</label>
-        <input type="text" id="jira-username" name="jira_username" value="<?= username ?>" placeholder="my username " />
+        <span class="inline grey">(Atlassian account name)</span>
+        <input type="text" id="jira-username" name="jira_username" class="block" style="width:100%" value="<?= username ?>" />
       </div>
       <div class="form-group block">
         <label for="jira-password">Password</label>
-        <input type="password" id="jira-password" name="jira_password" value="<?= password ?>">
+        <input type="password" id="jira-password" name="jira_password" class="block" style="width:100%" value="<?= password ?>">
       </div>
       
       <div class="block">
-        <button name="buttonsubmit" type="submit" class="action" disabled>Save</button>
-        <button name="buttonreset" type="button" onclick="google.script.host.close()">Cancel</button>
+        <button type="submit" class="action" disabled>Save</button>
+        <button type="button" onclick="google.script.host.close()">Cancel</button>
       </div>
     </form>
-
-    <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/mdlComponentHandler.js"></script>
-    <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/layout/layout.js"></script>
-    <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/button/button.js"></script>
-    <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/textfield/textfield.js"></script>
-    <script src="https://cdn.rawgit.com/google/material-design-lite/mdl-1.x/src/snackbar/snackbar.js"></script>
+    
     <script>
       // The code in this function runs when the page is loaded.
-      var valid  = false;
-      var setup  = document.querySelector('form');
-      var input  = Array.prototype.slice.call(setup.getElementsByTagName('input'));
-      var alert  = document.getElementById('response-message');
-      var action = document.querySelector('[type=submit]');
+      var valid   = false;
+      var setup   = document.forms['settings'];
+      var input   = Array.prototype.slice.call(setup.elements).filter(function(el){ return el.nodeName === 'INPUT'; });
+      var alert   = document.getElementById('response-message');
+      var action  = document.querySelector('[type=submit]');
+      var timeout = null;
+      
+      function hideAlert(){
+        if(timeout) timeout = clearTimeout(timeout);
+        alert.style.display = 'none';
+      }
+      
+      function showAlert(text,type,time) {
+        alert.innerText = text;
+        alert.style.backgroundColor = type ? 'rgb(139,195,74)' : 'rgb(213,0,0)';
+        alert.style.display = 'block';
+        if (time) timeout = setTimeout(hideAlert,time);
+      }
 
       function formSubmitHandler(event) {
         if (event) event.preventDefault();
         
-        alert.MaterialSnackbar.hideSnackbar();
+        hideAlert();
         
         if (!valid) return;
-
-        alert.style.backgroundColor = 'rgb(139,195,74)';
-        alert.MaterialSnackbar.showSnackbar({
-          message: 'saving ...',
-          timeout: 1500
-        });
+        
+        showAlert('saving ...', 1, 1500);
 
         google.script.run
           .withSuccessHandler(onResponse)
@@ -126,28 +70,18 @@
       
       function inputValidatyHandler() {
         var validaty = true;
-        input.forEach(function(el){ return validaty && (validaty = el.value.length > 0); });
+        input.forEach(function(el){ return validaty && (validaty = el.nodeName !== 'INPUT' || el.value.length > 0); });
         valid = validaty;
-        action.MaterialButton[valid?'enable':'disable']();
+        action.disabled = valid ? false : 'disabled';
       }
 
       function onResponse(response) {
         var done = response.status === true;
 
-        alert.MaterialSnackbar.hideSnackbar();
+        hideAlert();
+        showAlert(response.message, done, 10000);
         
-        if(done) {
-          google.script.host.close();
-        }
-        else {
-          response.actionText = 'Try again.';
-          response.actionHandler = function(){ setup.dispatchEvent(new Event('submit')); };
-        }
-        
-        response.timeout = 10000;
-        
-        alert.style.backgroundColor = done ? 'rgb(139,195,74)' : 'rgb(213,0,0)';
-        alert.MaterialSnackbar.showSnackbar(response);
+        if(done) google.script.host.close();
       }
 
       setup.addEventListener('submit', formSubmitHandler);

@@ -180,29 +180,29 @@ function getMyFilters(includeFavourites) {
   var ok = function(responseData, httpResponse, statusCode){
     // Check the data is valid and the Jira fields exist
     if(responseData) {
-      for(var i in responseData) {
-        filters.push({
-          id: responseData[i].id,
-          name: responseData[i].name,
-          self: responseData[i].self,
-          favourite: responseData[i].favourite,
-          owner: responseData[i].owner.displayName,
-          viewUrl: responseData[i].viewUrl,
-          jql: responseData[i].jql
-        });
-      }
-      // sorting the list of filters by favourite, name
-      filters.sort(function(a, b){
-        var keyA = (a.favourite ? '0' : '1') + a.name,
-          keyB = (b.favourite ? '0' : '1') + b.name;
-
-        if (keyA < keyB)
-          return -1;
-        if (keyA > keyB)
-          return 1;
-        return 0;
-      });
+      // add data to export
+      filters.push.apply(filters, responseData.map(function(filter){ return {
+          id: parseInt(filter.id),
+          name: filter.name,
+          self: filter.self,
+          favourite: filter.favourite,
+          owner: filter.owner.displayName,
+          viewUrl: filter.viewUrl,
+          jql: filter.jql
+        }; }) )
       
+      // sorting the list of filters by favourite, name
+      && filters.sort(function(a, b){
+          var keyA = (a.favourite ? '0' : '1') + a.name;
+          var keyB = (b.favourite ? '0' : '1') + b.name;
+
+          if (keyA < keyB)
+            return -1;
+          if (keyA > keyB)
+            return 1;
+          return 0;
+        })
+      ;
     } else {
       // Something funky is up with the JSON response.
       Logger.log("Failed to retrieve jira filters!");
