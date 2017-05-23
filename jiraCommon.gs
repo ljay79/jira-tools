@@ -332,14 +332,38 @@ function unifyIssueAttrib(attrib, data) {
         format: "0"
       };
       break;
+    case 'project':
+      resp = {
+        value: data.fields.project.name
+      };
+      break;
     case 'labels':
       resp = {
         value: data.fields.labels.join(',')
       };
-      break
+      break;
+    case 'components':
+    case 'fixVersions':
+      // array of objects with element name in property 'name'
+      resp = {
+        value: data.fields[attrib].map(function(value) {
+          return value.name;
+        }).join(',')
+      };
+      break;
+    case 'aggregateprogress':
+    case 'progress':
+      var percent = data.fields[attrib].percent || 0;
+      percent = Utilities.formatString("%.Xf%".replace('X',0), percent);
+      resp = {
+        value: percent,
+        format: "0%"
+      };
+      break;
 
     default:
       Logger.log('unifyIssueAttrib(' + attrib + ') no format defined yet.');
+      Logger.log(data.fields[attrib]);
       resp.value = data[attrib] || data.fields[attrib];
       break;
   }
