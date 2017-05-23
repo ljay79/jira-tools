@@ -8,7 +8,6 @@
  * - add feature to insert list of tickets (issue overview) based on available Jira filters
  */
 
-var userProps = PropertiesService.getUserProperties();
 
 /** 
  * Add a nice menu option for the users.
@@ -36,8 +35,7 @@ function onInstall(e) {
  * Add "Jira" Menu to UI. 
  */
 function addMenu() {
-  SpreadsheetApp.getUi()
-    .createMenu('JIRA')
+  SpreadsheetApp.getUi().createAddonMenu()
     // Tools
     .addItem('Refresh Ticket Data', 'refreshTicketsIds')
     
@@ -50,6 +48,6 @@ function addMenu() {
     .addSeparator()
     .addItem('Settings', 'dialogSettings')
     .addItem('About', 'dialogAbout')
-
+  
     .addToUi();
 }
