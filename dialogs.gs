@@ -27,8 +27,8 @@ function dialogSettings() {
   var dialog = getDialog('dialogSettings', getServerCfg());
 
   dialog
-    .setWidth(450)
-    .setHeight(320)
+    .setWidth(320)
+    .setHeight(260)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   Logger.log('Processed: %s', dialog);
@@ -68,12 +68,13 @@ function saveSettings(jsonFormData) {
 
 /* Dialog: Settings - END */
 
-/* Dialog: Settings */
+/* Dialog: Import Issues */
 
 /**
  * @desc Dialog to choose issues filter
  */
 function dialogIssueFromFilter() {
+  var userProps = PropertiesService.getUserProperties();
   var dialog = getDialog('dialogIssuesFromFilter', {
     columns: ISSUE_COLUMNS,
     defaultColumns: JSON.parse(userProps.getProperty('jiraColumnDefault'))
@@ -81,7 +82,7 @@ function dialogIssueFromFilter() {
 
   dialog
     .setWidth(600)
-    .setHeight(500)
+    .setHeight(480)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   Logger.log('Processed: %s', dialog);
@@ -135,7 +136,7 @@ function insertIssuesFromFilter(jsonFormData) {
 
   var data = {
     jql: filter.jql, 
-    fields: jsonFormData['columns[]'] || [], 
+    fields: jsonFormData['columns'] || [], 
     properties : ['due'],
     maxResults: 100, 
     validateQuery: 'strict'
@@ -149,4 +150,24 @@ function insertIssuesFromFilter(jsonFormData) {
   return response;
 }
 
-/* Dialog: Settings - END */
+/* Dialog: Import Issues - END */
+
+/* Dialog: About */
+
+/**
+ * @desc Dialog "About"
+ */
+function dialogAbout() {
+  var dialog = getDialog('dialogAbout');
+
+  dialog
+    .setWidth(480)
+    .setHeight(320)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+
+  Logger.log('Processed: %s', dialog);
+
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'About');
+}
+
+/* Dialog: About - END */

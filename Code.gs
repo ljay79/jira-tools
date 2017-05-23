@@ -8,21 +8,34 @@
  * - add feature to insert list of tickets (issue overview) based on available Jira filters
  */
 
-var userProps = PropertiesService.getUserProperties();
 
 /** 
  * Add a nice menu option for the users.
  */
-function onOpen() {
+function onOpen(e) {
   addMenu();
 };
+
+/**
+ * Runs when the add-on is installed.
+ * This method is only used by the regular add-on, and is never called by
+ * the mobile add-on version.
+ *
+ * @param {object} e The event parameter for a simple onInstall trigger. To
+ *     determine which authorization mode (ScriptApp.AuthMode) the trigger is
+ *     running in, inspect e.authMode. (In practice, onInstall triggers always
+ *     run in AuthMode.FULL, but onOpen triggers may be AuthMode.LIMITED or
+ *     AuthMode.NONE.)
+ */
+function onInstall(e) {
+  onOpen(e);
+}
 
 /**
  * Add "Jira" Menu to UI. 
  */
 function addMenu() {
-  SpreadsheetApp.getUi()
-    .createMenu('JIRA')
+  SpreadsheetApp.getUi().createAddonMenu()
     // Tools
     .addItem('Refresh Ticket Data', 'refreshTicketsIds')
     
@@ -34,6 +47,7 @@ function addMenu() {
 
     .addSeparator()
     .addItem('Settings', 'dialogSettings')
-
+    .addItem('About', 'dialogAbout')
+  
     .addToUi();
 }
