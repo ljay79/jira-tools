@@ -74,6 +74,7 @@ function saveSettings(jsonFormData) {
  * @desc Dialog to choose issues filter
  */
 function dialogIssueFromFilter() {
+  var userProps = PropertiesService.getUserProperties();
   var dialog = getDialog('dialogIssuesFromFilter', {
     columns: ISSUE_COLUMNS,
     defaultColumns: JSON.parse(userProps.getProperty('jiraColumnDefault'))

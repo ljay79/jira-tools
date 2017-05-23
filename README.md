@@ -4,6 +4,14 @@ tbc...
 
 Jira Sheet Tools provides a few useful integrations of Jira REST api into Google Spreadsheet.
 
+### Introduction
+
+Find it in [Chrome Web Store](https://chrome.google.com/webstore/category/apps)
+
+Once installed:
+To use, select “Add-ons > TimeSheet > Create Report” to get started - or select “How To” to learn more.
+
+
 ### Refresh Ticket Data
 
 Any Jira ticket Id in the form of "KEY-123" will be updated on the current active google sheet and extended with the current status of matching Jira ticket.
