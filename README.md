@@ -16,14 +16,23 @@ No manual status update copy&paste anymore.
 * Authorize the Add-On when asked for
 
 ##### Authorizations
-```View and manage your spreadsheets in Google Drive```
+
+`View and manage your spreadsheets in Google Drive`
+
 Required to change and add Jira issue information within the active sheet.
-```View and manage data associated with the application```
+
+`View and manage data associated with the application`
+
 The Add-on will store your Jira settings within the protected google sheet storage.
-```Allow this application to run when you are not present```
+
+`Allow this application to run when you are not present`
+
 Fault. This permission is actually not used at all, but triggered by yet unknown word within the code. Will hopefully be not necessary in a sonner release.
-```Connect to an external service```
+
+`Connect to an external service`
+
 Required for establishing connection to the Jira RESTful API to fetch your Jira issue details when requested.
+
 
 ## Setup Connection to JIRA
 Once installed:
