@@ -61,13 +61,18 @@ function refreshTickets() {
     }
   };
 
-  var request = new Request();
+  var request = new Request(), cellVal = '';
 
   for (var r=0; r<values.length; r++) {
     rowIdx = r + 1;
     for (var c=0; c<values[r].length; c++) {
       colIdx = c + 1;
-      jiraCell = grepJiraCell(values[r][c]);
+      cellVal = values[r][c];
+
+      if( cellVal.length < 3 || typeof cellVal !== 'string' || null === cellVal.match(/[a-zA-Z\w]/) )
+        continue;
+
+      jiraCell = grepJiraCell(cellVal);
       if(jiraCell.type == CELLTYPE_EMPTY || jiraCell.ticketId === null) continue;
 
       request.call(method, {issueIdOrKey: jiraCell.ticketId})

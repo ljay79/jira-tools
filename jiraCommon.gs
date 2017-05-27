@@ -96,7 +96,7 @@ function grepJiraCell(cellValue) {
     }
     return cellProps;
   }
-  
+
   // match: "lorem ipsum JIRA-123 [Status] dolores"
   match = reverse(cellValue).match(/(.*)((\][\w\s]+\[)\s?(\d+-[A-Z]+(?!-?[a-zA-Z]{1,10})))(.*)/);
   if(match && match.length == 6) {
