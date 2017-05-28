@@ -9,7 +9,7 @@
 function getDialog(file, values) {
   var template = HtmlService.createTemplateFromFile(file);
 
-  Logger.log('Processing: %s.html with %s', file, JSON.stringify(values));
+  log('Processing: %s.html with %s', file, JSON.stringify(values));
 
   for (var name in values) {
     template[name] = values[name];
@@ -31,7 +31,7 @@ function dialogSettings() {
     .setHeight(260)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
-  Logger.log('Processed: %s', dialog);
+  log('Processed: %s', dialog);
 
   SpreadsheetApp.getUi().showModalDialog(dialog, 'Jira Server Settings');
 }
@@ -74,6 +74,8 @@ function saveSettings(jsonFormData) {
  * @desc Dialog to choose issues filter
  */
 function dialogIssueFromFilter() {
+  if(!hasSettings(true)) return;
+
   var userProps = PropertiesService.getUserProperties();
   var dialog = getDialog('dialogIssuesFromFilter', {
     columns: ISSUE_COLUMNS,
@@ -85,7 +87,7 @@ function dialogIssueFromFilter() {
     .setHeight(480)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
-  Logger.log('Processed: %s', dialog);
+  log('Processed: %s', dialog);
 
   SpreadsheetApp.getUi().showModalDialog(dialog, 'List Jira issues from filter');
 }
@@ -165,7 +167,7 @@ function dialogAbout() {
     .setHeight(320)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
-  Logger.log('Processed: %s', dialog);
+  log('Processed: %s', dialog);
 
   SpreadsheetApp.getUi().showModalDialog(dialog, 'About');
 }

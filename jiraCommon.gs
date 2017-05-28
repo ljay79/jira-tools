@@ -96,7 +96,7 @@ function grepJiraCell(cellValue) {
     }
     return cellProps;
   }
-  
+
   // match: "lorem ipsum JIRA-123 [Status] dolores"
   match = reverse(cellValue).match(/(.*)((\][\w\s]+\[)\s?(\d+-[A-Z]+(?!-?[a-zA-Z]{1,10})))(.*)/);
   if(match && match.length == 6) {
@@ -205,12 +205,12 @@ function getMyFilters(includeFavourites) {
       ;
     } else {
       // Something funky is up with the JSON response.
-      Logger.log("Failed to retrieve jira filters!");
+      log("Failed to retrieve jira filters!");
     }
   };
 
   var error = function(responseData, httpResponse, statusCode) {
-    Logger.log("Failed to retrieve jira filters with status [" + statusCode + "]!\\n" + responseData.errorMessages.join("\\n"));
+    log("Failed to retrieve jira filters with status [" + statusCode + "]!\\n" + responseData.errorMessages.join("\\n"));
   };
 
   var request = new Request();
@@ -238,12 +238,12 @@ function getFilter(filterId) {
       filter = responseData;
     } else {
       // Something funky is up with the JSON response.
-      Logger.log("Failed to retrieve jira filter info!");
+      log("Failed to retrieve jira filter info!");
     }
   };
 
   var error = function(responseData, httpResponse, statusCode) {
-    Logger.log("Failed to retrieve jira filter with status [" + statusCode + "]!\\n" + responseData.errorMessages.join("\\n"));
+    log("Failed to retrieve jira filter with status [" + statusCode + "]!\\n" + responseData.errorMessages.join("\\n"));
   };
 
   request.call(method, {filterId:filterId})
@@ -362,8 +362,8 @@ function unifyIssueAttrib(attrib, data) {
       break;
 
     default:
-      Logger.log('unifyIssueAttrib(' + attrib + ') no format defined yet.');
-      Logger.log(data.fields[attrib]);
+      log('unifyIssueAttrib(' + attrib + ') no format defined yet.');
+      //log(data.fields[attrib]);
       resp.value = data[attrib] || data.fields[attrib];
       break;
   }

@@ -8,6 +8,7 @@
  * - add feature to insert list of tickets (issue overview) based on available Jira filters
  */
 
+var LOGGING = false;
 
 /** 
  * Add a nice menu option for the users.
@@ -50,4 +51,15 @@ function addMenu() {
     .addItem('About', 'dialogAbout')
   
     .addToUi();
+}
+
+/**
+ * @desc Simple Logger.log wrapper for centralized enabling/disabling log messages
+ * @param format  A Format or message to log
+ * @param values  Optional values to pass into format msg
+ * @return void
+ */
+function log(format, values, arg1, arg2) {
+  if(LOGGING == true)
+    Logger.log(format, values, arg1, arg2);
 }
