@@ -63,7 +63,7 @@ function testConnection() {
 function Request() {
   var statusCode, httpResponse, responseData,
       available = getCfg('available'),
-      domain = getCfg('jira_domain'),
+      url = getCfg('jira_url'),
       username = getCfg('jira_username'),
       password = getCfg('jira_password'),
       jiraMethod = null,
@@ -142,7 +142,7 @@ function Request() {
     this.prepareParams(urlParams, jiraQueryParams);
 
     // RESTfull URL to request
-    var fetchUrl = 'https://' + domain + '/rest/api/2' + jiraMethod;
+    var fetchUrl = url + '/rest/api/2' + jiraMethod;
 
     // data payload vs. url params handling
     var temp, 

@@ -38,9 +38,9 @@ function onInstall(e) {
 function addMenu() {
   SpreadsheetApp.getUi().createAddonMenu()
     // Tools
-    .addItem('Refresh Ticket Data', 'refreshTicketsIds')
+    .addItem('Refresh Ticket Data', 'dialogRefreshTicketsIds')
     
-    // Add "Ïnsert ..." menu with submenu
+    // Add "Insert ..." menu with submenu
     .addSeparator()
     .addSubMenu(SpreadsheetApp.getUi().createMenu('Insert...')
       //.addItem('Worklog', 'mySecondFunction')

@@ -92,3 +92,24 @@ function getDateFromIso(string) {
     return;
   }
 }
+
+/**
+ * @desc Escape special characters for use in a regular expression
+ * @param str {string}
+ * @return {string}
+ */
+function escapeRegExp(strToEscape) {
+    return strToEscape.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
+/**
+ * @desc Trim a character from string
+ * @param origString {string}    Original string to trim character from
+ * @param charToTrim {string}    Character to trim from string
+ * @return {string}
+ */
+function trimChar(origString, charToTrim) {
+    charToTrim = escapeRegExp(charToTrim);
+    var regEx = new RegExp("^[" + charToTrim + "]+|[" + charToTrim + "]+$", "g");
+    return origString.replace(regEx, "");
+}
