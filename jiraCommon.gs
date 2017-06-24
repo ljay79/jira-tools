@@ -86,7 +86,7 @@ function grepJiraCell(cellValue) {
   }
   
   // match: "JIRA-123 [Status]"
-  match = cellValue.match(/^([A-Z0-9]+\-\d+)\s?(\[[\w\s]+\])$/);
+  match = cellValue.match(/^([A-Z0-9]+\-\d+)\s?(\[.+\])$/);
   if(match && match.length == 3) {
     cellProps = {
       type: CELLTYPE_JIRAID,
@@ -98,7 +98,7 @@ function grepJiraCell(cellValue) {
   }
 
   // match: "lorem ipsum JIRA-123 [Status] dolores"
-  match = reverse(cellValue).match(/(.*)((\][\w\s]+\[)\s?(\d+-[A-Z0-9]+(?!-?[a-zA-Z]{1,10})))(.*)/);
+  match = reverse(cellValue).match(/(.*)((\].+\[)\s?(\d+-[A-Z0-9]+(?!-?[a-zA-Z]{1,10})))(.*)/);
   if(match && match.length == 6) {
     // remove status part
     cellValue = cellValue.replace(' ' + reverse(match[3]), '').trim();
@@ -281,7 +281,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'key':
       resp = {
         value: data.key || 'n/a',
-        link: "https://" + getCfg('jira_domain') + "/browse/" + data.key
+        link: getCfg('jira_url') + "/browse/" + data.key
       };
       break;
     case 'summary':
