@@ -43,7 +43,7 @@ function dialogSettings() {
 function getServerCfg() {
   return {
     available: getCfg('available'),
-    domain: getCfg('jira_domain'),
+    url: getCfg('jira_url'),
     username: getCfg('jira_username'),
     password: getCfg('jira_password')
   };
@@ -57,7 +57,7 @@ function getServerCfg() {
  */
 function saveSettings(jsonFormData) {
   setCfg('available', false);
-  setCfg('jira_domain', jsonFormData.jira_domain);
+  setCfg('jira_url', trimChar(jsonFormData.jira_url, "/"));
   setCfg('jira_username', jsonFormData.jira_username);
   setCfg('jira_password', jsonFormData.jira_password);
 
@@ -67,6 +67,18 @@ function saveSettings(jsonFormData) {
 }
 
 /* Dialog: Settings - END */
+
+/**
+ * @desc Fetch all Jira Issue IDs from active sheet and update their status.
+ *     Example: Cell with value "TIS-123" becomes "TIS-123 [Done]". 
+ *     Status msg in brackets gets updated.
+ * @return void
+ */
+function dialogRefreshTicketsIds() {
+  if(!hasSettings(true)) return;
+  
+  refreshTickets();
+}
 
 /* Dialog: Import Issues */
 
