@@ -10,6 +10,8 @@ You can directly import entire issue lists with your Jira filters just from with
 Enter your Jira server domain and user details once, and be able to use the Jira features in any sheet at any time.
 No manual status update copy&paste anymore.
 
+> Tested with latest Jira Cloud (OnDemand) - compatibility with Jira Server not yet fully tested! Please provide feedback.
+
 # Install / Get started
 * Open up your chrome browser
 * Find & Install the Add-on "[Jira Sheet Tools](https://chrome.google.com/webstore/detail/jira-sheet-tools/ncijnapilmmnebhbdanhkbbofofcniao)"
@@ -40,6 +42,9 @@ Simply provide your individual Jira server settings before you use all features.
 
 In any Google sheet, go in the menu to “Add-ons" > "Jira Sheet Tools" > "Settings”.
 Enter your "Jira Domain", "Username" and "Password".
+
+> It is recommended to use this Add-on only with an Jira Cloud/Server instance which runs via SSL (https).
+> This Add-on is using simple Basic Auth mechanism to authenticate with Jira, which means, user credentials are transmitted unsecure when using without SSL.
 
 **You're all set and ready to go**
 

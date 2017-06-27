@@ -56,12 +56,17 @@ function getServerCfg() {
  * @return {object} Object({status: [boolean], response: [string]})
  */
 function saveSettings(jsonFormData) {
+  var url = trimChar(jsonFormData.jira_url, "/");
   setCfg('available', false);
-  setCfg('jira_url', trimChar(jsonFormData.jira_url, "/"));
+  setCfg('jira_url', url);
   setCfg('jira_username', jsonFormData.jira_username);
   setCfg('jira_password', jsonFormData.jira_password);
 
   var test = testConnection();
+  
+  if (url.indexOf('atlassian.net') == -1) {
+    setCfg('server_type', 'server');
+  }
 
   return {status: test.status, message: test.response};
 }
@@ -88,10 +93,9 @@ function dialogRefreshTicketsIds() {
 function dialogIssueFromFilter() {
   if(!hasSettings(true)) return;
 
-  var userProps = PropertiesService.getUserProperties();
   var dialog = getDialog('dialogIssuesFromFilter', {
     columns: ISSUE_COLUMNS,
-    defaultColumns: JSON.parse(userProps.getProperty('jiraColumnDefault'))
+    defaultColumns: JSON.parse(getVar('jiraColumnDefault'))
   });
 
   dialog
