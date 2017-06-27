@@ -4,12 +4,22 @@
  * @object
  */
 var restMethods = {
-  'dashboard': '/dashboard',
-  'issueStatus': {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
-  'myFilters': {method: '/filter/my', queryparams: {includeFavourites: 'false'}},
-  'filter': {method: '/filter/{filterId}'},
-  //'search': {method: '/search', queryparams: {jql:'', fields: [], properties: [], maxResults: 100, validateQuery: 'strict'}} // GET
-  'search': {method: '/search'} // POST
+  'onDemand': {
+    'dashboard': '/dashboard',
+    'issueStatus': {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
+    'filter': {method: '/filter/{filterId}'},
+    //'search': {method: '/search', queryparams: {jql:'', fields: [], properties: [], maxResults: 100, validateQuery: 'strict'}} // GET
+    'search': {method: '/search'}, // POST
+    'myFilters': {method: '/filter/my', queryparams: {includeFavourites: 'false'}}
+  },
+  'server': {
+    'dashboard': '/dashboard',
+    'issueStatus': {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
+    'filter': {method: '/filter/{filterId}'},
+    'search': {method: '/search'}, // POST
+    // server api doesnt support /filter/my
+    'myFilters': {method: '/filter/favourite', queryparams: {includeFavourites: 'false'}}
+  }
 };
 
 var httpErrorCodes = {
@@ -135,8 +145,9 @@ function Request() {
       return this;
     }
 
-    jiraMethod = (typeof restMethods[method] === 'object') ? restMethods[method].method : restMethods[method];
-    jiraQueryParams = (typeof restMethods[method] === 'object') ? restMethods[method].queryparams : {};
+    var server_type = getCfg('server_type') || 'onDemand';
+    jiraMethod = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].method : restMethods[server_type][method];
+    jiraQueryParams = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].queryparams : {};
 
     var fetchArgs = fetchArgs || {}, urlParams = {};
     this.prepareParams(urlParams, jiraQueryParams);

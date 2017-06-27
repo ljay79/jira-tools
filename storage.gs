@@ -16,6 +16,8 @@ var jiraColumnDefault = [
  * @return {boolean}
  */
 function hasSettings(alert) {
+  initDefaults();
+
   var available = getCfg('available');
   var url = getCfg('jira_url');
   var username = getCfg('jira_username');
@@ -85,4 +87,30 @@ function setVar(key, value) {
 function getVar(key) {
   var userProps = PropertiesService.getUserProperties();
   return userProps.getProperty(key);
+}
+
+
+/**
+ * @desc  Storage init / setting defaults
+ *        Google Guide states, we should not access property storage during onInstall or onOpen,
+ *        So we have to do it somehow else, initializing some vars.
+ *        Need better testing utilities or advice to improve this dirty workaround.
+ *
+ */
+function initDefaults() {
+  var isInitialized = getVar('defaults_initialized') || 'false';
+  if (isInitialized == 'true') return;
+  
+  // set default jira issue columns  
+  var columnDefaults = getVar('jiraColumnDefault');
+  columnDefaults = (columnDefaults != null) ? JSON.parse(columnDefaults) : jiraColumnDefault;
+  setVar('jiraColumnDefault', JSON.stringify(columnDefaults));
+  
+  // Jira onDemand or Server
+  var server_type = getCfg('server_type');
+  if (server_type == null) server_type = 'onDemand';
+  setCfg('server_type', server_type);
+  
+  // set done
+  setVar('defaults_initialized', 'true');
 }

@@ -15,11 +15,6 @@ var LOGGING = false;
  */
 function onOpen(e) {
   addMenu();
-
-  // set default jira issue columns  
-  var columnDefaults = getVar('jiraColumnDefault');
-  columnDefaults = (columnDefaults != null) ? JSON.parse(columnDefaults) : jiraColumnDefault;
-  setVar('jiraColumnDefault', JSON.stringify(columnDefaults));
 };
 
 /**
