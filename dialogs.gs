@@ -88,10 +88,9 @@ function dialogRefreshTicketsIds() {
 function dialogIssueFromFilter() {
   if(!hasSettings(true)) return;
 
-  var userProps = PropertiesService.getUserProperties();
   var dialog = getDialog('dialogIssuesFromFilter', {
     columns: ISSUE_COLUMNS,
-    defaultColumns: JSON.parse(userProps.getProperty('jiraColumnDefault'))
+    defaultColumns: JSON.parse(getVar('jiraColumnDefault'))
   });
 
   dialog

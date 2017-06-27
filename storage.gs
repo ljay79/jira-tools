@@ -1,3 +1,15 @@
+// default issue fields/columns for issue listings
+var jiraColumnDefault = [
+  'summary',
+  'issuetype',
+  'priority',
+  'status',
+  'updated',
+  'assignee',
+  'due',
+  'project'
+];
+
 /**
  * @desc Helper to check if server settings are available
  * @param alert {boolean}  TRUE=prompts a Browser message box, FALSE=returns boolean
@@ -8,12 +20,6 @@ function hasSettings(alert) {
   var url = getCfg('jira_url');
   var username = getCfg('jira_username');
   var password = getCfg('jira_password');
-
-  var jiraColumnDefault = getCfg('jiraColumnDefault');
-  if( jiraColumnDefault != null ) {
-    jiraColumnDefault = JSON.parse(jiraColumnDefault);
-  }
-  setCfg('jiraColumnDefault', JSON.stringify(jiraColumnDefault));
 
   if(available === undefined || !username || !password || !url) {
     if(alert) Browser.msgBox("Jira Error", 
@@ -59,13 +65,24 @@ function getCfg(key) {
   return userProps.getProperty('serverConfig.' + key);
 }
 
-// default issue fields/columns for issue listings
-var jiraColumnDefault = [
-  'summary',
-  'issuetype',
-  'priority',
-  'status',
-  'updated',
-  'assignee',
-  'due'
-];
+/**
+ * @desc Short Helper to save a variable in the  property storage
+ * @param key {string}
+ * @param value {string}
+ * @return {this}  Allow chaining
+ */
+function setVar(key, value) {
+  var userProps = PropertiesService.getUserProperties();
+  userProps.setProperty(key, value);
+  return this;
+}
+
+/**
+ * @desc Short Helper to get a variable from property storage
+ * @param key {string}
+ * @return {string}||NULL
+ */
+function getVar(key) {
+  var userProps = PropertiesService.getUserProperties();
+  return userProps.getProperty(key);
+}
