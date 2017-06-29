@@ -15,7 +15,7 @@ var ISSUE_COLUMNS = {
   assignee: 'Assignee',
   creator: 'Creator',
   reporter: 'Reporter',
-  due: 'Due',
+  duedate: 'Due',
   /* --- */
   labels: 'Labels',
   project: 'Project',
@@ -309,16 +309,21 @@ function unifyIssueAttrib(attrib, data) {
       };
       break;
     case 'updated':
+    case 'created':
       resp = {
-        value: data.fields.updated || 'n/a',
-        date: new Date(getDateFromIso(data.fields.updated)) || new Date(),
-        format: "dd.mm.yyyy"
+        value: data.fields[attrib] || 'n/a',
+        date: new Date(getDateFromIso(data.fields[attrib])) || new Date(),
+        format: "dd.mm.yyyy hh:mm"
       };
       break;
     case 'duedate':
+      // very dirty - just cant get arround timezone issue when date is in format 'YYYY-MM-DD'
+      // @TODO: require proper generic solution for this
+      var _duedate = data.fields.duedate || 'n/a';
+      _duedate = (_duedate.length == 10) ? _duedate + 'T12:00:00' : _duedate;
       resp = {
-        value: data.fields.duedate || 'n/a',
-        date: new Date(getDateFromIso(data.fields.duedate)) || new Date(),
+        value: _duedate,
+        date: new Date(getDateFromIso(_duedate)) || new Date(),
         format: "dd.mm.yyyy"
       };
       break;
