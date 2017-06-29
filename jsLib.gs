@@ -59,7 +59,6 @@ function camelize(str) {
 
 /**
  * @desc Converts ISO 8601 date string into JS date object
- *       http://delete.me.uk/2005/03/iso8601.html
  * @param string {string}
  * @return {Date}
  */

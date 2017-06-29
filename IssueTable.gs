@@ -109,7 +109,12 @@ function IssueTable(sheet, initRange, data) {
    */
   this.addSummary = function(summary) {
     range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
-    range.mergeAcross().setValue(summary);
+    //range.mergeAcross().setValue(summary);
+    range.clearContent()
+      .clearNote()
+      .clearFormat()
+      .getCell(1,1)
+      .setValue(summary);
 
     return this;
   };
