@@ -155,7 +155,6 @@ function insertIssuesFromFilter(jsonFormData) {
   var data = {
     jql: filter.jql, 
     fields: jsonFormData['columns'] || [], 
-    properties : ['due'],
     maxResults: 100, 
     validateQuery: 'strict'
   };
