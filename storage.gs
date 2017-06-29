@@ -6,7 +6,7 @@ var jiraColumnDefault = [
   'status',
   'updated',
   'assignee',
-  'due',
+  'duedate',
   'project'
 ];
 
@@ -98,12 +98,16 @@ function getVar(key) {
  *
  */
 function initDefaults() {
+  var build         = getVar('BUILD') || 0;
   var isInitialized = getVar('defaults_initialized') || 'false';
-  if (isInitialized == 'true') return;
+  if (isInitialized == 'true' && build == BUILD) return;
   
-  // set default jira issue columns  
-  var columnDefaults = getVar('jiraColumnDefault');
-  columnDefaults = (columnDefaults != null) ? JSON.parse(columnDefaults) : jiraColumnDefault;
+  setVar('BUILD', BUILD);
+  
+  // set default jira issue columns
+  //var columnDefaults = getVar('jiraColumnDefault');
+  //columnDefaults = (columnDefaults != null) ? JSON.parse(columnDefaults) : jiraColumnDefault;
+  columnDefaults = jiraColumnDefault; //@TODO: allow user to change default columns
   setVar('jiraColumnDefault', JSON.stringify(columnDefaults));
   
   // Jira onDemand or Server
