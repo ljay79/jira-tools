@@ -8,7 +8,7 @@
  * - add feature to insert list of tickets (issue overview) based on available Jira filters
  */
 
-var BUILD = 0150;
+var BUILD = 0160;
 var LOGGING = true;
 
 /** 
