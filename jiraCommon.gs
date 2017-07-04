@@ -1,3 +1,5 @@
+var LIST_ISSUES_MAX_RESULT = 200;
+
 // const not available, but better solution needed
 var CELLTYPE_EMPTY = -1;
 var CELLTYPE_JIRAID = 10; // entire cell includes Jira ticket id only ("JIRA-123" or "JIRA-123 [Status]")

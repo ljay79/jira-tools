@@ -155,8 +155,8 @@ function insertIssuesFromFilter(jsonFormData) {
   var data = {
     jql: filter.jql, 
     fields: jsonFormData['columns'] || [], 
-    maxResults: 100, 
-    validateQuery: 'strict'
+    maxResults: LIST_ISSUES_MAX_RESULT, 
+    validateQuery: (getCfg('server_type') == 'onDemand') ? 'strict' : true
   };
 
   var request = new Request();
