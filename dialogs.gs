@@ -188,3 +188,29 @@ function dialogAbout() {
 }
 
 /* Dialog: About - END */
+
+
+/* Dialog: Worklog */
+
+/**
+ * @desc Dialog to create worklog based on user/group selection
+ */
+function dialogWorklog() {
+  if(!hasSettings(true)) return;
+
+  var dialog = getDialog('dialogWorklog', {
+    users: findUser('%'),
+    groups: findGroup('%')
+  });
+
+  dialog
+    .setWidth(600)
+    .setHeight(480)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+
+  log('Processed: %s', dialog);
+
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'Create worklog');
+}
+
+/* Dialog: Worklog - END */

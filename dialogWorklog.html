@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <style>
+    .error-container { display: none; margin-bottom: 16px; padding: 5px 10px; text-align: center; color: #fff; }
+    .is-loading { text-align: center; animation: blink .5s infinite; }
+    @keyframes blink { 0% { color: #fff; } 50% { color: #777; } 100% { color: #fff; } }
+    </style>
+  </head>
+  <body>
+    <div id="response-message" class="error-container" role="dialog"></div>
+    
+    <form name="worklog" action="" method="post">
+      <pre>
+      <?= JSON.stringify(users) ?>
+      </pre>
+      <pre>
+      <?= JSON.stringify(groups) ?>
+      </pre>
+
+      <div class="block">
+        <button type="submit" class="action" disabled>Create</button>
+        <button type="button" onclick="google.script.host.close()">Cancel</button>
+      </div>
+    </form>
+    
+    <script>
+      var valid   = false;
+      var timeout = null;
+      var alert   = document.getElementById('response-message');
+      var action  = filter.querySelector('[type=submit]');
+      
+      function hideAlert(){
+        if(timeout) timeout = clearTimeout(timeout);
+        alert.style.display = 'none';
+      }
+      
+      function showAlert(text,type,time) {
+        alert.innerText = text;
+        alert.style.backgroundColor = type ? 'rgb(139,195,74)' : 'rgb(213,0,0)';
+        alert.style.display = 'block';
+        if (time) timeout = setTimeout(hideAlert,time);
+      }
+      
+      function inputValidatyHandler() {
+        if (this.name === 'filter' && this.checked) filter.elements['filter_id'].value = this.value;
+        valid = columns.filter(function(el){ return el.checked; }).length > 0 && filter.elements['filter_id'].value.length > 0;
+        action.disabled = valid ? false : 'disabled';
+      }
+
+      function onInitWorklog(response) {
+        //window.dispatchEvent(new Event('load'));
+      }
+
+      function formSubmitHandler(event) {
+        if (event) event.preventDefault();
+
+        hideAlert();
+
+        if (!valid) return;
+
+        showAlert('inserting ...', 1);
+        
+        var formData = {};
+        
+        /*google.script.run
+          .withSuccessHandler(onResponse)
+          .withFailureHandler(onResponse)
+          .insertIssuesFromFilter(formData);*/
+      }
+
+      function onResponse(response) {
+        var done = response.status === true;
+
+        hideAlert();
+        
+        if(done) google.script.host.close();
+
+        showAlert(response.message, done, 10000);
+      }
+      
+      /*google.script.run
+        .withSuccessHandler(onInitFilter)
+        .getMyFilters(true);*/
+
+      filter.addEventListener('submit', formSubmitHandler);
+      input.forEach(function(el){ el.addEventListener('change', inputValidatyHandler); });
+      window.addEventListener('load', inputValidatyHandler);
+    </script>
+  </body>
+</html>

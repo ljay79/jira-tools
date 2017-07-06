@@ -10,7 +10,10 @@ var restMethods = {
     'filter': {method: '/filter/{filterId}'},
     //'search': {method: '/search', queryparams: {jql:'', fields: [], properties: [], maxResults: 100, validateQuery: 'strict'}} // GET
     'search': {method: '/search'}, // POST
-    'myFilters': {method: '/filter/my', queryparams: {includeFavourites: 'false'}}
+    'myFilters': {method: '/filter/my', queryparams: {includeFavourites: 'false'}},
+
+    'userSearch': {method: '/user/search', queryparams: {startAt:0, maxResults: 1000, username:'%'}},
+    'groupSearch': {method: '/groups/picker', queryparams: {maxResults: 1000, query: ''}}
   },
   'server': {
     'dashboard': '/dashboard',
@@ -18,7 +21,10 @@ var restMethods = {
     'filter': {method: '/filter/{filterId}'},
     'search': {method: '/search'}, // POST
     // server api doesnt support /filter/my
-    'myFilters': {method: '/filter/favourite', queryparams: {includeFavourites: 'false'}}
+    'myFilters': {method: '/filter/favourite', queryparams: {includeFavourites: 'false'}},
+
+    'userSearch': {method: '/user/search', queryparams: {startAt:0, maxResults: 1000, username:'%'}},
+    'groupSearch': {method: '/groups/picker', queryparams: {maxResults: 1000, query: ''}}
   }
 };
 

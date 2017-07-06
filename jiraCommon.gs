@@ -368,6 +368,27 @@ function unifyIssueAttrib(attrib, data) {
       };
       break;
 
+    case 'user':
+      resp = {
+        displayName: data.displayName + (data.active==true?'':' (X)'),
+        name: data.name,
+        emailAddress: data.emailAddress,
+        active: data.active,
+
+        value: data.displayName,
+        format: "@"
+      };
+      break;
+    case 'group':
+      var _dName = (data.labels.length > 0) ? data.labels[0].text : data.name;
+      resp = {
+        displayName: _dName,
+        name: data.name,
+        value: _dName,
+        format: "@"
+      };
+      break;
+
     default:
       log('unifyIssueAttrib(' + attrib + ') no format defined yet.');
       //log(data.fields[attrib]);

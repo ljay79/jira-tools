@@ -8,7 +8,7 @@
  * - add feature to insert list of tickets (issue overview) based on available Jira filters
  */
 
-var BUILD = 0160;
+var BUILD = 0170;
 var LOGGING = true;
 
 /** 
@@ -44,8 +44,9 @@ function addMenu() {
     // Add "Insert ..." menu with submenu
     .addSeparator()
     .addSubMenu(SpreadsheetApp.getUi().createMenu('Insert...')
-      //.addItem('Worklog', 'mySecondFunction')
-      .addItem('List Issues from Filter', 'dialogIssueFromFilter'))
+      .addItem('List Issues from Filter', 'dialogIssueFromFilter')
+      .addItem('Worklog', 'dialogWorklog')
+    )
 
     .addSeparator()
     .addItem('Settings', 'dialogSettings')
