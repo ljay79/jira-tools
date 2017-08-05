@@ -121,3 +121,106 @@ function trimChar(origString, charToTrim) {
 function isDate(date) {
     return ((new Date(date) !== "Invalid Date" && !isNaN(new Date(date)) ) ? true : false);
 }
+
+
+/**
+ * @desc The fill() method fills all the elements of an array from a start index to an end index with a static value.
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill
+ * @param value {mixed}    Value to fill an array.
+ * @param start {integer}    Optional, Start index, defaults to 0.
+ * @param end {integer}    End index, defaults to this.length.
+ * @return {Array}    The modified array.
+ */
+if (!Array.prototype.fill) {
+  Array.prototype.fill = function(value) {
+
+    // Steps 1-2.
+    if (this == null) {
+      throw new TypeError('this is null or not defined');
+    }
+
+    var O = Object(this);
+
+    // Steps 3-5.
+    var len = O.length >>> 0;
+
+    // Steps 6-7.
+    var start = arguments[1];
+    var relativeStart = start >> 0;
+
+    // Step 8.
+    var k = relativeStart < 0 ?
+      Math.max(len + relativeStart, 0) :
+      Math.min(relativeStart, len);
+
+    // Steps 9-10.
+    var end = arguments[2];
+    var relativeEnd = end === undefined ?
+      len : end >> 0;
+
+    // Step 11.
+    var final = relativeEnd < 0 ?
+      Math.max(len + relativeEnd, 0) :
+      Math.min(relativeEnd, len);
+    
+    // Step 12.
+    while (k < final) {
+      O[k] = value;
+      k++;
+    }
+
+    // Step 13.
+    return O;
+  };
+}
+
+/**
+ * @desc Converts time difference into human readable format.
+ *       Returns difference in %d %h %m %s
+ *
+ *       Sample call: formatTimeDiff(183599000) returns '2d 2h 59m 59s'
+ *                or: formatTimeDiff(new Date('2017-08-03T12:59:59'), new Date('2017-08-01T10:00:00')) return '2d 2h 59m 59s'
+ *
+ * @param {Integer|Date}   Either the time difference in seconds as integer, 
+ *                         or together with 2nd param a Date() object.
+ * @param {Date}           Optional Date() object to compare with first param Date()
+ * @return {String}
+ */
+function formatTimeDiff() {
+  var delta, response = '';
+  if(arguments.length == 1) {
+    // delta passed to convert
+    delta = arguments[0] / 1000;
+  } else if (arguments.length == 2) {
+    // get total seconds between the times
+    if ( arguments[1] > arguments[0] ) {
+      delta = Math.abs(arguments[1] - arguments[0]) / 1000;
+    } else {
+      delta = Math.abs(arguments[0] - arguments[1]) / 1000;
+    }
+  } else {
+    throw 'formatTime() accepts 1 or 2 arguments.';
+  }
+
+  // calculate (and subtract) whole days
+  var days = Math.floor(delta / 86400);
+  delta -= days * 86400;
+
+  // calculate (and subtract) whole hours
+  var hours = Math.floor(delta / 3600) % 24;
+  delta -= hours * 3600;
+
+  // calculate (and subtract) whole minutes
+  var minutes = Math.floor(delta / 60) % 60;
+  delta -= minutes * 60;
+
+  // what's left is seconds
+  var seconds = Math.floor(delta % 60);
+
+  response += days > 0 ? days + 'd ' : '';
+  response += hours > 0 ? hours + 'h ' : '';
+  response += minutes > 0 ? minutes + 'm ' : '';
+  response += seconds > 0 ? seconds + 's ' : '';
+
+  return response.trim();
+};
