@@ -112,3 +112,12 @@ function trimChar(origString, charToTrim) {
     var regEx = new RegExp("^[" + charToTrim + "]+|[" + charToTrim + "]+$", "g");
     return origString.replace(regEx, "");
 }
+
+/**
+ * @desc Check if passed string is valid or not.
+ * @param date {String}    String which gets validated as date (ie: '2017-05-31')
+ * @return {Boolean}
+ */
+function isDate(date) {
+    return ((new Date(date) !== "Invalid Date" && !isNaN(new Date(date)) ) ? true : false);
+}
