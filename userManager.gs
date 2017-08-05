@@ -7,11 +7,13 @@
  *         findUser('abc%')
  *         findUser('z%')
  * @param usernameTerm {string}  A query string used to search username, name or e-mail address
+ * @param {boolean} minimal  Def:FALSE; Returning data only includes minimal info (displayName,name[,active])
  * @return {Array}
  */
-function findUser(usernameTerm) {
+function findUser(usernameTerm, minimal) {
   var method = 'userSearch', 
       usernameTerm = usernameTerm || '%',
+      minimal = minimal || false,
       users = [];
 
   var ok = function(responseData, httpResponse, statusCode){
@@ -23,7 +25,7 @@ function findUser(usernameTerm) {
 
       var user;
       for(var i=0; i<responseData.length; i++) {
-        user = unifyIssueAttrib('user', responseData[i]);
+        user = unifyIssueAttrib((minimal?'userMin':'user'), responseData[i]);
         users.push(user);
       }
       
@@ -56,11 +58,13 @@ function findUser(usernameTerm) {
  *         findGroup('abc')
  *         findGroup('z')
  * @param groupTerm {string}  A query string used to search group name
+ * @param {boolean} minimal  Def:FALSE; Returning data only includes minimal info (displayName,name[,active])
  * @return {Array}
  */
-function findGroup(groupTerm) {
+function findGroup(groupTerm, minimal) {
   var method = 'groupSearch', 
       groupTerm = groupTerm || '',
+      minimal = minimal || false,
       groups = [];
 
   groupTerm = trimChar(groupTerm, "%");
@@ -74,7 +78,7 @@ function findGroup(groupTerm) {
 
       var group;
       for(var i=0; i<responseData.groups.length; i++) {
-        group = unifyIssueAttrib('group', responseData.groups[i]);
+        group = unifyIssueAttrib((minimal?'groupMin':'group'), responseData.groups[i]);
         groups.push(group);
       }
 
