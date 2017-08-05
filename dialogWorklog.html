@@ -10,84 +10,103 @@
     </style>
   </head>
   <body>
+    ... loading anim ... (loading user/groups)
     <div id="response-message" class="error-container" role="dialog"></div>
     
     <form name="worklog" action="" method="post">
-      <pre>
-      <?= JSON.stringify(users) ?>
-      </pre>
-      <pre>
-      <?= JSON.stringify(groups) ?>
-      </pre>
+      <label for="wlUser">
+        <select name="wlUser" id="wlUser">
+          <option value=""></option>
+        </select>
+      </label>
+      OR
+      <label for="wlGroup">
+        <select name="wlGroup" id="wlGroup">
+          <option value=""></option>
+        </select>
+      </label>
 
+      <hr/>
+      <label for="wlStartDate">
+        <input type="text" name="wlStartDate" value="2017-07-20" />(datePicker)<br/>
+      </label>
+      <label for="wlEndDate">
+        <input type="text" name="wlEndDate" value="2017-08-05" />(datePicker)<br/>
+      </label>
+      <hr/>
+
+      <hr/>
       <div class="block">
-        <button type="submit" class="action" disabled>Create</button>
+        <button type="submit" class="action">View Report</button>
         <button type="button" onclick="google.script.host.close()">Cancel</button>
       </div>
     </form>
     
     <script>
+      var frmWorklog  = document.forms['worklog'];
       var valid   = false;
       var timeout = null;
       var alert   = document.getElementById('response-message');
-      var action  = filter.querySelector('[type=submit]');
+      var action  = frmWorklog.querySelector('[type=submit]');
       
-      function hideAlert(){
-        if(timeout) timeout = clearTimeout(timeout);
-        alert.style.display = 'none';
-      }
-      
-      function showAlert(text,type,time) {
-        alert.innerText = text;
-        alert.style.backgroundColor = type ? 'rgb(139,195,74)' : 'rgb(213,0,0)';
-        alert.style.display = 'block';
-        if (time) timeout = setTimeout(hideAlert,time);
-      }
-      
-      function inputValidatyHandler() {
-        if (this.name === 'filter' && this.checked) filter.elements['filter_id'].value = this.value;
-        valid = columns.filter(function(el){ return el.checked; }).length > 0 && filter.elements['filter_id'].value.length > 0;
-        action.disabled = valid ? false : 'disabled';
-      }
-
       function onInitWorklog(response) {
-        //window.dispatchEvent(new Event('load'));
+        /* DEV */
+
+        // gen user dropdown
+        var sel = document.getElementById('wlUser');
+        var fragment = document.createDocumentFragment();
+        response.users.forEach(function(user, index) {
+          var opt = document.createElement('option');
+          opt.innerHTML = user.displayName;
+          opt.value = user.name;
+          fragment.appendChild(opt);
+        });
+        sel.appendChild(fragment);
+        
+        // gen group dropdown
+        var sel = document.getElementById('wlGroup');
+        var fragment = document.createDocumentFragment();
+        response.groups.forEach(function(group, index) {
+          var opt = document.createElement('option');
+          opt.innerHTML = group.name; //group.displayName;
+          opt.value = group.name;
+          fragment.appendChild(opt);
+        });
+        sel.appendChild(fragment);
       }
 
       function formSubmitHandler(event) {
         if (event) event.preventDefault();
 
-        hideAlert();
+        //hideAlert();
+        //if (!valid) return;
+        //showAlert('fetch data ...', 1);
 
-        if (!valid) return;
+        var formData = {
+          wlAuthorU: frmWorklog.wlUser.value,
+          wlAuthorG: frmWorklog.wlGroup.value,
+          wlStartDate: frmWorklog.wlStartDate.value,
+          wlEndDate: frmWorklog.wlEndDate.value
+        };
+        
+        google.script.run
+          //.withSuccessHandler(onResponse)
+          //.withFailureHandler(onResponse)
+          .createWorklog(formData);
 
-        showAlert('inserting ...', 1);
-        
-        var formData = {};
-        
-        /*google.script.run
-          .withSuccessHandler(onResponse)
-          .withFailureHandler(onResponse)
-          .insertIssuesFromFilter(formData);*/
+        // dont wait for response - bubble up all states not possible
+        // instead,show loading animation for 2sec and then close dialog
+        // success/error feedback handled inside sheet.
+        google.script.host.close();
       }
 
-      function onResponse(response) {
-        var done = response.status === true;
+      google.script.run
+        .withSuccessHandler(onInitWorklog)
+        .fetchUsersAndGroups(true);
 
-        hideAlert();
-        
-        if(done) google.script.host.close();
-
-        showAlert(response.message, done, 10000);
-      }
-      
-      /*google.script.run
-        .withSuccessHandler(onInitFilter)
-        .getMyFilters(true);*/
-
-      filter.addEventListener('submit', formSubmitHandler);
-      input.forEach(function(el){ el.addEventListener('change', inputValidatyHandler); });
-      window.addEventListener('load', inputValidatyHandler);
+      frmWorklog.addEventListener('submit', formSubmitHandler);
+      //input.forEach(function(el){ el.addEventListener('change', inputValidatyHandler); });
+      //window.addEventListener('load', );
     </script>
   </body>
 </html>
