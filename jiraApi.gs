@@ -29,23 +29,23 @@ var restMethods = {
 };
 
 var httpErrorCodes = {
-  400:	'Bad Request',
-  401:	'Unauthorized',
-  403:	'Forbidden',
-  404:	'Not Found',
-  405:	'Method Not Allowed',
-  407:	'Proxy Authentication Required',
-  408:	'Request Time-out',
-  410:	'Gone',
-  413:	'Request Entity Too Large',
-  414:	'Request-URL Too Long',
-  429:	'Too Many Requests',
-  500:	'Internal Server Error',
-  502:	'Bad Gateway',
-  503:	'Service Unavailable',
-  504:	'Gateway Time-out',
-  509:	'Bandwidth Limit Exceeded',
-  510:	'Not Extended'
+  400:  'Bad Request',
+  401:  'Unauthorized',
+  403:  'Forbidden',
+  404:  'Not Found',
+  405:  'Method Not Allowed',
+  407:  'Proxy Authentication Required',
+  408:  'Request Time-out',
+  410:  'Gone',
+  413:  'Request Entity Too Large',
+  414:  'Request-URL Too Long',
+  429:  'Too Many Requests',
+  500:  'Internal Server Error',
+  502:  'Bad Gateway',
+  503:  'Service Unavailable',
+  504:  'Gateway Time-out',
+  509:  'Bandwidth Limit Exceeded',
+  510:  'Not Extended'
 };
 
 /**
@@ -78,15 +78,17 @@ function testConnection() {
  */
 function Request() {
   var statusCode, httpResponse, responseData,
-      available = getCfg('available'),
-      url = getCfg('jira_url'),
-      username = getCfg('jira_username'),
-      password = getCfg('jira_password'),
+      available, url, username, password,
       jiraMethod = null,
       jiraQueryParams = {};
 
   this.init = function() {
-    // prepare for initialization if necessary
+    server_type = getCfg('server_type') || 'onDemand';
+    available = getCfg('available');
+    url = getCfg('jira_url');
+    username = getCfg('jira_username');
+    password = getCfg('jira_password');
+    jiraMethod = null;
   };
 
   /**
@@ -151,7 +153,6 @@ function Request() {
       return this;
     }
 
-    var server_type = getCfg('server_type') || 'onDemand';
     jiraMethod = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].method : restMethods[server_type][method];
     jiraQueryParams = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].queryparams : {};
 
