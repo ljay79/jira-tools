@@ -256,7 +256,7 @@ function getFilter(filterId) {
 }
 
 /**
- * @desc Fetch all *active* users and groups for dialog selection.
+ * @desc Fetch all active users and groups for dialog selection.
  * @param {boolean} minimal  Returning data only includes minimal info (displayName,name[,active])
  * @return {object} Object({"users":[{<arrayOfObjects}], "groups":[{arrayOfObjects}]})
  */
@@ -270,9 +270,9 @@ function fetchUsersAndGroups(minimal) {
   result.users = findUser('%', minimal).filter(function( user ) {
     return user.active !== false;
   });
-
+  
   result.users.sort(function(a,b) {return (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0);} ); 
-
+  
   return result;
 }
 

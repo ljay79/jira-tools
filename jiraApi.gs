@@ -29,23 +29,23 @@ var restMethods = {
 };
 
 var httpErrorCodes = {
-  400:  'Bad Request',
-  401:  'Unauthorized',
-  403:  'Forbidden',
-  404:  'Not Found',
-  405:  'Method Not Allowed',
-  407:  'Proxy Authentication Required',
-  408:  'Request Time-out',
-  410:  'Gone',
-  413:  'Request Entity Too Large',
-  414:  'Request-URL Too Long',
-  429:  'Too Many Requests',
-  500:  'Internal Server Error',
-  502:  'Bad Gateway',
-  503:  'Service Unavailable',
-  504:  'Gateway Time-out',
-  509:  'Bandwidth Limit Exceeded',
-  510:  'Not Extended'
+  400:	'Bad Request',
+  401:	'Unauthorized',
+  403:	'Forbidden',
+  404:	'Not Found',
+  405:	'Method Not Allowed',
+  407:	'Proxy Authentication Required',
+  408:	'Request Time-out',
+  410:	'Gone',
+  413:	'Request Entity Too Large',
+  414:	'Request-URL Too Long',
+  429:	'Too Many Requests',
+  500:	'Internal Server Error',
+  502:	'Bad Gateway',
+  503:	'Service Unavailable',
+  504:	'Gateway Time-out',
+  509:	'Bandwidth Limit Exceeded',
+  510:	'Not Extended'
 };
 
 /**
