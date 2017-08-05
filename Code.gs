@@ -62,6 +62,11 @@ function addMenu() {
  * @return void
  */
 function log(format, values, arg1, arg2) {
-  if(LOGGING == true)
+  if(LOGGING !== true) return;
+
+  if(arguments.length == 0) {
+    Logger.log(format);
+  } else {
     Logger.log(format, values, arg1, arg2);
+  }
 }
