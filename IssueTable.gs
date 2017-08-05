@@ -98,6 +98,8 @@ function IssueTable(sheet, initRange, data) {
       .clearFormat()
       .setValues([ values ])
       .setFontWeights([ formats ]);
+    
+    SpreadsheetApp.flush();
 
     return this;
   };
@@ -115,6 +117,8 @@ function IssueTable(sheet, initRange, data) {
       .clearFormat()
       .getCell(1,1)
       .setValue(summary);
+    
+    SpreadsheetApp.flush();
 
     return this;
   };
