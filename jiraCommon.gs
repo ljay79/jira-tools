@@ -256,6 +256,27 @@ function getFilter(filterId) {
 }
 
 /**
+ * @desc Fetch all *active* users and groups for dialog selection.
+ * @param {boolean} minimal  Returning data only includes minimal info (displayName,name[,active])
+ * @return {object} Object({"users":[{<arrayOfObjects}], "groups":[{arrayOfObjects}]})
+ */
+function fetchUsersAndGroups(minimal) {
+  var minimal = minimal || true, 
+      result = {
+        "users" : [],
+        "groups": findGroup('%', minimal)
+      };
+
+  result.users = findUser('%', minimal).filter(function( user ) {
+    return user.active !== false;
+  });
+
+  result.users.sort(function(a,b) {return (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0);} ); 
+
+  return result;
+}
+
+/**
  * @desc Helper to convert indiv. jira field/property objects 
  *       into simple objects for using as cell data.
  * @param attrib {string}
@@ -386,6 +407,20 @@ function unifyIssueAttrib(attrib, data) {
         name: data.name,
         value: _dName,
         format: "@"
+      };
+      break;
+    case 'userMin':
+      resp = {
+        displayName: data.displayName + (data.active==true?'':' (X)'),
+        name: data.name,
+        active: data.active,
+      };
+      break;
+    case 'groupMin':
+      var _dName = (data.labels.length > 0) ? data.labels[0].text : data.name;
+      resp = {
+        displayName: _dName,
+        name: data.name,
       };
       break;
 
