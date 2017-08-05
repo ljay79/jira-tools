@@ -129,7 +129,7 @@ function insertIssuesFromFilter(jsonFormData) {
         return;
       }
 
-      var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+      var sheet = getTicketSheet();
       var cell = sheet.getActiveCell();
 
       var table = new IssueTable(sheet, cell, responseData);
@@ -198,10 +198,7 @@ function dialogAbout() {
 function dialogWorklog() {
   if(!hasSettings(true)) return;
 
-  var dialog = getDialog('dialogWorklog', {
-    users: findUser('%'),
-    groups: findGroup('%')
-  });
+  var dialog = getDialog('dialogWorklog');
 
   dialog
     .setWidth(600)
