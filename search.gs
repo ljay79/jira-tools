@@ -1,3 +1,28 @@
+/*function testSearch() {
+  var s = new Search('worklogDate>="2017-07-02" and worklogDate<="2017-07-11" and worklogAuthor="jrosemeier"');
+  s.setOrderBy('updated', 'DESC')
+   .setFields(['id','key','issuetype','project','status','summary']);
+
+  onSuccess = function(a,b,c) {
+    log('%s', '----------ON SUCCESS-----------');
+    log('%s %s %s', JSON.stringify(a), b, c);
+    log('%s', '---------------------1');
+    
+    log('AMOUNT: %s !', a.length);
+  };
+  onFailure = function(a,b,c) {
+    log('%s', '----------ON FAILURE-----------');
+    log('a:%s b:%s c:%s', a, b, c);
+    log('%s', '---------------------1');
+  };
+  
+  s.search()
+    .withSuccessHandler(onSuccess)
+    .withFailureHandler(onFailure)
+  ;
+}*/
+
+
 /**
  * @desc Class 'Search' API abstraction with pagination handling.
  *       Performs a JQL POST search request to JIRA Rest API.
