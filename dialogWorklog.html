@@ -14,6 +14,7 @@
     <div id="response-message" class="error-container" role="dialog"></div>
     
     <form name="worklog" action="" method="post">
+      <!-- to be hidden field --><input type="text" name="wlAuthorName" id="wlAuthorName" value="" />
       <label for="wlUser">
         <select name="wlUser" id="wlUser">
           <option value=""></option>
@@ -62,10 +63,13 @@
           fragment.appendChild(opt);
         });
         sel.appendChild(fragment);
+        sel.onchange = function () {
+          document.getElementById("wlAuthorName").value = this.options[this.selectedIndex].text;
+        };
         
         // gen group dropdown
-        var sel = document.getElementById('wlGroup');
-        var fragment = document.createDocumentFragment();
+        sel = document.getElementById('wlGroup');
+        fragment = document.createDocumentFragment();
         response.groups.forEach(function(group, index) {
           var opt = document.createElement('option');
           opt.innerHTML = group.name; //group.displayName;
@@ -73,6 +77,9 @@
           fragment.appendChild(opt);
         });
         sel.appendChild(fragment);
+        sel.onchange = function () {
+          document.getElementById("wlAuthorName").value = this.options[this.selectedIndex].text;
+        };
       }
 
       function formSubmitHandler(event) {
