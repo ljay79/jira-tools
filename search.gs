@@ -1,40 +1,15 @@
-/*
- * Notes
- * check out Firebase as a JSON database; https://sites.google.com/site/scriptsexamples/new-connectors-to-google-services/firebase
- */
-
-/*function testSearch() {
-  var s = new SearchWorklog();
-
-  onSuccess = function(a,b,c) {
-    log('%s', '----------ON SUCCESS-----------');
-    log('%s %s %s', a, b, c);
-  };
-  onFailure = function(a,b,c) {
-    log('%s', '----------ON FAILURE-----------');
-    log('%s %s %s', a, b, c);
-  };
-  
-  s.filterDate('2017-08-01', '2017-07-01');
-  s.filterByUser('jrosemeier');
-  s.search()
-    .withSuccessHandler(onSuccess)
-    .withFailureHandler(onFailure)
-  ;
-}*/
-
-
 /**
- * @desc Class SearchWorklog provides a simple interface for performing a search against Jira for worklogs.
+ * @desc Class 'Search' API abstraction with pagination handling.
+ *       Performs a JQL POST search request to JIRA Rest API.
+ * @param searchQuery {String}    JQL Query statement
  */
-function SearchWorklog() {
-  var fields = ['worklog'],
-      startAt = 0, maxResults = 1000;
-  var jql_worklogAuthor = '', 
-      jql_worklogDateFrom, jql_worklogDateTo;
+function Search(searchQuery) {
+  var fields = ['key'],
+      startAt = 0, maxResults = 1000, maxPerPage = 500,
+      queryStr = searchQuery, orderBy = '', orderDir = 'ASC';
   var response = {
-    'responseData': {},
-    'statusCode': -1,
+    'data': [],
+    'status': -1,
     'errorMessage': ''
   };
 
@@ -43,14 +18,6 @@ function SearchWorklog() {
    * @return void
    */
   this.init = function() {
-    var _now = new Date();
-    // from = now() - 7 days
-    jql_worklogDateFrom = new Date();
-    jql_worklogDateFrom.setDate(_now.getDate() - 7);
-    jql_worklogDateFrom = jql_worklogDateFrom.toISOString().substring(0, 10);
-
-    // to = now()
-    jql_worklogDateTo = _now.toISOString().substring(0, 10);
   }
   
   /**
@@ -98,60 +65,39 @@ function SearchWorklog() {
     return this;
   }
 
-  /**
-   * @desc Set date filter for the search JQL. Date from and to
-   * @param sDateFrom {String}    The filter start date in any format Date class constructor accepts ("YYYY-MM-DD")
-   * @param sDateTo {String}    The filter end/to date in any format Date class constructor accepts ("YYYY-MM-DD")
-   * @return {this}    Allow chaining
-   */
-  this.filterDate = function(sDateFrom, sDateTo) {
-    if( sDateFrom ) {
-      jql_worklogDateFrom = (new Date(sDateFrom)).toISOString().substring(0, 10);
+  this.setMaxPerPage = function(iMaxPerPage) {
+    if(iMaxPerPage.constructor == Number) {
+      maxPerPage = iMaxPerPage;
+    } else {
+      throw '{iMaxPerPage} is not a Number.';
     }
-    if( sDateTo ) {
-      jql_worklogDateTo = (new Date(sDateTo)).toISOString().substring(0, 10);
-    }
-    
-    var _d = jql_worklogDateFrom;
-    if( Date.parse(_d) > Date.parse(jql_worklogDateTo) ) {
-      jql_worklogDateFrom = jql_worklogDateTo;
-      jql_worklogDateTo   = _d;
-    }
-    
+
     return this;
   }
 
   /**
-   * @desc Set JQL filter for searching worklogs from a single username
-   * @param sUsername {String}    The Jira username we search worklogs for
-   * @param {this}    Allow chaining
+   * @desc Set Order of results (JQL order by clause)
+   * @param sOrderBy {String}    Jira field to order by. Example: 'updated'
+   * @param sDir {String}        Direction of order; 'ASC' or 'DESC'
+   * @return {this}    Allow Chaining
    */
-  this.filterByUser = function(sUsername) {
-    jql_worklogAuthor = ' worklogAuthor = "' + sUsername + '" ';
-    
-    return this;
-  }
+  this.setOrderBy = function(sOrderBy, sDir) {
+    sOrderBy = sOrderBy || '', sDir = sDir || 'ASC';
 
-  /**
-   * @desc Set JQL filter for searching worklogs from a jira group
-   * @param sGroupname {String}    The Jira group name we search worklogs for
-   * @param {this}    Allow chaining
-   */
-  this.filterByGroup = function(sGroupname) {
-    jql_worklogAuthor = ' worklogAuthor in membersOf("' + sGroupname + '") ';
+    if( sOrderBy != '' ) orderBy  = sOrderBy;
+    if( sDir != '' )     orderDir = sDir;
     
     return this;
   }
-  
+ 
   /**
    * @desc Callback Success handler
    * @param fn {function}  Method to call on successfull request
    * @return {this}  Allow chaining
    */
   this.withSuccessHandler = function(fn) {
-    if(response.statusCode === 200) {
-      log('withSuccessHandler: [%s] calling: %s', response.statusCode, fn);
-      fn.call(this, response.responseData, response.statusCode, response.errorMessage);
+    if(response.status === 200) {
+      fn.call(this, response.data, response.status, response.errorMessage);
     }
     return this;
   };
@@ -162,65 +108,87 @@ function SearchWorklog() {
    * @return {this}  Allow chaining
    */
   this.withFailureHandler = function(fn) {
-    if(response.statusCode !== 200) {
-      log('withFailureHandler: [%s] calling: %s', response.statusCode, fn);
-      fn.call(this, response.responseData, response.statusCode, response.errorMessage);
+    if(response.status !== 200) {
+      fn.call(this, response.data, response.status, response.errorMessage);
     }
     return this;
   };
 
- 
   /**
    * @desc Prepare JQL search query
    * @return {String}
    */
   var getJql = function() {
-    var jql = '';
-
-    jql += 'worklogDate>="' + jql_worklogDateFrom + '" ';
-    jql += ' and worklogDate<="' + jql_worklogDateTo + '" ';
-    if( jql_worklogAuthor != '' ) jql += ' and ' + jql_worklogAuthor;
-
+    var jql = queryStr + ' ORDER BY ' + orderBy + ' ' + orderDir;
     log('Search JQL: [%s]', jql);
 
     //return encodeURIComponent(jql); //only when api call is performed as GET
     return jql;
   }
-  
+
   /**
    * @desc OnSuccess handler for search request
    */
-  var onSuccess = function(responseData, httpResponse, statusCode) {
-    log('onSuccess: [%s]', statusCode);
+  var onSuccess = function(resp, httpResp, status) {
+    var _total = parseInt(resp.total || 0);
 
-    // nothing found
-    if( responseData.total == 0 ) {
-      response.errorMessage = responseData.hasOwnProperty('warningMessages') ? responseData.warningMessages : 'No results found.';
+    // nothing found - return class response
+    if( _total == 0 ) {
+      response = {
+        'responseData' : resp.issues || resp,
+        'statusCode'   : status,
+        'errorMessage' : resp.hasOwnProperty('warningMessages') ? resp.warningMessages : 'No results found.'
+      };
+      return;
     }
 
-    response.statusCode = statusCode;
-    response.responseData = responseData;
+    // add current results and status
+    response.data.push.apply(response.data, resp.issues || []);
+    response.status = status;
+
+    // pagination / sub-requests required?
+    var _countTotalResults = parseInt(resp.startAt) + parseInt(resp.maxResults);
+    if( (_countTotalResults < _total) && (_countTotalResults < maxResults) ) {
+      // more data to fetch
+
+      var subSearch = new Search( queryStr );
+      subSearch.setOrderBy( orderBy, orderDir )
+               .setFields( fields )
+               .setMaxPerPage( maxPerPage )
+               .setMaxResults( maxResults )
+               .setStartAt( _countTotalResults );
+
+      subSearch.search().withSuccessHandler(function(data, status, msg) {
+         // append results to parent results
+         response.data.push.apply(response.data, data);
+         response.status = status;
+      }); // dont bubble up failure - 1st call was successfull so we soft-fail and response with results found so far
+    }
   }
 
   /**
    * @desc OnFailure handler for search request
    */
-  var onFailure = function(responseData, httpResponse, statusCode) {
-    log('onFailure: [%s] %s', statusCode, responseData);
+  var onFailure = function(resp, httpResp, status) {
+    log('onFailure: [%s] %s', status, resp);
 
-    var msgs = responseData.hasOwnProperty('errorMessages') ? responseData.errorMessages : [];
-    msgs = msgs.concat((responseData.hasOwnProperty('warningMessages') ? responseData.warningMessages : []));
+    var msgs = resp.hasOwnProperty('errorMessages') ? resp.errorMessages : [];
+    msgs = msgs.concat((resp.hasOwnProperty('warningMessages') ? resp.warningMessages : []));
 
-    response.statusCode = statusCode;
+    response.status = status;
     response.errorMessage = msgs.join("\n");
   }
 
+  /**
+   * @desc Perform Search
+   */
   this.search = function() {
+    log("search with start:%s and maxResults:%s and field:[%s]", startAt, maxPerPage, fields);
     var data = {
-      jql: getJql(), 
-      fields: fields, 
-      startAt: startAt,
-      maxResults: maxResults
+      jql        : getJql(), 
+      fields     : fields, 
+      startAt    : startAt,
+      maxResults : maxPerPage
     };
 
     var request = new Request();
