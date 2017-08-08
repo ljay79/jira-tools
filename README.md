@@ -1,6 +1,6 @@
 # Jira Sheet Tools
 
-[Jira](https://www.atlassian.com/software/jira) is a powerful and well established project management tool amoung small to enterprice businesses. Still we often end up using Google Sheets for some overview roadmaps, project dashboards and other purposes.
+[Jira](https://www.atlassian.com/software/jira) is a powerful and well established project management tool amoung small to enterprise businesses. Still we often end up using Google Sheets for some overview roadmaps, project dashboards and other purposes.
 
 With this Google Sheet Add-on the, called "[Jira Sheet Tools](https://chrome.google.com/webstore/detail/jira-sheet-tools/ncijnapilmmnebhbdanhkbbofofcniao)" available in the Google Add-On store from within Google Sheet, you can now take your sheets with Jira information to the next level.
 
