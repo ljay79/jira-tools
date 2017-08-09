@@ -182,7 +182,7 @@ if (!Array.prototype.fill) {
  *                or: formatTimeDiff(new Date('2017-08-03T12:59:59'), new Date('2017-08-01T10:00:00')) return '2d 2h 59m 59s'
  *
  * @param {Integer|Date}   Either the time difference in seconds as integer, 
- *                         or together with 2nd param a Date() object.
+ *                         or two Date() objects.
  * @param {Date}           Optional Date() object to compare with first param Date()
  * @return {String}
  */
@@ -190,7 +190,7 @@ function formatTimeDiff() {
   var delta, response = '';
   if(arguments.length == 1) {
     // delta passed to convert
-    delta = arguments[0] / 1000;
+    delta = arguments[0];
   } else if (arguments.length == 2) {
     // get total seconds between the times
     if ( arguments[1] > arguments[0] ) {
@@ -202,9 +202,10 @@ function formatTimeDiff() {
     throw 'formatTime() accepts 1 or 2 arguments.';
   }
 
-  // calculate (and subtract) whole days
-  var days = Math.floor(delta / 86400);
-  delta -= days * 86400;
+  // calculate (and subtract) whole days (workday=8h)
+  var workhoursInSeconds = parseFloat(getVar('workhours')) * 3600;
+  var days = Math.floor(delta / workhoursInSeconds);
+  delta -= days * workhoursInSeconds;
 
   // calculate (and subtract) whole hours
   var hours = Math.floor(delta / 3600) % 24;
@@ -224,3 +225,35 @@ function formatTimeDiff() {
 
   return response.trim();
 };
+
+/**
+ * @desc Converts time difference or seconds passed into hours.
+ *
+ *       Sample call: formatTimeDiff(5400) returns '1.5' (hours)
+ *                or: formatTimeDiff(new Date('2017-08-01T08:30:00'), new Date('2017-08-01T10:00:00')) return '1.5'
+ *
+ * @param {Integer|Date}   Either the time difference in seconds as integer, 
+ *                         or 2 Date objects (from - to).
+ * @param {Date}           Optional Date() object to compare with first param Date()
+ * @return {Number}
+ */
+function formatWorkhours() {
+  var delta, response = '';
+  if(arguments.length == 1) {
+    // delta passed to convert
+    delta = arguments[0];
+  } else if (arguments.length == 2) {
+    // get total seconds between the times
+    if ( arguments[1] > arguments[0] ) {
+      delta = Math.abs(arguments[1] - arguments[0]) / 1000;
+    } else {
+      delta = Math.abs(arguments[0] - arguments[1]) / 1000;
+    }
+  } else {
+    throw 'formatWorkhours() accepts 1 or 2 arguments.';
+  }
+
+  var hours = Math.round(delta / 3600 * 100) / 100;
+  
+  return hours;
+}

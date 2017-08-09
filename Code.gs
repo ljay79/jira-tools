@@ -8,7 +8,7 @@
  * - add feature to insert list of tickets (issue overview) based on available Jira filters
  */
 
-var BUILD = 0170;
+var BUILD = 0180;
 var LOGGING = true;
 
 /** 
@@ -45,7 +45,7 @@ function addMenu() {
     .addSeparator()
     .addSubMenu(SpreadsheetApp.getUi().createMenu('Insert...')
       .addItem('List Issues from Filter', 'dialogIssueFromFilter')
-      .addItem('Worklog', 'dialogWorklog')
+      .addItem('Time Sheet', 'dialogTimesheet')
     )
 
     .addSeparator()
@@ -61,12 +61,12 @@ function addMenu() {
  * @param values  Optional values to pass into format msg
  * @return void
  */
-function log(format, values, arg1, arg2) {
+function log(format, values, arg1, arg2, arg3) {
   if(LOGGING !== true) return;
 
   if(arguments.length == 0) {
     Logger.log(format);
   } else {
-    Logger.log(format, values, arg1, arg2);
+    Logger.log(format, values, arg1, arg2, arg3);
   }
 }

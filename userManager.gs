@@ -16,19 +16,25 @@ function findUser(usernameTerm, minimal) {
       minimal = minimal || false,
       users = [];
 
-  var ok = function(responseData, httpResponse, statusCode){
-    if(responseData) {
-      if(responseData.length == 0) {
+  /**
+   * @desc OnSuccess handler
+   * @param resp {Object}    JSON response object from Jira
+   * @param httpResp {Object}
+   * @param status {Number}
+   * @return Mixed
+   */
+  var ok = function(resp, httpResp, status){
+    if(resp) {
+      if(resp.length == 0) {
         Browser.msgBox("No users were found to match your search.", Browser.Buttons.OK);
         return users;
       }
 
       var user;
-      for(var i=0; i<responseData.length; i++) {
-        user = unifyIssueAttrib((minimal?'userMin':'user'), responseData[i]);
+      for(var i=0; i<resp.length; i++) {
+        user = unifyIssueAttrib((minimal ? 'userMin' : 'user'), resp[i]);
         users.push(user);
       }
-      
     } else {
       // Something funky is up with the JSON response.
       Browser.msgBox("Failed searching for user!", Browser.Buttons.OK);
@@ -36,8 +42,16 @@ function findUser(usernameTerm, minimal) {
     }
   };
 
-  var error = function(responseData, httpResponse, statusCode) {
-    Browser.msgBox("Failed api search request with error status [" + statusCode + "]!\\n" + responseData.errorMessages.join("\\n"), Browser.Buttons.OK);
+  /**
+   * @desc OnFailure handler
+   * @param resp {Object}    JSON response object from Jira
+   * @param httpResp {Object}
+   * @param status {Number}
+   * @return {Array}
+   */
+  var error = function(resp, httpResp, status) {
+    Browser.msgBox("Failed api search request with error status [" + status + "]!\\n" + resp.errorMessages.join("\\n"), 
+                   Browser.Buttons.OK);
     return users;
   };
 
@@ -69,28 +83,43 @@ function findGroup(groupTerm, minimal) {
 
   groupTerm = trimChar(groupTerm, "%");
 
-  var ok = function(responseData, httpResponse, statusCode){
-    if(responseData && responseData.hasOwnProperty('groups')) {
-      if(responseData.groups.length == 0) {
+  /**
+   * @desc OnSuccess handler
+   * @param resp {Object}    JSON response object from Jira
+   * @param httpResp {Object}
+   * @param status {Number}
+   * @return Mixed
+   */
+  var ok = function(resp, httpResp, status) {
+    if(resp && resp.hasOwnProperty('groups')) {
+      if(resp.groups.length == 0) {
         Browser.msgBox("No groups were found to match your search.", Browser.Buttons.OK);
         return groups;
       }
 
       var group;
-      for(var i=0; i<responseData.groups.length; i++) {
-        group = unifyIssueAttrib((minimal?'groupMin':'group'), responseData.groups[i]);
+      for(var i=0; i<resp.groups.length; i++) {
+        group = unifyIssueAttrib((minimal ? 'groupMin' : 'group'), resp.groups[i]);
         groups.push(group);
       }
 
     } else {
       // Something funky is up with the JSON response.
+      log('Failed searching for group: %s ; %s', httpResp, resp);
       Browser.msgBox("Failed searching for group!", Browser.Buttons.OK);
       return groups;
     }
   };
 
-  var error = function(responseData, httpResponse, statusCode) {
-    Browser.msgBox("Failed api search request with error status [" + statusCode + "]!\\n" + responseData.errorMessages.join("\\n"), Browser.Buttons.OK);
+  /**
+   * @desc OnFailure handler
+   * @param resp {Object}    JSON response object from Jira
+   * @param httpResp {Object}
+   * @param status {Number}
+   * @return {Array}
+   */
+  var error = function(resp, httpResp, status) {
+    Browser.msgBox("Failed api search request with error status [" + status + "]!\\n" + resp.errorMessages.join("\\n"), Browser.Buttons.OK);
     return groups;
   };
 

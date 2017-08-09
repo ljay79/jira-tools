@@ -101,20 +101,46 @@ function initDefaults() {
   var build         = getVar('BUILD') || 0;
   var isInitialized = getVar('defaults_initialized') || 'false';
   if (isInitialized == 'true' && build == BUILD) return;
-  
+
   setVar('BUILD', BUILD);
-  
+
   // set default jira issue columns
   //var columnDefaults = getVar('jiraColumnDefault');
   //columnDefaults = (columnDefaults != null) ? JSON.parse(columnDefaults) : jiraColumnDefault;
   columnDefaults = jiraColumnDefault; //@TODO: allow user to change default columns
   setVar('jiraColumnDefault', JSON.stringify(columnDefaults));
-  
+
+  setVar('workhours', 8);
+
   // Jira onDemand or Server
   var server_type = getCfg('server_type');
   if (server_type == null) server_type = 'onDemand';
   setCfg('server_type', server_type);
-  
+
   // set done
   setVar('defaults_initialized', 'true');
 }
+
+/**
+ * @desc Save Jira server settings, provided in dialog form and perform 
+ *     a connection test to Jira api.
+ * @param jsonFormData {object}  JSON Form object of all form values
+ * @return {object} Object({status: [boolean], response: [string]})
+ */
+function saveSettings(jsonFormData) {
+  var url = trimChar(jsonFormData.jira_url, "/");
+  setCfg('available', false);
+  setCfg('jira_url', url);
+  setCfg('jira_username', jsonFormData.jira_username);
+  setCfg('jira_password', jsonFormData.jira_password);
+  setVar('workhours', jsonFormData.ts_workhours);
+
+  var test = testConnection();
+
+  if (url.indexOf('atlassian.net') == -1) {
+    setCfg('server_type', 'server');
+  }
+
+  return {status: test.status, message: test.response};
+}
+

@@ -10,31 +10,44 @@
     </style>
   </head>
   <body>
-    ... loading anim ... (loading user/groups)
+    ... loading anim ... (loading users)
     <div id="response-message" class="error-container" role="dialog"></div>
     
     <form name="worklog" action="" method="post">
-      <!-- to be hidden field --><input type="text" name="wlAuthorName" id="wlAuthorName" value="" />
+      <!-- to be hidden field -->
+      <input type="text" name="wlAuthorName" id="wlAuthorName" value="" />
+      
       <label for="wlUser">
         <select name="wlUser" id="wlUser">
           <option value=""></option>
         </select>
       </label>
+      <!-- Groups not supported yet 
       OR
       <label for="wlGroup">
         <select name="wlGroup" id="wlGroup">
           <option value=""></option>
         </select>
       </label>
+      -->
 
       <hr/>
       <label for="wlStartDate">
-        <input type="text" name="wlStartDate" value="2017-07-20" />(datePicker)<br/>
+        <!-- default to now()-7 days -->
+        Start date: <input type="text" name="wlStartDate" value="2017-07-30" />(datePicker)<br/>
       </label>
       <label for="wlEndDate">
-        <input type="text" name="wlEndDate" value="2017-08-05" />(datePicker)<br/>
+        <!-- default to now() -->
+        End Date:<input type="text" name="wlEndDate" value="2017-08-05" />(datePicker)<br/>
       </label>
       <hr/>
+
+      <label for="wlTimeFormat">
+        format:
+        <input type="radio" name="wlTimeFormat" value="1" checked /> 1d 7h 59m<br>
+        <input type="radio" name="wlTimeFormat" value="2" /> 7.5 (hours) (tooltip: workhours as float, good for post calculations)<br>
+      </label>
+
 
       <hr/>
       <div class="block">
@@ -66,7 +79,7 @@
         sel.onchange = function () {
           document.getElementById("wlAuthorName").value = this.options[this.selectedIndex].text;
         };
-        
+
         // gen group dropdown
         sel = document.getElementById('wlGroup');
         fragment = document.createDocumentFragment();
@@ -88,14 +101,14 @@
         //hideAlert();
         //if (!valid) return;
         //showAlert('fetch data ...', 1);
-
         var formData = {
           wlAuthorU: frmWorklog.wlUser.value,
-          wlAuthorG: frmWorklog.wlGroup.value,
+          //wlAuthorG: frmWorklog.wlGroup.value,
           wlStartDate: frmWorklog.wlStartDate.value,
-          wlEndDate: frmWorklog.wlEndDate.value
+          wlEndDate: frmWorklog.wlEndDate.value,
+          wlTimeFormat: frmWorklog.querySelector('input[name="wlTimeFormat"]:checked').value
         };
-        
+
         google.script.run
           //.withSuccessHandler(onResponse)
           //.withFailureHandler(onResponse)

@@ -26,6 +26,13 @@
         <input type="password" id="jira-password" name="jira_password" class="block" style="width:100%" value="<?= password ?>">
       </div>
       
+      <h4 style="margin-top:40px">Time Sheet</h4>
+      <div class="form-group block">
+        <label for="ts-workhours">Working hours per day</label>
+        <input type="text" id="ts-workhours" name="ts_workhours" class="block" style="width:35px" value="<?= workhours ?>">
+        <span>h</span>
+      </div>
+      
       <div class="block">
         <button type="submit" class="action" disabled>Save</button>
         <button type="button" onclick="google.script.host.close()">Cancel</button>

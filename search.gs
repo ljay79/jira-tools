@@ -42,9 +42,8 @@ function Search(searchQuery) {
    * @desc Initialize anything necessary for the class object
    * @return void
    */
-  this.init = function() {
-  }
-  
+  this.init = function() {}
+
   /**
    * @desc Set the list of jira issue fields to be returned in search response for each issue.
    * @param aFields {Array}    Array of jira issue fields
@@ -90,6 +89,11 @@ function Search(searchQuery) {
     return this;
   }
 
+  /**
+   * @desc Set max results per page
+   * @param iMaxPerPage {Number}    Integer of how many results max per page to fetch
+   * @return {this}    Allow chaining
+   */
   this.setMaxPerPage = function(iMaxPerPage) {
     if(iMaxPerPage.constructor == Number) {
       maxPerPage = iMaxPerPage;
@@ -111,13 +115,13 @@ function Search(searchQuery) {
 
     if( sOrderBy != '' ) orderBy  = sOrderBy;
     if( sDir != '' )     orderDir = sDir;
-    
+
     return this;
   }
- 
+
   /**
    * @desc Callback Success handler
-   * @param fn {function}  Method to call on successfull request
+   * @param fn {function}  Method to call on successfull request (statue=200)
    * @return {this}  Allow chaining
    */
   this.withSuccessHandler = function(fn) {
@@ -129,7 +133,7 @@ function Search(searchQuery) {
 
   /**
    * @desc Callback Failure handler
-   * @param fn {function}  Method to call on failed request
+   * @param fn {function}  Method to call on failed request (status!==200)
    * @return {this}  Allow chaining
    */
   this.withFailureHandler = function(fn) {
@@ -153,6 +157,10 @@ function Search(searchQuery) {
 
   /**
    * @desc OnSuccess handler for search request
+   * @param resp {Object}    JSON response object from Jira
+   * @param httpResp {Object}
+   * @param status {Number}
+   * @return void
    */
   var onSuccess = function(resp, httpResp, status) {
     var _total = parseInt(resp.total || 0);
@@ -193,6 +201,10 @@ function Search(searchQuery) {
 
   /**
    * @desc OnFailure handler for search request
+   * @param resp {Object}    JSON response object from Jira
+   * @param httpResp {Object}
+   * @param status {Number}
+   * @return void
    */
   var onFailure = function(resp, httpResp, status) {
     log('onFailure: [%s] %s', status, resp);
@@ -206,6 +218,7 @@ function Search(searchQuery) {
 
   /**
    * @desc Perform Search
+   * @return {this}    Allow chaining
    */
   this.search = function() {
     log("search with start:%s and maxResults:%s and field:[%s]", startAt, maxPerPage, fields);
