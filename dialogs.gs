@@ -118,6 +118,9 @@ function insertIssuesFromFilter(jsonFormData) {
       
       response.status = true;
 
+      // toast with status message
+      SpreadsheetApp.getActiveSpreadsheet().toast("Finished inserting " + (responseData.issues.length||"n/a") + " Jira issues.", "Status", 5);
+
     } else {
       // Something funky is up with the JSON response.
       response.message = "Failed to retrieve jira issues!";
@@ -134,7 +137,7 @@ function insertIssuesFromFilter(jsonFormData) {
   var data = {
     jql: filter.jql, 
     fields: jsonFormData['columns'] || [], 
-    maxResults: LIST_ISSUES_MAX_RESULT, 
+    maxResults: 1000, 
     validateQuery: (getCfg('server_type') == 'onDemand') ? 'strict' : true
   };
 
