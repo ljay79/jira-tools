@@ -183,8 +183,8 @@ function dialogTimesheet() {
   var dialog = getDialog('dialogTimesheet');
 
   dialog
-    .setWidth(600)
-    .setHeight(480)
+    .setWidth(480)
+    .setHeight(400)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   log('Processed: %s', dialog);
