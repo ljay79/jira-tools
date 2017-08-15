@@ -377,7 +377,8 @@ function TimesheetTable1(options) {
       .clearFormat()
       .setBackgrounds([ bgColors ])
       .setValues([ values ])
-      .setFontWeights([ formats ]);
+      .setFontWeights([ formats ])
+      .activate();
 
     // 1st col IssueTypeIcon align center
     sheet.getRange(currentRowIdx-1, 1, 1, 1).setHorizontalAlignment("center");
@@ -388,7 +389,7 @@ function TimesheetTable1(options) {
     ++numIssueRows;
 
     SpreadsheetApp.flush();
-    
+
     return this;
   };
 
