@@ -75,8 +75,17 @@ function IssueTable(sheet, initRange, data) {
         .clearNote()
         .clearFormat()
         .setValues([ values ])
-        .setNumberFormats([ formats ]);
-    }
+        .setNumberFormats([ formats ])
+        .activate();
+
+      // flush sheet
+      if(i % 5 === 0) {
+        SpreadsheetApp.flush();
+      }
+
+      issue = null;
+
+    }// END: for(data.issues.length)
 
     return this;
   };
