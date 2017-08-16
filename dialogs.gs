@@ -183,13 +183,13 @@ function dialogTimesheet() {
   var dialog = getDialog('dialogTimesheet');
 
   dialog
-    .setWidth(480)
-    .setHeight(400)
+    .setWidth(420)
+    .setHeight(360)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   log('Processed: %s', dialog);
 
-  SpreadsheetApp.getUi().showModalDialog(dialog, 'Create worklog');
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'Create Time Report');
 }
 
 /* Dialog: Worklog - END */
