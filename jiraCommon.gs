@@ -1,5 +1,3 @@
-var LIST_ISSUES_MAX_RESULT = 200;
-
 // const not available, but better solution needed
 var CELLTYPE_EMPTY = -1;
 var CELLTYPE_JIRAID = 10; // entire cell includes Jira ticket id only ("JIRA-123" or "JIRA-123 [Status]")
@@ -256,6 +254,27 @@ function getFilter(filterId) {
 }
 
 /**
+ * @desc Fetch all active users and groups for dialog selection.
+ * @param {boolean} minimal  Returning data only includes minimal info (displayName,name[,active])
+ * @return {object} Object({"users":[{<arrayOfObjects}], "groups":[{arrayOfObjects}]})
+ */
+function fetchUsersAndGroups(minimal) {
+  var minimal = minimal || true, 
+      result = {
+        "users" : [],
+        "groups": findGroup('%', minimal)
+      };
+
+  result.users = findUser('%', minimal).filter(function( user ) {
+    return user.active !== false;
+  });
+  
+  result.users.sort(function(a,b) {return (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0);} ); 
+  
+  return result;
+}
+
+/**
  * @desc Helper to convert indiv. jira field/property objects 
  *       into simple objects for using as cell data.
  * @param attrib {string}
@@ -321,7 +340,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'duedate':
       // very dirty - just cant get arround timezone issue when date is in format 'YYYY-MM-DD'
       // @TODO: require proper generic solution for this
-      var _duedate = data.fields.duedate || 'n/a';
+      var _duedate = data.fields.duedate || null;
       _duedate = (_duedate.length == 10) ? _duedate + 'T12:00:00' : _duedate;
       resp = {
         value: _duedate,
@@ -365,6 +384,41 @@ function unifyIssueAttrib(attrib, data) {
       resp = {
         value: percent,
         format: "0%"
+      };
+      break;
+
+    case 'user':
+      resp = {
+        displayName: data.displayName + (data.active==true?'':' (X)'),
+        name: data.name,
+        emailAddress: data.emailAddress,
+        active: data.active,
+
+        value: data.displayName,
+        format: "@"
+      };
+      break;
+    case 'group':
+      var _dName = (data.labels.length > 0) ? data.labels[0].text : data.name;
+      resp = {
+        displayName: _dName,
+        name: data.name,
+        value: _dName,
+        format: "@"
+      };
+      break;
+    case 'userMin':
+      resp = {
+        displayName: data.displayName + (data.active==true?'':' (X)'),
+        name: data.name,
+        active: data.active,
+      };
+      break;
+    case 'groupMin':
+      var _dName = (data.labels.length > 0) ? data.labels[0].text : data.name;
+      resp = {
+        displayName: _dName,
+        name: data.name,
       };
       break;
 

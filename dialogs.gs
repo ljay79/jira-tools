@@ -27,8 +27,8 @@ function dialogSettings() {
   var dialog = getDialog('dialogSettings', getServerCfg());
 
   dialog
-    .setWidth(320)
-    .setHeight(260)
+    .setWidth(340)
+    .setHeight(400)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   log('Processed: %s', dialog);
@@ -45,30 +45,9 @@ function getServerCfg() {
     available: getCfg('available'),
     url: getCfg('jira_url'),
     username: getCfg('jira_username'),
-    password: getCfg('jira_password')
+    password: getCfg('jira_password'),
+    workhours: getVar('workhours')
   };
-}
-
-/**
- * @desc Save Jira server settings, provided in dialog form and perform 
- *     a connection test to Jira api.
- * @param jsonFormData {object}  JSON Form object of all form values
- * @return {object} Object({status: [boolean], response: [string]})
- */
-function saveSettings(jsonFormData) {
-  var url = trimChar(jsonFormData.jira_url, "/");
-  setCfg('available', false);
-  setCfg('jira_url', url);
-  setCfg('jira_username', jsonFormData.jira_username);
-  setCfg('jira_password', jsonFormData.jira_password);
-
-  var test = testConnection();
-  
-  if (url.indexOf('atlassian.net') == -1) {
-    setCfg('server_type', 'server');
-  }
-
-  return {status: test.status, message: test.response};
 }
 
 /* Dialog: Settings - END */
@@ -129,7 +108,7 @@ function insertIssuesFromFilter(jsonFormData) {
         return;
       }
 
-      var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+      var sheet = getTicketSheet();
       var cell = sheet.getActiveCell();
 
       var table = new IssueTable(sheet, cell, responseData);
@@ -138,6 +117,9 @@ function insertIssuesFromFilter(jsonFormData) {
         .fillTable();
       
       response.status = true;
+
+      // toast with status message
+      SpreadsheetApp.getActiveSpreadsheet().toast("Finished inserting " + (responseData.issues.length||"n/a") + " Jira issues.", "Status", 5);
 
     } else {
       // Something funky is up with the JSON response.
@@ -155,7 +137,7 @@ function insertIssuesFromFilter(jsonFormData) {
   var data = {
     jql: filter.jql, 
     fields: jsonFormData['columns'] || [], 
-    maxResults: LIST_ISSUES_MAX_RESULT, 
+    maxResults: 1000, 
     validateQuery: (getCfg('server_type') == 'onDemand') ? 'strict' : true
   };
 
@@ -188,3 +170,26 @@ function dialogAbout() {
 }
 
 /* Dialog: About - END */
+
+
+/* Dialog: Worklog */
+
+/**
+ * @desc Dialog to create worklog based on user/group selection
+ */
+function dialogTimesheet() {
+  if(!hasSettings(true)) return;
+
+  var dialog = getDialog('dialogTimesheet');
+
+  dialog
+    .setWidth(420)
+    .setHeight(360)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+
+  log('Processed: %s', dialog);
+
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'Create Time Report');
+}
+
+/* Dialog: Worklog - END */

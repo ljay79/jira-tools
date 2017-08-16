@@ -5,20 +5,28 @@
  */
 var restMethods = {
   'onDemand': {
-    'dashboard': '/dashboard',
-    'issueStatus': {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
-    'filter': {method: '/filter/{filterId}'},
+    'dashboard'     : '/dashboard',
+    'issueStatus'   : {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
+    'worklogOfIssue': {method: '/issue/{issueIdOrKey}/worklog'},
+    'filter'        : {method: '/filter/{filterId}'},
     //'search': {method: '/search', queryparams: {jql:'', fields: [], properties: [], maxResults: 100, validateQuery: 'strict'}} // GET
-    'search': {method: '/search'}, // POST
-    'myFilters': {method: '/filter/my', queryparams: {includeFavourites: 'false'}}
+    'search'        : {method: '/search'}, // POST
+    'myFilters'     : {method: '/filter/my', queryparams: {includeFavourites: 'false'}},
+
+    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 1000, username:'%'}},
+    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 1000, query: ''}}
   },
   'server': {
-    'dashboard': '/dashboard',
-    'issueStatus': {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
-    'filter': {method: '/filter/{filterId}'},
-    'search': {method: '/search'}, // POST
+    'dashboard'     : '/dashboard',
+    'issueStatus'   : {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
+    'worklogOfIssue': {method: '/issue/{issueIdOrKey}/worklog'},
+    'filter'        : {method: '/filter/{filterId}'},
+    'search'        : {method: '/search'}, // POST
     // server api doesnt support /filter/my
-    'myFilters': {method: '/filter/favourite', queryparams: {includeFavourites: 'false'}}
+    'myFilters'     : {method: '/filter/favourite', queryparams: {includeFavourites: 'false'}},
+
+    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 1000, username:'%'}},
+    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 1000, query: ''}}
   }
 };
 
@@ -72,15 +80,17 @@ function testConnection() {
  */
 function Request() {
   var statusCode, httpResponse, responseData,
-      available = getCfg('available'),
-      url = getCfg('jira_url'),
-      username = getCfg('jira_username'),
-      password = getCfg('jira_password'),
+      available, url, username, password,
       jiraMethod = null,
       jiraQueryParams = {};
 
   this.init = function() {
-    // prepare for initialization if necessary
+    server_type = getCfg('server_type') || 'onDemand';
+    available = getCfg('available');
+    url = getCfg('jira_url');
+    username = getCfg('jira_username');
+    password = getCfg('jira_password');
+    jiraMethod = null;
   };
 
   /**
@@ -145,7 +155,6 @@ function Request() {
       return this;
     }
 
-    var server_type = getCfg('server_type') || 'onDemand';
     jiraMethod = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].method : restMethods[server_type][method];
     jiraQueryParams = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].queryparams : {};
 

@@ -51,7 +51,7 @@ function IssueTable(sheet, initRange, data) {
         // for some custom formatting
         switch(true) {
           case key.hasOwnProperty('date'):
-            key.value = key.date;
+            key.value = (key.date != null) ? key.date : '';
             break;
           case key.hasOwnProperty('link'):
             key.value = '=HYPERLINK("' + key.link + '"; "' + key.value + '")';
@@ -75,8 +75,17 @@ function IssueTable(sheet, initRange, data) {
         .clearNote()
         .clearFormat()
         .setValues([ values ])
-        .setNumberFormats([ formats ]);
-    }
+        .setNumberFormats([ formats ])
+        .activate();
+
+      // flush sheet
+      if(i % 5 === 0) {
+        SpreadsheetApp.flush();
+      }
+
+      issue = null;
+
+    }// END: for(data.issues.length)
 
     return this;
   };
@@ -98,6 +107,8 @@ function IssueTable(sheet, initRange, data) {
       .clearFormat()
       .setValues([ values ])
       .setFontWeights([ formats ]);
+    
+    SpreadsheetApp.flush();
 
     return this;
   };
@@ -115,6 +126,8 @@ function IssueTable(sheet, initRange, data) {
       .clearFormat()
       .getCell(1,1)
       .setValue(summary);
+    
+    SpreadsheetApp.flush();
 
     return this;
   };
