@@ -65,7 +65,7 @@ function createWorklog(jsonFormData) {
         .setFields(['id','key','issuetype','priority','status','summary']);
 
   /* OnSucess, start prepping Timesheet Table and perform subsequent api searches for all worklogs per individual jira issue */
-  onSuccess = function(data, status, errorMessage) {
+  var onSuccess = function(data, status, errorMessage) {
     log('Issue with worklogs founds: %s !', data.length);
     //log('%s %s %s', JSON.stringify(data), status, errorMessage);
 
@@ -131,10 +131,10 @@ function createWorklog(jsonFormData) {
     timeSheetTable.addFooter();
   }; //END: onSuccess()
 
-  onFailure = function(a, status , errorMessage) {
-    Logger.log('a:%s b:%s c:%s', a, status, errorMessage);
+  var onFailure = function(resp, status , errorMessage) {
+    log('worklog::onFailure: resp:%s status:%s msg:%s', resp, status, errorMessage);
     Browser.msgBox("Jira Worklog",
-                   "Failure during request to Jira server.\nStatus:" + status + " \nMessage:'" + errorMessage + "'", 
+                   "Failure during request to Jira server.\\nStatus:" + (status||-1) + " \\nMessage:'" + errorMessage + "'", 
                    Browser.Buttons.OK);
   };
 
@@ -310,8 +310,14 @@ function TimesheetTable1(options) {
 
     // all period and total columns to be centered
     sheet.getRange(currentRowIdx-1, currentColIdx+dataRowFields.length-1, 1, values.length-dataRowFields.length+1).setHorizontalAlignment("center");
-    
+    sheet.getRange(currentRowIdx-1, values.length).setHorizontalAlignment("right");
+
     SpreadsheetApp.flush();
+
+    // set width of period columns
+    for(var c=(dataRowFields.length+1); c <= values.length; c++) {
+      sheet.setColumnWidth(c, 70);
+    }
 
     return this;
   }
