@@ -340,7 +340,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'duedate':
       // very dirty - just cant get arround timezone issue when date is in format 'YYYY-MM-DD'
       // @TODO: require proper generic solution for this
-      var _duedate = data.fields.duedate || 'n/a';
+      var _duedate = data.fields.duedate || null;
       _duedate = (_duedate.length == 10) ? _duedate + 'T12:00:00' : _duedate;
       resp = {
         value: _duedate,
