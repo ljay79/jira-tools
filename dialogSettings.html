@@ -11,20 +11,34 @@
     <div id="response-message" class="error-container" role="dialog"></div>
 
     <form id="settings" action="" method="post">
-      <div class="form-group block">
-        <label for="jira-url">Jira URL</label>
-        <span class="inline grey">(https://YOURCOMPANY.atlassian.net/)</span>
-        <input type="text" id="jira-url" name="jira_url" class="block" style="width:100%" value="<?= url ?>">
-      </div>
-      <div class="form-group block">
-        <label for="jira-username">Username</label>
-        <span class="inline grey">(Atlassian account name)</span>
-        <input type="text" id="jira-username" name="jira_username" class="block" style="width:100%" value="<?= username ?>" />
-      </div>
-      <div class="form-group block">
-        <label for="jira-password">Password</label>
-        <input type="password" id="jira-password" name="jira_password" class="block" style="width:100%" value="<?= password ?>">
-      </div>
+      <fieldset class="block">
+        <legend>General</legend>
+        
+        <div class="form-group block">
+          <label for="jira-url">Jira URL</label>
+          <span class="inline grey">(https://YOURCOMPANY.atlassian.net/)</span>
+          <input type="text" id="jira-url" name="jira_url" class="block" style="width:100%" value="<?= url ?>">
+        </div>
+        <div class="form-group block">
+          <label for="jira-username">Username</label>
+          <span class="inline grey">(Atlassian account name)</span>
+          <input type="text" id="jira-username" name="jira_username" class="block" style="width:100%" value="<?= username ?>" />
+        </div>
+        <div class="form-group block">
+          <label for="jira-password">Password</label>
+          <input type="password" id="jira-password" name="jira_password" class="block" style="width:100%" value="<?= password ?>">
+        </div>
+      </fieldset>
+      
+      <fieldset class="block">
+        <legend>Time Sheet</legend>
+        
+        <div class="form-group block">
+          <label for="ts-workhours" class="block">Working hours per day</label>
+          <input type="number" id="ts-workhours" name="ts_workhours" style="display:inline-block;width:16%" min="1" step=".1" value="<?= workhours ?>">
+          <span class="inline">h</span>
+        </div>
+      </fieldset>
       
       <div class="block">
         <button type="submit" class="action" disabled>Save</button>

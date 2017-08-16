@@ -35,6 +35,9 @@ function refreshTickets() {
           rows.getCell(rowIdx, colIdx).setValue(newValue);
           break;
       }
+      
+      SpreadsheetApp.flush();
+
     } else {
       // Something funky is up with the JSON response.
       log(rowIdx, "Failed to retrieve ticket data for ID [" + jiraCell.ticketId + "]!");
