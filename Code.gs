@@ -9,7 +9,7 @@
  */
 
 var BUILD = 0180;
-var LOGGING = true;
+var LOGGING = false;
 
 /** 
  * Add a nice menu option for the users.
@@ -43,10 +43,10 @@ function addMenu() {
     
     // Add "Insert ..." menu with submenu
     .addSeparator()
-    .addSubMenu(SpreadsheetApp.getUi().createMenu('Insert...')
+    //.addSubMenu(SpreadsheetApp.getUi().createMenu('Insert...')
       .addItem('List Issues from Filter', 'dialogIssueFromFilter')
-      .addItem('Time Sheet', 'dialogTimesheet')
-    )
+      .addItem('Create Time Report', 'dialogTimesheet')
+    //)
 
     .addSeparator()
     .addItem('Settings', 'dialogSettings')
