@@ -6,6 +6,7 @@ With this Google Sheet Add-on the, called "[Jira Sheet Tools](https://chrome.goo
 
 [Jira Sheet Tools](https://chrome.google.com/webstore/detail/jira-sheet-tools/ncijnapilmmnebhbdanhkbbofofcniao) allows you to visualize the status of any Jira ticket you mention in a sheet.
 You can directly import entire issue lists with your Jira filters just from within Google sheet.
+NEW! You can create time reports for any of your users based on the Jira worklogs.
 
 Enter your Jira server domain and user details once, and be able to use the Jira features in any sheet at any time.
 No manual status update copy&paste anymore.
@@ -64,10 +65,19 @@ Even when used within text it will search for keys and add the status.
 If Jira issue key used in a single cell, the value will be linked automatically to the Jira issue page.
 
 ### List Issues From Filter
-“Add-ons" > “Jira Sheet Tools” > "Insert...” > "List Issues from Filter"
+“Add-ons" > “Jira Sheet Tools” > "List Issues from Filter"
 
 Allows you to add a table/list of all found Jira issues based on a Jira Filter.
 The dialog will let you choose from all your Jira filters and then insert all results into the active Google sheet.
 You can even decide which information to be shown in the resulting table.
 Most common Jira fields / columns are available to select from.
 
+> Note: This feature is currently limited to list a maximum of 1000 jira issues.
+
+### Time Sheet
+“Add-ons" > “Jira Sheet Tools” > "Time Sheet"
+
+Lets you pick a user from Jira and a date period to filter for and generates a nice Time sheet report based on all worklogs for the filtered user and date period.
+Supports two different time report formats; "1d 7h 59m" for better readibility or "7.5" (work hours as decimal number) for better calculations in the sheet.
+
+> Careful when selecting to big date periods, can be slow and become a wide table. Start with 1 week and scale up.
