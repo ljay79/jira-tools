@@ -138,6 +138,7 @@ function Search(searchQuery) {
    */
   this.withFailureHandler = function(fn) {
     if(response.status !== 200) {
+      log("withFailureHandler: %s", response);
       fn.call(this, response.data, response.status, response.errorMessage);
     }
     return this;
@@ -168,8 +169,8 @@ function Search(searchQuery) {
     // nothing found - return class response
     if( _total == 0 ) {
       response = {
-        'responseData' : resp.issues || resp,
-        'statusCode'   : status,
+        'data'         : resp.issues || resp,
+        'status'       : status,
         'errorMessage' : resp.hasOwnProperty('warningMessages') ? resp.warningMessages : 'No results found.'
       };
       return;
@@ -207,7 +208,7 @@ function Search(searchQuery) {
    * @return void
    */
   var onFailure = function(resp, httpResp, status) {
-    log('onFailure: [%s] %s', status, resp);
+    Logger.log('search:onFailure: [%s] %s', status, resp);
 
     var msgs = resp.hasOwnProperty('errorMessages') ? resp.errorMessages : [];
     msgs = msgs.concat((resp.hasOwnProperty('warningMessages') ? resp.warningMessages : []));
