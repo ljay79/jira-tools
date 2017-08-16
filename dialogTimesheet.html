@@ -24,10 +24,10 @@
     
     <form name="worklog" action="" method="post">
       <fieldset class="block">
-        <legend>Target</legend>
+        <legend>Select User</legend>
         
         <div class="block">
-          <label for="wlUser">Select user</label>
+          <!--<label for="wlUser">Select user</label>-->
           <select name="wlUser" id="wlUser" class="block is-loading">
             <option value=""></option>
           </select>
@@ -45,22 +45,22 @@
       </fieldset>
 
       <fieldset class="block">
-        <legend>Parameters</legend>
+        <legend>Options</legend>
         
         <? var now = (new Date()).getTime(), MilliPerDay = 1000 * 60 * 60 * 24; ?>
         <div class="block">
           <div class="inline" style="vertical-align:top;">
-            <label for="wlStartDate">Start date:</label><!-- default to now()-7 days -->
-            <input type="text" name="wlStartDate" class="block" style="width:100%" value="<?= Utilities.formatDate(new Date(now - 7 * MilliPerDay), 'Etc/GMT', 'yyyy-MM-dd') ?>" />
+            <label for="wlStartDate">Start Date:</label><!-- default to now()-7 days -->
+            <input type="text" name="wlStartDate" class="block" style="width:80%" value="<?= Utilities.formatDate(new Date(now - 7 * MilliPerDay), 'Etc/GMT', 'yyyy-MM-dd') ?>" />
           </div>
           <div class="inline" style="vertical-align:top;">
             <label for="wlEndDate">End Date:</label><!-- default to now() -->
-            <input type="text" name="wlEndDate" class="block" style="width:100%" value="<?= Utilities.formatDate(new Date(now), 'Etc/GMT', 'yyyy-MM-dd') ?>" />
+            <input type="text" name="wlEndDate" class="block" style="width:80%" value="<?= Utilities.formatDate(new Date(now), 'Etc/GMT', 'yyyy-MM-dd') ?>" />
           </div>
         </div>
         
         <div class="block">
-          <label for="wlTimeFormat" class="block">Format:</label>
+          <label for="wlTimeFormat" class="block">Reporting Time Format:</label>
           <input type="radio" id="wlTimeFormatOne" name="wlTimeFormat" value="1" checked /> <label for="wlTimeFormatOne" title="human readable">1d 7h 59m</label><br/>
           <input type="radio" id="wlTimeFormatTwo" name="wlTimeFormat" value="2" /> <label for="wlTimeFormatTwo" title="workhours as float, good for post calculations">7.5</label>
         </div>
