@@ -24,6 +24,8 @@ function getDialog(file, values) {
  * @desc Jira Settings Dialog constructor
  */
 function dialogSettings() {
+  initDefaults();
+  
   var dialog = getDialog('dialogSettings', getServerCfg());
 
   dialog
