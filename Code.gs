@@ -1,11 +1,10 @@
 /**
  * @author Jens Rosemeier <github@jens79.de>
  * @github  https://github.com/ljay79/jira-tools
+ * @copyright Jens Rosemeier, 2017
  *
  * ToDo/Notes:
  * - use google auth with token based Jira RESTful API vs. cleartext password
- * - add feature to insert worklogs - list of worklogs, using dialog with filter input
- * - add feature to insert list of tickets (issue overview) based on available Jira filters
  */
 
 var BUILD = 0180;
