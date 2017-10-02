@@ -76,12 +76,12 @@ function dialogIssueFromFilter() {
 
   var dialog = getDialog('dialogIssuesFromFilter', {
     columns: ISSUE_COLUMNS,
-    defaultColumns: JSON.parse(getVar('jiraColumnDefault'))
+    defaultColumns: getVar('jiraColumnDefault')
   });
 
   dialog
     .setWidth(600)
-    .setHeight(480)
+    .setHeight(390)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   log('Processed: %s', dialog);

@@ -4,8 +4,8 @@
     <base target="_top">
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
     <style>
-    .error-container { display: none; margin-bottom: 16px; padding: 5px 10px; text-align: center; color: #fff; }
-    .filter-select { border: 1px solid #dfdfdf; height: 224px; overflow-y: auto; line-height: 28px; }
+    .error-container { display: none; margin-bottom: 16px; padding: 5px 10px; text-align: center; color: #fff; width:50%; float:right}
+    .filter-select { border: 1px solid #dfdfdf; height: 154px; overflow-y: auto; line-height: 28px; }
     .filter-select > div { padding-left: 3px; padding-right: 24px; }
     .filter-select > div:nth-child(even) { background: #f7f8f9; }
     .is-loading { text-align: center; animation: blink .5s infinite; }
@@ -18,8 +18,6 @@
     </style>
   </head>
   <body>
-    <div id="response-message" class="error-container" role="dialog"></div>
-    
     <form name="issue-filter" action="" method="post">
       <input type="hidden" name="filter_id" id="filter-id" value="" />
       <div class="block filter-select is-loading">loading filters ...</div>
@@ -37,6 +35,7 @@
       <div class="block">
         <button type="submit" class="action" disabled>Insert</button>
         <button type="button" onclick="google.script.host.close()">Cancel</button>
+        <div id="response-message" class="error-container" role="dialog"></div>
       </div>
     </form>
     
