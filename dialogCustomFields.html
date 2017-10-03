@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <style>
+    .error-container { display: none; margin-bottom: 16px; padding: 5px 10px; text-align: center; color: #fff; width:50%; float:right}
+    .is-loading { text-align: center; animation: blink .5s infinite; }
+    @keyframes blink { 0% { color: #fff; } 50% { color: #777; } 100% { color: #fff; } }
+    .label { flex: 0 0 100%; font-weight: bold; }
+    .customfields-select { border: 1px solid #dfdfdf; height: 154px; overflow-y: auto; line-height: 28px; }
+    .customfields-select > div { padding-left: 3px; padding-right: 24px; }
+    .customfields-select > div:nth-child(even) { background: #f7f8f9; }
+    .customfields-favs { height:160px; display: flex; flex-direction: row; flex-wrap: wrap; align-items: left; justify-content: left; overflow-y: scroll }
+    .customfields-favs .item { position: relative; padding: 0 20px; box-sizing: border-box; }
+    .customfields-favs .item input[type="checkbox"] { position: absolute; }
+    </style>
+  </head>
+  <body>
+    <div class="block" style="margin-bottom: 14px;">
+      Select your favorites from your Jira Custom Fields, which will then be available for this Add-On, ie: for "List Issues from Filter". 
+    </div>
+
+    <form name="frm-customfields" action="" method="post">
+      <div class="block">
+        <label class="label">Jira Custom Fields</label>
+        <div class="block customfields-select is-loading">loading Jira Custom Fields ...</div>
+      </div>
+
+      <div class="block customfields-favs">
+        <label class="label">Favorite Custom Fields</label>
+        <? for (var idx=0; idx < favoriteCustomFields.length; idx++) { ?>
+        <div class="item">
+          <input type="checkbox" id="favoriteField-<?= favoriteCustomFields[idx].key ?>" 
+                 name="favoriteFields[]" 
+                 value="<?= JSON.stringify(favoriteCustomFields[idx]) ?>"
+                 checked="checked">
+          <label for="favoriteField-<?= favoriteCustomFields[idx].key ?>"><?= favoriteCustomFields[idx].name ?></label>
+        </div>
+        <? } ?>
+      </div>
+
+      <div class="block">
+        <button type="submit" class="action">Save</button>
+        <button type="button" onclick="google.script.host.close()">Cancel</button>
+        <div id="response-message" class="error-container" role="dialog"></div>
+      </div>
+
+    </form>
+
+    <script>
+      var form    = document.forms['frm-customfields'];
+      var timeout = null;
+      var alert   = document.getElementById('response-message');
+      var _storedFavFields = <?!= JSON.stringify(favoriteCustomFields) ?>;
+      var fieldSelect = form.querySelector('.customfields-select');
+      var fieldFavorites = form.querySelector('.customfields-favs');
+
+      function hideAlert(){
+        if(timeout) timeout = clearTimeout(timeout);
+        alert.style.display = 'none';
+      }
+
+      function showAlert(text, type, time) {
+        alert.innerText = text;
+        alert.style.backgroundColor = type ? 'rgb(139,195,74)' : 'rgb(213,0,0)';
+        alert.style.display = 'block';
+        if (time) timeout = setTimeout(hideAlert,time);
+      }
+      
+      function onInitCustomFields(response) {
+        fieldSelect.innerText = '';
+        fieldSelect.classList.remove('is-loading');
+
+        if (!response.length) {
+          showAlert('No Custom Fields available!')
+          return;
+        }
+
+        response.forEach(function(field) {
+          var chkbox = document.createElement('div');
+          var chkboxInput = document.createElement('input');
+          var chkboxLabel = document.createElement('label');
+          
+          chkboxInput.setAttribute('type', 'checkbox');
+          chkboxInput.setAttribute('name', 'customfield');
+          chkboxInput.setAttribute('id', 'customfield-id-'+field.key);
+          chkboxInput.setAttribute('value', JSON.stringify(field));
+          chkboxLabel.setAttribute('for', 'customfield-id-'+field.key);
+          chkboxLabel.innerHTML = field.name + ' <small><em>(Type: ' + JSON.stringify(field.type) + (field.supported?'':' - not supported') + ')</em></small>';
+          if (isFavorite(field.key)) chkboxInput.setAttribute('checked', 'checked');
+          if (!field.supported) chkboxInput.setAttribute('disabled', 'disabled');
+
+          //if (option.favourite) chkbox.className = 'is-favourite';
+          chkbox.appendChild(chkboxInput);
+          chkbox.appendChild(chkboxLabel);
+
+          fieldSelect.appendChild(chkbox);
+          //chkboxInput.addEventListener('change', updFavoriteField);
+        });
+
+        window.dispatchEvent(new Event('load'));
+      }
+
+      function updFavoriteField() {
+        var add = (this.name === 'customfield') && this.checked;
+        // add custom field to favorites
+        if (add) {
+          addFavoriteItem(JSON.parse(this.value));
+        }
+
+        // remove custom field from favorites
+        if (!this.checked) {
+          var field = JSON.parse(this.value);
+          form.querySelector('#customfield-id-' + field.key).checked = false;
+          var el = form.querySelector('#favoriteField-'  + field.key);
+          el.parentNode.parentNode.removeChild(el.parentNode);
+        }
+      }
+
+      function addFavoriteItem(item) {
+        var chkbox = document.createElement('div');
+        chkbox.setAttribute('class', 'item');
+        var chkboxInput = document.createElement('input');
+        var chkboxLabel = document.createElement('label');
+
+        chkboxInput.setAttribute('type', 'checkbox');
+        chkboxInput.setAttribute('name', 'favoriteFields[]');
+        chkboxInput.setAttribute('id',   'favoriteField-' + item.key);
+        chkboxInput.setAttribute('value', JSON.stringify(item));
+        chkboxInput.setAttribute('checked', 'checked');
+        chkboxLabel.setAttribute('for',  'favoriteField-' + item.key);
+        chkboxLabel.innerHTML = item.name;
+
+        chkbox.appendChild(chkboxInput);
+        chkbox.appendChild(chkboxLabel);
+
+        fieldFavorites.appendChild(chkbox);
+        chkboxInput.addEventListener('change', updFavoriteField);
+      }
+      
+      function formSubmitHandler(event) {
+        if (event) event.preventDefault();
+        hideAlert();
+
+        // get all checked favorite custom field checkbox elements
+        var _checkedFavs = Array.prototype.slice.call(fieldFavorites.querySelectorAll('*[id^="favoriteField-"]')).filter(function(el){ 
+          if(el.nodeName === 'INPUT' && el.type === 'checkbox' && el.checked === true) {
+            return true;
+          }
+          return false;
+        });
+
+        showAlert('saving ...', 1);
+
+        var formData = {
+          favoriteCustomFields: _checkedFavs.map(function(el) { return JSON.parse(el.value); })
+        };
+
+        google.script.run
+          .withSuccessHandler(onResponse)
+          .withFailureHandler(onResponse)
+          .saveCustomFields(formData);
+      }
+
+      function onResponse(response) {
+        var done = response.status === true;
+        hideAlert();
+        if(done) google.script.host.close();
+        showAlert(response.message, done, 10000);
+      }
+      
+      /**
+       * Check if key is part of favoriteCustomFields
+       * @return {boolean}
+       */
+      function isFavorite(key) {
+        return _storedFavFields.find(o => o.key === key);
+      }
+
+      google.script.run
+        .withSuccessHandler(onInitCustomFields)
+        .getCustomFields();
+
+      form.addEventListener('submit', formSubmitHandler);
+      window.addEventListener('load', function(){
+        Array.prototype.slice.call(form.elements).filter(function(el){ 
+          if(el.nodeName === 'INPUT' && el.type === 'checkbox') {
+            el.addEventListener('change', updFavoriteField);
+            return true;
+          }
+          return false;
+        });
+      });
+    </script>
+  </body>
+</html>

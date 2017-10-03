@@ -8,7 +8,7 @@
  */
 
 var BUILD = 0180;
-var LOGGING = false;
+var LOGGING = true;
 
 /** 
  * Add a nice menu option for the users.
@@ -40,15 +40,13 @@ function addMenu() {
     // Tools
     .addItem('Refresh Ticket Data', 'dialogRefreshTicketsIds')
     
-    // Add "Insert ..." menu with submenu
     .addSeparator()
-    //.addSubMenu(SpreadsheetApp.getUi().createMenu('Insert...')
-      .addItem('List Issues from Filter', 'dialogIssueFromFilter')
-      .addItem('Create Time Report', 'dialogTimesheet')
-    //)
+    .addItem('List Issues from Filter', 'dialogIssueFromFilter')
+    .addItem('Create Time Report', 'dialogTimesheet')
 
     .addSeparator()
     .addItem('Settings', 'dialogSettings')
+    .addItem('Configure Custom Fields', 'dialogCustomFields')
     .addItem('About', 'dialogAbout')
   
     .addToUi();

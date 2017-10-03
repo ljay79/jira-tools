@@ -195,3 +195,26 @@ function dialogTimesheet() {
 }
 
 /* Dialog: Worklog - END */
+
+
+/* Dialog: Custom Fields */
+
+/**
+ * @desc Dialog to configure Jira custom fields
+ */
+function dialogCustomFields() {
+  if(!hasSettings(true)) return;
+
+  var dialog = getDialog('dialogCustomFields', {favoriteCustomFields: (getVar('favoriteCustomFields') || [])});
+
+  dialog
+    .setWidth(480)
+    .setHeight(460)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+
+  log('Processed: %s', dialog);
+
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'Configure Custom Fields');
+}
+
+/* Dialog: Custom Fields - END */
