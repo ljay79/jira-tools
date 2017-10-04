@@ -285,6 +285,54 @@ function unifyIssueAttrib(attrib, data) {
   var resp = {value: ''};
   
   try { // no error handling, always return a valid object
+    
+  // custom fields first
+  if ( attrib.substring(0, 12) == 'customfield_' ) {
+    var customFields = getCustomFields(CUSTOMFIELD_FORMAT_UNIFY);
+
+    if (customFields.hasOwnProperty(attrib)) {
+      var format = customFields[attrib];
+
+      switch(format) {
+        case 'datetime':
+          var _date = data.fields[attrib] || null;
+          resp = {
+            value: _date,
+            date: new Date(getDateFromIso(_date)) || new Date(),
+            format: "dd.mm.yyyy hh:mm"
+          };
+          break;
+        case 'date':
+          var _date = data.fields[attrib] || null;
+          _date = (_date.length == 10) ? _date + 'T12:00:00' : _date;
+          var date = new Date(getDateFromIso(_date)) || new Date();
+          date.setHours(0,0,0);
+          resp = {
+            value: _date,
+            date: date,
+            format: "dd.mm.yyyy"
+          };
+          break;
+        case 'number':
+          resp = {
+            value: parseFloat(data.fields[attrib]) || null,
+            format: "0"
+          };
+          break;
+        case 'string':
+          resp.value = data.fields[attrib] || '';
+          break;
+        default:
+          log('unifyIssueAttrib(' + attrib + ') no format defined yet for custom field.');
+          resp.value = data[attrib] || data.fields[attrib];
+          break;
+      }
+
+      return resp;
+    }
+  }
+  
+  // regular fields
   switch(attrib) {
     case 'status':
       resp = {
@@ -332,7 +380,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'updated':
     case 'created':
       resp = {
-        value: data.fields[attrib] || 'n/a',
+        value: data.fields[attrib] || null,
         date: new Date(getDateFromIso(data.fields[attrib])) || new Date(),
         format: "dd.mm.yyyy hh:mm"
       };
@@ -393,7 +441,6 @@ function unifyIssueAttrib(attrib, data) {
         name: data.name,
         emailAddress: data.emailAddress,
         active: data.active,
-
         value: data.displayName,
         format: "@"
       };
@@ -446,6 +493,9 @@ function headerNames(header) {
     duedate: 'Due',
     priority: 'P',
   });
+  
+  // append favorite custom fields
+  extend(labels, getCustomFields(CUSTOMFIELD_FORMAT_SEARCH));
 
   if( !labels.hasOwnProperty(header) ) {
     label = camelize(header);
