@@ -51,7 +51,7 @@ function IssueTable(sheet, initRange, data) {
         // for some custom formatting
         switch(true) {
           case key.hasOwnProperty('date'):
-            key.value = (key.date != null) ? key.date : '';
+            key.value = (key.value != null) ? key.date : '';
             break;
           case key.hasOwnProperty('link'):
             key.value = '=HYPERLINK("' + key.link + '"; "' + key.value + '")';
