@@ -14,7 +14,8 @@ var restMethods = {
     'myFilters'     : {method: '/filter/my', queryparams: {includeFavourites: 'false'}},
 
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 1000, username:'%'}},
-    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 1000, query: ''}}
+    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 1000, query: ''}},
+    'field'         : {method: '/field'}
   },
   'server': {
     'dashboard'     : '/dashboard',
@@ -27,6 +28,7 @@ var restMethods = {
 
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 1000, username:'%'}},
     'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 1000, query: ''}}
+    'field'         : {method: '/field'}
   }
 };
 
