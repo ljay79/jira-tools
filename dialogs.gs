@@ -74,14 +74,22 @@ function dialogRefreshTicketsIds() {
 function dialogIssueFromFilter() {
   if(!hasSettings(true)) return;
 
+  var customFields = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
   var dialog = getDialog('dialogIssuesFromFilter', {
     columns: ISSUE_COLUMNS,
-    defaultColumns: getVar('jiraColumnDefault')
+    defaultColumns: getVar('jiraColumnDefault'),
+    customFields: customFields
   });
+
+  // try to adjust height depending on amount of jira fields to show
+  var rowH = 28;
+  var height = 364;
+  height += (Math.ceil(Object.keys(ISSUE_COLUMNS).length % 4) * rowH);
+  height += (Math.ceil(Object.keys(customFields).length % 4) * rowH);
 
   dialog
     .setWidth(600)
-    .setHeight(390)
+    .setHeight(height)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   log('Processed: %s', dialog);

@@ -23,12 +23,24 @@
       <div class="block filter-select is-loading">loading filters ...</div>
       
       <div class="block filter-cols">
-        <label class="label">Columns</label>
+        <label class="label">System Columns</label>
         <? for (var id in columns) { ?>
         <div class="item">
           <input type="checkbox" id="column-<?= id ?>" name="columns[]" value="<?= id ?>"<? if (defaultColumns.indexOf(id) > -1) { ?> checked="checked"<? } ?>>
           <label for="column-<?= id ?>"><?= columns[id] ?></label>
         </div>
+        <? } ?>
+      </div>
+      <div class="block filter-cols">
+        <label class="label">Custom Columns (Favorite Fields)</label>
+        <? for (var id in customFields) { ?>
+        <div class="item">
+          <input type="checkbox" id="column-<?= id ?>" name="columns[]" value="<?= id ?>"<? if (defaultColumns.indexOf(id) > -1) { ?> checked="checked"<? } ?>>
+          <label for="column-<?= id ?>"><?= customFields[id] ?></label>
+        </div>
+        <? } ?>
+        <? if( Object.keys(customFields).length == 0 ) { ?>
+        <em>Configure your favorite custom fields here: "Add-ons" -> "Jira Sheet Tools" -> "Configure Custom Fields".</em>
         <? } ?>
       </div>
 
@@ -38,7 +50,7 @@
         <div id="response-message" class="error-container" role="dialog"></div>
       </div>
     </form>
-    
+
     <script>
       var filter  = document.forms['issue-filter'];
       var valid   = false;
@@ -76,7 +88,7 @@
           showAlert('No filters available!')
           return;
         }
-        
+
         response.forEach(function(option) {
           var radio = document.createElement('div');
           var radioInput = document.createElement('input');

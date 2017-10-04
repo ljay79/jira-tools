@@ -1,8 +1,41 @@
+var CUSTOMFIELD_FORMAT_RAW    = 1;
+var CUSTOMFIELD_FORMAT_SEARCH = 2;
+var CUSTOMFIELD_FORMAT_UNIFY  = 3;
+
+/**
+ * @desc Convert stored custom fields in different prepared format.
+ * @param format {Integer}
+ * @return {Object}
+ */
+function getCustomFields( format ) {
+  format = format || CUSTOMFIELD_FORMAT_RAW;
+  var customFields = getVar('favoriteCustomFields') || [];
+  var fieldsFormatted = {};
+
+  if ( format === CUSTOMFIELD_FORMAT_RAW ) {
+    return customFields;
+  }
+
+  if ( format === CUSTOMFIELD_FORMAT_SEARCH ) {
+    customFields.forEach(function(el) {
+      fieldsFormatted[el.key] = el.name;
+    });
+  }
+
+  if ( format === CUSTOMFIELD_FORMAT_UNIFY ) {
+    customFields.forEach(function(el) {
+      fieldsFormatted[el.key] = el.type;
+    });
+  }
+
+  return fieldsFormatted;
+}
+
 /**
  * Dialog Helper to retrieve list of all available Jira Custom Fields
  * @returns {Array}    Array of custom Jira Fields
  */
-function getCustomFields() {
+function fetchCustomFields() {
   var method = "field", _customFieldsRaw = [], customFields = [];
 
   var ok = function(respData, httpResp, status) {

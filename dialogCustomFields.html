@@ -180,7 +180,7 @@
 
       google.script.run
         .withSuccessHandler(onInitCustomFields)
-        .getCustomFields();
+        .fetchCustomFields();
 
       form.addEventListener('submit', formSubmitHandler);
       window.addEventListener('load', function(){
