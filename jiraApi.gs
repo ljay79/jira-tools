@@ -28,7 +28,6 @@ var restMethods = {
 
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 1000, username:'%'}},
     'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 1000, query: ''}}
-    'field'         : {method: '/field'}
   }
 };
 
@@ -156,6 +155,10 @@ function Request() {
       // dont bother trying to connect - use .withFailureHandler() to act on this failure
       return this;
     }
+    
+    var timingLabel = 'JiraApi call('+method+')';
+    console.info('Timing the %s function (%d arguments)', 'Request.call', 3);
+    console.time(timingLabel);
 
     jiraMethod = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].method : restMethods[server_type][method];
     jiraQueryParams = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].queryparams : {};
@@ -200,8 +203,13 @@ function Request() {
     fetchUrl = buildUrl(fetchUrl, urlParams);
 
     responseData = null;
-    httpResponse = UrlFetchApp.fetch(fetchUrl, this.getFetchArgs(fetchArgs));
-    statusCode = parseInt( httpResponse.getResponseCode() );
+    try {
+      httpResponse = UrlFetchApp.fetch(fetchUrl, this.getFetchArgs(fetchArgs));
+      statusCode = parseInt( httpResponse.getResponseCode() );
+    } catch (e) {
+      console.error('UrlFetchApp.fetch(%s) yielded an error: ' + e, fetchUrl);
+      statusCode = 500;
+    }
 
     if (httpResponse) {
       try {
@@ -218,6 +226,8 @@ function Request() {
     if( typeof responseData == 'string' ) {
       responseData = {errorMessages: [responseData]};
     }
+
+    console.timeEnd(timingLabel);
 
     return this;
   };
