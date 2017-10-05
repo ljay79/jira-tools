@@ -1,8 +1,16 @@
 /*function testSearch() {
-  var s = new Search('worklogDate>="2017-07-02" and worklogDate<="2017-07-11" and worklogAuthor="jrosemeier"');
+  var s = new Search('');
   s.setOrderBy('updated', 'DESC')
-   .setFields(['id','key','issuetype','project','status','summary']);
+   .setFields(['summary', 'issuetype', 'priority', 
+		'status', 'updated', 'assignee', 
+		'duedate', 'project', 'customfield_11102'])
+    .setMaxResults(50)
+    .setMaxPerPage(10);
 
+  //var s = new Search('worklogDate>="2017-07-02" and worklogDate<="2017-07-11" and worklogAuthor="jrosemeier"');
+  //s.setOrderBy('updated', 'DESC')
+  // .setFields(['id','key','issuetype','project','status','summary']);
+  //
   onSuccess = function(a,b,c) {
     log('%s', '----------ON SUCCESS-----------');
     log('%s %s %s', JSON.stringify(a), b, c);
@@ -30,10 +38,11 @@
  */
 function Search(searchQuery) {
   var fields = ['key'],
-      startAt = 0, maxResults = 1000, maxPerPage = 500,
+      startAt = 0, maxResults = 1000, maxPerPage = 50,
       queryStr = searchQuery, orderBy = '', orderDir = 'ASC';
   var response = {
     'data': [],
+    'totalFoundRecords': 0,
     'status': -1,
     'errorMessage': ''
   };
@@ -126,7 +135,7 @@ function Search(searchQuery) {
    */
   this.withSuccessHandler = function(fn) {
     if(response.status === 200) {
-      fn.call(this, response.data, response.status, response.errorMessage);
+      fn.call(this, {data: response.data, totalFoundRecords: response.totalFoundRecords}, response.status, response.errorMessage);
     }
     return this;
   };
@@ -139,7 +148,7 @@ function Search(searchQuery) {
   this.withFailureHandler = function(fn) {
     if(response.status !== 200) {
       log("withFailureHandler: %s", response);
-      fn.call(this, response.data, response.status, response.errorMessage);
+      fn.call(this, {data: response.data, totalFoundRecords: response.totalFoundRecords}, response.status, response.errorMessage);
     }
     return this;
   };
@@ -149,7 +158,7 @@ function Search(searchQuery) {
    * @return {String}
    */
   var getJql = function() {
-    var jql = queryStr + ' ORDER BY ' + orderBy + ' ' + orderDir;
+    var jql = queryStr + ((orderBy != '') ? ' ORDER BY ' + orderBy + ' ' + orderDir : '');
     log('Search JQL: [%s]', jql);
 
     //return encodeURIComponent(jql); //only when api call is performed as GET
@@ -165,13 +174,15 @@ function Search(searchQuery) {
    */
   var onSuccess = function(resp, httpResp, status) {
     var _total = parseInt(resp.total || 0);
+    log('onSuccess found total: %s', _total);
 
     // nothing found - return class response
     if( _total == 0 ) {
       response = {
-        'data'         : resp.issues || resp,
-        'status'       : status,
-        'errorMessage' : resp.hasOwnProperty('warningMessages') ? resp.warningMessages : 'No results found.'
+        'data'             : resp.issues || resp,
+        'totalFoundRecords': _total,
+        'status'           : status,
+        'errorMessage'     : resp.hasOwnProperty('warningMessages') ? resp.warningMessages : 'No results found.'
       };
       return;
     }
@@ -179,12 +190,19 @@ function Search(searchQuery) {
     // add current results and status
     response.data.push.apply(response.data, resp.issues || []);
     response.status = status;
+    response.totalFoundRecords = _total;
 
     // pagination / sub-requests required?
     var _countTotalResults = parseInt(resp.startAt) + parseInt(resp.maxResults);
     if( (_countTotalResults < _total) && (_countTotalResults < maxResults) ) {
       // more data to fetch
+      log('-- subSearch: %s / %s of max: %s', _countTotalResults, _total, maxResults);
 
+      // provide little feedback to user
+      var _currPage = Math.ceil(_countTotalResults / maxPerPage) + 1;
+      var _maxPage  = Math.ceil((_total<maxResults?_total:maxResults) / maxPerPage);
+      SpreadsheetApp.getActiveSpreadsheet().toast(".. fetching result page "+_currPage+" / " + _maxPage, "Progress", 5);
+      
       var subSearch = new Search( queryStr );
       subSearch.setOrderBy( orderBy, orderDir )
                .setFields( fields )
@@ -192,10 +210,16 @@ function Search(searchQuery) {
                .setMaxResults( maxResults )
                .setStartAt( _countTotalResults );
 
-      subSearch.search().withSuccessHandler(function(data, status, msg) {
-         // append results to parent results
-         response.data.push.apply(response.data, data);
-         response.status = status;
+      subSearch.search().withSuccessHandler(function(resp, status, errorMessage) {
+        // append results to parent results
+        try {
+          response.data.push.apply(response.data, resp.data || []);
+          response.status = status;
+        } catch(e) {
+          response.status = 500;
+          response.errorMessage = e;
+          console.error("Exception: %s || response: %s", e, resp);
+        }
       }); // dont bubble up failure - 1st call was successfull so we soft-fail and response with results found so far
     }
   }
@@ -208,7 +232,8 @@ function Search(searchQuery) {
    * @return void
    */
   var onFailure = function(resp, httpResp, status) {
-    Logger.log('search:onFailure: [%s] %s', status, resp);
+    log('search:onFailure: [%s] %s', status, resp);
+    console.error('search:onFailure: [%s] %s', status, resp);
 
     var msgs = resp.hasOwnProperty('errorMessages') ? resp.errorMessages : [];
     msgs = msgs.concat((resp.hasOwnProperty('warningMessages') ? resp.warningMessages : []));
@@ -222,7 +247,7 @@ function Search(searchQuery) {
    * @return {this}    Allow chaining
    */
   this.search = function() {
-    log("search with start:%s and maxResults:%s and field:[%s]", startAt, maxPerPage, fields);
+    log("search with startAt:%s, maxPerPage:%s, totalMaxResults:%s and field:[%s]", startAt, maxPerPage, maxResults, fields);
     var data = {
       jql        : getJql(), 
       fields     : fields, 
