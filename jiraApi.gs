@@ -58,19 +58,19 @@ var httpErrorCodes = {
 function testConnection() {
   var req = new Request, response;
 
-  this.ok = function(responseData, httpResponse, statusCode) {
+  var ok = function(responseData, httpResponse, statusCode) {
     response = 'Connection successfully established.';
     setCfg('available', true);
   };
 
-  this.error = function(responseData, httpResponse, statusCode) {
+  var error = function(responseData, httpResponse, statusCode) {
     response = 'Could not connect to Jira Server!' + '['+statusCode+']';
     setCfg('available', false);
   };
 
   req.call('dashboard')
-    .withSuccessHandler(this.ok)
-    .withFailureHandler(this.error);
+    .withSuccessHandler(ok)
+    .withFailureHandler(error);
 
   return {status: (getCfg('available')=='true'), response: response};
 };
