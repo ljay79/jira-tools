@@ -147,7 +147,7 @@ function insertIssuesFromFilter(jsonFormData) {
   var data = {
     jql: filter.jql, 
     fields: jsonFormData['columns'] || [], 
-    maxResults: 1000,
+    maxResults: 105, 
     validateQuery: (getCfg('server_type') == 'onDemand') ? 'strict' : true
   };
 
@@ -167,11 +167,12 @@ function insertIssuesFromFilter(jsonFormData) {
  * @desc Dialog "About"
  */
 function dialogAbout() {
-  var dialog = getDialog('dialogAbout');
+  var tempActiveUserKey = Session.getTemporaryActiveUserKey();
+  var dialog = getDialog('dialogAbout', {tempUserKey: tempActiveUserKey});
 
   dialog
     .setWidth(480)
-    .setHeight(320)
+    .setHeight(340)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   log('Processed: %s', dialog);

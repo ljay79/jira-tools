@@ -13,6 +13,7 @@
     .about span { flex: 75%; }
     .about a { color: inherit; }
     .license { width: calc(100% - 20px); padding: 10px; max-height: 150px; overflow-x: hidden; overflow-y: auto; font: .82em/1 monospace; white-space: pre; } 
+    input.temp-user-key { width: 340px; font: 1em/1 monospace; height:14px; border:none; padding:0; margin:0; }
     </style>
   </head>
   <body>
@@ -26,6 +27,9 @@
       <label>Author:</label> <span><a href="https://github.com/ljay79">Jens Rosemeier</a></span>
       <label>Contributors:</label> <span><a href="https://github.com/DanielKulbe">Daniel Kulbe</a></span>
       <label>Github:</label> <span><a href="https://github.com/ljay79/jira-tools">https://github.com/ljay79/jira-tools</a></span>
+      <label>&nbsp;</label> <span>&nbsp;</span>
+      <label>Support:</label> <span><a href="https://github.com/ljay79/jira-tools/issues">https://github.com/ljay79/jira-tools/issues</a></span>
+      <label>Temp. User Key:</label> <span><input type="text" class="temp-user-key" name="tempUserKey" id="tempUserKey" value="<?= tempUserKey ?>" /></span>
       <!-- <label>Chrome Webstore Store:</label> <span></span>-->
     </div>
 
@@ -706,5 +710,17 @@ Public License instead of this License.  But first, please read
 &lt;http://www.gnu.org/philosophy/why-not-lgpl.html&gt;.
     </div>
 
+    <script>
+    var tempUserKeyField = document.getElementById("tempUserKey");
+    tempUserKeyField.addEventListener('click', function(e) {
+      this.setSelectionRange(0, this.value.length);
+      // Use try & catch for unsupported browser
+      try {
+        // The important part (copy selected text)
+        var ok = document.execCommand('copy');
+        if (ok) this.setAttribute('title', 'Copied!')
+      } catch (err) {}
+    });
+    </script>
   </body>
 </html>
