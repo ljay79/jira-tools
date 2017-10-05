@@ -7,7 +7,7 @@
  * - use google auth with token based Jira RESTful API vs. cleartext password
  */
 
-var BUILD = 0180;
+var BUILD = 0190;
 var LOGGING = true;
 
 /** 
@@ -54,6 +54,7 @@ function addMenu() {
 
 /**
  * @desc Simple Logger.log wrapper for centralized enabling/disabling log messages
+ *       For console.log see: https://developers.google.com/apps-script/reference/base/console
  * @param format  A Format or message to log
  * @param values  Optional values to pass into format msg
  * @return void
