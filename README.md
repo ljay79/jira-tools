@@ -81,3 +81,15 @@ Lets you pick a user from Jira and a date period to filter for and generates a n
 Supports two different time report formats; "1d 7h 59m" for better readibility or "7.5" (work hours as decimal number) for better calculations in the sheet.
 
 > Careful when selecting to big date periods, can be slow and become a wide table. Start with 1 week and scale up.
+
+### Limitations
+With the features of this Add-On are some hard limits implemented purposly.
+Specifically related to the amount of records you can fetch from your Jira API due to Atlassians REST API policy.
+It is described here on [Atlassian.com](https://confluence.atlassian.com/jirakb/changing-maxresults-parameter-for-jira-rest-api-779160706.html) that the limit of records per call can be changed without notice.
+Therefore i do use already pagination where ever possible.
+
+Current existing limitations by this Add-On:
+* "List Issues from Filter" is limited to a total amount of **10.000** issues to be listed per request
+  * To comply with Atlassians policy, it does internally fetch only *50* records per page which can result in quite some delay when dealing with too many issues.
+* Listing of Jira users and groups (within dialogs) is limited to **100** user/group records
+* "Time Sheet" is limited to report max **1.000** worklogs per Jira issue (max **1.000** issues) per Time sheet
