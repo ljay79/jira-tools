@@ -4,41 +4,40 @@
     <base target="_top">
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
     <style>
-    .error-container { display: none; margin-bottom: 16px; padding: 5px 10px; text-align: center; color: #fff; width:50%; float:right}
+    p { margin-top: 0; }
+    .error-container { display: none; width: 50%; float: right; margin-bottom: 16px; padding: 5px 10px; text-align: center; color: #fff; }
     .is-loading { text-align: center; animation: blink .5s infinite; }
     @keyframes blink { 0% { color: #fff; } 50% { color: #777; } 100% { color: #fff; } }
-    .label { flex: 0 0 100%; font-weight: bold; }
-    .customfields-select { border: 1px solid #dfdfdf; height: 154px; overflow-y: auto; line-height: 28px; }
-    .customfields-select > div { padding-left: 3px; padding-right: 24px; }
-    .customfields-select > div:nth-child(even) { background: #f7f8f9; }
-    .customfields-favs { height:160px; display: flex; flex-direction: row; flex-wrap: wrap; align-items: left; justify-content: left; overflow-y: scroll }
-    .customfields-favs .item { position: relative; padding: 0 20px; box-sizing: border-box; }
-    .customfields-favs .item input[type="checkbox"] { position: absolute; }
+    .customfields-select, .customfields-favs { height: 136px; margin: -0.5em -0.75em -0.625em; overflow-y: auto; line-height: 28px; }
+    .customfields-select > div, .customfields-favs > div { position: relative; padding-left: 3px; padding-right: 24px; }
+    .customfields-select > div:nth-child(even), .customfields-favs > div:nth-child(even) { background: #f7f8f9; }
+    .customfields-favs input[type="checkbox"] { opacity: 0; }
+    .customfields-favs > div:before { content: "\2212"; position: absolute; top: 0; left: .33em; bottom: 0; font-size: 1.3em; font-weight: bold; }
     </style>
   </head>
   <body>
-    <div class="block" style="margin-bottom: 14px;">
-      Select your favorites from your Jira Custom Fields, which will then be available for this Add-On, ie: for "List Issues from Filter". 
-    </div>
+    <p>Select your favorites from your Jira Custom Fields, which will then be available for this Add-On, ie: for "List Issues from Filter".</p>
 
     <form name="frm-customfields" action="" method="post">
-      <div class="block">
-        <label class="label">Jira Custom Fields</label>
-        <div class="block customfields-select is-loading">loading Jira Custom Fields ...</div>
-      </div>
+      <fieldset class="block">
+        <legend>Available Custom Fields</legend>
+        <div class="block customfields-select is-loading">loading Custom Fields from Jira ...</div>
+      </fieldset>
 
-      <div class="block customfields-favs">
-        <label class="label">Favorite Custom Fields</label>
-        <? for (var idx=0; idx < favoriteCustomFields.length; idx++) { ?>
-        <div class="item">
-          <input type="checkbox" id="favoriteField-<?= favoriteCustomFields[idx].key ?>" 
-                 name="favoriteFields[]" 
-                 value="<?= JSON.stringify(favoriteCustomFields[idx]) ?>"
-                 checked="checked">
-          <label for="favoriteField-<?= favoriteCustomFields[idx].key ?>"><?= favoriteCustomFields[idx].name ?></label>
+      <fieldset class="block">
+        <legend>Your Custom Fields</legend>
+        <div class="customfields-favs">
+        <? for (var idx=0, ldx = favoriteCustomFields.length; idx < ldx; idx++) { ?>
+          <div>
+            <input type="checkbox" id="favoriteField-<?= favoriteCustomFields[idx].key ?>" 
+                   name="favoriteFields[]" 
+                   value="<?= JSON.stringify(favoriteCustomFields[idx]) ?>"
+                   checked="checked">
+            <label for="favoriteField-<?= favoriteCustomFields[idx].key ?>"><?= favoriteCustomFields[idx].name ?></label>
+          </div>
+          <? } ?>
         </div>
-        <? } ?>
-      </div>
+      </fieldset>
 
       <div class="block">
         <button type="submit" class="action">Save</button>
@@ -49,6 +48,7 @@
     </form>
 
     <script>
+      /* global google */
       var form    = document.forms['frm-customfields'];
       var timeout = null;
       var alert   = document.getElementById('response-message');
@@ -78,7 +78,7 @@
         }
 
         response.forEach(function(field) {
-          var chkbox = document.createElement('div');
+          var chkbox      = document.createElement('div');
           var chkboxInput = document.createElement('input');
           var chkboxLabel = document.createElement('label');
           
@@ -104,6 +104,7 @@
 
       function updFavoriteField() {
         var add = (this.name === 'customfield') && this.checked;
+        
         // add custom field to favorites
         if (add) {
           addFavoriteItem(JSON.parse(this.value));
@@ -119,8 +120,7 @@
       }
 
       function addFavoriteItem(item) {
-        var chkbox = document.createElement('div');
-        chkbox.setAttribute('class', 'item');
+        var chkbox      = document.createElement('div');
         var chkboxInput = document.createElement('input');
         var chkboxLabel = document.createElement('label');
 

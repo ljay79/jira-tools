@@ -1,3 +1,4 @@
+/* global Request, getVar, setVar, log */
 var CUSTOMFIELD_FORMAT_RAW    = 1;
 var CUSTOMFIELD_FORMAT_SEARCH = 2;
 var CUSTOMFIELD_FORMAT_UNIFY  = 3;
@@ -33,7 +34,7 @@ function getCustomFields( format ) {
 
 /**
  * Dialog Helper to retrieve list of all available Jira Custom Fields
- * @returns {Array}    Array of custom Jira Fields
+ * @return {Array}    Array of custom Jira Fields
  */
 function fetchCustomFields() {
   var method = "field", _customFieldsRaw = [], customFields = [];
