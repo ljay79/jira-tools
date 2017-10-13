@@ -4,7 +4,7 @@
     <base target="_top">
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
     <style>
-    .error-container { display: none; margin-bottom: 16px; padding: 5px 10px; text-align: center; color: #fff; width:50%; float:right}
+    .error-container { display: none; width: 50%; float: right; margin-bottom: 16px; padding: 5px 10px; text-align: center; color: #fff; }
     .filter-select { border: 1px solid #dfdfdf; height: 154px; overflow-y: auto; line-height: 28px; }
     .filter-select > div { padding-left: 3px; padding-right: 24px; }
     .filter-select > div:nth-child(even) { background: #f7f8f9; }
@@ -13,6 +13,7 @@
     .is-favourite label { font-weight: bold; }
     .filter-cols { display: flex; flex-direction: row; flex-wrap: wrap; align-items: left; justify-content: left; }
     .filter-cols .label { flex: 0 0 100%; font-weight: bold; }
+    .filter-cols .empty { flex: 0 0 100%; }
     .filter-cols .item { position: relative; flex: 0 0 25%; padding-left: 20px; box-sizing: border-box; }
     .filter-cols .item input[type="checkbox"] { position: absolute; }
     </style>
@@ -31,16 +32,17 @@
         </div>
         <? } ?>
       </div>
+      
       <div class="block filter-cols">
-        <label class="label">Custom Columns (Favorite Fields)</label>
+        <label class="label">Custom Columns</label>
         <? for (var id in customFields) { ?>
         <div class="item">
           <input type="checkbox" id="column-<?= id ?>" name="columns[]" value="<?= id ?>"<? if (defaultColumns.indexOf(id) > -1) { ?> checked="checked"<? } ?>>
           <label for="column-<?= id ?>"><?= customFields[id] ?></label>
         </div>
         <? } ?>
-        <? if( Object.keys(customFields).length == 0 ) { ?>
-        <em>Configure your favorite custom fields here: "Add-ons" -> "Jira Sheet Tools" -> "Configure Custom Fields".</em>
+        <? if ( Object.keys(customFields).length == 0 ) { ?>
+        <em class="empty">Set up your Custom Fields here:<br />"Add-ons" <strong>-></strong> "Jira Sheet Tools" <strong>-></strong> "Configure Custom Fields".</em>
         <? } ?>
       </div>
 
@@ -52,6 +54,7 @@
     </form>
 
     <script>
+      /* global google */
       var filter  = document.forms['issue-filter'];
       var valid   = false;
       var timeout = null;
@@ -85,7 +88,7 @@
             filterSelect.classList.remove('is-loading');
         
         if (!response.length) {
-          showAlert('No filters available!')
+          showAlert('No filters available!');
           return;
         }
 
