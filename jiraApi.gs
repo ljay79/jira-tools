@@ -14,7 +14,8 @@ var restMethods = {
     'myFilters'     : {method: '/filter/my', queryparams: {includeFavourites: 'false'}},
 
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 1000, username:'%'}},
-    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 1000, query: ''}}
+    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 1000, query: ''}},
+    'field'         : {method: '/field'}
   },
   'server': {
     'dashboard'     : '/dashboard',
@@ -57,19 +58,19 @@ var httpErrorCodes = {
 function testConnection() {
   var req = new Request, response;
 
-  this.ok = function(responseData, httpResponse, statusCode) {
+  var ok = function(responseData, httpResponse, statusCode) {
     response = 'Connection successfully established.';
     setCfg('available', true);
   };
 
-  this.error = function(responseData, httpResponse, statusCode) {
+  var error = function(responseData, httpResponse, statusCode) {
     response = 'Could not connect to Jira Server!' + '['+statusCode+']';
     setCfg('available', false);
   };
 
   req.call('dashboard')
-    .withSuccessHandler(this.ok)
-    .withFailureHandler(this.error);
+    .withSuccessHandler(ok)
+    .withFailureHandler(error);
 
   return {status: (getCfg('available')=='true'), response: response};
 };
@@ -154,6 +155,10 @@ function Request() {
       // dont bother trying to connect - use .withFailureHandler() to act on this failure
       return this;
     }
+    
+    var timingLabel = 'JiraApi call('+method+')';
+    console.info('Timing the %s function (%d arguments)', 'Request.call', 3);
+    console.time(timingLabel);
 
     jiraMethod = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].method : restMethods[server_type][method];
     jiraQueryParams = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].queryparams : {};
@@ -198,8 +203,13 @@ function Request() {
     fetchUrl = buildUrl(fetchUrl, urlParams);
 
     responseData = null;
-    httpResponse = UrlFetchApp.fetch(fetchUrl, this.getFetchArgs(fetchArgs));
-    statusCode = parseInt( httpResponse.getResponseCode() );
+    try {
+      httpResponse = UrlFetchApp.fetch(fetchUrl, this.getFetchArgs(fetchArgs));
+      statusCode = parseInt( httpResponse.getResponseCode() );
+    } catch (e) {
+      console.error('UrlFetchApp.fetch(%s) yielded an error: ' + e, fetchUrl);
+      statusCode = 500;
+    }
 
     if (httpResponse) {
       try {
@@ -216,6 +226,8 @@ function Request() {
     if( typeof responseData == 'string' ) {
       responseData = {errorMessages: [responseData]};
     }
+
+    console.timeEnd(timingLabel);
 
     return this;
   };

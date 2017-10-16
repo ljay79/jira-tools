@@ -59,17 +59,12 @@ function createWorklog(jsonFormData) {
   
   /* Get all affected jira issues */
 
-  // Search API returns max 20 worklogs per issue - we have to get worklog indiv. per issue later in iterated requests
-  var search = new Search(wlQuery);
-  search.setOrderBy('created', 'DESC')
-        .setFields(['id','key','issuetype','priority','status','summary']);
-
   /* OnSucess, start prepping Timesheet Table and perform subsequent api searches for all worklogs per individual jira issue */
-  var onSuccess = function(data, status, errorMessage) {
-    log('Issue with worklogs founds: %s !', data.length);
-    //log('%s %s %s', JSON.stringify(data), status, errorMessage);
+  var onSuccess = function(resp, status, errorMessage) {
+    log('Issue with worklogs founds: %s !', resp.data.length);
+    log('%s %s %s', JSON.stringify(resp), status, errorMessage);
 
-    if(data.length == 0) {
+    if(resp.data.length == 0) {
       Browser.msgBox("Jira Worklog",
                      "Apparently there are no issues with worklogs available for \"" + authorName + "\" in the requested time period.", 
                      Browser.Buttons.OK);
@@ -85,7 +80,7 @@ function createWorklog(jsonFormData) {
     timeSheetTable.addHeader(authorName, 'Time Sheet');
 
     // foreach jira issue, fetch worklogs and fill sheet row
-    (data || []).forEach(function(issue, index) {
+    (resp.data || []).forEach(function(issue, index) {
       log('============= (data || []).forEach() ================='); 
       log('issue= icon:%s; key:%s; summary:%s; priority:%s ', 
         unifyIssueAttrib('issuetype', issue),
@@ -98,7 +93,8 @@ function createWorklog(jsonFormData) {
       var request = new Request();
       request.call('worklogOfIssue',{issueIdOrKey: issue.id})
         .withFailureHandler(function(resp, httpResp, status) {
-          Logger.log("Failed to retrieve worklogs for issue with status [" + status + "]!\\n" + resp.errorMessages.join("\\n"));
+          log("Failed to retrieve worklogs for issue with status [" + status + "]!\\n" + resp.errorMessages.join("\\n"));
+          console.error("Failed to retrieve worklogs for issue with status [%s]!\\n" + resp.errorMessages.join("\\n"), status);
         })
         .withSuccessHandler(function(resp, httpResp, status) {
           // we have all logs here for 1 jira issue
@@ -125,18 +121,25 @@ function createWorklog(jsonFormData) {
 
         }); // END: withSuccessHandler()
       //END: request.call('worklogOfIssue') 
-    });//END: (data || []).forEach()
-    
+    });//END: (resp.data || []).forEach()
+
     // add table footer
     timeSheetTable.addFooter();
   }; //END: onSuccess()
 
   var onFailure = function(resp, status , errorMessage) {
     log('worklog::onFailure: resp:%s status:%s msg:%s', resp, status, errorMessage);
+    console.error('worklog::onFailure: resp:%s status:%s msg:%s', resp, status, errorMessage);
     Browser.msgBox("Jira Worklog",
                    "Failure during request to Jira server.\\nStatus:" + (status||-1) + " \\nMessage:'" + errorMessage + "'", 
                    Browser.Buttons.OK);
   };
+
+  // Search API returns max 20 worklogs per issue - we have to get worklog 
+  // indiv. per issue later in iterated requests - see onSuccess handler
+  var search = new Search(wlQuery);
+  search.setOrderBy('created', 'DESC')
+        .setFields(['id','key','issuetype','priority','status','summary']);
 
   search.search()
     .withSuccessHandler(onSuccess)

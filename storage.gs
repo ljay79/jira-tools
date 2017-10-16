@@ -75,7 +75,7 @@ function getCfg(key) {
  */
 function setVar(key, value) {
   var userProps = PropertiesService.getUserProperties();
-  userProps.setProperty(key, value);
+  userProps.setProperty(key, JSON.stringify(value));
   return this;
 }
 
@@ -86,7 +86,7 @@ function setVar(key, value) {
  */
 function getVar(key) {
   var userProps = PropertiesService.getUserProperties();
-  return userProps.getProperty(key);
+  return JSON.parse(userProps.getProperty(key));
 }
 
 
@@ -105,10 +105,8 @@ function initDefaults() {
   setVar('BUILD', BUILD);
 
   // set default jira issue columns
-  //var columnDefaults = getVar('jiraColumnDefault');
-  //columnDefaults = (columnDefaults != null) ? JSON.parse(columnDefaults) : jiraColumnDefault;
   columnDefaults = jiraColumnDefault; //@TODO: allow user to change default columns
-  setVar('jiraColumnDefault', JSON.stringify(columnDefaults));
+  setVar('jiraColumnDefault', columnDefaults);
 
   setVar('workhours', 8);
 

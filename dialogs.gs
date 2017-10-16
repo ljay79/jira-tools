@@ -24,6 +24,8 @@ function getDialog(file, values) {
  * @desc Jira Settings Dialog constructor
  */
 function dialogSettings() {
+  initDefaults();
+  
   var dialog = getDialog('dialogSettings', getServerCfg());
 
   dialog
@@ -72,14 +74,22 @@ function dialogRefreshTicketsIds() {
 function dialogIssueFromFilter() {
   if(!hasSettings(true)) return;
 
+  var customFields = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
   var dialog = getDialog('dialogIssuesFromFilter', {
     columns: ISSUE_COLUMNS,
-    defaultColumns: JSON.parse(getVar('jiraColumnDefault'))
+    defaultColumns: getVar('jiraColumnDefault'),
+    customFields: customFields
   });
+
+  // try to adjust height depending on amount of jira fields to show
+  var rowH = 28;
+  var height = 364;
+  height += (Math.ceil(Object.keys(ISSUE_COLUMNS).length % 4) * rowH);
+  height += (Math.ceil(Object.keys(customFields).length % 4) * rowH);
 
   dialog
     .setWidth(600)
-    .setHeight(480)
+    .setHeight(height)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   log('Processed: %s', dialog);
@@ -98,11 +108,12 @@ function insertIssuesFromFilter(jsonFormData) {
   var filter = getFilter( parseInt(jsonFormData.filter_id) ),
       response = {status: false, message: ''};
 
-  var ok = function(responseData, httpResponse, statusCode){
-    // Check the data is valid and the Jira fields exist
-    if(responseData) {
+  var ok = function(resp, status, errorMessage) {
+    log('insertIssuesFromFilter() resp(len): %s; s: %s; msg: %s', resp.data.length, status, errorMessage);
+
+    if( status === 200 ) {
       // any issues in result?
-      if(!responseData.hasOwnProperty('issues') || responseData.issues.length == 0) {
+      if( resp.data.length === 0 ) {
         response.message = "No issues were found to match your search.";
         Browser.msgBox(response.message, Browser.Buttons.OK);
         return;
@@ -111,15 +122,17 @@ function insertIssuesFromFilter(jsonFormData) {
       var sheet = getTicketSheet();
       var cell = sheet.getActiveCell();
 
-      var table = new IssueTable(sheet, cell, responseData);
+      var table = new IssueTable(sheet, cell, {issues: resp.data});
       table.addHeader()
         .addSummary(filter.name)
         .fillTable();
-      
+
       response.status = true;
 
       // toast with status message
-      SpreadsheetApp.getActiveSpreadsheet().toast("Finished inserting " + (responseData.issues.length||"n/a") + " Jira issues.", "Status", 5);
+      SpreadsheetApp.getActiveSpreadsheet().toast("Finished inserting " + (resp.data.length||"n/a") 
+        + " Jira issues out of " + resp.totalFoundRecords + " total found records.", 
+          "Status", 10);
 
     } else {
       // Something funky is up with the JSON response.
@@ -128,23 +141,18 @@ function insertIssuesFromFilter(jsonFormData) {
     }
   };
 
-  var error = function(responseData, httpResponse, statusCode) {
-    response.message = "Failed to retrieve jira issues from filter with status [" + statusCode + "]!\\n"
-      + responseData.errorMessages.join("\\n");
+  var error = function(resp, status, errorMessage) {
+    response.message = "Failed to retrieve jira issues from filter with status [" + status + "]!\\n" + errorMessage;
     Browser.msgBox(response.message, Browser.Buttons.OK);
   };
 
-  var data = {
-    jql: filter.jql, 
-    fields: jsonFormData['columns'] || [], 
-    maxResults: 1000, 
-    validateQuery: (getCfg('server_type') == 'onDemand') ? 'strict' : true
-  };
-
-  var request = new Request();
-  request.call('search', data, {'method' : 'post'})
-    .withSuccessHandler(ok)
-    .withFailureHandler(error);
+  var search = new Search(filter.jql);
+  search.setOrderBy()
+        .setFields(jsonFormData['columns'] || [])
+        .setMaxResults(10000)
+        .search()      
+        .withSuccessHandler(ok)
+        .withFailureHandler(error);
 
   return response;
 }
@@ -157,11 +165,12 @@ function insertIssuesFromFilter(jsonFormData) {
  * @desc Dialog "About"
  */
 function dialogAbout() {
-  var dialog = getDialog('dialogAbout');
+  var tempActiveUserKey = Session.getTemporaryActiveUserKey();
+  var dialog = getDialog('dialogAbout', {tempUserKey: tempActiveUserKey});
 
   dialog
     .setWidth(480)
-    .setHeight(320)
+    .setHeight(340)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   log('Processed: %s', dialog);
@@ -193,3 +202,26 @@ function dialogTimesheet() {
 }
 
 /* Dialog: Worklog - END */
+
+
+/* Dialog: Custom Fields */
+
+/**
+ * @desc Dialog to configure Jira custom fields
+ */
+function dialogCustomFields() {
+  if(!hasSettings(true)) return;
+
+  var dialog = getDialog('dialogCustomFields', {favoriteCustomFields: (getVar('favoriteCustomFields') || [])});
+
+  dialog
+    .setWidth(480)
+    .setHeight(460)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+
+  log('Processed: %s', dialog);
+
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'Configure Custom Fields');
+}
+
+/* Dialog: Custom Fields - END */

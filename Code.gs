@@ -1,15 +1,14 @@
 /**
  * @author Jens Rosemeier <github@jens79.de>
  * @github  https://github.com/ljay79/jira-tools
+ * @copyright Jens Rosemeier, 2017
  *
  * ToDo/Notes:
  * - use google auth with token based Jira RESTful API vs. cleartext password
- * - add feature to insert worklogs - list of worklogs, using dialog with filter input
- * - add feature to insert list of tickets (issue overview) based on available Jira filters
  */
 
-var BUILD = 0180;
-var LOGGING = false;
+var BUILD = 0190;
+var LOGGING = true;
 
 /** 
  * Add a nice menu option for the users.
@@ -41,15 +40,13 @@ function addMenu() {
     // Tools
     .addItem('Refresh Ticket Data', 'dialogRefreshTicketsIds')
     
-    // Add "Insert ..." menu with submenu
     .addSeparator()
-    //.addSubMenu(SpreadsheetApp.getUi().createMenu('Insert...')
-      .addItem('List Issues from Filter', 'dialogIssueFromFilter')
-      .addItem('Create Time Report', 'dialogTimesheet')
-    //)
+    .addItem('List Issues from Filter', 'dialogIssueFromFilter')
+    .addItem('Create Time Report', 'dialogTimesheet')
 
     .addSeparator()
     .addItem('Settings', 'dialogSettings')
+    .addItem('Configure Custom Fields', 'dialogCustomFields')
     .addItem('About', 'dialogAbout')
   
     .addToUi();
@@ -57,6 +54,7 @@ function addMenu() {
 
 /**
  * @desc Simple Logger.log wrapper for centralized enabling/disabling log messages
+ *       For console.log see: https://developers.google.com/apps-script/reference/base/console
  * @param format  A Format or message to log
  * @param values  Optional values to pass into format msg
  * @return void
