@@ -7,7 +7,7 @@
  * - use google auth with token based Jira RESTful API vs. cleartext password
  */
 
-var BUILD = 0190;
+var BUILD = 0191;
 var LOGGING = true;
 
 /** 

@@ -27,7 +27,8 @@ var restMethods = {
     'myFilters'     : {method: '/filter/favourite', queryparams: {includeFavourites: 'false'}},
 
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 1000, username:'%'}},
-    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 1000, query: ''}}
+    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 1000, query: ''}},
+    'field'         : {method: '/field'}
   }
 };
 

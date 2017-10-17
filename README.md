@@ -105,3 +105,24 @@ Current existing limitations by this Add-On:
   * To comply with Atlassians policy, it does internally fetch only *50* records per page which can result in quite some delay when dealing with too many issues.
 * Listing of Jira users and groups (within dialogs) is limited to **100** user/group records
 * "Time Sheet" is limited to report max **1.000** worklogs per Jira issue (max **1.000** issues) per Time sheet
+
+# Known Issues
+## `Could not connect to Jira Server![401]`
+In case someone comes across here with a same or similar issue, i could actually reproduce that error and identify one use case where this would happen.
+
+### Solution
+This applies to **JIRA Cloud** using **G-Suite synced** account. It might not apply to self hosted Jira instances.
+
+Note that if you are logging in via a synced Google account, it is **NOT** the google password you are supposed to use. Instead you should go to your user profile and look up your username and set a password.
+
+For site admin functions, RSS feeds, REST API access, or WebDAV uploads you'll need to have an Atlassian Cloud password (separate to your Google Apps password.) Which applies to this Add-On as well.
+
+#### Instructions
+Log out from your Jira portal.
+Go to https://id.atlassian.com and click on "Can't log in?" - just below the log on form.
+On the next page enter your email address (which would be your Google Email) and press "Send recovery link".
+
+Your will get an email from Atlassian where you please click the provided link at "Reset your password".
+Now on the Atlassian page where you can set/change your Atlassian (and not Google) password, enter a new password for your Atlassian account, not to mix up with your Google account.
+
+Of course it makes no sense that this information is not available on the REST API documentation page, since it is quite crucial to get it working.
