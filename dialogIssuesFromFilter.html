@@ -81,7 +81,6 @@
         valid = columns.filter(function(el){ return el.checked; }).length > 0 && filter.elements['filter_id'].value.length > 0;
         action.disabled = valid ? false : 'disabled';
       }
-
       function onInitFilter(response) {
         var filterSelect = filter.querySelector('.filter-select');
             filterSelect.innerText = '';
@@ -91,7 +90,6 @@
           showAlert('No filters available!');
           return;
         }
-
         response.forEach(function(option) {
           var radio = document.createElement('div');
           var radioInput = document.createElement('input');
@@ -119,14 +117,10 @@
         
         window.dispatchEvent(new Event('load'));
       }
-
       function formSubmitHandler(event) {
         if (event) event.preventDefault();
-
         hideAlert();
-
         if (!valid) return;
-
         showAlert('inserting ...', 1);
         
         var formData = {
@@ -139,21 +133,17 @@
           .withFailureHandler(onResponse)
           .insertIssuesFromFilter(formData);
       }
-
       function onResponse(response) {
         var done = response.status === true;
-
         hideAlert();
         
         if(done) google.script.host.close();
-
         showAlert(response.message, done, 10000);
       }
       
       google.script.run
         .withSuccessHandler(onInitFilter)
         .getMyFilters(true);
-
       filter.addEventListener('submit', formSubmitHandler);
       input.forEach(function(el){ el.addEventListener('change', inputValidatyHandler); });
       window.addEventListener('load', inputValidatyHandler);
