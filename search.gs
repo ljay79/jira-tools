@@ -233,7 +233,7 @@ function Search(searchQuery) {
    */
   var onFailure = function(resp, httpResp, status) {
     log('search:onFailure: [%s] %s', status, resp);
-    console.error('search:onFailure: [%s] %s', status, resp);
+    console.error('search:onFailure: [%s] %s - %s', status, resp, httpResp);
 
     var msgs = resp.hasOwnProperty('errorMessages') ? resp.errorMessages : [];
     msgs = msgs.concat((resp.hasOwnProperty('warningMessages') ? resp.warningMessages : []));
