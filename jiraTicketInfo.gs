@@ -40,7 +40,8 @@ function refreshTickets() {
 
     } else {
       // Something funky is up with the JSON response.
-      log(rowIdx, "Failed to retrieve ticket data for ID [" + jiraCell.ticketId + "]!");
+      log("Failed to retrieve ticket data for ID [" + jiraCell.ticketId + "]!");
+      console.error("Failed to retrieve ticket data for ID [" + jiraCell.ticketId + "]! responseData:%s; httpResponse:%s; statusCode:%s", responseData, httpResponse, statusCode);
     }
   };
 
