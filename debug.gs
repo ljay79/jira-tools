@@ -10,7 +10,7 @@ debug = (function(){
     that = {},
 
       // switch logger on/off; default: off
-    log_enabled = (getVar('debugging')=='true'),
+    log_enabled = false,
 
     // Logging methods, in "priority order". Not all console implementations
     log_methods = ['log', 'info', 'warn', 'error', 'time', 'timeEnd'],
@@ -36,10 +36,21 @@ debug = (function(){
     return this;
   };
 
+  // init debug enabled by getting users store property value
+  init = (function(){
+    // little hacky, but had to come arround the add-on lifecycle when trying to access userproperty onOpen()
+    // as this debug function is parsed and executed on all events and triggers.
+    try {
+      var uDebugging = getVar('debugging');
+      that.enable( uDebugging == 'true' );
+    } catch(e){}
+  })();
+
   return that;
 })();
 
 function toggleDebugging(formData) {
   setVar('debugging', (formData=='1' ? 'true' : 'false') );
   debug.enable( getVar('debugging')=='true' );
+  console.log('Debugging switched [%s]', (getVar('debugging')=='true' ? 'ON' : 'OFF'));
 }
