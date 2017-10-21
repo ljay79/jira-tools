@@ -55,12 +55,10 @@
       var _storedFavFields = <?!= JSON.stringify(favoriteCustomFields) ?>;
       var fieldSelect = form.querySelector('.customfields-select');
       var fieldFavorites = form.querySelector('.customfields-favs');
-
       function hideAlert(){
         if(timeout) timeout = clearTimeout(timeout);
         alert.style.display = 'none';
       }
-
       function showAlert(text, type, time) {
         alert.innerText = text;
         alert.style.backgroundColor = type ? 'rgb(139,195,74)' : 'rgb(213,0,0)';
@@ -71,12 +69,10 @@
       function onInitCustomFields(response) {
         fieldSelect.innerText = '';
         fieldSelect.classList.remove('is-loading');
-
         if (!response.length) {
           showAlert('No Custom Fields available!')
           return;
         }
-
         response.forEach(function(field) {
           var chkbox      = document.createElement('div');
           var chkboxInput = document.createElement('input');
@@ -90,18 +86,14 @@
           chkboxLabel.innerHTML = field.name + ' <small><em>(Type: ' + JSON.stringify(field.type) + (field.supported?'':' - not supported') + ')</em></small>';
           if (isFavorite(field.key)) chkboxInput.setAttribute('checked', 'checked');
           if (!field.supported) chkboxInput.setAttribute('disabled', 'disabled');
-
           //if (option.favourite) chkbox.className = 'is-favourite';
           chkbox.appendChild(chkboxInput);
           chkbox.appendChild(chkboxLabel);
-
           fieldSelect.appendChild(chkbox);
           //chkboxInput.addEventListener('change', updFavoriteField);
         });
-
         window.dispatchEvent(new Event('load'));
       }
-
       function updFavoriteField() {
         var add = (this.name === 'customfield') && this.checked;
         
@@ -109,7 +101,6 @@
         if (add) {
           addFavoriteItem(JSON.parse(this.value));
         }
-
         // remove custom field from favorites
         if (!this.checked) {
           var field = JSON.parse(this.value);
@@ -118,12 +109,10 @@
           el.parentNode.parentNode.removeChild(el.parentNode);
         }
       }
-
       function addFavoriteItem(item) {
         var chkbox      = document.createElement('div');
         var chkboxInput = document.createElement('input');
         var chkboxLabel = document.createElement('label');
-
         chkboxInput.setAttribute('type', 'checkbox');
         chkboxInput.setAttribute('name', 'favoriteFields[]');
         chkboxInput.setAttribute('id',   'favoriteField-' + item.key);
@@ -131,10 +120,8 @@
         chkboxInput.setAttribute('checked', 'checked');
         chkboxLabel.setAttribute('for',  'favoriteField-' + item.key);
         chkboxLabel.innerHTML = item.name;
-
         chkbox.appendChild(chkboxInput);
         chkbox.appendChild(chkboxLabel);
-
         fieldFavorites.appendChild(chkbox);
         chkboxInput.addEventListener('change', updFavoriteField);
       }
@@ -142,7 +129,6 @@
       function formSubmitHandler(event) {
         if (event) event.preventDefault();
         hideAlert();
-
         // get all checked favorite custom field checkbox elements
         var _checkedFavs = Array.prototype.slice.call(fieldFavorites.querySelectorAll('*[id^="favoriteField-"]')).filter(function(el){ 
           if(el.nodeName === 'INPUT' && el.type === 'checkbox' && el.checked === true) {
@@ -150,19 +136,15 @@
           }
           return false;
         });
-
         showAlert('saving ...', 1);
-
         var formData = {
           favoriteCustomFields: _checkedFavs.map(function(el) { return JSON.parse(el.value); })
         };
-
         google.script.run
           .withSuccessHandler(onResponse)
           .withFailureHandler(onResponse)
           .saveCustomFields(formData);
       }
-
       function onResponse(response) {
         var done = response.status === true;
         hideAlert();
@@ -177,11 +159,9 @@
       function isFavorite(key) {
         return _storedFavFields.find(o => o.key === key);
       }
-
       google.script.run
         .withSuccessHandler(onInitCustomFields)
         .fetchCustomFields();
-
       form.addEventListener('submit', formSubmitHandler);
       window.addEventListener('load', function(){
         Array.prototype.slice.call(form.elements).filter(function(el){ 

@@ -7,8 +7,7 @@
  * - use google auth with token based Jira RESTful API vs. cleartext password
  */
 
-var BUILD = 0191;
-var LOGGING = true;
+var BUILD = '0.19.2';
 
 /** 
  * Add a nice menu option for the users.
@@ -50,21 +49,4 @@ function addMenu() {
     .addItem('About', 'dialogAbout')
   
     .addToUi();
-}
-
-/**
- * @desc Simple Logger.log wrapper for centralized enabling/disabling log messages
- *       For console.log see: https://developers.google.com/apps-script/reference/base/console
- * @param format  A Format or message to log
- * @param values  Optional values to pass into format msg
- * @return void
- */
-function log(format, values, arg1, arg2, arg3) {
-  if(LOGGING !== true) return;
-
-  if(arguments.length == 0) {
-    Logger.log(format);
-  } else {
-    Logger.log(format, values, arg1, arg2, arg3);
-  }
 }

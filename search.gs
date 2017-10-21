@@ -12,16 +12,16 @@
   // .setFields(['id','key','issuetype','project','status','summary']);
   //
   onSuccess = function(a,b,c) {
-    log('%s', '----------ON SUCCESS-----------');
-    log('%s %s %s', JSON.stringify(a), b, c);
-    log('%s', '---------------------1');
+    debug.log('%s', '----------ON SUCCESS-----------');
+    debug.log('%s %s %s', JSON.stringify(a), b, c);
+    debug.log('%s', '---------------------1');
     
-    log('AMOUNT: %s !', a.length);
+    debug.log('AMOUNT: %s !', a.length);
   };
   onFailure = function(a,b,c) {
-    log('%s', '----------ON FAILURE-----------');
-    log('a:%s b:%s c:%s', a, b, c);
-    log('%s', '---------------------1');
+    debug.log('%s', '----------ON FAILURE-----------');
+    debug.log('a:%s b:%s c:%s', a, b, c);
+    debug.log('%s', '---------------------1');
   };
   
   s.search()
@@ -147,7 +147,7 @@ function Search(searchQuery) {
    */
   this.withFailureHandler = function(fn) {
     if(response.status !== 200) {
-      log("withFailureHandler: %s", response);
+      debug.log("withFailureHandler: %s", response);
       fn.call(this, {data: response.data, totalFoundRecords: response.totalFoundRecords}, response.status, response.errorMessage);
     }
     return this;
@@ -159,7 +159,7 @@ function Search(searchQuery) {
    */
   var getJql = function() {
     var jql = queryStr + ((orderBy != '') ? ' ORDER BY ' + orderBy + ' ' + orderDir : '');
-    log('Search JQL: [%s]', jql);
+    debug.log('Search JQL: [%s]', jql);
 
     //return encodeURIComponent(jql); //only when api call is performed as GET
     return jql;
@@ -174,7 +174,7 @@ function Search(searchQuery) {
    */
   var onSuccess = function(resp, httpResp, status) {
     var _total = parseInt(resp.total || 0);
-    log('onSuccess found total: %s', _total);
+    debug.log('onSuccess found total: %s', _total);
 
     // nothing found - return class response
     if( _total == 0 ) {
@@ -196,7 +196,7 @@ function Search(searchQuery) {
     var _countTotalResults = parseInt(resp.startAt) + parseInt(resp.maxResults);
     if( (_countTotalResults < _total) && (_countTotalResults < maxResults) ) {
       // more data to fetch
-      log('-- subSearch: %s / %s of max: %s', _countTotalResults, _total, maxResults);
+      debug.log('-- subSearch: %s / %s of max: %s', _countTotalResults, _total, maxResults);
 
       // provide little feedback to user
       var _currPage = Math.ceil(_countTotalResults / maxPerPage) + 1;
@@ -218,7 +218,7 @@ function Search(searchQuery) {
         } catch(e) {
           response.status = 500;
           response.errorMessage = e;
-          console.error("Exception: %s || response: %s", e, resp);
+          debug.error("Exception: %s || response: %s", e, resp);
         }
       }); // dont bubble up failure - 1st call was successfull so we soft-fail and response with results found so far
     }
@@ -232,8 +232,7 @@ function Search(searchQuery) {
    * @return void
    */
   var onFailure = function(resp, httpResp, status) {
-    log('search:onFailure: [%s] %s', status, resp);
-    console.error('search:onFailure: [%s] %s', status, resp);
+    debug.error('search:onFailure: [%s] %s - %s', status, resp, httpResp);
 
     var msgs = resp.hasOwnProperty('errorMessages') ? resp.errorMessages : [];
     msgs = msgs.concat((resp.hasOwnProperty('warningMessages') ? resp.warningMessages : []));
@@ -247,7 +246,7 @@ function Search(searchQuery) {
    * @return {this}    Allow chaining
    */
   this.search = function() {
-    log("search with startAt:%s, maxPerPage:%s, totalMaxResults:%s and field:[%s]", startAt, maxPerPage, maxResults, fields);
+    debug.log("search with startAt:%s, maxPerPage:%s, totalMaxResults:%s and field:[%s]", startAt, maxPerPage, maxResults, fields);
     var data = {
       jql        : getJql(), 
       fields     : fields, 

@@ -9,7 +9,12 @@
 function getDialog(file, values) {
   var template = HtmlService.createTemplateFromFile(file);
 
-  log('Processing: %s.html with %s', file, JSON.stringify(values));
+  // privacy (remove clear text password and username from possible debug logging
+  var debugValue = {};
+  extend(debugValue, values);
+  if(debugValue.password) delete debugValue.password;
+  if(debugValue.username) delete debugValue.username;
+  debug.log('Processing: %s.html with %s', file, JSON.stringify(debugValue));
 
   for (var name in values) {
     template[name] = values[name];
@@ -33,7 +38,7 @@ function dialogSettings() {
     .setHeight(400)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
-  log('Processed: %s', dialog);
+  debug.log('Processed: %s', dialog);
 
   SpreadsheetApp.getUi().showModalDialog(dialog, 'Jira Server Settings');
 }
@@ -92,69 +97,9 @@ function dialogIssueFromFilter() {
     .setHeight(height)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
-  log('Processed: %s', dialog);
+  debug.log('Processed: %s', dialog);
 
   SpreadsheetApp.getUi().showModalDialog(dialog, 'List Jira issues from filter');
-}
-
-/**
- * @desc Form handler for dialogIssuesFromFilter. Retrieve issues for given 
- *       filter with specified columns from Jira and insert into current active sheet.
- * @param jsonFormData {object}  JSON Form object of all form values
- * @return {object} Object({status: [boolean], response: [string]})
- */
-function insertIssuesFromFilter(jsonFormData) {
-  jsonFormData = jsonFormData || {filter_id: 0};
-  var filter = getFilter( parseInt(jsonFormData.filter_id) ),
-      response = {status: false, message: ''};
-
-  var ok = function(resp, status, errorMessage) {
-    log('insertIssuesFromFilter() resp(len): %s; s: %s; msg: %s', resp.data.length, status, errorMessage);
-
-    if( status === 200 ) {
-      // any issues in result?
-      if( resp.data.length === 0 ) {
-        response.message = "No issues were found to match your search.";
-        Browser.msgBox(response.message, Browser.Buttons.OK);
-        return;
-      }
-
-      var sheet = getTicketSheet();
-      var cell = sheet.getActiveCell();
-
-      var table = new IssueTable(sheet, cell, {issues: resp.data});
-      table.addHeader()
-        .addSummary(filter.name)
-        .fillTable();
-
-      response.status = true;
-
-      // toast with status message
-      SpreadsheetApp.getActiveSpreadsheet().toast("Finished inserting " + (resp.data.length||"n/a") 
-        + " Jira issues out of " + resp.totalFoundRecords + " total found records.", 
-          "Status", 10);
-
-    } else {
-      // Something funky is up with the JSON response.
-      response.message = "Failed to retrieve jira issues!";
-      Browser.msgBox(response.message, Browser.Buttons.OK);
-    }
-  };
-
-  var error = function(resp, status, errorMessage) {
-    response.message = "Failed to retrieve jira issues from filter with status [" + status + "]!\\n" + errorMessage;
-    Browser.msgBox(response.message, Browser.Buttons.OK);
-  };
-
-  var search = new Search(filter.jql);
-  search.setOrderBy()
-        .setFields(jsonFormData['columns'] || [])
-        .setMaxResults(10000)
-        .search()      
-        .withSuccessHandler(ok)
-        .withFailureHandler(error);
-
-  return response;
 }
 
 /* Dialog: Import Issues - END */
@@ -166,14 +111,18 @@ function insertIssuesFromFilter(jsonFormData) {
  */
 function dialogAbout() {
   var tempActiveUserKey = Session.getTemporaryActiveUserKey();
-  var dialog = getDialog('dialogAbout', {tempUserKey: tempActiveUserKey});
+  var dialog = getDialog('dialogAbout', {
+    buildNumber: BUILD,
+    debugging: getVar('debugging'),
+    tempUserKey: tempActiveUserKey
+  });
 
   dialog
     .setWidth(480)
-    .setHeight(340)
+    .setHeight(400)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
-  log('Processed: %s', dialog);
+  debug.log('Processed: %s', dialog);
 
   SpreadsheetApp.getUi().showModalDialog(dialog, 'About');
 }
@@ -196,7 +145,7 @@ function dialogTimesheet() {
     .setHeight(360)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
-  log('Processed: %s', dialog);
+  debug.log('Processed: %s', dialog);
 
   SpreadsheetApp.getUi().showModalDialog(dialog, 'Create Time Report');
 }
@@ -219,7 +168,7 @@ function dialogCustomFields() {
     .setHeight(460)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
-  log('Processed: %s', dialog);
+  debug.log('Processed: %s', dialog);
 
   SpreadsheetApp.getUi().showModalDialog(dialog, 'Configure Custom Fields');
 }

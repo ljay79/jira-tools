@@ -205,12 +205,12 @@ function getMyFilters(includeFavourites) {
       ;
     } else {
       // Something funky is up with the JSON response.
-      log("Failed to retrieve jira filters!");
+      debug.error("Failed to retrieve jira filters!");
     }
   };
 
   var error = function(responseData, httpResponse, statusCode) {
-    log("Failed to retrieve jira filters with status [" + statusCode + "]!\\n" + responseData.errorMessages.join("\\n"));
+    debug.error("Failed to retrieve jira filters with status [" + statusCode + "]!\\n" + responseData.errorMessages.join("\\n"));
   };
 
   var request = new Request();
@@ -238,12 +238,12 @@ function getFilter(filterId) {
       filter = responseData;
     } else {
       // Something funky is up with the JSON response.
-      log("Failed to retrieve jira filter info!");
+      debug.info("Failed to retrieve jira filter info!");
     }
   };
 
   var error = function(responseData, httpResponse, statusCode) {
-    log("Failed to retrieve jira filter with status [" + statusCode + "]!\\n" + responseData.errorMessages.join("\\n"));
+    debug.error("Failed to retrieve jira filter with status [" + statusCode + "]!\\n" + responseData.errorMessages.join("\\n"));
   };
 
   request.call(method, {filterId:filterId})
@@ -323,7 +323,7 @@ function unifyIssueAttrib(attrib, data) {
           resp.value = data.fields[attrib] || '';
           break;
         default:
-          log('unifyIssueAttrib(' + attrib + ') no format defined yet for custom field.');
+          debug.log('unifyIssueAttrib(' + attrib + ') no format defined yet for custom field.');
           resp.value = data[attrib] || data.fields[attrib];
           break;
       }
@@ -470,8 +470,7 @@ function unifyIssueAttrib(attrib, data) {
       break;
 
     default:
-      log('unifyIssueAttrib(' + attrib + ') no format defined yet.');
-      //log(data.fields[attrib]);
+      debug.log('unifyIssueAttrib(' + attrib + ') no format defined yet.');
       resp.value = data[attrib] || data.fields[attrib];
       break;
   }

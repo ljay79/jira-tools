@@ -13,8 +13,8 @@ var restMethods = {
     'search'        : {method: '/search'}, // POST
     'myFilters'     : {method: '/filter/my', queryparams: {includeFavourites: 'false'}},
 
-    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 1000, username:'%'}},
-    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 1000, query: ''}},
+    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 100, username:'%'}},
+    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 100, query: ''}},
     'field'         : {method: '/field'}
   },
   'server': {
@@ -26,8 +26,8 @@ var restMethods = {
     // server api doesnt support /filter/my
     'myFilters'     : {method: '/filter/favourite', queryparams: {includeFavourites: 'false'}},
 
-    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 1000, username:'%'}},
-    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 1000, query: ''}},
+    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 100, username:'%'}},
+    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 100, query: ''}},
     'field'         : {method: '/field'}
   }
 };
@@ -158,8 +158,7 @@ function Request() {
     }
     
     var timingLabel = 'JiraApi call('+method+')';
-    console.info('Timing the %s function (%d arguments)', 'Request.call', 3);
-    console.time(timingLabel);
+    debug.time(timingLabel);
 
     jiraMethod = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].method : restMethods[server_type][method];
     jiraQueryParams = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].queryparams : {};
@@ -208,7 +207,7 @@ function Request() {
       httpResponse = UrlFetchApp.fetch(fetchUrl, this.getFetchArgs(fetchArgs));
       statusCode = parseInt( httpResponse.getResponseCode() );
     } catch (e) {
-      console.error('UrlFetchApp.fetch(%s) yielded an error: ' + e, fetchUrl);
+      debug.error('UrlFetchApp.fetch(%s) yielded an error: ' + e, fetchUrl);
       statusCode = 500;
     }
 
@@ -228,7 +227,7 @@ function Request() {
       responseData = {errorMessages: [responseData]};
     }
 
-    console.timeEnd(timingLabel);
+    debug.timeEnd(timingLabel);
 
     return this;
   };
