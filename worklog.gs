@@ -61,8 +61,8 @@ function createWorklog(jsonFormData) {
 
   /* OnSucess, start prepping Timesheet Table and perform subsequent api searches for all worklogs per individual jira issue */
   var onSuccess = function(resp, status, errorMessage) {
-    log('Issue with worklogs founds: %s !', resp.data.length);
-    log('%s %s %s', JSON.stringify(resp), status, errorMessage);
+    debug.log('Issue with worklogs founds: %s !', resp.data.length);
+    debug.log('%s %s %s', JSON.stringify(resp), status, errorMessage);
 
     if(resp.data.length == 0) {
       Browser.msgBox("Jira Worklog",
@@ -81,8 +81,8 @@ function createWorklog(jsonFormData) {
 
     // foreach jira issue, fetch worklogs and fill sheet row
     (resp.data || []).forEach(function(issue, index) {
-      log('============= (data || []).forEach() ================='); 
-      log('issue= icon:%s; key:%s; summary:%s; priority:%s ', 
+      debug.log('============= (data || []).forEach() ================='); 
+      debug.log('issue= icon:%s; key:%s; summary:%s; priority:%s ', 
         unifyIssueAttrib('issuetype', issue),
         unifyIssueAttrib('key', issue),
         unifyIssueAttrib('summary', issue),
@@ -93,8 +93,7 @@ function createWorklog(jsonFormData) {
       var request = new Request();
       request.call('worklogOfIssue',{issueIdOrKey: issue.id})
         .withFailureHandler(function(resp, httpResp, status) {
-          log("Failed to retrieve worklogs for issue with status [" + status + "]!\\n" + resp.errorMessages.join("\\n"));
-          console.error("Failed to retrieve worklogs for issue with status [%s]!\\n" + resp.errorMessages.join("\\n"), status);
+          debug.error("Failed to retrieve worklogs for issue with status [%s]!\\n" + resp.errorMessages.join("\\n"), status);
         })
         .withSuccessHandler(function(resp, httpResp, status) {
           // we have all logs here for 1 jira issue
@@ -128,8 +127,7 @@ function createWorklog(jsonFormData) {
   }; //END: onSuccess()
 
   var onFailure = function(resp, status , errorMessage) {
-    log('worklog::onFailure: resp:%s status:%s msg:%s', resp, status, errorMessage);
-    console.error('worklog::onFailure: resp:%s status:%s msg:%s', resp, status, errorMessage);
+    debug.error('worklog::onFailure: resp:%s status:%s msg:%s', resp, status, errorMessage);
     Browser.msgBox("Jira Worklog",
                    "Failure during request to Jira server.\\nStatus:" + (status||-1) + " \\nMessage:'" + errorMessage + "'", 
                    Browser.Buttons.OK);
@@ -291,7 +289,7 @@ function TimesheetTable1(options) {
         fontColors  = Array(numColumns).fill('#000'),
         bgColors    = Array(numColumns).fill('#3399ff')
     ;
-    log('periodTotals: [%s]', periodTotals);
+    debug.log('periodTotals: [%s]', periodTotals);
 
     // set totals on each period column + overall total column
     var _totalTimeSpent = 0;

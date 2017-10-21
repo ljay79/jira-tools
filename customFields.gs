@@ -81,12 +81,12 @@ function fetchCustomFields() {
 
     } else {
       // Something funky is up with the JSON response.
-      log("Failed to retrieve Jira Custom Fields!");
+      debug.info("Failed to retrieve Jira Custom Fields with status [" + status + "]; httpResp: %s", httpResp);
     }
   };
 
   var error = function(respData, httpResp, status) {
-    log("Failed to retrieve Jira Custom Fields with status [" + status + "]!\\n" + respData.errorMessages.join("\\n"));
+    debug.error("Failed to retrieve Jira Custom Fields with status [" + status + "]!\\n" + respData.errorMessages.join("\\n") + " httpResp: %s", httpResp);
   };
 
   var request = new Request();

@@ -158,10 +158,7 @@ function Request() {
     }
     
     var timingLabel = 'JiraApi call('+method+')';
-    if (LOGGING) {
-    	console.info('Timing the %s function (%d arguments)', 'Request.call', 3);
-    	console.time(timingLabel);
-    }
+    debug.time(timingLabel);
 
     jiraMethod = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].method : restMethods[server_type][method];
     jiraQueryParams = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].queryparams : {};
@@ -210,7 +207,7 @@ function Request() {
       httpResponse = UrlFetchApp.fetch(fetchUrl, this.getFetchArgs(fetchArgs));
       statusCode = parseInt( httpResponse.getResponseCode() );
     } catch (e) {
-      console.error('UrlFetchApp.fetch(%s) yielded an error: ' + e, fetchUrl);
+      debug.error('UrlFetchApp.fetch(%s) yielded an error: ' + e, fetchUrl);
       statusCode = 500;
     }
 
@@ -230,7 +227,7 @@ function Request() {
       responseData = {errorMessages: [responseData]};
     }
 
-    if (LOGGING) console.timeEnd(timingLabel);
+    debug.timeEnd(timingLabel);
 
     return this;
   };

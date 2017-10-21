@@ -1,4 +1,65 @@
 /**
+ * @desc Form handler for dialogIssuesFromFilter. Retrieve issues for given 
+ *       filter with specified columns from Jira and insert into current active sheet.
+ * @param jsonFormData {object}  JSON Form object of all form values
+ * @return {object} Object({status: [boolean], response: [string]})
+ */
+function insertIssuesFromFilter(jsonFormData) {
+  jsonFormData = jsonFormData || {filter_id: 0};
+  var filter = getFilter( parseInt(jsonFormData.filter_id) ),
+      response = {status: false, message: ''};
+
+  var ok = function(resp, status, errorMessage) {
+    debug.log('insertIssuesFromFilter() resp(len): %s; s: %s; msg: %s', resp.data.length, status, errorMessage);
+
+    if( status === 200 ) {
+      // any issues in result?
+      if( resp.data.length === 0 ) {
+        response.message = "No issues were found to match your search.";
+        Browser.msgBox(response.message, Browser.Buttons.OK);
+        return;
+      }
+
+      var sheet = getTicketSheet();
+      var cell = sheet.getActiveCell();
+
+      var table = new IssueTable(sheet, cell, {issues: resp.data});
+      table.addHeader()
+        .addSummary(filter.name)
+        .fillTable();
+
+      response.status = true;
+
+      // toast with status message
+      SpreadsheetApp.getActiveSpreadsheet().toast("Finished inserting " + (resp.data.length||"n/a") 
+        + " Jira issues out of " + resp.totalFoundRecords + " total found records.", 
+          "Status", 10);
+
+    } else {
+      // Something funky is up with the JSON response.
+      response.message = "Failed to retrieve jira issues!";
+      Browser.msgBox(response.message, Browser.Buttons.OK);
+    }
+  };
+
+  var error = function(resp, status, errorMessage) {
+    response.message = "Failed to retrieve jira issues from filter with status [" + status + "]!\\n" + errorMessage;
+    Browser.msgBox(response.message, Browser.Buttons.OK);
+  };
+
+  var search = new Search(filter.jql);
+  search.setOrderBy()
+        .setFields(jsonFormData['columns'] || [])
+        .setMaxResults(10000)
+        .search()      
+        .withSuccessHandler(ok)
+        .withFailureHandler(error);
+
+  return response;
+}
+
+
+/**
  * @desc
  * @param sheet {object}  SpreadsheetApp sheet
  * @param initRange {object}  SpreadsheetApp range

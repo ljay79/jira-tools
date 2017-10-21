@@ -105,7 +105,7 @@ function findGroup(groupTerm, minimal) {
 
     } else {
       // Something funky is up with the JSON response.
-      log('Failed searching for group: %s ; %s', httpResp, resp);
+      debug.log('Failed searching for group: %s ; %s', httpResp, resp);
       Browser.msgBox("Failed searching for group!", Browser.Buttons.OK);
       return groups;
     }
@@ -132,5 +132,5 @@ function findGroup(groupTerm, minimal) {
   return groups;
 }
 
-//function testFindUsers(){ log('%s', findUser('%')); }
-//function testFindGroups(){ log('%s', findGroup('')); }
+//function testFindUsers(){ debug.log('%s', findUser('%')); }
+//function testFindGroups(){ debug.log('%s', findGroup('')); }
