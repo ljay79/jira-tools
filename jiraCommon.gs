@@ -147,27 +147,6 @@ OUT: {"type":20,"value":"Lorem ispum IT-123 dolores","ticketId":"IT-123","parts"
 */
 }
 
-/**
- * @desc Helper to simplify Jira's status field response. 
- *     Less IF/ELSE and property scopes needed.
- * @deprecated
- * @param fields {Object}  JSON objec from Jira response attribute 'fields'
- * @return {Object} Object({name:[string], color:[string]})
- */
-function getIssueStatus(fields) {
-  var o = {
-    'name': 'n/a',
-    'color': ''
-  };
-
-  try {
-    o.name = fields.status.name;
-    o.color = fields.status.statusCategory.colorName;
-  } catch (e) {}
-
-  return o;
-}
-
 
 /**
  * @desc Request users own (and favourite) filters and return an object of main props.

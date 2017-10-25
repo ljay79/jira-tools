@@ -51,7 +51,7 @@ function fetchCustomFields() {
           name:       cField.name,
           custom:     cField.custom,
           schemaType: (cField.schema ? cField.schema.type : null) || null,
-          supported:  (arrSupportedTypes.indexOf((cField.schema ? cField.schema.type : null)) > -1)
+          supported:  (arrSupportedTypes.indexOf( cField.schema ? cField.schema.type : null ) > -1)
         };
       }) )
       // sorting by supported type and name
