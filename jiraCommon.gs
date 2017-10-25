@@ -175,10 +175,11 @@ function getIssueStatus(fields) {
  * @return {object} Object({[id]:{name:{string}, self:{string}, favourite:{boolean}, owner:{string}, viewUrl:{string}}})
  */
 function getMyFilters(includeFavourites) {
-  var method = "myFilters", filters = [];
+  var filters = [];
 
-  var ok = function(responseData, httpResponse, statusCode){
+  var ok = function(responseData, httpResponse, statusCode) {
     // Check the data is valid and the Jira fields exist
+    //debug.log("getMyFilters()->ok(): %s", responseData);
     if(responseData) {
       // add data to export
       filters.push.apply(filters, responseData.map(function(filter){ return {
@@ -190,7 +191,6 @@ function getMyFilters(includeFavourites) {
           viewUrl: filter.viewUrl,
           jql: filter.jql
         }; }) )
-      
       // sorting the list of filters by favourite, name
       && filters.sort(function(a, b){
           var keyA = (a.favourite ? '0' : '1') + a.name;
@@ -215,7 +215,7 @@ function getMyFilters(includeFavourites) {
 
   var request = new Request();
 
-  request.call(method, {includeFavourites:(includeFavourites?'true':'false')})
+  request.call("myFilters", {includeFavourites:(includeFavourites?'true':'false')})
     .withSuccessHandler(ok)
     .withFailureHandler(error);
 
