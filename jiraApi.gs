@@ -61,11 +61,13 @@ function testConnection() {
 
   var ok = function(responseData, httpResponse, statusCode) {
     response = 'Connection successfully established.';
+    debug.log('%s to server [%s] %s', response, getCfg('server_type'), getCfg('jira_url'));
     setCfg('available', true);
   };
 
   var error = function(responseData, httpResponse, statusCode) {
     response = 'Could not connect to Jira Server!' + '['+statusCode+']';
+    debug.warn('%s Server [%s] %s', response, getCfg('server_type'), getCfg('jira_url'));
     setCfg('available', false);
   };
 
