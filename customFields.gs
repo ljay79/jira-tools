@@ -47,7 +47,7 @@ function fetchCustomFields() {
       // add data to export
       _customFieldsRaw.push.apply(_customFieldsRaw, respData.map(function(cField) {
         return {
-          key:        cField.key ||cField.id, // Server API returns ".id" only while Cloud returns both with same value
+          key:        cField.key || cField.id, // Server API returns ".id" only while Cloud returns both with same value
           name:       cField.name,
           custom:     cField.custom,
           schemaType: (cField.schema ? cField.schema.type : null) || null,

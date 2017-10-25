@@ -81,6 +81,7 @@
         valid = columns.filter(function(el){ return el.checked; }).length > 0 && filter.elements['filter_id'].value.length > 0;
         action.disabled = valid ? false : 'disabled';
       }
+
       function onInitFilter(response) {
         var filterSelect = filter.querySelector('.filter-select');
             filterSelect.innerText = '';
@@ -88,8 +89,14 @@
         
         if (!response.length) {
           showAlert('No filters available!');
+          // add Jira Server note to box
+          filterSelect.innerHTML = '<span class="inline grey">Note: If you are using a Jira Server installation, this can show your <strong>*favorite*</strong> filters only.</br>Read more at: <a href="https://confluence.atlassian.com/jiracoreserver073/saving-your-search-as-a-filter-861257224.html#Savingyoursearchasafilter-favorite_filters">Atlassian Support</a></span>';
+          filterSelect.innerHTML += '</br></br><span class="inline grey">Still having problems? File a issue report with the author here: <a href="https://github.com/ljay79/jira-tools/issues">JST on Github</a></span>';
+          action.disabled = 'disabled';
+
           return;
         }
+
         response.forEach(function(option) {
           var radio = document.createElement('div');
           var radioInput = document.createElement('input');
@@ -117,6 +124,7 @@
         
         window.dispatchEvent(new Event('load'));
       }
+
       function formSubmitHandler(event) {
         if (event) event.preventDefault();
         hideAlert();
@@ -133,6 +141,7 @@
           .withFailureHandler(onResponse)
           .insertIssuesFromFilter(formData);
       }
+
       function onResponse(response) {
         var done = response.status === true;
         hideAlert();
@@ -144,6 +153,7 @@
       google.script.run
         .withSuccessHandler(onInitFilter)
         .getMyFilters(true);
+
       filter.addEventListener('submit', formSubmitHandler);
       input.forEach(function(el){ el.addEventListener('change', inputValidatyHandler); });
       window.addEventListener('load', inputValidatyHandler);
