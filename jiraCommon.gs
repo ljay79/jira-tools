@@ -262,9 +262,9 @@ function fetchUsersAndGroups(minimal) {
  */
 function unifyIssueAttrib(attrib, data) {
   var resp = {value: ''};
-  
+
   try { // no error handling, always return a valid object
-    
+
   // custom fields first
   if ( attrib.substring(0, 12) == 'customfield_' ) {
     var customFields = getCustomFields(CUSTOMFIELD_FORMAT_UNIFY);
@@ -302,13 +302,17 @@ function unifyIssueAttrib(attrib, data) {
           resp.value = data.fields[attrib] || '';
           break;
         default:
-          debug.log('unifyIssueAttrib(' + attrib + ') no format defined yet for custom field.');
+          debug.log('unifyIssueAttrib(%s) no format defined yet for custom field.(02)', attrib);
           resp.value = data[attrib] || data.fields[attrib];
           break;
       }
-
-      return resp;
+      
+    } else {
+      debug.log('unifyIssueAttrib(%s) is custom field, but no format defined in customFields:%s.', attrib, customFields);
+      resp.value = data.fields[attrib] || data[attrib];
     }
+
+    return resp;
   }
   
   // regular fields
@@ -449,7 +453,7 @@ function unifyIssueAttrib(attrib, data) {
       break;
 
     default:
-      debug.log('unifyIssueAttrib(' + attrib + ') no format defined yet.');
+      debug.log('unifyIssueAttrib(' + attrib + ') no format defined yet.(01)');
       resp.value = data[attrib] || data.fields[attrib];
       break;
   }
@@ -471,7 +475,7 @@ function headerNames(header) {
     duedate: 'Due',
     priority: 'P',
   });
-  
+
   // append favorite custom fields
   extend(labels, getCustomFields(CUSTOMFIELD_FORMAT_SEARCH));
 
