@@ -41,11 +41,13 @@ function fetchCustomFields() {
 
   var ok = function(respData, httpResp, status) {
     if(respData) {
+      debug.log("Response of fetchCustomFields(); respData: %s", respData);
+
       var arrSupportedTypes = ['string', 'number', 'datetime', 'date'];
       // add data to export
       _customFieldsRaw.push.apply(_customFieldsRaw, respData.map(function(cField) {
         return {
-          key:        cField.key,
+          key:        cField.key ||cField.id, // Server API returns ".id" only while Cloud returns both with same value
           name:       cField.name,
           custom:     cField.custom,
           schemaType: (cField.schema ? cField.schema.type : null) || null,
@@ -81,7 +83,7 @@ function fetchCustomFields() {
 
     } else {
       // Something funky is up with the JSON response.
-      debug.info("Failed to retrieve Jira Custom Fields with status [" + status + "]; httpResp: %s", httpResp);
+      debug.warn("Failed to retrieve Jira Custom Fields with status [" + status + "]; httpResp: %s", httpResp);
     }
   };
 
@@ -106,5 +108,6 @@ function fetchCustomFields() {
  */
 function saveCustomFields(jsonFormData) {
   setVar('favoriteCustomFields', jsonFormData.favoriteCustomFields);
+  debug.log("Saved favoriteCustomFields: %s", jsonFormData.favoriteCustomFields);
   return {status: true, message: 'Ok'};
 }
