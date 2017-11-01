@@ -43,15 +43,21 @@ function fetchCustomFields() {
     if(respData) {
       debug.log("Response of fetchCustomFields(); respData: %s", respData);
 
-      var arrSupportedTypes = ['string', 'number', 'datetime', 'date'];
+      var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'array|option'];
+
       // add data to export
       _customFieldsRaw.push.apply(_customFieldsRaw, respData.map(function(cField) {
+        var _type = (cField.schema ? cField.schema.type : null) || null;
+        if(cField.schema && cField.schema.items) {
+          _type += '|' + cField.schema.items;
+        }
+
         return {
           key:        cField.key || cField.id, // Server API returns ".id" only while Cloud returns both with same value
           name:       cField.name,
           custom:     cField.custom,
-          schemaType: (cField.schema ? cField.schema.type : null) || null,
-          supported:  (arrSupportedTypes.indexOf( cField.schema ? cField.schema.type : null ) > -1)
+          schemaType: _type,
+          supported:  (arrSupportedTypes.indexOf(_type) > -1)
         };
       }) )
       // sorting by supported type and name

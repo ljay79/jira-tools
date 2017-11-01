@@ -301,6 +301,15 @@ function unifyIssueAttrib(attrib, data) {
         case 'string':
           resp.value = data.fields[attrib] || '';
           break;
+        case 'array|option':
+          resp.value = '(unsupported value)';
+          var _values = [];
+          // Try casting array to values
+          if (data.fields[attrib].length > 0 && data.fields[attrib][0].hasOwnProperty('value'))
+            for (var i = 0; i < data.fields[attrib].length; i++) 
+              _values.push(data.fields[attrib][i].value);
+          resp.value = _values.join();
+          break;
         default:
           debug.log('unifyIssueAttrib(%s) no format defined yet for custom field.(02)', attrib);
           resp.value = data[attrib] || data.fields[attrib];
