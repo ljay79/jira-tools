@@ -19,6 +19,7 @@ function refreshTickets() {
   var ok = function(responseData, httpResponse, statusCode){
     // Check the data is valid and the Jira fields exist
     if(responseData && responseData.fields) {
+      //var status = getIssueStatus(responseData.fields);
       var status = unifyIssueAttrib('status', responseData);
       // dependent cell value update
       switch(jiraCell.type) {
