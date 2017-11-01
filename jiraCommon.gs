@@ -301,6 +301,9 @@ function unifyIssueAttrib(attrib, data) {
         case 'string':
           resp.value = data.fields[attrib] || '';
           break;
+        case 'option':
+          resp.value = data.fields[attrib].value || 'n/a';
+          break;
         case 'array|option':
           resp.value = '(unsupported value)';
           var _values = [];

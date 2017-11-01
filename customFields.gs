@@ -43,7 +43,7 @@ function fetchCustomFields() {
     if(respData) {
       debug.log("Response of fetchCustomFields(); respData: %s", respData);
 
-      var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'array|option'];
+      var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'array|option', 'option'];
 
       // add data to export
       _customFieldsRaw.push.apply(_customFieldsRaw, respData.map(function(cField) {
