@@ -61,11 +61,13 @@ function testConnection() {
 
   var ok = function(responseData, httpResponse, statusCode) {
     response = 'Connection successfully established.';
+    debug.log('%s to server [%s] %s', response, getCfg('server_type'), getCfg('jira_url'));
     setCfg('available', true);
   };
 
   var error = function(responseData, httpResponse, statusCode) {
     response = 'Could not connect to Jira Server!' + '['+statusCode+']';
+    debug.warn('%s Server [%s] %s', response, getCfg('server_type'), getCfg('jira_url'));
     setCfg('available', false);
   };
 
@@ -149,7 +151,7 @@ function Request() {
   this.call = function(method, data, fetchArgs) {
     if( !hasSettings(false) ) {
       // check if server settings are available
-      responseData = null;
+      responseData = {errorMessages: ['Internal Error! No Jira Settings.']};
       httpResponse = null;
       statusCode = -1;
 
@@ -217,14 +219,15 @@ function Request() {
         responseData = JSON.parse(httpResponse.getContentText());
       } catch(e) {
         if(httpErrorCodes[statusCode]) responseData = httpErrorCodes[statusCode];
-        else responseData = 'Unable to make requests to Jira!';
+        else responseData = 'Unable to make requests to Jira (02)!';
       }
     } else {
-      responseData = 'Unable to make requests to Jira!';
+      responseData = 'Unable to make requests to Jira (01)!';
     }
 
     if( typeof responseData == 'string' ) {
       responseData = {errorMessages: [responseData]};
+      statusCode = 500;
     }
 
     debug.timeEnd(timingLabel);

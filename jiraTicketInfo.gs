@@ -1,6 +1,6 @@
 
 /**
- * Make a request to jira for all listed tickets, and update the spreadsheet 
+ * Make a request to jira for all listed tickets, and update the spreadsheet
  */
 function refreshTickets() {
   var method = "issueStatus";

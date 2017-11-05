@@ -147,27 +147,6 @@ OUT: {"type":20,"value":"Lorem ispum IT-123 dolores","ticketId":"IT-123","parts"
 */
 }
 
-/**
- * @desc Helper to simplify Jira's status field response. 
- *     Less IF/ELSE and property scopes needed.
- * @deprecated
- * @param fields {Object}  JSON objec from Jira response attribute 'fields'
- * @return {Object} Object({name:[string], color:[string]})
- */
-function getIssueStatus(fields) {
-  var o = {
-    'name': 'n/a',
-    'color': ''
-  };
-
-  try {
-    o.name = fields.status.name;
-    o.color = fields.status.statusCategory.colorName;
-  } catch (e) {}
-
-  return o;
-}
-
 
 /**
  * @desc Request users own (and favourite) filters and return an object of main props.
@@ -175,10 +154,11 @@ function getIssueStatus(fields) {
  * @return {object} Object({[id]:{name:{string}, self:{string}, favourite:{boolean}, owner:{string}, viewUrl:{string}}})
  */
 function getMyFilters(includeFavourites) {
-  var method = "myFilters", filters = [];
+  var filters = [];
 
-  var ok = function(responseData, httpResponse, statusCode){
+  var ok = function(responseData, httpResponse, statusCode) {
     // Check the data is valid and the Jira fields exist
+    //debug.log("getMyFilters()->ok(): %s", responseData);
     if(responseData) {
       // add data to export
       filters.push.apply(filters, responseData.map(function(filter){ return {
@@ -190,7 +170,6 @@ function getMyFilters(includeFavourites) {
           viewUrl: filter.viewUrl,
           jql: filter.jql
         }; }) )
-      
       // sorting the list of filters by favourite, name
       && filters.sort(function(a, b){
           var keyA = (a.favourite ? '0' : '1') + a.name;
@@ -215,7 +194,7 @@ function getMyFilters(includeFavourites) {
 
   var request = new Request();
 
-  request.call(method, {includeFavourites:(includeFavourites?'true':'false')})
+  request.call("myFilters", {includeFavourites:(includeFavourites?'true':'false')})
     .withSuccessHandler(ok)
     .withFailureHandler(error);
 
@@ -283,9 +262,9 @@ function fetchUsersAndGroups(minimal) {
  */
 function unifyIssueAttrib(attrib, data) {
   var resp = {value: ''};
-  
+
   try { // no error handling, always return a valid object
-    
+
   // custom fields first
   if ( attrib.substring(0, 12) == 'customfield_' ) {
     var customFields = getCustomFields(CUSTOMFIELD_FORMAT_UNIFY);
@@ -322,14 +301,30 @@ function unifyIssueAttrib(attrib, data) {
         case 'string':
           resp.value = data.fields[attrib] || '';
           break;
+        case 'option':
+          resp.value = data.fields[attrib].value || 'n/a';
+          break;
+        case 'array|option':
+          resp.value = '(unsupported value)';
+          var _values = [];
+          // Try casting array to values
+          if (data.fields[attrib].length > 0 && data.fields[attrib][0].hasOwnProperty('value'))
+            for (var i = 0; i < data.fields[attrib].length; i++) 
+              _values.push(data.fields[attrib][i].value);
+          resp.value = _values.join();
+          break;
         default:
-          debug.log('unifyIssueAttrib(' + attrib + ') no format defined yet for custom field.');
+          debug.log('unifyIssueAttrib(%s) no format defined yet for custom field.(02)', attrib);
           resp.value = data[attrib] || data.fields[attrib];
           break;
       }
-
-      return resp;
+      
+    } else {
+      debug.log('unifyIssueAttrib(%s) is custom field, but no format defined in customFields:%s.', attrib, customFields);
+      resp.value = data.fields[attrib] || data[attrib];
     }
+
+    return resp;
   }
   
   // regular fields
@@ -470,7 +465,7 @@ function unifyIssueAttrib(attrib, data) {
       break;
 
     default:
-      debug.log('unifyIssueAttrib(' + attrib + ') no format defined yet.');
+      debug.log('unifyIssueAttrib(' + attrib + ') no format defined yet.(01)');
       resp.value = data[attrib] || data.fields[attrib];
       break;
   }
@@ -492,7 +487,7 @@ function headerNames(header) {
     duedate: 'Due',
     priority: 'P',
   });
-  
+
   // append favorite custom fields
   extend(labels, getCustomFields(CUSTOMFIELD_FORMAT_SEARCH));
 

@@ -2,18 +2,24 @@
  * @author Jens Rosemeier <github@jens79.de>
  * @github  https://github.com/ljay79/jira-tools
  * @copyright Jens Rosemeier, 2017
+ * 
+ * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  *
  * ToDo/Notes:
  * - use google auth with token based Jira RESTful API vs. cleartext password
  */
 
-var BUILD = '0.19.2';
+var BUILD = '0.19.6';
 
 /** 
  * Add a nice menu option for the users.
  */
 function onOpen(e) {
   addMenu();
+
+  if (e && e.authMode == ScriptApp.AuthMode.FULL) {
+    debug.enable( (getVar('debugging')=='true') );
+  }
 };
 
 /**
@@ -32,7 +38,8 @@ function onInstall(e) {
 }
 
 /**
- * Add "Jira" Menu to UI. 
+ * Add "Jira" Menu to UI.
+ * @OnlyCurrentDoc
  */
 function addMenu() {
   SpreadsheetApp.getUi().createAddonMenu()
