@@ -268,33 +268,45 @@ function unifyIssueAttrib(attrib, data) {
   // custom fields first
   if ( attrib.substring(0, 12) == 'customfield_' ) {
     var customFields = getCustomFields(CUSTOMFIELD_FORMAT_UNIFY);
+    // custom epic
+    var epicField = getVar('jst_epic');
+    if (epicField.usable === true) {
+      customFields[epicField.link_key] = 'jst_epic';
+    }
 
     if (customFields.hasOwnProperty(attrib)) {
       var format = customFields[attrib];
 
       switch(format) {
+        case 'jst_epic':
+          resp = {
+            epic  : true,
+            value : data.fields[attrib] || 'n/a',
+            link  : getCfg('jira_url') + "/browse/" + data.fields[attrib]
+          };
+          break;
         case 'datetime':
           var _date = data.fields[attrib] || null;
           resp = {
-            value: _date,
-            date: new Date(getDateFromIso(_date)) || new Date(),
+            value : _date,
+            date  : new Date(getDateFromIso(_date)) || new Date(),
             format: "dd.mm.yyyy hh:mm"
           };
           break;
         case 'date':
           var _date = data.fields[attrib] || null;
-          _date = (_date.length == 10) ? _date + 'T12:00:00' : _date;
-          var date = new Date(getDateFromIso(_date)) || new Date();
+          _date     = (_date.length == 10) ? _date + 'T12:00:00' : _date;
+          var date  = new Date(getDateFromIso(_date)) || new Date();
           date.setHours(0,0,0);
-          resp = {
-            value: _date,
-            date: date,
+          resp      = {
+            value : _date,
+            date  : date,
             format: "dd.mm.yyyy"
           };
           break;
         case 'number':
           resp = {
-            value: parseFloat(data.fields[attrib]) || null,
+            value : parseFloat(data.fields[attrib]) || null,
             format: "0"
           };
           break;
@@ -491,6 +503,12 @@ function headerNames(header) {
   // append favorite custom fields
   extend(labels, getCustomFields(CUSTOMFIELD_FORMAT_SEARCH));
 
+  // custom epic
+  var epicField = getVar('jst_epic');
+  if (epicField.usable === true) {
+    labels[epicField.link_key] = 'Epic';
+  }
+  
   if( !labels.hasOwnProperty(header) ) {
     label = camelize(header);
   } else {
@@ -498,4 +516,47 @@ function headerNames(header) {
   }
 
   return label;
+}
+
+/**
+ * @TODO: to be used in convertEpicCell() and further places
+ * @desc Get single jira issue data from api, calling method 'issueStatus'
+ * @return {object}    Returns json object of issue
+ */
+function getIssue(issueKey, fields) {
+  var response = {
+    'data': [],
+    'status': -1,
+    'errorMessage': ''
+  };
+
+  var ok = function(resp, httpResp, status) {
+    if(resp && resp.fields) {
+      response = {
+        'data'             : resp.issues || resp,
+        'status'           : status,
+        'errorMessage'     : resp.hasOwnProperty('warningMessages') ? resp.warningMessages : 'No results found.'
+      };
+    } else {
+      // Something funky is up with the JSON response.
+      debug.error("Failed to retrieve issue data for ID [" + issueKey + "]! resp:%s; httpResp:%s; status:%s", resp, httpResp, status);
+    }
+  };
+
+  var error = function(resp, httpResp, status) {
+    debug.error('[%s] %s - %s', status, resp, httpResp);
+
+    var msgs = resp.hasOwnProperty('errorMessages') ? resp.errorMessages : [];
+    msgs = msgs.concat((resp.hasOwnProperty('warningMessages') ? resp.warningMessages : []));
+
+    response.status = status;
+    response.errorMessage = msgs.join("\n");
+  };
+
+  var request = new Request();
+  request.call('issueStatus', {issueIdOrKey: issueKey, fields: fields})
+    .withSuccessHandler(ok)
+    .withFailureHandler(error);
+  
+  return response;
 }

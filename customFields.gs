@@ -3,6 +3,16 @@ var CUSTOMFIELD_FORMAT_RAW    = 1;
 var CUSTOMFIELD_FORMAT_SEARCH = 2;
 var CUSTOMFIELD_FORMAT_UNIFY  = 3;
 
+// storage of custom Jira field 'EPIC'
+var fieldEpic = {
+  usable:    false,  // true|false
+  key:       'jst_epic',
+  name:      'Epic',
+  link_key:  null, //customfield_10003
+  label_key: null //customfield_10005
+};
+
+
 /**
  * @desc Convert stored custom fields in different prepared format.
  * @param format {Integer}
@@ -43,6 +53,9 @@ function fetchCustomFields() {
     if(respData) {
       debug.log("Response of fetchCustomFields(); respData: %s", respData);
 
+      // reset custom epic field
+      setVar('jst_epic', null);
+      
       var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'array|option', 'option'];
 
       // add data to export
@@ -50,6 +63,16 @@ function fetchCustomFields() {
         var _type = (cField.schema ? cField.schema.type : null) || null;
         if(cField.schema && cField.schema.items) {
           _type += '|' + cField.schema.items;
+        }
+        
+        // EPIC customization
+        if (cField.schema && cField.schema.custom) {
+          if (cField.schema.custom.indexOf(':gh-epic-link') > -1) {
+            fieldEpic.link_key = cField.key || cField.id;
+          }
+          if (cField.schema.custom.indexOf(':gh-epic-label') > -1) {
+            fieldEpic.label_key = cField.key || cField.id;
+          }
         }
 
         return {
@@ -86,6 +109,20 @@ function fetchCustomFields() {
           supported:  el.supported
         };
       });
+
+      // EPIC usable?
+      if (fieldEpic.link_key != null && fieldEpic.label_key != null) {
+        fieldEpic.usable = true;
+        setVar('jst_epic', fieldEpic);
+
+        // add custom field 'Epic' to beginning of array
+        customFields.unshift({
+          key:        fieldEpic.key,
+          name:       fieldEpic.name,
+          type:       'jst_epic',
+          supported:  true
+        });
+      }
 
     } else {
       // Something funky is up with the JSON response.

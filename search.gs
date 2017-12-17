@@ -61,6 +61,12 @@ function Search(searchQuery) {
   this.setFields = function(aFields) {
     if(aFields.constructor == Array) {
       fields = aFields;
+      // has custom Epic field 'jst_epic'?
+      if (fields.indexOf('jst_epic') > -1) {
+        var epicField = getVar('jst_epic');
+        fields.push(epicField.label_key || null);
+        fields.push(epicField.link_key || null);
+      }
     } else {
       throw '{aFields} is not an Array.';
     }
