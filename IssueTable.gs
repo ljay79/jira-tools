@@ -89,6 +89,7 @@ function IssueTable(sheet, initRange, data) {
     }
 
     numColumns = headers.length;
+    clearTimeTriggers('trigger_epicCell');
   };
 
   /**
@@ -96,7 +97,7 @@ function IssueTable(sheet, initRange, data) {
    * @return this  For chaining
    */
   this.fillTable = function() {
-    var range = sheet.getRange(initRange.getRow(), initRange.getColumn(), 1, headers.length);
+    var range = sheet.getRange(initRange.getRow(), initRange.getColumn(), 1, headers.length); //obsolete?
 
     // loop over each resulted issue
     for(var i=0; i<data.issues.length; i++) {
@@ -113,6 +114,13 @@ function IssueTable(sheet, initRange, data) {
         switch(true) {
           case key.hasOwnProperty('date'):
             key.value = (key.value != null) ? key.date : '';
+            break;
+          case (key.hasOwnProperty('epic') && key.epic === true):
+            // set EPIC cell data trigger
+            if (key.value != 'n/a') {
+              addTriggerEpicCell(key.value, (initRange.getRow() + rowIndex -1), (initRange.getColumn()+j));
+              key.value = '=HYPERLINK("' + key.link + '"; "' + key.value + '")';
+            }
             break;
           case key.hasOwnProperty('link'):
             key.value = '=HYPERLINK("' + key.link + '"; "' + key.value + '")';

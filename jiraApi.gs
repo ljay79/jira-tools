@@ -203,6 +203,8 @@ function Request() {
 
     // build full fetch URL    
     fetchUrl = buildUrl(fetchUrl, urlParams);
+    debug.log('fetchUrl: %s', fetchUrl);
+    debug.log('fetchArgs: %s', fetchArgs);
 
     responseData = null;
     try {
