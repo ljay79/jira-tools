@@ -54,7 +54,7 @@ function fetchCustomFields() {
       debug.log("Response of fetchCustomFields(); respData: %s", respData);
 
       // reset custom epic field
-      setVar('jst_epic', null);
+      setVar('jst_epic', fieldEpic);
       
       var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'array|option', 'option'];
 
