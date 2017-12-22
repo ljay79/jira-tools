@@ -107,7 +107,7 @@ function initDefaults() {
   // set default jira issue columns
   columnDefaults = jiraColumnDefault; //@TODO: allow user to change default columns
   setVar('jiraColumnDefault', columnDefaults);
-
+  setVar('jst_epic', fieldEpic);
   setVar('workhours', 8);
 
   // Jira onDemand or Server
@@ -142,3 +142,10 @@ function saveSettings(jsonFormData) {
   return {status: test.status, message: test.response};
 }
 
+
+function deleteAllProperties()
+{
+  // Delete all user properties in the current script.
+  var userProperties = PropertiesService.getUserProperties();
+  userProperties.deleteAllProperties();
+}
