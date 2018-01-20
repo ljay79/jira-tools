@@ -34,7 +34,7 @@ function dialogSettings() {
   var dialog = getDialog('dialogSettings', getServerCfg());
 
   dialog
-    .setWidth(340)
+    .setWidth(360)
     .setHeight(400)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
@@ -53,7 +53,8 @@ function getServerCfg() {
     url: getCfg('jira_url'),
     username: getCfg('jira_username'),
     password: getCfg('jira_password'),
-    workhours: getVar('workhours')
+    workhours: getVar('workhours'),
+    dspuseras_name: getVar('dspuseras_name')
   };
 }
 

@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
     <style>
     .error-container { display: none; margin-bottom: 10px; padding: 5px 10px; text-align: center; color: #fff; }
+    .block2x2 { width:40%; margin-right:20px; }
     </style>
   </head>
   <body>
@@ -30,13 +31,27 @@
         </div>
       </fieldset>
       
-      <fieldset class="block">
+      <fieldset class="block block2x2" style="float:left;">
         <legend>Time Sheet</legend>
         
         <div class="form-group block">
           <label for="ts-workhours" class="block">Working hours per day</label>
-          <input type="number" id="ts-workhours" name="ts_workhours" style="display:inline-block;width:16%" min="1" step=".1" value="<?= workhours ?>">
+          <input type="number" id="ts-workhours" name="ts_workhours" style="display:inline-block;width:30%" min="1" step=".1" value="<?= workhours ?>">
           <span class="inline">h</span>
+        </div>
+      </fieldset>
+
+      <fieldset class="block block2x2">
+        <legend>Display User as</legend>
+        <div class="form-group block">
+          <label>
+            <input type="radio" name="ts_dspuseras_name" style="display:inline-block;margin:0 5px" value="1"<? if (dspuseras_name == 1) { ?> checked="checked"<? } ?> />
+            First-/Lastname
+          </label>
+          <label>
+            <input type="radio" name="ts_dspuseras_name" style="display:inline-block;margin:0 5px" value="0"<? if (dspuseras_name == 0) { ?> checked="checked"<? } ?> />
+            Username
+          </label>
         </div>
       </fieldset>
       

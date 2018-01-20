@@ -378,7 +378,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'creator':
     case 'reporter':
       resp = {
-        value: data.fields[attrib].displayName || 'Unknown',
+        value: (getVar('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
         avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
       };
       break;
