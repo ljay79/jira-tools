@@ -64,8 +64,8 @@ function Search(searchQuery) {
       // has custom Epic field 'jst_epic'?
       if (fields.indexOf('jst_epic') > -1) {
         var epicField = getVar('jst_epic');
-        fields.push(epicField.label_key || null);
-        fields.push(epicField.link_key || null);
+        if(epicField.label_key) fields.push(epicField.label_key);
+        if(epicField.label_key) fields.push(epicField.link_key);
       }
     } else {
       throw '{aFields} is not an Array.';
