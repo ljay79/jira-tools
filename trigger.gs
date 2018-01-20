@@ -60,6 +60,7 @@ function addTriggerEpicCell(key, rowIdx, colIdx) {
 
 /**
  * Clear all time based triggers. Best to call onOpen()
+ * @param byHandlerName {String}    Handlerfunction of trigger(s) to delete
  */
 function clearTimeTriggers(byHandlerName) {
   var handlersToClear = (byHandlerName != null) ? [byHandlerName] : ['trigger_epicCell'];
@@ -72,6 +73,19 @@ function clearTimeTriggers(byHandlerName) {
   }
 }
 
+/**
+ * Delete Trigger by UniuqeId
+ * @param uniqueId {String}
+ */
+function deleteTrigger(uniqueId) {
+  var triggers = ScriptApp.getProjectTriggers();
+
+  for (var i = 0; i < triggers.length; i++) {
+    if (triggers[i].getUniqueId() == uniqueId) {
+      ScriptApp.deleteTrigger(triggers[i]);
+    }
+  }
+}
 
 /* ------------------------------------------------------ */
 
@@ -81,9 +95,10 @@ var TRIGGER_BUCKET_EPIC = [];
 
 /**
  * @desc Time-based trigger to convert epic cell content from Jira issue key into Epic label/name with link.
+ * @param event {Object}
  * @return VOID
  */
-function trigger_epicCell() {
+function trigger_epicCell(event) {
   debug.log('===trigger_epicCell()===');
   var triggerName = 'trigger_epicCell';
 
@@ -127,6 +142,9 @@ function trigger_epicCell() {
 
   // set state as finished
   setTriggerState(triggerName, false);
+  // immediately delete finished trigger
+  var _triggerUId = event.triggerUid.toString().slice(0,14);
+  deleteTrigger(_triggerUId);
 }
 
 /**
