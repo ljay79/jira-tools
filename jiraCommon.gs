@@ -364,7 +364,8 @@ function unifyIssueAttrib(attrib, data) {
       };
       break;
     case 'summary':
-      resp.value = data.fields.summary || '';
+    case 'description':
+      resp.value = data.fields[attrib] || '';
       break;
     case 'issuetype':
       resp = {
