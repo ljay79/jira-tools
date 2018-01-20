@@ -55,8 +55,8 @@ function fetchCustomFields() {
 
       // reset custom epic field
       setVar('jst_epic', fieldEpic);
-      
-      var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'array|option', 'option'];
+
+      var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string'];
 
       // add data to export
       _customFieldsRaw.push.apply(_customFieldsRaw, respData.map(function(cField) {
@@ -64,7 +64,7 @@ function fetchCustomFields() {
         if(cField.schema && cField.schema.items) {
           _type += '|' + cField.schema.items;
         }
-        
+
         // EPIC customization
         if (cField.schema && cField.schema.custom) {
           if (cField.schema.custom.indexOf(':gh-epic-link') > -1) {

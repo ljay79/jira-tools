@@ -317,13 +317,16 @@ function unifyIssueAttrib(attrib, data) {
           resp.value = data.fields[attrib].value || 'n/a';
           break;
         case 'array|option':
-          resp.value = '(unsupported value)';
+          resp.value = '';
           var _values = [];
           // Try casting array to values
           if (data.fields[attrib].length > 0 && data.fields[attrib][0].hasOwnProperty('value'))
             for (var i = 0; i < data.fields[attrib].length; i++) 
               _values.push(data.fields[attrib][i].value);
           resp.value = _values.join();
+          break;
+        case 'array|string':
+          resp.value = data.fields[attrib].join(',');
           break;
         default:
           debug.log('unifyIssueAttrib(%s) no format defined yet for custom field.(02)', attrib);
