@@ -101,27 +101,27 @@
           var radio = document.createElement('div');
           var radioInput = document.createElement('input');
           var radioLabel = document.createElement('label');
-          
+
           radioInput.setAttribute('type', 'radio');
           radioInput.setAttribute('name', 'filter');
           radioInput.setAttribute('id', 'filter-id-'+option.id);
           radioInput.setAttribute('value', option.id);
           radioLabel.setAttribute('for', 'filter-id-'+option.id);
           radioLabel.innerText = option.name + ' ('+option.owner+')';
-          
+
           if (option.favourite) radio.className = 'is-favourite';
           radio.appendChild(radioInput);
           radio.appendChild(radioLabel);
-          
+
           radioInput.addEventListener('change', inputValidatyHandler);
           
           filters.push(radioInput);
           filterSelect.appendChild(radio);
         });
-        
+
         filters[0].checked = true;
         filter.elements['filter_id'].value = filters[0].value;
-        
+
         window.dispatchEvent(new Event('load'));
       }
 

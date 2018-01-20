@@ -317,13 +317,16 @@ function unifyIssueAttrib(attrib, data) {
           resp.value = data.fields[attrib].value || 'n/a';
           break;
         case 'array|option':
-          resp.value = '(unsupported value)';
+          resp.value = '';
           var _values = [];
           // Try casting array to values
           if (data.fields[attrib].length > 0 && data.fields[attrib][0].hasOwnProperty('value'))
             for (var i = 0; i < data.fields[attrib].length; i++) 
               _values.push(data.fields[attrib][i].value);
           resp.value = _values.join();
+          break;
+        case 'array|string':
+          resp.value = data.fields[attrib].join(',');
           break;
         default:
           debug.log('unifyIssueAttrib(%s) no format defined yet for custom field.(02)', attrib);
@@ -361,7 +364,8 @@ function unifyIssueAttrib(attrib, data) {
       };
       break;
     case 'summary':
-      resp.value = data.fields.summary || '';
+    case 'description':
+      resp.value = data.fields[attrib] || '';
       break;
     case 'issuetype':
       resp = {
@@ -374,7 +378,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'creator':
     case 'reporter':
       resp = {
-        value: data.fields[attrib].displayName || 'Unknown',
+        value: (getVar('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
         avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
       };
       break;

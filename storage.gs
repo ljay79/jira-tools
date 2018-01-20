@@ -109,6 +109,7 @@ function initDefaults() {
   setVar('jiraColumnDefault', columnDefaults);
   setVar('jst_epic', fieldEpic);
   setVar('workhours', 8);
+  setVar('dspuseras_name', 1);
 
   // Jira onDemand or Server
   var server_type = getCfg('server_type');
@@ -132,6 +133,7 @@ function saveSettings(jsonFormData) {
   setCfg('jira_username', jsonFormData.jira_username);
   setCfg('jira_password', jsonFormData.jira_password);
   setVar('workhours', jsonFormData.ts_workhours);
+  setVar('dspuseras_name', parseInt(jsonFormData.ts_dspuseras_name));
 
   var test = testConnection();
 
