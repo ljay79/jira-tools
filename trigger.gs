@@ -163,6 +163,10 @@ function convertEpicCell(sheetName, key, rowIdx, colIdx) {
   var cell      = sheet.getRange(rowIdx, colIdx);
   var jiraCell  = grepJiraCell(cell.getValue());
   var epicField = getVar('jst_epic');
+  
+  if(jiraCell.value == '') {
+    return;
+  }
 
   if(jiraCell.type !== CELLTYPE_JIRAID) {
     debug.error('Unable to convert EPIC cell value "%s" of type "%s"', jiraCell.value, jiraCell.type);
