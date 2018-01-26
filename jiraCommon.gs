@@ -323,11 +323,54 @@ function unifyIssueAttrib(attrib, data) {
           if (data.fields[attrib].length > 0 && data.fields[attrib][0].hasOwnProperty('value'))
             for (var i = 0; i < data.fields[attrib].length; i++) 
               _values.push(data.fields[attrib][i].value);
-          resp.value = _values.join();
+          
           break;
         case 'array|string':
-          resp.value = data.fields[attrib].join(',');
+          resp.value = '';
+          var _values = data.fields[attrib];
+
+          // field "Sprint" is type string with custom value
+          if (data.fields[attrib][0].indexOf('service.sprint.Sprint') > -1) {
+            _values = [];
+            var _regEx = /name=([^,]+),/gi;
+            var _sprintNameArr = [];
+            for (var i = 0; i < data.fields[attrib].length; i++) {
+              _sprintNameArr = _regEx.exec(data.fields[attrib][i]);
+              if(_sprintNameArr.length==2) _values.push(_sprintNameArr[1]);
+            }
+          }
+          //
+
+          resp.value = _values.join(',');
+
           break;
+        case 'user':
+          resp = {
+            value: (getVar('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
+            avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
+          };
+          break;
+        case 'array|user':
+          resp.value = data.fields[attrib].map(function(el){
+            return ((getVar('dspuseras_name') == 1 ? el.displayName : el.name) || 'Unknown');
+          }).join(', ');
+          break;
+        case 'group':
+          resp.value = data.fields[attrib].name || '';
+          break;
+        case 'array|group':
+        case 'array|version':
+          resp.value = data.fields[attrib].map(function(el){
+            return (el.name || 'n/a');
+          }).join(', ');
+          break;
+        case 'version':
+          resp = {
+            value: data.fields[attrib].name,
+            format: (data.fields[attrib].released == true) ? '@[green]' : ''
+          };
+          break;
+
         default:
           debug.log('unifyIssueAttrib(%s) no format defined yet for custom field.(02)', attrib);
           resp.value = data[attrib] || data.fields[attrib];
