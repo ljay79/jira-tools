@@ -95,21 +95,26 @@
         });
         window.dispatchEvent(new Event('load'));
       }
+
       function updFavoriteField() {
         var add = (this.name === 'customfield') && this.checked;
-        
+
         // add custom field to favorites
         if (add) {
           addFavoriteItem(JSON.parse(this.value));
         }
+
         // remove custom field from favorites
         if (!this.checked) {
-          var field = JSON.parse(this.value);
-          form.querySelector('#customfield-id-' + field.key).checked = false;
+          var cfield, field = JSON.parse(this.value);
+          if (cfield = form.querySelector('#customfield-id-' + field.key)) {
+            cfield.checked = false;
+          }
           var el = form.querySelector('#favoriteField-'  + field.key);
           el.parentNode.parentNode.removeChild(el.parentNode);
         }
       }
+
       function addFavoriteItem(item) {
         var chkbox      = document.createElement('div');
         var chkboxInput = document.createElement('input');
@@ -160,10 +165,13 @@
       function isFavorite(key) {
         return _storedFavFields.find(o => o.key === key);
       }
+
       google.script.run
         .withSuccessHandler(onInitCustomFields)
         .fetchCustomFields();
+
       form.addEventListener('submit', formSubmitHandler);
+
       window.addEventListener('load', function(){
         Array.prototype.slice.call(form.elements).filter(function(el){ 
           if(el.nodeName === 'INPUT' && el.type === 'checkbox') {
