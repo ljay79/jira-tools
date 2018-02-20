@@ -261,6 +261,14 @@ function Request() {
     return this;
   };
 
+  /**
+   * @desc Return raw response object from previous call.
+   * @return {Object}    Response object: {respData: {..}, httpResp: {}, statusCode: Integer}
+   */
+  this.getResponse = function() {
+    return {'respData': responseData, 'httpResp': httpResponse, 'statusCode': statusCode};
+  };
+
   // call init
   this.init();
 }
