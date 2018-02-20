@@ -8,8 +8,8 @@ var fieldEpic = {
   usable:    false,  // true|false
   key:       'jst_epic',
   name:      'Epic',
-  link_key:  null, //customfield_10003
-  label_key: null //customfield_10005
+  link_key:  null, // customfield_10003
+  label_key: null  // customfield_10005
 };
 
 
@@ -43,7 +43,7 @@ function getCustomFields( format ) {
 }
 
 /**
- * Dialog Helper to retrieve list of all available Jira Custom Fields
+ * @desc Dialog Helper to retrieve list of all available Jira Custom Fields from api.
  * @return {Array}    Array of custom Jira Fields
  */
 function fetchCustomFields() {
