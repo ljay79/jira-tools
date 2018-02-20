@@ -566,7 +566,7 @@ function headerNames(header) {
 }
 
 /**
- * @TODO: to be used in convertEpicCell() and further places
+ * @TODO: not used yet / to be used in convertEpicCell() and further places
  * @desc Get single jira issue data from api, calling method 'issueStatus'
  * @return {object}    Returns json object of issue
  */

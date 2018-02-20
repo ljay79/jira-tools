@@ -89,7 +89,6 @@ function IssueTable(sheet, initRange, data) {
     }
 
     numColumns = headers.length;
-    clearTimeTriggers('trigger_epicCell');
   };
 
   /**
@@ -116,10 +115,8 @@ function IssueTable(sheet, initRange, data) {
             key.value = (key.value != null) ? key.date : '';
             break;
           case (key.hasOwnProperty('epic') && key.epic === true):
-            // set EPIC cell data trigger
             if (key.value != 'n/a') {
-              addTriggerEpicCell(key.value, (initRange.getRow() + rowIndex -1), (initRange.getColumn()+j));
-              key.value = '=HYPERLINK("' + key.link + '"; "' + key.value + '")';
+              key.value = '=HYPERLINK("' + key.link + '"; JST_EPICLABEL("' + key.value + '"))';
             }
             break;
           case key.hasOwnProperty('link'):
