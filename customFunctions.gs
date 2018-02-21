@@ -27,7 +27,9 @@ function JST_EPICLABEL(TicketId) {
   }).getResponse();
 
   if(response.statusCode === 200 && response.respData && response.respData.fields) {
-    return response.respData.fields[epicField.label_key];
+    var value = response.respData.fields[epicField.label_key];
+    if ( value === undefined || value == '') value = TicketId;
+    return value;
   } else {
     throw new Error("Jira Error: " + response.respData.errorMessages.join(","));
   }
