@@ -14,7 +14,7 @@ function JST_EPICLABEL(TicketId) {
     throw new Error("{TicketId} can not be empty.");
   }
 
-  if(epicField.usable === false || epicField.label_key == null) {
+  if(undefined == epicField || epicField.usable === false || epicField.label_key == null) {
     throw new Error("Please configure your Jira Epic field first. Go to 'Jira Sheet Tools' -> 'Configure Custom Fields'");
   }
 
