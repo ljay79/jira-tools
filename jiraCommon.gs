@@ -378,7 +378,7 @@ function unifyIssueAttrib(attrib, data) {
       }
       
     } else {
-      debug.log('unifyIssueAttrib(%s) is custom field, but no format defined in customFields:%s.', attrib, customFields);
+      debug.info('unifyIssueAttrib(%s) is custom field, but no format defined in customFields:%s.', attrib, customFields);
       resp.value = data.fields[attrib] || data[attrib];
     }
 
@@ -524,7 +524,7 @@ function unifyIssueAttrib(attrib, data) {
       break;
 
     default:
-      debug.log('unifyIssueAttrib(' + attrib + ') no format defined yet.(01)');
+      debug.info('unifyIssueAttrib(' + attrib + ') no format defined yet.(01)');
       resp.value = data[attrib] || data.fields[attrib];
       break;
   }
