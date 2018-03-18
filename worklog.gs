@@ -93,7 +93,14 @@ function createWorklog(jsonFormData) {
       var request = new Request();
       request.call('worklogOfIssue',{issueIdOrKey: issue.id})
         .withFailureHandler(function(resp, httpResp, status) {
-          debug.error("Failed to retrieve worklogs for issue with status [%s]!\\n" + resp.errorMessages.join("\\n"), status);
+          debug.error("Failed to retrieve worklogs for issue with status [%s]!\\n" + resp.errorMessages.join("\\n") + "Response: %s", status, resp);
+
+          // add issue to time report highlighted and with error message as cell note
+          issue.cellNote = {
+              message: resp.errorMessages.join("\\n"), 
+              color: 'red'
+          };
+          timeSheetTable.addRow(issue, []);
         })
         .withSuccessHandler(function(resp, httpResp, status) {
           // we have all logs here for 1 jira issue
@@ -107,14 +114,7 @@ function createWorklog(jsonFormData) {
 
             //@TODO: make compatible with worklogs of groups ( memberOf("") )
             return wlog.author.name === jsonFormData.wlAuthorU;
-          })/*.forEach(function(wlog){ // pass to table, add row
-            timeSheetTable.addRow(issue, {
-              "started": wlog.started,
-              "authorName": wlog.author.name,
-              "timeSpentSeconds": wlog.timeSpentSeconds
-            });
-          })*/
-          ;
+          });
 
           timeSheetTable.addRow(issue, worklogs);
 
@@ -365,7 +365,7 @@ function TimesheetTable1(options) {
 
       values.push(_val);
     });
-
+    
     // add timespent to overall period totals
     for(var key in rowTimes) {
       rowTotal += rowTimes[key];
@@ -386,6 +386,11 @@ function TimesheetTable1(options) {
       .setValues([ values ])
       .setFontWeights([ formats ])
       .activate();
+
+    if (issue.cellNote) {
+      // cell of summary text; add note and change color
+      range.getCell(1, 3).setNote(issue.cellNote.message||'').setFontColor(issue.cellNote.color);
+    }
 
     // 1st col IssueTypeIcon align center
     sheet.getRange(currentRowIdx-1, 1, 1, 1).setHorizontalAlignment("center");

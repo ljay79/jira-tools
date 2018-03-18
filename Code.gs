@@ -9,7 +9,7 @@
  * - use google auth with token based Jira RESTful API vs. cleartext password
  */
 
-var BUILD = '0.21.2';
+var BUILD = '0.21.3';
 
 /** 
  * Add a nice menu option for the users.

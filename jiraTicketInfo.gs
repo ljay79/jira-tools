@@ -49,7 +49,7 @@ function refreshTickets() {
       rows.getCell(rowIdx, colIdx).setNote("This Jira ticket does not exist on " + getCfg('jira_url'));
     } else {
       // Jira returns all errors that occured in an array (if using the application/json mime type)
-      rows.getCell(rowIdx, colIdx).setNote("Jira Error: " + responseData.errorMessages.join(","));
+      rows.getCell(rowIdx, colIdx).setNote("Jira Error: " + responseData.errorMessages.join(",") || responseData.errorMessages);
     }
   };
 

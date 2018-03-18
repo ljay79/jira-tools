@@ -174,6 +174,7 @@ if (!Array.prototype.fill) {
   };
 }
 
+
 /**
  * @desc Converts time difference into human readable format.
  *       Returns difference in %d %h %m %s
