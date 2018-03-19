@@ -31,6 +31,6 @@ function JST_EPICLABEL(TicketId) {
     if ( value === undefined || value == '') value = TicketId;
     return value;
   } else {
-    throw new Error("Jira Error: " + response.respData.errorMessages.join(","));
+    throw new Error("Jira Error: " + response.respData.errorMessages.join(",") || response.respData.errorMessages);
   }
 }
