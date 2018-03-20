@@ -34,3 +34,33 @@ function JST_EPICLABEL(TicketId) {
     throw new Error("Jira Error: " + response.respData.errorMessages.join(",") || response.respData.errorMessages);
   }
 }
+
+/**
+ * Fetch the total count of results for given Jira JQL search query.
+ *
+ * @param {"status = Done"} JQL    A well-formed Jira JQL query (https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries).
+ * @return {Number}    Total number of results
+ * @customfunction
+ */
+function JST_getTotalForSearchResult(JQL) {
+  if (undefined == JQL || JQL == '') {
+    throw new Error("{JQL} can not be empty.");
+  }
+
+  var request   = new Request();
+  var response  = {}, data = {
+    jql        : JQL, 
+    fields     : ['summary'], 
+    maxResults : 1
+  };
+
+  response = request.call('search', data, {'method' : 'post'}).getResponse();
+
+  if(response.statusCode === 200 && response.respData && response.respData.total) {
+    debug.log("JST_getTotalForSearchResult [%s]: response: %s", response.statusCode, response);
+    return parseInt(response.respData.total || 0);
+  } else {
+    debug.error("Jira Error [" + response.statusCode + "]: " + response.respData.errorMessages.join(",") || response.respData.errorMessages);
+    throw new Error("[" + response.statusCode + "] - " + response.respData.errorMessages.join(",") || response.respData.errorMessages);
+  }
+}
