@@ -60,7 +60,16 @@ function JST_getTotalForSearchResult(JQL) {
     debug.log("JST_getTotalForSearchResult [%s]: response: %s", response.statusCode, response);
     return parseInt(response.respData.total || 0);
   } else {
-    debug.error("Jira Error [" + response.statusCode + "]: " + response.respData.errorMessages.join(",") || response.respData.errorMessages);
     throw new Error("[" + response.statusCode + "] - " + response.respData.errorMessages.join(",") || response.respData.errorMessages);
   }
+}
+
+/**
+ * @desc Forces trigger to re-calculate all custom functions / formulars in the active sheet.
+ *       No official function for this, but this trick does it.
+ * @return Void
+ */
+function recalcCustomFunctions() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(); 
+  sheet.insertRowBefore(1).deleteRow(1);
 }

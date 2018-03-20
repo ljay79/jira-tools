@@ -45,6 +45,7 @@ function onInstall(e) {
 function addMenu() {
   SpreadsheetApp.getUi().createAddonMenu()
     .addItem('Refresh Ticket Data', 'dialogRefreshTicketsIds')
+    .addItem('Re-Calculate all formulas in active sheet', 'recalcCustomFunctions')
     .addItem('Show Jira Field Map', 'sidebarJiraFieldMap')
     
     .addSeparator()
