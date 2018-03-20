@@ -53,7 +53,9 @@ Enter your "Jira Domain", "Username" and "Password".
 **You're all set and ready to go**
 
 # Features
-## Refresh Ticket Data
+### Refresh Ticket Data
+“Add-ons" > “Jira Sheet Tools” > "Refresh Ticket Data"
+
 Any Jira ticket Id in the form of "KEY-123" will be updated on the current active google sheet and extended with the current status of matching Jira ticket.
 
 Sample Data:
@@ -65,6 +67,20 @@ Sample Data:
 ```
 Even when used within text it will search for keys and add the status.
 If a Jira issue key is found in a single cell, the value will be linked automatically to the Jira issue page.
+
+
+### Re-Calculate all formulas in active sheet
+“Add-ons" > “Jira Sheet Tools” > "Re-Calculate all formulas in active sheet"
+
+When anu custom function or other formula is used, this simple 'click' will refresh / re-calculate all the formulas and custom functions used in the current active google sheet.
+If a sheet is re-opened this will re-calculate all custom functions by default anyway, but usually not while editing or watching the current sheet.
+
+
+### Show Jira Field Map
+“Add-ons" > “Jira Sheet Tools” > "Show Jira Field Map"
+
+Fetch and show all your Jira fields name and id in a sidebar. Very useful for our custom functions where you can make use of JQL queries.
+
 
 ### List Issues From Filter
 “Add-ons" > “Jira Sheet Tools” > "List Issues from Filter"
@@ -127,8 +143,21 @@ TicketId: `A well-formed Jira EPIC Ticket Id / Key.`
 
 Use this custom function whenever you like to automatically retrieve the Jira issue label for a given EPIC ticket Id / Key.
 
+
+### JST_getTotalForSearchResult
+Sample: `JST_getTotalForSearchResult("status = Done")`
+
+Description: `Fetch the total count of results for given Jira JQL search query.`
+
+JQL: `A well-formed Jira JQL query.`
+(see [https://confluence.atlassian.com/jirasoftwarecloud/...](https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries))
+
+Use this custom function whenever you simply need the total count of Jira issues resulting from your JQL ([Jira Query Language](https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries)) queries.
+
+
 # Known Issues
 `Could not connect to Jira Server![401]`
+**1st: Make sure you use your Atlassian username and password, not an email or possibly Google password!**
 In case someone comes across the same or similar issue, i could actually reproduce that error and identify one use case where this would happen.
 
 ### Solution
@@ -143,7 +172,7 @@ Log out from your Jira portal.
 Go to https://id.atlassian.com and click on "Can't log in?" - just below the log on form.
 On the next page enter your email address (which would be your Google Email) and press "Send recovery link".
 
-Your will get an email from Atlassian where you please click the provided link at "Reset your password".
+You will get an email from Atlassian where you please click the provided link at "Reset your password".
 Now on the Atlassian page where you can set/change your Atlassian (and not Google) password, enter a new password for your Atlassian account, not to mix up with your Google account.
 
 Of course it makes no sense that this information is not available on the REST API documentation page, since it is quite crucial to get it working.
