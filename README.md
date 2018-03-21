@@ -117,11 +117,12 @@ Once you configured your custom fields, these fields are available to create col
 > Supported custom fields are of type: **string**, **number**, **date**, **datetime**
 **option**, **array of options**, **array of strings**, **user**, **array of users**, **group**, **array of groups**, **version** and **array of versions**
 
+
 # Custom Functions
 Custom functions in Google sheet's are created using standard JavaScript.
 (see https://developers.google.com/apps-script/guides/sheets/functions#using_a_custom_function)
 
-# JST_EPICLABEL
+### JST_EPICLABEL
 
 Sample: `JST_EPICLABEL("JST-123")`
 
@@ -132,7 +133,7 @@ TicketId: `A well-formed Jira EPIC Ticket Id / Key.`
 Use this custom function whenever you like to automatically retrieve the Jira issue label for a given EPIC ticket Id / Key.
 
 
-## JST_getTotalForSearchResult
+### JST_getTotalForSearchResult
 Sample: `JST_getTotalForSearchResult("status = Done")`
 
 Description: `Fetch the total count of results for given Jira JQL search query.`
@@ -143,7 +144,7 @@ JQL: `A well-formed Jira JQL query.`
 Use this custom function whenever you simply need the total count of Jira issues resulting from your JQL ([Jira Query Language](https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries)) queries.
 
 
-## JST_search
+### JST_search
 Sample: `JST_search("status = Done"; "summary,status"; 10)`
 
 Description: `(Mini)Search for Jira issues using JQL.`
