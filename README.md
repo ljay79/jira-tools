@@ -122,7 +122,9 @@ Custom functions in Google sheet's are created using standard JavaScript.
 (see https://developers.google.com/apps-script/guides/sheets/functions#using_a_custom_function)
 
 ### JST_EPICLABEL
+
 Sample: `JST_EPICLABEL("JST-123")`
+
 Description: `Fetch EPIC label from Jira instance for a given Jira Issue Key of type EPIC.`
 
 TicketId: `A well-formed Jira EPIC Ticket Id / Key.`
@@ -132,6 +134,7 @@ Use this custom function whenever you like to automatically retrieve the Jira is
 
 ### JST_getTotalForSearchResult
 Sample: `JST_getTotalForSearchResult("status = Done")`
+
 Description: `Fetch the total count of results for given Jira JQL search query.`
 
 JQL: `A well-formed Jira JQL query.`
@@ -142,11 +145,14 @@ Use this custom function whenever you simply need the total count of Jira issues
 
 ### JST_search
 Sample: `JST_search("status = Done"; "summary,status"; 10)`
+
 Description: `(Mini)Search for Jira issues using JQL.`
 
 JQL: `A well-formed Jira JQL query.`
 (see [https://confluence.atlassian.com/jirasoftwarecloud/...](https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries))
+
 Fields: `Jira issue field IDs. e.g.: "key,summary,status"`
+
 Limit: `Number of results to return. 1 to 100. Default: 1`
 
 Little but quite powerful function to search for Jira issues and fill your sheet with the results.
@@ -162,7 +168,7 @@ When you define a `Limit` greater than `1`, the results will fill multiple rows 
 Give it a try, with a very basic JQL: `JST_search("status = Done"; "key,summary,status"; 5)`
 This will search for any Jira issue with `status` equals `Done` and fill your cells with max 5 rows over 3 columns (3 fields = 3 columns).
 
-> **Sample Result:**
+**Sample Result:**
 In cell `A1` put in `JST_search("status = Done"; "key,summary,status"; 5)`
 ```markdown
 1 | A      | B                       | C
