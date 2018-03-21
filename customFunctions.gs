@@ -1,4 +1,14 @@
 /**
+ * @desc Forces trigger to re-calculate all custom functions / formulars in the active sheet.
+ *       No official function for this, but this trick does it.
+ * @return Void
+ */
+function recalcCustomFunctions() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(); 
+  sheet.insertRowBefore(1).deleteRow(1);
+}
+
+/**
  * Fetch EPIC label from Jira instance for a given Jira Issue Key of type EPIC.
  *
  * @param {"JST-123"} TicketId    A well-formed Jira EPIC Ticket Id / Key.
@@ -14,7 +24,7 @@ function JST_EPICLABEL(TicketId) {
     throw new Error("{TicketId} can not be empty.");
   }
 
-  if(undefined == epicField || epicField.usable === false || epicField.label_key == null) {
+  if(undefined == epicField || epicField.usable !== true || epicField.label_key == null) {
     throw new Error("Please configure your Jira Epic field first. Go to 'Jira Sheet Tools' -> 'Configure Custom Fields'");
   }
 
@@ -31,6 +41,7 @@ function JST_EPICLABEL(TicketId) {
     if ( value === undefined || value == '') value = TicketId;
     return value;
   } else {
+    debug.error("In JST_EPICLABEL; Response %s", response);
     throw new Error("Jira Error: " + response.respData.errorMessages.join(",") || response.respData.errorMessages);
   }
 }
@@ -65,11 +76,71 @@ function JST_getTotalForSearchResult(JQL) {
 }
 
 /**
- * @desc Forces trigger to re-calculate all custom functions / formulars in the active sheet.
- *       No official function for this, but this trick does it.
- * @return Void
+ * (Mini)Search for Jira issues using JQL.
+ *
+ * @param {"status = Done"} JQL    A well-formed Jira JQL query (https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries).
+ * @param {"summary,status"} Fields    Jira issue field IDs. e.g.: "key,summary,status"
+ * @param {10} Limit    Number of results to return. 1 to 100. Default: 1
+ * @return {Array}    Array of results
+ * @customfunction
  */
-function recalcCustomFunctions() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(); 
-  sheet.insertRowBefore(1).deleteRow(1);
+function JST_search(JQL, Fields, Limit) {
+  // - checks - 
+  if (undefined == JQL || JQL == '') {
+    throw new Error("{JQL} can not be empty.");
+  }
+
+  if (undefined == Fields || Fields == '') {
+    throw new Error("{Fields} can not be empty.");
+  }
+
+  Limit = parseInt(Limit) || 1;
+  Limit = (Limit > 100)? 100 : Limit;
+
+  debug.log("JST_search([%s]; [%s]; [%s])", JQL, Fields, Limit);
+
+  // sanitize string and split to array
+  var aFields = Fields.replace(/;/g, ",").replace(/(^,)|(,$)/g, "").split(',');
+  aFields.filter(function(item) { 
+    return item != ' ';
+  });
+
+  // - logic -
+  var request   = new Request();
+  var response  = {}, data = {
+    jql        : JQL, 
+    fields     : aFields, 
+    maxResults : Limit
+  };
+
+  response = request.call('search', data, {'method' : 'post'}).getResponse();
+
+  if(response.statusCode === 200 && response.respData && response.respData.total) {
+    //debug.log("JST_search [%s], Total: %s: response: %s", response.statusCode, response.respData.total, response);
+    debug.log("JST_search [%s], Total: %s", response.statusCode, response.respData.total);
+
+    var issue = null, key = null, rowValues = [], results = [];
+    for(var i=0; i<response.respData.issues.length; i++) {
+      issue = response.respData.issues[i];
+      rowValues = [];
+
+      // loop over each requested field
+      for(var j=0; j<aFields.length; j++) {
+        key = unifyIssueAttrib(aFields[j], issue);
+        // for some custom formatting
+        switch(true) {
+          case key.hasOwnProperty('date'):
+            key.value = (key.value != null) ? key.date : '';
+            break;
+        }
+        rowValues.push( key.value == null ? aFields[j] : key.value );
+      }//END:j
+      results.push( rowValues );
+    }//END:i
+
+    return results;
+
+  } else {
+    throw new Error("[" + response.statusCode + "] - " + response.respData.errorMessages.join(",") || response.respData.errorMessages);
+  }
 }
