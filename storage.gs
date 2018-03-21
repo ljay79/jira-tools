@@ -107,9 +107,16 @@ function initDefaults() {
   // set default jira issue columns
   columnDefaults = jiraColumnDefault; //@TODO: allow user to change default columns
   setVar('jiraColumnDefault', columnDefaults);
-  setVar('jst_epic', fieldEpic);
-  setVar('workhours', 8);
-  setVar('dspuseras_name', 1);
+
+  var _tmp = getVar('jst_epic');
+  if (_tmp == null || _tmp.usable === false) 
+    setVar('jst_epic', fieldEpic);
+
+  if (null == getVar('workhours'))
+    setVar('workhours', 8);
+
+  if (null == getVar('dspuseras_name'))
+    setVar('dspuseras_name', 1);
 
   // Jira onDemand or Server
   var server_type = getCfg('server_type');
