@@ -151,7 +151,9 @@ function saveSettings(jsonFormData) {
   return {status: test.status, message: test.response};
 }
 
-
+/**
+ * Delete entire user properties - for testing only
+ */
 function deleteAllProperties()
 {
   // Delete all user properties in the current script.

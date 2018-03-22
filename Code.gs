@@ -20,7 +20,6 @@ function onOpen(e) {
   if (e && e.authMode == ScriptApp.AuthMode.FULL) {
     debug.enable( (getVar('debugging')=='true') );
   }
-  
 };
 
 /**

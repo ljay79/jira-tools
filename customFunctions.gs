@@ -25,6 +25,7 @@ function JST_EPICLABEL(TicketId) {
   }
 
   if(undefined == epicField || epicField.usable !== true || epicField.label_key == null) {
+    debug.error("epicField seems not be configured: %s", epicField);
     throw new Error("Please configure your Jira Epic field first. Go to 'Jira Sheet Tools' -> 'Configure Custom Fields'");
   }
 
@@ -95,7 +96,9 @@ function JST_search(JQL, Fields, Limit) {
   }
 
   Limit = parseInt(Limit) || 1;
-  Limit = (Limit > 100)? 100 : Limit;
+  if (Limit > 100) {
+    throw new Error("{Limit} must be between 1 and 100.");
+  }
 
   debug.log("JST_search([%s]; [%s]; [%s])", JQL, Fields, Limit);
 

@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base target="_top">
-    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+<head>
+<base target="_top">
+<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
 <style>
 body {
   padding: 4px;
 }
-
 table, th, td {
   border: 1px solid black;
   border-collapse: collapse;
@@ -16,16 +15,13 @@ table, th, td {
   font-family: Arial;
   font-size: 12px;
 }
-
 th, td {
   padding: 4px;
   text-align: left;
 }
-
 table tr:nth-child(even) {
   background-color: #fff;
 }
-
 table tr:nth-child(odd) {
   background-color: #f7f8f9;
 }
@@ -34,20 +30,10 @@ table th {
   color: white;
   width: 50%;
 }
-.error-container { 
-  display: none;
-  margin-bottom: 16px;
-  padding: 5px 10px;
-  text-align: center;
-  color: #fff;
-  background-color: #d50000;
-}
 </style>
 </head>
 <body>
-  List of all Jira fields and their IDs:
-  <br>
-  <div id="response-message" class="error-container" role="dialog">aaaa bbb cccc dddd eeee  fffff gggg</div>
+  List of all Jira fields and their IDs:<br>
   <table>
     <tbody>
       <tr id="column-titles">
@@ -55,10 +41,10 @@ table th {
         <th>ID</th>
       </tr>
       <? fieldMap.forEach(function(field) { ?>
-        <tr>
-          <td><?= field.name ?></td>
-          <td><?= field.key ?></td>
-        </tr>
+      <tr>
+        <td><?= field.name ?></td>
+        <td><?= field.key ?></td>
+      </tr>
       <? }) ?>
     </tbody>
   </table>
