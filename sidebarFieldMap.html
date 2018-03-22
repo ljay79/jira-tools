@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+<style>
+body {
+  padding: 4px;
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  font-family: Arial;
+  font-size: 12px;
+}
+th, td {
+  padding: 4px;
+  text-align: left;
+}
+table tr:nth-child(even) {
+  background-color: #fff;
+}
+table tr:nth-child(odd) {
+  background-color: #f7f8f9;
+}
+table th {
+  background-color: black;
+  color: white;
+  width: 50%;
+}
+</style>
+</head>
+<body>
+  List of all Jira fields and their IDs:<br>
+  <table>
+    <tbody>
+      <tr id="column-titles">
+        <th>Name</th>
+        <th>ID</th>
+      </tr>
+      <? fieldMap.forEach(function(field) { ?>
+      <tr>
+        <td><?= field.name ?></td>
+        <td><?= field.key ?></td>
+      </tr>
+      <? }) ?>
+    </tbody>
+  </table>
+</body>
+</html>

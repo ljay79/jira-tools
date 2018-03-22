@@ -256,7 +256,7 @@ function Search(searchQuery) {
       jql        : getJql(), 
       fields     : fields, 
       startAt    : startAt,
-      maxResults : maxPerPage
+      maxResults : (maxResults < maxPerPage) ? maxResults : maxPerPage
     };
 
     var request = new Request();

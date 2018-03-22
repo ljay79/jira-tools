@@ -9,7 +9,7 @@
  * - use google auth with token based Jira RESTful API vs. cleartext password
  */
 
-var BUILD = '0.21.3';
+var BUILD = '0.22.0';
 
 /** 
  * Add a nice menu option for the users.
@@ -20,7 +20,6 @@ function onOpen(e) {
   if (e && e.authMode == ScriptApp.AuthMode.FULL) {
     debug.enable( (getVar('debugging')=='true') );
   }
-  
 };
 
 /**
@@ -44,8 +43,9 @@ function onInstall(e) {
  */
 function addMenu() {
   SpreadsheetApp.getUi().createAddonMenu()
-    // Tools
     .addItem('Refresh Ticket Data', 'dialogRefreshTicketsIds')
+    .addItem('Re-Calculate all formulas in active sheet', 'recalcCustomFunctions')
+    .addItem('Show Jira Field Map', 'sidebarJiraFieldMap')
     
     .addSeparator()
     .addItem('List Issues from Filter', 'dialogIssueFromFilter')

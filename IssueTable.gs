@@ -68,6 +68,7 @@ function insertIssuesFromFilter(jsonFormData) {
  */
 function IssueTable(sheet, initRange, data) {
   var headers = ['key'], rowIndex = 0, numColumns = 0;
+  var epicField = getVar('jst_epic');
 
   /**
    * @desc Initialization, validation
@@ -116,7 +117,11 @@ function IssueTable(sheet, initRange, data) {
             break;
           case (key.hasOwnProperty('epic') && key.epic === true):
             if (key.value != 'n/a') {
-              key.value = '=HYPERLINK("' + key.link + '"; JST_EPICLABEL("' + key.value + '"))';
+              if(undefined == epicField || epicField.usable === false || epicField.label_key == null) {
+                key.value = '=HYPERLINK("' + key.link + '"; "' + key.value + '")';
+              } else {
+                key.value = '=HYPERLINK("' + key.link + '"; JST_EPICLABEL("' + key.value + '"))';
+              }
             }
             break;
           case key.hasOwnProperty('link'):

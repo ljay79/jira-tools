@@ -175,3 +175,25 @@ function dialogCustomFields() {
 }
 
 /* Dialog: Custom Fields - END */
+
+
+/* Sidebar: Field Map */
+
+/**
+ * @desc Show sidebar with Jira field map listing
+ * @param fieldMap {object}
+ */
+function showSidebar(fieldMap) {
+  var htmlTpl = HtmlService.createTemplateFromFile('sidebarFieldMap');
+  htmlTpl.fieldMap = fieldMap;
+
+  var html = HtmlService.createHtmlOutput( htmlTpl.evaluate().getContent() )
+    .setTitle('Jira Field Map')
+    .setWidth(380)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+  ;
+
+  SpreadsheetApp.getUi().showSidebar(html);
+}
+
+/* Sidebar: Field Map - END */
