@@ -144,6 +144,7 @@ function JST_search(JQL, Fields, Limit) {
     return results;
 
   } else {
-    throw new Error("[" + response.statusCode + "] - " + response.respData.errorMessages.join(",") || response.respData.errorMessages);
+    var msg = (response.respData && response.respData.errorMessages) ? response.respData.errorMessages.join("\n") : JSON.stringify(response);
+    throw new Error("[" + response.statusCode + "] - " + msg);
   }
 }
