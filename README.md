@@ -45,7 +45,8 @@ Once installed:
 Simply provide your individual Jira server settings before you use any feature.
 
 In any Google sheet, go in the menu to “Add-ons" > "Jira Sheet Tools" > "Settings”.
-Enter your "Jira Domain", "Username" and "Password".
+Enter your "Jira Domain", "Username" and "API Token" or "Password".
+> Use API Token for improved security. [Read more](https://confluence.atlassian.com/cloud/api-tokens-938839638.html)
 
 > It is recommended to use this Add-on only with an Jira Cloud/Server instance which runs via SSL (https).
 > This Add-on is using simple Basic Auth mechanism to authenticate with Jira, which means, user credentials are transmitted unencrypted when used without SSL.
