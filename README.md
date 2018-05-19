@@ -145,16 +145,18 @@ Use this custom function whenever you simply need the total count of Jira issues
 
 
 ### JST_search
-Sample: `JST_search("status = Done"; "summary,status"; 10)`
+Sample: `JST_search("status = Done"; "summary,status")`
 
 Description: `(Mini)Search for Jira issues using JQL.`
 
-JQL: `A well-formed Jira JQL query.`
+JQL: `A well-formed Jira JQL query.` _(*required)_
 (see [https://confluence.atlassian.com/jirasoftwarecloud/...](https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries))
 
-Fields: `Jira issue field IDs. e.g.: "key,summary,status"`
+Fields: `Jira issue field IDs. e.g.: "key,summary,status"` _(*required)_
 
-Limit: `Number of results to return. 1 to 100. Default: 1`
+Limit: `Number of results to return. 1 to 100. Default: 1` _(*optional)_
+
+StartAt: `The index of the first result to return (0-based)` _(*optional)_
 
 Little but quite powerful function to search for Jira issues and fill your sheet with the results.
 Using JQL ([Jira Query Language](https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries)) queries as you would inside Jira.

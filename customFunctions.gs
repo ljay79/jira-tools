@@ -82,10 +82,11 @@ function JST_getTotalForSearchResult(JQL) {
  * @param {"status = Done"} JQL    A well-formed Jira JQL query (https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries).
  * @param {"summary,status"} Fields    Jira issue field IDs. e.g.: "key,summary,status"
  * @param {10} Limit    Number of results to return. 1 to 100. Default: 1
+ * @param {0} StartAt    The index of the first result to return (0-based)
  * @return {Array}    Array of results
  * @customfunction
  */
-function JST_search(JQL, Fields, Limit) {
+function JST_search(JQL, Fields, Limit, StartAt) {
   // - checks - 
   if (undefined == JQL || JQL == '') {
     throw new Error("{JQL} can not be empty.");
@@ -99,6 +100,8 @@ function JST_search(JQL, Fields, Limit) {
   if (Limit > 100) {
     throw new Error("{Limit} must be between 1 and 100.");
   }
+  
+  StartAt = parseInt(StartAt) || 0;
 
   debug.log("JST_search([%s]; [%s]; [%s])", JQL, Fields, Limit);
 
@@ -113,7 +116,8 @@ function JST_search(JQL, Fields, Limit) {
   var response  = {}, data = {
     jql        : JQL, 
     fields     : aFields, 
-    maxResults : Limit
+    maxResults : Limit,
+    startAt    : StartAt
   };
 
   response = request.call('search', data, {'method' : 'post'}).getResponse();
