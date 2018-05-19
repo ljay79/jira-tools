@@ -85,7 +85,7 @@ Fetch and show all your Jira fields name and id in a sidebar. Very useful for ou
 ### List Issues From Filter
 “Add-ons" > “Jira Sheet Tools” > "List Issues from Filter"
 
-Allows you to add a table/list of all found Jira issues based on a Jira Filter.
+Allows you to add a table/list of all found Jira issues based on your favorite Jira Filter.
 The dialog will let you choose from all your Jira filters and then insert all results into the active Google sheet.
 You can even decide which information to be shown in the resulting table.
 Most common Jira fields / columns are available to select from.

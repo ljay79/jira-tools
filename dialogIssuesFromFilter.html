@@ -90,8 +90,10 @@
         if (!response.length) {
           showAlert('No filters available!');
           // add Jira Server note to box
-          filterSelect.innerHTML = '<span class="inline grey">Note: If you are using a Jira Server installation, this can show your <strong>*favorite*</strong> filters only.</br>Read more at: <a href="https://confluence.atlassian.com/jiracoreserver073/saving-your-search-as-a-filter-861257224.html#Savingyoursearchasafilter-favorite_filters">Atlassian Support</a></span>';
-          filterSelect.innerHTML += '</br></br><span class="inline grey">Still having problems? File a issue report with the author here: <a href="https://github.com/ljay79/jira-tools/issues">JST on Github</a></span>';
+          filterSelect.innerHTML = '<span class="inline grey">Note: If you are using a JIRA Server installation, this can show your <strong>*favorite*</strong> filters only.<br/>'
+            + 'For JIRA Cloud users it lists all your personal and your favorite ones. Make sure, you have at least one filter marked as favorite.'
+            + '</br>Read more at: <a href="https://confluence.atlassian.com/jiracoreserver073/saving-your-search-as-a-filter-861257224.html#Savingyoursearchasafilter-favorite_filters">Atlassian Support</a></span>';
+            + '</br></br><span class="inline grey">Still having problems? File a issue report with the author here: <a href="https://github.com/ljay79/jira-tools/issues">JST on Github</a></span>';
           action.disabled = 'disabled';
 
           return;
