@@ -23,6 +23,7 @@ var ISSUE_COLUMNS = {
   components: 'Components',
   description: 'Description',
   resolution: 'Resolution',
+  resolutiondate: 'Resolved',
   timespent: 'Time spent',
   timeestimate: 'Estimate', // remaining
   timeoriginalestimate: 'Original estimate',
@@ -433,6 +434,7 @@ function unifyIssueAttrib(attrib, data) {
       break;
     case 'updated':
     case 'created':
+    case 'resolutiondate':
       resp = {
         value: data.fields[attrib] || null,
         date: new Date(getDateFromIso(data.fields[attrib])) || new Date(),
