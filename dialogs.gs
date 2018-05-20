@@ -35,7 +35,7 @@ function dialogSettings() {
 
   dialog
     .setWidth(360)
-    .setHeight(400)
+    .setHeight(420)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   debug.log('Processed: %s', dialog);
@@ -53,8 +53,8 @@ function getServerCfg() {
     url: getCfg('jira_url'),
     username: getCfg('jira_username'),
     password: getCfg('jira_password'),
-    workhours: getVar('workhours'),
-    dspuseras_name: getVar('dspuseras_name')
+    workhours: getStorage_().getValue('workhours'),
+    dspuseras_name: getStorage_().getValue('dspuseras_name')
   };
 }
 
@@ -83,7 +83,7 @@ function dialogIssueFromFilter() {
   var customFields = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
   var dialog = getDialog('dialogIssuesFromFilter', {
     columns: ISSUE_COLUMNS,
-    defaultColumns: getVar('jiraColumnDefault'),
+    defaultColumns: getStorage_().getValue('jiraColumnDefault'),
     customFields: customFields
   });
 
@@ -112,9 +112,10 @@ function dialogIssueFromFilter() {
  */
 function dialogAbout() {
   var tempActiveUserKey = Session.getTemporaryActiveUserKey();
+  var userProps = PropertiesService.getUserProperties();
   var dialog = getDialog('dialogAbout', {
     buildNumber: BUILD,
-    debugging: getVar('debugging'),
+    debugging: userProps.getProperty('debugging'),
     tempUserKey: tempActiveUserKey
   });
 
@@ -162,7 +163,7 @@ function dialogTimesheet() {
 function dialogCustomFields() {
   if(!hasSettings(true)) return;
 
-  var dialog = getDialog('dialogCustomFields', {favoriteCustomFields: (getVar('favoriteCustomFields') || [])});
+  var dialog = getDialog('dialogCustomFields', {favoriteCustomFields: (getStorage_().getValue('favoriteCustomFields') || [])});
 
   dialog
     .setWidth(480)

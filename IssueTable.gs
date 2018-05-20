@@ -68,7 +68,7 @@ function insertIssuesFromFilter(jsonFormData) {
  */
 function IssueTable(sheet, initRange, data) {
   var headers = ['key'], rowIndex = 0, numColumns = 0;
-  var epicField = getVar('jst_epic');
+  var epicField = getStorage_().getValue('jst_epic');
 
   /**
    * @desc Initialization, validation

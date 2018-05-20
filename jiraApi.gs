@@ -75,7 +75,7 @@ function testConnection() {
     .withSuccessHandler(ok)
     .withFailureHandler(error);
 
-  return {status: (getCfg('available')=='true'), response: response};
+  return {status: (getCfg('available')==true), response: response};
 };
 
 /**

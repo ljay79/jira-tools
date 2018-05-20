@@ -270,7 +270,7 @@ function unifyIssueAttrib(attrib, data) {
   if ( attrib.substring(0, 12) == 'customfield_' ) {
     var customFields = getCustomFields(CUSTOMFIELD_FORMAT_UNIFY);
     // custom epic
-    var epicField = getVar('jst_epic');
+    var epicField = getStorage_().getValue('jst_epic');
     if (epicField.usable === true) {
       customFields[epicField.link_key] = 'jst_epic';
     }
@@ -347,13 +347,13 @@ function unifyIssueAttrib(attrib, data) {
           break;
         case 'user':
           resp = {
-            value: (getVar('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
+            value: (getStorage_().getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
             avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
           };
           break;
         case 'array|user':
           resp.value = data.fields[attrib].map(function(el){
-            return ((getVar('dspuseras_name') == 1 ? el.displayName : el.name) || 'Unknown');
+            return ((getStorage_().getValue('dspuseras_name') == 1 ? el.displayName : el.name) || 'Unknown');
           }).join(', ');
           break;
         case 'group':
@@ -422,7 +422,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'creator':
     case 'reporter':
       resp = {
-        value: (getVar('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
+        value: (getStorage_().getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
         avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
       };
       break;
@@ -553,7 +553,7 @@ function headerNames(header) {
   extend(labels, getCustomFields(CUSTOMFIELD_FORMAT_SEARCH));
 
   // custom epic
-  var epicField = getVar('jst_epic');
+  var epicField = getStorage_().getValue('jst_epic');
   if (epicField.usable === true) {
     labels[epicField.link_key] = 'Epic';
   }
