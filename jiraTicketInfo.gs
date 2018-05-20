@@ -1,4 +1,3 @@
-
 /**
  * Make a request to jira for all listed tickets, and update the spreadsheet
  */
@@ -53,7 +52,7 @@ function refreshTickets() {
     }
   };
 
-  var request = new Request(), cellVal = '';
+  var request = new Request(), cellVal = '', cellFormula = '';
 
   for (var r=0; r<values.length; r++) {
     rowIdx = r + 1;
@@ -64,6 +63,13 @@ function refreshTickets() {
       if( cellVal.length < 3 || typeof cellVal !== 'string' || null === cellVal.match(/[a-zA-Z\w]/) )
         continue;
 
+      // check for formulas is cell (skip processing if formula exists except HYPERLINK)
+      cellFormula = sheet.getRange(rowIdx, colIdx).getFormula();
+      if(cellFormula != '' && cellFormula.indexOf("=HYPERLINK") != 0) {
+        continue;
+        // we do not touch formulas
+      }
+      
       jiraCell = grepJiraCell(cellVal);
       if(jiraCell.type == CELLTYPE_EMPTY || jiraCell.ticketId === null) continue;
 
