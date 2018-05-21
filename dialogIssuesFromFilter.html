@@ -27,7 +27,7 @@
         <label class="label">System Columns</label>
         <? for (var id in columns) { ?>
         <div class="item">
-          <input type="checkbox" id="column-<?= id ?>" name="columns[]" value="<?= id ?>"<? if (defaultColumns.indexOf(id) > -1) { ?> checked="checked"<? } ?>>
+          <input type="checkbox" id="column-<?= id ?>" name="columns[]" value="<?= id ?>"<? if (userColumns.indexOf(id) > -1) { ?> checked="checked"<? } ?>>
           <label for="column-<?= id ?>"><?= columns[id] ?></label>
         </div>
         <? } ?>
@@ -37,7 +37,7 @@
         <label class="label">Custom Columns</label>
         <? for (var id in customFields) { ?>
         <div class="item">
-          <input type="checkbox" id="column-<?= id ?>" name="columns[]" value="<?= id ?>"<? if (defaultColumns.indexOf(id) > -1) { ?> checked="checked"<? } ?>>
+          <input type="checkbox" id="column-<?= id ?>" name="columns[]" value="<?= id ?>"<? if (userColumns.indexOf(id) > -1) { ?> checked="checked"<? } ?>>
           <label for="column-<?= id ?>"><?= customFields[id] ?></label>
         </div>
         <? } ?>

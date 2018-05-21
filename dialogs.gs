@@ -81,10 +81,11 @@ function dialogIssueFromFilter() {
   if(!hasSettings(true)) return;
 
   var customFields = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
+  var userColumns = getStorage_().getValue('userColumns') || [];
   var dialog = getDialog('dialogIssuesFromFilter', {
     columns: ISSUE_COLUMNS,
-    defaultColumns: getStorage_().getValue('jiraColumnDefault'),
-    customFields: customFields
+    customFields: customFields,
+    userColumns: userColumns.length > 0 ? userColumns : jiraColumnDefault
   });
 
   // try to adjust height depending on amount of jira fields to show

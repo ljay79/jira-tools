@@ -96,10 +96,6 @@ function initDefaults() {
 
   getStorage_().setValue('BUILD', BUILD);
 
-  // set default jira issue columns
-  columnDefaults = jiraColumnDefault; //@TODO: allow user to change default columns
-  getStorage_().setValue('jiraColumnDefault', columnDefaults);
-
   var _tmp = getStorage_().getValue('jst_epic');
   if (_tmp == null || _tmp.usable === false) 
     getStorage_().setValue('jst_epic', fieldEpic);
