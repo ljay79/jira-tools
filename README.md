@@ -45,7 +45,9 @@ Once installed:
 Simply provide your individual Jira server settings before you use any feature.
 
 In any Google sheet, go in the menu to “Add-ons" > "Jira Sheet Tools" > "Settings”.
-Enter your "Jira Domain", "Username" and "Password".
+Enter your "Jira Domain" and your log on credentials.
+Either combination of your Atlassian account username/email + password or your Atlassian account email + API Token.
+> Use API Token for improved security. [How to obtain API Token](https://confluence.atlassian.com/cloud/api-tokens-938839638.html)
 
 > It is recommended to use this Add-on only with an Jira Cloud/Server instance which runs via SSL (https).
 > This Add-on is using simple Basic Auth mechanism to authenticate with Jira, which means, user credentials are transmitted unencrypted when used without SSL.
@@ -85,7 +87,7 @@ Fetch and show all your Jira fields name and id in a sidebar. Very useful for ou
 ### List Issues From Filter
 “Add-ons" > “Jira Sheet Tools” > "List Issues from Filter"
 
-Allows you to add a table/list of all found Jira issues based on a Jira Filter.
+Allows you to add a table/list of all found Jira issues based on your favorite Jira Filter.
 The dialog will let you choose from all your Jira filters and then insert all results into the active Google sheet.
 You can even decide which information to be shown in the resulting table.
 Most common Jira fields / columns are available to select from.
@@ -145,16 +147,18 @@ Use this custom function whenever you simply need the total count of Jira issues
 
 
 ### JST_search
-Sample: `JST_search("status = Done"; "summary,status"; 10)`
+Sample: `JST_search("status = Done"; "summary,status")`
 
 Description: `(Mini)Search for Jira issues using JQL.`
 
-JQL: `A well-formed Jira JQL query.`
+JQL: `A well-formed Jira JQL query.` _(*required)_
 (see [https://confluence.atlassian.com/jirasoftwarecloud/...](https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries))
 
-Fields: `Jira issue field IDs. e.g.: "key,summary,status"`
+Fields: `Jira issue field IDs. e.g.: "key,summary,status"` _(*required)_
 
-Limit: `Number of results to return. 1 to 100. Default: 1`
+Limit: `Number of results to return. 1 to 100. Default: 1` _(*optional)_
+
+StartAt: `The index of the first result to return (0-based)` _(*optional)_
 
 Little but quite powerful function to search for Jira issues and fill your sheet with the results.
 Using JQL ([Jira Query Language](https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries)) queries as you would inside Jira.
