@@ -235,7 +235,7 @@ function getFilter(filterId) {
 
 /**
  * @desc Fetch all active users and groups for dialog selection.
- * @param {boolean} minimal  Returning data only includes minimal info (displayName,name[,active])
+ * @param {boolean} minimal  Returning data includes only minimal info (displayName,name[,active])
  * @return {object} Object({"users":[{<arrayOfObjects}], "groups":[{arrayOfObjects}]})
  */
 function fetchUsersAndGroups(minimal) {
@@ -248,7 +248,14 @@ function fetchUsersAndGroups(minimal) {
   result.users = findUser('%', minimal).filter(function( user ) {
     return user.active !== false;
   });
-  
+
+  // Jira Server Issue workaround (https://jira.atlassian.com/browse/JRASERVER-29069)
+  if(result.users.length == 0 && getCfg('server_type') == 'server') {
+    result.users = findUser('.', minimal).filter(function( user ) {
+      return user.active !== false;
+    });
+  }
+
   result.users.sort(function(a,b) {return (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0);} ); 
   
   return result;
