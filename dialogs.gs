@@ -185,13 +185,13 @@ function dialogCustomFields() {
  * @desc Show sidebar with Jira field map listing
  * @param fieldMap {object}
  */
-function showSidebar(fieldMap) {
-  var htmlTpl = HtmlService.createTemplateFromFile('sidebarFieldMap');
-  htmlTpl.fieldMap = fieldMap;
+function sidebarFieldMap(fieldMap) {
+  var dialog = getDialog('sidebarFieldMap', {fieldMap: fieldMap});
 
-  var html = HtmlService.createHtmlOutput( htmlTpl.evaluate().getContent() )
+  debug.log('Processed: %s', dialog);
+
+  var html = HtmlService.createHtmlOutput( dialog.getContent() )
     .setTitle('Jira Field Map')
-    .setWidth(380)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
   ;
 

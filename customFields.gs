@@ -183,7 +183,7 @@ function sidebarJiraFieldMap() {
       return 0;
     });
     
-    showSidebar(fieldMap);
+    sidebarFieldMap(fieldMap);
   };
 
   var error = function(respData, httpResp, status) {
