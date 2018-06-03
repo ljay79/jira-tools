@@ -25,10 +25,7 @@ function findUser(usernameTerm, minimal) {
    */
   var ok = function(resp, httpResp, status){
     if(resp) {
-      if(resp.length == 0) {
-        Browser.msgBox("No users were found to match your search.", Browser.Buttons.OK);
-        return users;
-      }
+      if(resp.length == 0) return users;
 
       var user;
       for(var i=0; i<resp.length; i++) {
@@ -37,7 +34,7 @@ function findUser(usernameTerm, minimal) {
       }
     } else {
       // Something funky is up with the JSON response.
-      Browser.msgBox("Failed searching for user!", Browser.Buttons.OK);
+      debug.error('Failed searching for user: %s ; %s', httpResp, resp);
       return users;
     }
   };
@@ -50,8 +47,7 @@ function findUser(usernameTerm, minimal) {
    * @return {Array}
    */
   var error = function(resp, httpResp, status) {
-    Browser.msgBox("Failed api search request with error status [" + status + "]!\\n" + resp.errorMessages.join("\\n"), 
-                   Browser.Buttons.OK);
+    debug.error("Failed api search request with error status [%s]!\\n%s", status, resp.errorMessages.join("\\n"));
     return users;
   };
 
@@ -92,21 +88,16 @@ function findGroup(groupTerm, minimal) {
    */
   var ok = function(resp, httpResp, status) {
     if(resp && resp.hasOwnProperty('groups')) {
-      if(resp.groups.length == 0) {
-        Browser.msgBox("No groups were found to match your search.", Browser.Buttons.OK);
-        return groups;
-      }
+      if(resp.groups.length == 0) return groups;
 
       var group;
       for(var i=0; i<resp.groups.length; i++) {
         group = unifyIssueAttrib((minimal ? 'groupMin' : 'group'), resp.groups[i]);
         groups.push(group);
       }
-
     } else {
       // Something funky is up with the JSON response.
-      debug.log('Failed searching for group: %s ; %s', httpResp, resp);
-      Browser.msgBox("Failed searching for group!", Browser.Buttons.OK);
+      debug.error('Failed searching for group: %s ; %s', httpResp, resp);
       return groups;
     }
   };
@@ -119,7 +110,7 @@ function findGroup(groupTerm, minimal) {
    * @return {Array}
    */
   var error = function(resp, httpResp, status) {
-    Browser.msgBox("Failed api search request with error status [" + status + "]!\\n" + resp.errorMessages.join("\\n"), Browser.Buttons.OK);
+    debug.error("Failed api search request with error status [%s]!\\n%s", status, resp.errorMessages.join("\\n"));
     return groups;
   };
 
@@ -131,6 +122,3 @@ function findGroup(groupTerm, minimal) {
 
   return groups;
 }
-
-//function testFindUsers(){ debug.log('%s', findUser('%')); }
-//function testFindGroups(){ debug.log('%s', findGroup('')); }

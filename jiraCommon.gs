@@ -251,13 +251,18 @@ function fetchUsersAndGroups(minimal) {
 
   // Jira Server Issue workaround (https://jira.atlassian.com/browse/JRASERVER-29069)
   if(result.users.length == 0 && getCfg('server_type') == 'server') {
+    // try it again with custom query param apparently working like %
     result.users = findUser('.', minimal).filter(function( user ) {
       return user.active !== false;
     });
   }
 
   result.users.sort(function(a,b) {return (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0);} ); 
-  
+
+  if(result.users.length == 0) {
+    SpreadsheetApp.getActiveSpreadsheet().toast("No users were found. Check your JIRA permission.", "Error", 10);
+  }
+
   return result;
 }
 
