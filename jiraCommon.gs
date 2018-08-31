@@ -336,7 +336,7 @@ function unifyIssueAttrib(attrib, data) {
           if (data.fields[attrib].length > 0 && data.fields[attrib][0].hasOwnProperty('value'))
             for (var i = 0; i < data.fields[attrib].length; i++) 
               _values.push(data.fields[attrib][i].value);
-          
+
           break;
         case 'array|string':
           resp.value = '';
@@ -346,16 +346,15 @@ function unifyIssueAttrib(attrib, data) {
           if (data.fields[attrib][0].indexOf('service.sprint.Sprint') > -1) {
             _values = [];
             var _regEx = /name=([^,]+),/gi;
-            var _sprintNameArr = [];
             for (var i = 0; i < data.fields[attrib].length; i++) {
+              var _sprintNameArr = null;
               _sprintNameArr = _regEx.exec(data.fields[attrib][i]);
+              _regEx.lastIndex = 0; // Reset
               if(_sprintNameArr.length==2) _values.push(_sprintNameArr[1]);
             }
           }
-          //
 
           resp.value = _values.join(',');
-
           break;
         case 'user':
           resp = {
