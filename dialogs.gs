@@ -89,8 +89,8 @@ function dialogIssueFromFilter() {
   });
 
   // try to adjust height depending on amount of jira fields to show
-  var rowH = 28;
-  var height = 404;
+  var rowH = 32;
+  var height = 424;
   height += (Math.ceil(Object.keys(ISSUE_COLUMNS).length % 4) * rowH);
   height += (Math.ceil(Object.keys(customFields).length % 4) * rowH);
 
