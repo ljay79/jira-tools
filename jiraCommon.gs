@@ -160,6 +160,7 @@ function getMyFilters(includeFavourites) {
   var ok = function(responseData, httpResponse, statusCode) {
     // Check the data is valid and the Jira fields exist
     debug.log("getMyFilters()->ok(): %s", responseData);
+
     if(responseData) {
       // add data to export
       filters.list.push.apply(filters.list, responseData.map(function(filter){ return {
@@ -340,6 +341,7 @@ function unifyIssueAttrib(attrib, data) {
             for (var i = 0; i < data.fields[attrib].length; i++) 
               _values.push(data.fields[attrib][i].value);
 
+          resp.value = _values.join(',');
           break;
         case 'array|string':
           resp.value = '';
