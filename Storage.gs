@@ -39,7 +39,7 @@ function Storage_(prefix, properties, optCache) {
  * @type {number}
  * @private
  */
-Storage_.CACHE_EXPIRATION_TIME_SECONDS = 21600; // 6 hours.
+Storage_.CACHE_EXPIRATION_TIME_SECONDS = 12*3600; // 12 hours.
 
 /**
  * Gets a stored value.

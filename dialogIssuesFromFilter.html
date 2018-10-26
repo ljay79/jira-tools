@@ -86,9 +86,9 @@
         var filterSelect = filter.querySelector('.filter-select');
             filterSelect.innerText = '';
             filterSelect.classList.remove('is-loading');
-        
-        if (!response.length) {
-          showAlert('No filters available!');
+
+        if (!response.list.length) {
+          showAlert('No filters available!' + response.error);
           // add Jira Server note to box
           filterSelect.innerHTML = '<span class="inline grey">Note: If you are using a JIRA Server installation, this can show your <strong>*favorite*</strong> filters only.<br/>'
             + 'For JIRA Cloud users it lists all your personal and your favorite ones. Make sure, you have at least one filter marked as favorite.'
@@ -97,9 +97,12 @@
           action.disabled = 'disabled';
 
           return;
+        } else if('' != response.error) {
+          showAlert(response.error);
+          return;
         }
 
-        response.forEach(function(option) {
+        response.list.forEach(function(option) {
           var radio = document.createElement('div');
           var radioInput = document.createElement('input');
           var radioLabel = document.createElement('label');
@@ -151,7 +154,7 @@
         if(done) google.script.host.close();
         showAlert(response.message, done, 10000);
       }
-      
+
       google.script.run
         .withSuccessHandler(onInitFilter)
         .getMyFilters(true);

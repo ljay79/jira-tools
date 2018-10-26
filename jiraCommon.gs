@@ -155,14 +155,15 @@ OUT: {"type":20,"value":"Lorem ispum IT-123 dolores","ticketId":"IT-123","parts"
  * @return {object} Object({[id]:{name:{string}, self:{string}, favourite:{boolean}, owner:{string}, viewUrl:{string}}})
  */
 function getMyFilters(includeFavourites) {
-  var filters = [];
+  var filters = {list:[], error:''};
 
   var ok = function(responseData, httpResponse, statusCode) {
     // Check the data is valid and the Jira fields exist
-    //debug.log("getMyFilters()->ok(): %s", responseData);
+    debug.log("getMyFilters()->ok(): %s", responseData);
+
     if(responseData) {
       // add data to export
-      filters.push.apply(filters, responseData.map(function(filter){ return {
+      filters.list.push.apply(filters.list, responseData.map(function(filter){ return {
           id: parseInt(filter.id),
           name: filter.name,
           self: filter.self,
@@ -172,7 +173,7 @@ function getMyFilters(includeFavourites) {
           jql: filter.jql
         }; }) )
       // sorting the list of filters by favourite, name
-      && filters.sort(function(a, b){
+      && filters.list.sort(function(a, b){
           var keyA = (a.favourite ? '0' : '1') + a.name;
           var keyB = (b.favourite ? '0' : '1') + b.name;
 
@@ -183,14 +184,17 @@ function getMyFilters(includeFavourites) {
           return 0;
         })
       ;
+      debug.log("getMyFilters()->return(): %s", filters);
     } else {
       // Something funky is up with the JSON response.
-      debug.error("Failed to retrieve jira filters!");
+      filters.error = "Failed to retrieve jira filters!";
+      debug.error(filters.error);
     }
   };
 
   var error = function(responseData, httpResponse, statusCode) {
-    debug.error("Failed to retrieve jira filters with status [" + statusCode + "]!\\n" + responseData.errorMessages.join("\\n"));
+    filters.error = "Failed to retrieve jira filters with status [" + statusCode + "]!\\n" + responseData.errorMessages.join("\\n");
+    debug.error(filters.error);
   };
 
   var request = new Request();
@@ -337,6 +341,7 @@ function unifyIssueAttrib(attrib, data) {
             for (var i = 0; i < data.fields[attrib].length; i++) 
               _values.push(data.fields[attrib][i].value);
 
+          resp.value = _values.join(',');
           break;
         case 'array|string':
           resp.value = '';

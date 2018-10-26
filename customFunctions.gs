@@ -72,7 +72,8 @@ function JST_getTotalForSearchResult(JQL) {
     debug.log("JST_getTotalForSearchResult [%s]: response: %s", response.statusCode, response);
     return parseInt(response.respData.total || 0);
   } else {
-    throw new Error("[" + response.statusCode + "] - " + response.respData.errorMessages.join(",") || response.respData.errorMessages);
+    var msg = response.respData.errorMessages ? (response.respData.errorMessages.join(",") || response.respData.errorMessages) : response;
+    throw new Error("[" + response.statusCode + "] - " + msg + " - JQL: " + JQL);
   }
 }
 
