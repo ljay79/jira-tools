@@ -216,6 +216,7 @@ function Request() {
     }
 
     if (httpResponse) {
+      debug.log("httpResponse: %s", httpResponse);
       try {
         // we care about json response content only
         responseData = JSON.parse(httpResponse.getContentText());
