@@ -199,3 +199,23 @@ function sidebarFieldMap(fieldMap) {
 }
 
 /* Sidebar: Field Map - END */
+
+
+/* Sidebar: Quick Menu */
+
+/**
+ * @desc Show sidebar with Quick Menu for all/most features
+ */
+function sidebarQuickMenu() {
+  var dialog = getDialog('sidebarQuickMenu');
+
+  debug.log('Processed: %s', dialog);
+
+  var html = HtmlService.createHtmlOutput( dialog.getContent() )
+    .setTitle('Quick Menu')
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+  ;
+
+  SpreadsheetApp.getUi().showSidebar(html);
+}
+/* Sidebar: Quick Menu - END */

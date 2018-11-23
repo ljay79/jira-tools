@@ -9,5 +9,7 @@
     "https://www.googleapis.com/auth/script.scriptapp",
     "https://www.googleapis.com/auth/script.webapp.deploy",
     "https://www.googleapis.com/auth/spreadsheets.currentonly"
-  ]
+  ],
+  "sheets": {
+  }
 }
