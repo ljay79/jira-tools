@@ -73,7 +73,7 @@ function JST_getTotalForSearchResult(JQL) {
     return parseInt(response.respData.total || 0);
   } else {
     var msg = response.respData.errorMessages ? (response.respData.errorMessages.join(",") || response.respData.errorMessages) : response;
-    throw new Error("[" + response.statusCode + "] - " + msg + " - JQL: " + JQL);
+    throw new Error("[" + response.statusCode + "] - " + JSON.stringify(msg) + " - JQL: " + JQL);
   }
 }
 

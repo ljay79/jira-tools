@@ -94,6 +94,14 @@ function IssueTable(sheet, initRange, data) {
     for(var k in data.issues[0].fields) {
       headers.push(k);
     }
+    
+    // sort fields based on defined order in ISSUE_COLUMNS
+    // improves consistent column listing/sorting and defined fields first before alpha sorting rest
+    var _unsortedHeaders = headers.sort();
+    headers = Object.keys(ISSUE_COLUMNS).filter(function(n) {
+      return _unsortedHeaders.indexOf(n) > -1;
+    });
+    headers.unshift('key');
 
     numColumns = headers.length;
   };
