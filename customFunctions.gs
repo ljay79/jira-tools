@@ -153,3 +153,17 @@ function JST_search(JQL, Fields, Limit, StartAt) {
     throw new Error("[" + response.statusCode + "] - " + msg);
   }
 }
+
+
+/**
+ * Format time difference in seconds into nice duration format.
+ *
+ * @param {"12345"} Seconds    Duration in seconds
+ * @return {String}
+ * @customfunction
+ */
+function JST_formatDuration(Seconds) {
+  Seconds = parseInt(Seconds) || 0;
+
+  return formatTimeDiff(Seconds);
+}

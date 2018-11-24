@@ -35,7 +35,7 @@ function dialogSettings() {
 
   dialog
     .setWidth(360)
-    .setHeight(420)
+    .setHeight(480)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   debug.log('Processed: %s', dialog);
@@ -54,7 +54,8 @@ function getServerCfg() {
     username: getCfg('jira_username'),
     password: getCfg('jira_password'),
     workhours: getStorage_().getValue('workhours'),
-    dspuseras_name: getStorage_().getValue('dspuseras_name')
+    dspuseras_name: getStorage_().getValue('dspuseras_name'),
+    dspdurationas: getStorage_().getValue('dspdurationas')
   };
 }
 

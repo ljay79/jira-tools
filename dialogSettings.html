@@ -55,6 +55,20 @@
           </label>
         </div>
       </fieldset>
+
+      <fieldset class="block">
+        <legend>Show Duration as</legend>
+        <div class="form-group block">
+          <label style="display:block">
+            <input type="radio" name="ts_dspdurationas" style="display:inline-block;margin:0 5px" value="s"<? if (dspdurationas == "s") { ?> checked="checked"<? } ?> />
+            In Seconds (1h = "3600")
+          </label>
+          <label>
+            <input type="radio" name="ts_dspdurationas" style="display:inline-block;margin:0 5px" value="w"<? if (dspdurationas == "w") { ?> checked="checked"<? } ?> />
+            As Worktime ("2d 3h 35m 30s")
+          </label>
+        </div>
+      </fieldset>
       
       <div class="block">
         <button type="submit" class="action" disabled>Save</button>

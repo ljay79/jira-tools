@@ -483,7 +483,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'aggregatetimespent':
     case 'aggregatetimeestimate':
       resp = {
-        value: formatTimeDiff(parseInt(data.fields[attrib]) || 0),
+        value: (getStorage_().getValue('dspdurationas') == "w") ? formatTimeDiff(parseInt(data.fields[attrib]) || 0) : parseInt(data.fields[attrib]) || 0
       };
       break;
     case 'project':
