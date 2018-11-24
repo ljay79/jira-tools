@@ -185,6 +185,25 @@ In cell `A1` put in `JST_search("status = Done"; "key,summary,status"; 5)`
 ```
 
 
+### JST_formatDuration
+
+Sample: `JST_formatDuration(60*60)`
+
+Description: `Format time difference in seconds into nice duration format.`
+
+Seconds: `Duration in seconds`
+
+Use this custom function whenever you like to format a duration time in seconds into JIRA common work duration format.
+
+**Sample Result:**
+In cell `A1` put in `JST_formatDuration(60*60)`
+```markdown
+1 | A
+2 | 1h
+```
+357878 = `12d 3h 24m 38s`
+
+
 # Known Limitations
 With the features of this Add-On come a few hard limits implemented purposly.
 Specifically related to the amount of records you can fetch from your Jira API due to Atlassians REST API policy and Google's execution timeouts.
