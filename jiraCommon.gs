@@ -4,33 +4,40 @@ var CELLTYPE_JIRAID = 10; // entire cell includes Jira ticket id only ("JIRA-123
 var CELLTYPE_TEXT = 20;  // Jira ticket id is within text ("lorem ipsum JIRA-123 [Status] dolores")
 
 // Jira issue fields/columns
+// Sorting of definition below is applied as sorting for IssueTable
 var ISSUE_COLUMNS = {
-  // defaults
   summary: 'Summary',
+  project: 'Project',
   issuetype: 'Issue Type',
   priority: 'Priority',
   status: 'Status',
-  updated: 'Updated',
-  created: 'Created',
+  labels: 'Labels',
+  components: 'Components',
+  description: 'Description',
   assignee: 'Assignee',
   creator: 'Creator',
   reporter: 'Reporter',
-  duedate: 'Due',
-  /* --- */
-  labels: 'Labels',
-  project: 'Project',
+  environment: 'Environment',
   fixVersions: 'Fix Version',
-  components: 'Components',
-  description: 'Description',
-  resolution: 'Resolution',
+  duedate: 'Due',
   resolutiondate: 'Resolved',
+  created: 'Created',
+  updated: 'Updated',
+  resolution: 'Resolution',
   timespent: 'Time spent',
   timeestimate: 'Estimate', // remaining
   timeoriginalestimate: 'Original estimate',
   aggregatetimespent: 'Aggregate Time Spent',
   aggregatetimeestimate: 'Aggregate Time Estimate',
   aggregateprogress: 'Aggregate Progress',
-  progress: 'Progress'
+  progress: 'Progress',
+  lastViewed: 'Last Viewed',
+  votes: 'Votes',
+  watches: 'Watchers',
+  workratio: 'Work Ratio'
+  //subtasks:[{"id":"33351","key":"FF24-229","self":"...atlassian.net/rest/api/2/issue/33351","fields":{"summary":"QA - Feedback","status":{"self":"....atlassian.net/rest/api/2/status/6","description":"The issue is considered finished, the resolution is correct. Issues which are closed can be reopened.","iconUrl":"https://dyhltd.atlassian.net/images/icons/statuses/closed.png","name":"Closed","id":"6","statusCategory":{"self":"https://dyhltd.atlassian.net/rest/api/2/statuscategory/3","id":3,"key":"done","colorName":"green","name":"Done"}},"priority":{"self":"https://dyhltd.atlassian.net/rest/api/2/priority/1","iconUrl":"https://dyhltd.atlassian.net/images/icons/priorities/highest.svg","name":"Highest","id":"1"},"issuetype":{"self":"https://dyhltd.atlassian.net/rest/api/2/issuetype/10003","id":"10003","description":"The sub-task of the issue","iconUrl":"https://dyhltd.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype","name":"Sub-task","subtask":true,"avatarId":10316}}}]
+  //versions: [{"self": "https://dyhltd.atlassian.net/rest/api/2/version/14021","id": "14021","description": "","name": "Loan - Release v2.0.17","archived": false,"released": true,"releaseDate": "2018-03-21"}]
+  //aggregatetimeoriginalestimate: 288000
 };
 //@see storage.gs for jiraColumnDefault
 
@@ -425,6 +432,7 @@ function unifyIssueAttrib(attrib, data) {
       break;
     case 'summary':
     case 'description':
+    case 'environment':
       resp.value = data.fields[attrib] || '';
       break;
     case 'issuetype':
@@ -451,6 +459,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'updated':
     case 'created':
     case 'resolutiondate':
+    case 'lastViewed':
       resp = {
         value: data.fields[attrib] || null,
         date: new Date(getDateFromIso(data.fields[attrib])) || new Date(),
@@ -474,8 +483,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'aggregatetimespent':
     case 'aggregatetimeestimate':
       resp = {
-        value: parseInt(data.fields[attrib]) || 0,
-        format: "0"
+        value: (getStorage_().getValue('dspdurationas') == "w") ? formatTimeDiff(parseInt(data.fields[attrib]) || 0) : parseInt(data.fields[attrib]) || 0
       };
       break;
     case 'project':
@@ -506,7 +514,12 @@ function unifyIssueAttrib(attrib, data) {
         format: "0%"
       };
       break;
-
+    case 'workratio':
+      resp = {
+        value: parseInt(data.fields[attrib]) / 100 || 0,
+        format: "0%"
+      };
+      break;
     case 'user':
       resp = {
         displayName: data.displayName + (data.active==true?'':' (X)'),
@@ -538,6 +551,18 @@ function unifyIssueAttrib(attrib, data) {
       resp = {
         displayName: _dName,
         name: data.name,
+      };
+      break;
+    case 'votes':
+      resp = {
+        value: data.fields[attrib].votes,
+        format: '0',
+      };
+      break;
+    case 'watches':
+      resp = {
+        value: data.fields[attrib].watchCount || 0,
+        format: '0',
       };
       break;
 

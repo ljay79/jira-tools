@@ -73,7 +73,7 @@ function JST_getTotalForSearchResult(JQL) {
     return parseInt(response.respData.total || 0);
   } else {
     var msg = response.respData.errorMessages ? (response.respData.errorMessages.join(",") || response.respData.errorMessages) : response;
-    throw new Error("[" + response.statusCode + "] - " + msg + " - JQL: " + JQL);
+    throw new Error("[" + response.statusCode + "] - " + JSON.stringify(msg) + " - JQL: " + JQL);
   }
 }
 
@@ -152,4 +152,18 @@ function JST_search(JQL, Fields, Limit, StartAt) {
     var msg = (response.respData && response.respData.errorMessages) ? response.respData.errorMessages.join("\n") : JSON.stringify(response);
     throw new Error("[" + response.statusCode + "] - " + msg);
   }
+}
+
+
+/**
+ * Format time difference in seconds into nice duration format.
+ *
+ * @param {"12345"} Seconds    Duration in seconds
+ * @return {String}
+ * @customfunction
+ */
+function JST_formatDuration(Seconds) {
+  Seconds = parseInt(Seconds) || 0;
+
+  return formatTimeDiff(Seconds);
 }

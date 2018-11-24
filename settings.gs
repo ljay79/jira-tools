@@ -106,6 +106,9 @@ function initDefaults() {
   if (null == getStorage_().getValue('dspuseras_name'))
     getStorage_().setValue('dspuseras_name', 1);
 
+  if (null == getStorage_().getValue('dspdurationas'))
+    getStorage_().setValue('dspdurationas', "w");
+
   // Jira onDemand or Server
   var server_type = getCfg('server_type');
   if (server_type == null) server_type = 'onDemand';
@@ -129,6 +132,7 @@ function saveSettings(jsonFormData) {
   setCfg('jira_password', jsonFormData.jira_password);
   getStorage_().setValue('workhours', jsonFormData.ts_workhours);
   getStorage_().setValue('dspuseras_name', parseInt(jsonFormData.ts_dspuseras_name));
+  getStorage_().setValue('dspdurationas', jsonFormData.ts_dspdurationas);
 
   var test = testConnection();
 
