@@ -258,3 +258,36 @@ function formatWorkhours() {
   
   return hours;
 }
+
+/**
+ * @desc Sorts array of keys in the same order as the keys/properties of a reference object.
+ * 
+ * @param {Array} usortObject    Unsorted assoc array of keys
+ * @param {Object} referenceObject    Reference object to adopt sort of properties from
+ * @return {Array}    Original array with sorted keys
+ */
+function _sortKeysByRef(usortObject, referenceObject) {
+  var _sortedObject = Object.keys(referenceObject).filter(function(n) {
+    var found = usortObject.indexOf(n) > -1;
+    if (found) delete removeFromArray(usortObject, n);
+	return found;
+  });
+
+  return _sortedObject.concat(usortObject);
+}
+
+/**
+ * @desc Removing a specific element from an array
+ * 
+ * @param {Array} array    Array to remove element from
+ * @param {String|Number} element    Element to remove from array
+ * @return {Array}
+ */
+function removeFromArray(array, element) {
+  const index = array.indexOf(element);
+
+  if (index !== -1) {
+    array.splice(index, 1);
+  }
+}
+

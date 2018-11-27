@@ -73,7 +73,7 @@ function insertIssuesFromFilter(jsonFormData) {
  * @return {IssueTable}
  */
 function IssueTable(sheet, initRange, data) {
-  var headers = ['key'], rowIndex = 0, numColumns = 0;
+  var headers = [], rowIndex = 0, numColumns = 0;
   var epicField = getStorage_().getValue('jst_epic');
 
   /**
@@ -97,10 +97,7 @@ function IssueTable(sheet, initRange, data) {
     
     // sort fields based on defined order in ISSUE_COLUMNS
     // improves consistent column listing/sorting and defined fields first before alpha sorting rest
-    var _unsortedHeaders = headers.sort();
-    headers = Object.keys(ISSUE_COLUMNS).filter(function(n) {
-      return _unsortedHeaders.indexOf(n) > -1;
-    });
+    headers = _sortKeysByRef(headers, ISSUE_COLUMNS);
     headers.unshift('key');
 
     numColumns = headers.length;
