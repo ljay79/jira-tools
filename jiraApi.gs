@@ -66,7 +66,8 @@ function testConnection() {
   };
 
   var error = function(responseData, httpResponse, statusCode) {
-    response = 'Could not connect to Jira Server!' + '['+statusCode+']';
+    response = 'Could not connect to Jira Server!';
+    response += httpErrorCodes[statusCode] ? '\n ('+statusCode+') ' + httpErrorCodes[statusCode] : '('+statusCode+')';
     debug.warn('%s Server [%s] %s', response, getCfg('server_type'), getCfg('jira_url'));
     setCfg('available', false);
   };
@@ -211,12 +212,20 @@ function Request() {
       httpResponse = UrlFetchApp.fetch(fetchUrl, this.getFetchArgs(fetchArgs));
       statusCode = parseInt( httpResponse.getResponseCode() );
     } catch (e) {
-      debug.error('UrlFetchApp.fetch(%s) yielded an error: ' + e, fetchUrl);
       statusCode = 500;
+
+      debug.error('UrlFetchApp.fetch(%s) yielded an error: ' + e, fetchUrl);
+      // add Browser Msg
+      Browser.msgBox("Exception", e, Browser.Buttons.OK);
     }
 
     if (httpResponse) {
-      debug.log("httpResponse: %s", httpResponse);
+      if(statusCode !== 200){
+        debug.warn("Code: %s, ResponseHeaders: %s, httpResponse: %s", httpResponse.getResponseCode(), httpResponse.getAllHeaders(), httpResponse);
+      } else {
+        debug.log("Code: %s, httpResponse: %s", httpResponse.getResponseCode(), httpResponse);
+      }
+
       try {
         // we care about json response content only
         responseData = JSON.parse(httpResponse.getContentText());
@@ -230,7 +239,6 @@ function Request() {
 
     if( typeof responseData == 'string' ) {
       responseData = {errorMessages: [responseData]};
-      statusCode = 500;
     }
 
     debug.timeEnd(timingLabel);
