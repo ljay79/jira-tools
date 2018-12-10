@@ -28,7 +28,7 @@ function insertIssuesFromFilter(jsonFormData) {
       var table = new IssueTable(sheet, cell, {issues: resp.data});
 
       if (filter.name) table.addSummary("Filter: " + filter.name)
-      table.addHeader().fillTable();
+      table.addHeader().fillTable().addNote(jsonFormData);
 
       response.status = true;
 
@@ -210,6 +210,20 @@ function IssueTable(sheet, initRange, data) {
       .setValue(summary);
     
     SpreadsheetApp.flush();
+
+    return this;
+  };
+
+  /**
+   * @desc Add a note to keep the form data so that we can refresh the table later
+   * @param jsonFormData {object}  JSON Form object of all form values
+   * @return this  For chaining
+   */
+  this.addNote = function(jsonFormData) {
+    initRange.setNote(
+      "[jira-tools] Don't remove or edit this note as it contains the arguments needed to refresh the Jira filter data below.\n"
+        + ">>>"
+        + JSON.stringify(jsonFormData));
 
     return this;
   };
