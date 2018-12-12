@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <style>
+    .error-container { display: none; width: 50%; float: right; margin-bottom: 16px; padding: 5px 10px; text-align: center; color: #fff; }
+    .filter-select { border: 1px solid #dfdfdf; height: 154px; overflow-y: auto; line-height: 28px; }
+    .filter-select > div { padding-left: 3px; padding-right: 24px; }
+    .filter-select > div:nth-child(even) { background: #f7f8f9; }
+    .is-loading { text-align: center; animation: blink .5s infinite; }
+    @keyframes blink { 0% { color: #fff; } 50% { color: #777; } 100% { color: #fff; } }
+    .is-favourite label { font-weight: bold; }
+    .filter-cols { display: flex; flex-direction: row; flex-wrap: wrap; align-items: left; justify-content: left; }
+    .filter-cols .label { flex: 0 0 100%; font-weight: bold; }
+    .filter-cols .empty { flex: 0 0 100%; }
+    .filter-cols .item { position: relative; flex: 0 0 25%; padding-left: 20px; box-sizing: border-box; }
+    .filter-cols .item input[type="checkbox"] { position: absolute; }
+    </style>
+  </head>
+  <body>
+    <form  action="" method="post">
+      
+      <div class="block filter-cols">
+        <label class="label">Fields in Spreadsheet</label>
+        <? for (var id in headerFields ) { ?>
+        <div class="item">
+          <input type="checkbox" id="column-<?= id ?>" name="columns[]" value="<?= id ?>"<? if (fieldsBeingUpdated.indexOf(id) > -1) { ?> checked="checked"<? } ?>>
+          <label for="column-<?= id ?>"><?= headerFields[id] ?></label>
+        </div>
+        <? } ?>
+      </div>
+
+      <div class="block">
+        <button type="submit" class="action" disabled>Insert</button>
+        <button type="button" onclick="google.script.host.close()">Cancel</button>
+        <div id="response-message" class="error-container" role="dialog"></div>
+      </div>
+    </form>
+
+    <script>
+      /* global google */
+      var timeout = null;
+      var alert   = document.getElementById('response-message');
+       
+      function hideAlert(){
+        if(timeout) timeout = clearTimeout(timeout);
+        alert.style.display = 'none';
+      }
+      
+      function showAlert(text,type,time) {
+        alert.innerText = text;
+        alert.style.backgroundColor = type ? 'rgb(139,195,74)' : 'rgb(213,0,0)';
+        alert.style.display = 'block';
+        if (time) timeout = setTimeout(hideAlert,time);
+      }
+      
+      
+
+      function formSubmitHandler(event) {
+        if (event) event.preventDefault();
+        hideAlert();
+        if (!valid) return;
+        showAlert('updating JIRA...', 1);
+        
+        
+        
+        google.script.run
+          .withSuccessHandler(onResponse)
+          .withFailureHandler(onResponse)
+          .updateIssues(formData);
+      }
+
+      function onResponse(response) {
+        var done = response.status === true;
+        
+        if(done) google.script.host.close();
+        showAlert(response.message, done, 10000);
+      }
+
+      google.script.run
+        .withSuccessHandler(onInitFilter)
+        .getMyFilters(true);
+
+      filter.addEventListener('submit', formSubmitHandler);
+      input.forEach(function(el){ el.addEventListener('change', inputValidatyHandler); });
+      window.addEventListener('load', inputValidatyHandler);
+    </script>
+  </body>
+</html>

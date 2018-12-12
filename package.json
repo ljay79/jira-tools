@@ -1,0 +1,23 @@
+{
+  "name": "jira-tools",
+  "version": "1.0.0",
+  "description": "Tools for Google sheets to work with Jira",
+  "main": "Code.gs",
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^23.6.0"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ljay79/jira-tools.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ljay79/jira-tools/issues"
+  },
+  "homepage": "https://github.com/ljay79/jira-tools#readme"
+}
