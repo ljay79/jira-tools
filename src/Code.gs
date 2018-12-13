@@ -51,6 +51,9 @@ function addMenu() {
     .addSeparator()
     .addItem('List Issues from Filter', 'dialogIssueFromFilter')
     .addItem('Create Time Report', 'dialogTimesheet')
+  
+    .addSeparator()
+    .addItem('Update Issues from Spreadsheet', 'dialogIssuesFromSheet')
 
     .addSeparator()
     .addItem('Settings', 'dialogSettings')

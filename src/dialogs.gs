@@ -156,6 +156,38 @@ function dialogTimesheet() {
 
 /* Dialog: Worklog - END */
 
+/* Dialog: Update Fields in Jira Issues from Spreadsheet */
+function dialogIssuesFromSheet() {
+  if(!hasSettings(true)) return;
+  
+  var cellValues = SpreadsheetApp.getActiveSheet().getActiveRange().getValues();
+  var headerFields = {};
+  var fieldsBeingUpdated = [];
+  if (cellValues.length>0) {
+    var firstRow = cellValues[0];
+    for (var i=0;i<firstRow.length;i++) {
+      headerFields[firstRow[i]]=firstRow[i];
+      fieldsBeingUpdated.push(firstRow[i]);
+    }
+  }
+  var dialog = getDialog('dialogIssuesFromSheet',
+      {
+        headerFields:headerFields,
+        fieldsBeingUpdated:fieldsBeingUpdated,
+        cellValues: cellValues
+      }
+  );
+
+  dialog
+    .setWidth(420)
+    .setHeight(360)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+
+  debug.log('Processed: %s', dialog);
+
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'Update Fields in Jira Issues from Spreadsheet');
+}
+/* Dialog: Update Fields in Jira Issues from Spreadsheet - END */
 
 /* Dialog: Custom Fields */
 

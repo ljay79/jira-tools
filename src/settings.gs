@@ -1,3 +1,26 @@
+// Require imports
+const BUILD = require("./Code.gs").BUILD;
+const fieldEpic = require("./customFields.gs").fieldEpic;
+const Storage_ = require("./Storage.gs").Storage_;
+const PropertiesService = function() {
+  var data = {};
+  var userProperties = {
+    getProperty: function (key) {
+      return data[key];
+    },
+    setProperty: function (key, value) {
+      data[key] = value;
+    }
+  }
+
+  return {
+    getUserProperties: function() {
+      return userProperties;
+    }
+  }
+}();
+// End of Require imports
+
 var APP_STORAGE;
 
 /**
@@ -152,3 +175,5 @@ function deleteAllProperties_()
   var userProperties = PropertiesService.getUserProperties();
   userProperties.deleteAllProperties();
 }
+
+module.exports = {getCfg: getCfg, setCfg: setCfg, hasSettings: hasSettings}

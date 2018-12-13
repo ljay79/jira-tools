@@ -19,8 +19,7 @@
     </style>
   </head>
   <body>
-    <form  action="" method="post">
-      
+    <form name="issue-update"   action="" method="post">
       <div class="block filter-cols">
         <label class="label">Fields in Spreadsheet</label>
         <? for (var id in headerFields ) { ?>
@@ -32,17 +31,22 @@
       </div>
 
       <div class="block">
-        <button type="submit" class="action" disabled>Insert</button>
+        <button type="submit" class="action">Insert</button>
         <button type="button" onclick="google.script.host.close()">Cancel</button>
         <div id="response-message" class="error-container" role="dialog"></div>
       </div>
     </form>
 
+    <div id="progress">
+
+    </div>
     <script>
       /* global google */
       var timeout = null;
       var alert   = document.getElementById('response-message');
-       
+      var issueForm = document.forms['issue-update'];
+      var progressBox = document.getElementById('progress');
+
       function hideAlert(){
         if(timeout) timeout = clearTimeout(timeout);
         alert.style.display = 'none';
@@ -55,20 +59,38 @@
         if (time) timeout = setTimeout(hideAlert,time);
       }
       
-      
+      function ticketCallback(key,success,message) {
+          var item = document.createElement('div');
+          var ticket = document.createElement('div');
+          var successDiv = document.createElement('div');
+          
+          radioLabel.innerText = option.name + ' ('+option.owner+')';
+
+          successDiv.className = 'update-fail';
+          if (success) {
+            successDiv.className = 'update-success';
+          } 
+          if (message != null && message != "") {
+            successDiv.innerText = message;
+          }
+          item.appendChild(ticket);
+          item.appendChild(success);
+          progressBox.appendChild(item);
+      }
 
       function formSubmitHandler(event) {
         if (event) event.preventDefault();
         hideAlert();
-        if (!valid) return;
+        
         showAlert('updating JIRA...', 1);
         
-        
+        var headerRows = {};
+        var data = [];
         
         google.script.run
           .withSuccessHandler(onResponse)
           .withFailureHandler(onResponse)
-          .updateIssues(formData);
+          .updateIssues(headerRows,data);
       }
 
       function onResponse(response) {
@@ -78,13 +100,8 @@
         showAlert(response.message, done, 10000);
       }
 
-      google.script.run
-        .withSuccessHandler(onInitFilter)
-        .getMyFilters(true);
 
-      filter.addEventListener('submit', formSubmitHandler);
-      input.forEach(function(el){ el.addEventListener('change', inputValidatyHandler); });
-      window.addEventListener('load', inputValidatyHandler);
+      issueForm.addEventListener('submit', formSubmitHandler);
     </script>
   </body>
 </html>

@@ -120,3 +120,5 @@ Storage_.prototype.getPrefixedKey_ = function(key) {
     return this.prefix_;
   }
 };
+
+module.exports = {Storage_: Storage_};

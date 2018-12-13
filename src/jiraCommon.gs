@@ -650,3 +650,5 @@ function getIssue(issueKey, fields) {
   
   return response;
 }
+
+module.exports = {unifyIssueAttrib: unifyIssueAttrib}
