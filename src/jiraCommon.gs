@@ -651,4 +651,65 @@ function getIssue(issueKey, fields) {
   return response;
 }
 
+/**
+@desc returns all fields in the JIRA instance
+@return array Array of objects for each field 
+
+return {
+          key:        cField.key || cField.id, // Server API returns ".id" only while Cloud returns both with same value
+          name:       cField.name,
+          custom:     cField.custom,
+          schemaType: _type,
+          supported:  (arrSupportedTypes.indexOf(_type) > -1)
+        };
+*/
+
+function getAllJiraFields(successCallBack,errorCallBack) {
+  var request = new Request();
+  var fieldMap = [];
+
+  var ok = function(respData, httpResp, status) {
+    if (!respData) {
+      error(respData, httpResp, status);
+    }
+    var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
+    fieldMap.push.apply(fieldMap, respData.map(function(cField) {
+      var _type = (cField.schema ? cField.schema.type : null) || null;
+        if(cField.schema && cField.schema.items) {
+          _type += '|' + cField.schema.items;
+        }
+      return {
+        key:        cField.key || cField.id, // Server API returns ".id" only while Cloud returns both with same value
+        name:       cField.name,
+        custom:     cField.custom,
+        schemaType: _type,
+        supported:  (arrSupportedTypes.indexOf(_type) > -1)
+      };
+    }) )
+    // sorting by supported type and name
+    && fieldMap.sort(function(a, b) {
+      var keyA = a.name.toLowerCase();
+      var keyB = b.name.toLowerCase();
+
+      if (keyA < keyB)
+        return -1;
+      if (keyA > keyB)
+        return 1;
+      return 0;
+    });
+    successCallBack(fieldMap);
+  };
+
+  var error = function(respData, httpResp, status) {
+    var msg = "Failed to retrieve Jira Fields info with status [" + status + "]!\\n" 
+                + (respData.errorMessages.join("\\n") || respData.errorMessages);
+    errorCallBack(msg);
+  };
+
+  request.call("field")
+    .withSuccessHandler(ok)
+    .withFailureHandler(error)
+  ;
+}
+
 module.exports = {unifyIssueAttrib: unifyIssueAttrib}

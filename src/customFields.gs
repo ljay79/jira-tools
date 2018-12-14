@@ -158,43 +158,15 @@ function saveCustomFields(jsonFormData) {
  * @desc Fetch list of all Jira fields (name and id) and show them in a sidebar.
  */
 function sidebarJiraFieldMap() {
-  var request = new Request();
-  var fieldMap = [];
 
-  var ok = function(respData, httpResp, status) {
-    if (!respData) {
-      return error(respData, httpResp, status);
-    }
-    fieldMap.push.apply(fieldMap, respData.map(function(cField) {
-      return {
-        key:  cField.key || cField.id, // Server API returns ".id" only while Cloud returns both with same value
-        name: cField.name
-      };
-    }) )
-    // sorting by supported type and name
-    && fieldMap.sort(function(a, b) {
-      var keyA = a.name.toLowerCase();
-      var keyB = b.name.toLowerCase();
-
-      if (keyA < keyB)
-        return -1;
-      if (keyA > keyB)
-        return 1;
-      return 0;
-    });
-    
+  var ok = function(fieldMap) {
     sidebarFieldMap(fieldMap);
   };
 
-  var error = function(respData, httpResp, status) {
-    var msg = "Failed to retrieve Jira Fields info with status [" + status + "]!\\n" 
-                + (respData.errorMessages.join("\\n") || respData.errorMessages);
+  var error = function(msg) {
     Browser.msgBox(msg, Browser.Buttons.OK);
-    debug.error(msg + " httpResp: %s", httpResp);
+    debug.error(msg);
   };
 
-  request.call("field")
-    .withSuccessHandler(ok)
-    .withFailureHandler(error)
-  ;
+  getAllJiraFields(ok,error);
 }

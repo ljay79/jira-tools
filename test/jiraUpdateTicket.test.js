@@ -86,7 +86,6 @@ test("Sending Individual Issues to Jira", () => {
         (method,params) => {
             expect(method).toBe("issue");
             expect(params.keyOrIssueId).toBe("PBI-1");
-
             return chain;
         }
     );
