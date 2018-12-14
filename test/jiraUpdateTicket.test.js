@@ -100,3 +100,49 @@ test("Sending Individual Issues to Jira", () => {
 
 
 });
+
+test("field validation", () => {
+    var fieldList = [
+        {
+            key:        "summary",
+            name:       "Summary",
+            custom:     false,
+            schemaType: 'string',
+            supported:  true
+        },
+        {
+            key:        "custom1234",
+            name:       "My custom field",
+            custom:     true,
+            schemaType: 'datetime',
+            supported:  true
+
+        },
+        {
+            key:        "custom5678",
+            name:       "My custom field 2",
+            custom:     true,
+            schemaType: 'datetime',
+            supported:  true
+
+        }
+    ]
+
+    const getMatchingJiraFields = require("../src/jiraUpdateTicket.gs").getMatchingJiraFields;
+    
+    
+
+    var getFilteredList = getMatchingJiraFields(
+        fieldList, {"custom1234":1,"Not a Match":2,"My custom field 2":3}
+    );
+    expect(getFilteredList).not.toBeNull();
+    expect(Object.keys(getFilteredList).length).toBe(2);
+    expect(getFilteredList["custom1234"]).not.toBeNull();
+    expect(getFilteredList["custom1234"]).toBe(1);
+    expect(getFilteredList["custom5678"]).toBe(3);
+    expect(getFilteredList["Not a Match"]).not.toBeDefined();
+    expect(getFilteredList["My custom field 2"]).not.toBeDefined();
+
+
+    
+});

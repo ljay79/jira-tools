@@ -712,4 +712,18 @@ function getAllJiraFields(successCallBack,errorCallBack) {
   ;
 }
 
-module.exports = {unifyIssueAttrib: unifyIssueAttrib}
+function getMatchingJiraField(listOfValidJiraFields, fieldName) {
+  var matchingFunction = (stringA, stringB) => {
+    return stringA.toLowerCase().trim() == stringB.toLowerCase().trim();
+  }
+  var results = listOfValidJiraFields.filter((fieldSpec) => {
+    return matchingFunction(fieldSpec.name,fieldName) || matchingFunction(fieldSpec.key,fieldName)
+  });
+  if (results.length>0) {
+    return results[0];
+  } else {
+    return null;
+  }
+}
+
+module.exports = {unifyIssueAttrib: unifyIssueAttrib, getMatchingJiraField:getMatchingJiraField}

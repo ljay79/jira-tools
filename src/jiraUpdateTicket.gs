@@ -4,6 +4,7 @@ const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
 const debug = {
     info: console.log
 }
+const getMatchingJiraField = require("../src/jiraCommon.gs").getMatchingJiraField;
 // End of Require imports
 /*
 * @desc Takes a 2 x 2 array of values and uses them to update JIRA 
@@ -50,6 +51,17 @@ function packageRowForUpdate(headerRow, dataRow) {
     return result;
 }
 
+function getMatchingJiraFields(allJiraFields,headerRow) {
+    var filteredHeadings = {};
+    Object.keys(headerRow).forEach( (fieldTitle) => {
+        var matchField = getMatchingJiraField(allJiraFields,fieldTitle);
+        if (matchField != null) {
+            filteredHeadings[matchField.key] = headerRow[fieldTitle];
+        } 
+    });
+    return filteredHeadings;
+}
+
 function updateIssueinJira(issueData, callback) {
     var method = "issueStatus";
     var request = new Request();
@@ -81,4 +93,4 @@ function updateIssueinJira(issueData, callback) {
     
 }
 
-module.exports = {updateJiraIssues: updateJiraIssues, packageRowForUpdate: packageRowForUpdate, updateIssueinJira: updateIssueinJira};
+module.exports = {updateJiraIssues: updateJiraIssues, packageRowForUpdate: packageRowForUpdate, updateIssueinJira: updateIssueinJira, getMatchingJiraFields:getMatchingJiraFields};
