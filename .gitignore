@@ -3,4 +3,5 @@
 /.gitconfig
 /node_modules
 /dist
+/script
 /src/.clasp.json

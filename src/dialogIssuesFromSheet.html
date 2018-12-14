@@ -24,8 +24,8 @@
         <label class="label">Fields in Spreadsheet</label>
         <? for (var id in headerFields ) { ?>
         <div class="item">
-          <input type="checkbox" id="column-<?= id ?>" name="columns[]" value="<?= id ?>"<? if (fieldsBeingUpdated.indexOf(id) > -1) { ?> checked="checked"<? } ?>>
-          <label for="column-<?= id ?>"><?= headerFields[id] ?></label>
+          <input type="checkbox" id="column-<?= id ?>" name="columns[]" value="<?= id ?>" checked="checked" >
+          <label for="column-<?= id ?>"><?= id ?></label>
         </div>
         <? } ?>
       </div>
@@ -46,7 +46,9 @@
       var alert   = document.getElementById('response-message');
       var issueForm = document.forms['issue-update'];
       var progressBox = document.getElementById('progress');
-
+      var input   = Array.prototype.slice.call(issueForm.elements).filter(function(el){ return el.nodeName === 'INPUT'; });
+      var columns = input.filter(function(el){ return el.type === 'checkbox'; });
+      
       function hideAlert(){
         if(timeout) timeout = clearTimeout(timeout);
         alert.style.display = 'none';
@@ -58,46 +60,36 @@
         alert.style.display = 'block';
         if (time) timeout = setTimeout(hideAlert,time);
       }
-      
-      function ticketCallback(key,success,message) {
-          var item = document.createElement('div');
-          var ticket = document.createElement('div');
-          var successDiv = document.createElement('div');
-          
-          radioLabel.innerText = option.name + ' ('+option.owner+')';
-
-          successDiv.className = 'update-fail';
-          if (success) {
-            successDiv.className = 'update-success';
-          } 
-          if (message != null && message != "") {
-            successDiv.innerText = message;
-          }
-          item.appendChild(ticket);
-          item.appendChild(success);
-          progressBox.appendChild(item);
-      }
 
       function formSubmitHandler(event) {
         if (event) event.preventDefault();
-        hideAlert();
-        
-        showAlert('updating JIRA...', 1);
-        
-        var headerRows = {};
-        var data = [];
-        
+            hideAlert();
+            
+        showAlert("updating jira...",1);
+        var selectedColumns = columns.filter(function(el){ return el.checked; }).map(function(el) { return el.value; });
+  
         google.script.run
           .withSuccessHandler(onResponse)
-          .withFailureHandler(onResponse)
-          .updateIssues(headerRows,data);
-      }
-
-      function onResponse(response) {
-        var done = response.status === true;
+          .withFailureHandler(errorInServerCallback)
+          .dialogProcessIssuesFromSheet(selectedColumns);
         
-        if(done) google.script.host.close();
-        showAlert(response.message, done, 10000);
+      }
+      
+     function errorInServerCallback(response) {
+          showAlert(response.message, false, 10000);
+     }
+
+      function onResponse(result) {
+        var done = result.status === true;
+     
+        if(done) {
+          showAlert(result.rowsUpdated+" issues updated in JIRA", done, 5000);
+          setTimeout(function() {
+           google.script.host.close();
+          },10000);
+        } else {
+           showAlert(result.message, done, 10000);
+        }
       }
 
 

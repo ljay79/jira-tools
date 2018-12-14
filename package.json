@@ -11,7 +11,8 @@
     "gulp-rename": "latest",
     "exec-sh": "latest",
     "gulp-diff": "latest",
-    "del": "latest"
+    "del": "latest",
+    "gulp-changed": "latest"
   },
   "scripts": {
     "test": "jest"

@@ -157,26 +157,36 @@ function dialogTimesheet() {
 /* Dialog: Worklog - END */
 
 /* Dialog: Update Fields in Jira Issues from Spreadsheet */
-function dialogIssuesFromSheet() {
-  if(!hasSettings(true)) return;
-  
+/*
+* @desc Gets the selected cells in the spreadsheet and separates to headers and datarows
+* @return {object}
+*/
+function getDataForJiraUpdateFromSheet() {
+  debug.log('getDataForJiraUpdateFromSheet:called');
   var cellValues = SpreadsheetApp.getActiveSheet().getActiveRange().getValues();
   var headerFields = {};
-  var fieldsBeingUpdated = [];
+  var dataRows = [];
   if (cellValues.length>0) {
     var firstRow = cellValues[0];
     for (var i=0;i<firstRow.length;i++) {
-      headerFields[firstRow[i]]=firstRow[i];
-      fieldsBeingUpdated.push(firstRow[i]);
+      headerFields[firstRow[i]]=i;
     }
+    cellValues.splice(0, 1);
+    dataRows = cellValues;
   }
-  var dialog = getDialog('dialogIssuesFromSheet',
-      {
-        headerFields:headerFields,
-        fieldsBeingUpdated:fieldsBeingUpdated,
-        cellValues: cellValues
-      }
-  );
+  var result = {
+      headerFields:headerFields,
+      dataRows:dataRows
+  };
+  debug.log('getDataForJiraUpdateFromSheet result = : %s', result);
+  return result;
+}
+
+function dialogIssuesFromSheet() {
+  if(!hasSettings(true)) return;
+  
+  var selectedData = getDataForJiraUpdateFromSheet();
+  var dialog = getDialog('dialogIssuesFromSheet',selectedData);
 
   dialog
     .setWidth(420)
@@ -187,6 +197,21 @@ function dialogIssuesFromSheet() {
 
   SpreadsheetApp.getUi().showModalDialog(dialog, 'Update Fields in Jira Issues from Spreadsheet');
 }
+
+function dialogProcessIssuesFromSheet(headerFieldsToUse) {
+  if(!hasSettings(true)) return;
+  
+  var selectedData = getDataForJiraUpdateFromSheet();
+  var headerRowsToUpdate = {};
+  var allHeaderRows = selectedData.headerFields;
+  headerFieldsToUse.forEach(function(element) {
+       headerRowsToUpdate[element] = allHeaderRows[element];
+  });
+  var data = selectedData.dataRows;
+  return updateJiraIssues(headerRowsToUpdate,data);
+}
+
+
 /* Dialog: Update Fields in Jira Issues from Spreadsheet - END */
 
 /* Dialog: Custom Fields */

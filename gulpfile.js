@@ -4,7 +4,7 @@ var del = require('del');
 var execSh = require('exec-sh');
 var rename = require('gulp-rename');
 var diff = require('gulp-diff');
-
+var changed = require('gulp-changed');
 
 
 gulp.task('clean', function(done) {
@@ -73,9 +73,16 @@ gulp.task('clasp-push', function (done) {
 
 gulp.task('diff-pulled-code', function (done) {
     return gulp
-        .src(["src/**/*","src/**/.*"])
-        .pipe(diff('dist/pull'))
+        .src(["dist/pull/**/*","dist/pull/**/.*"])
+        .pipe(diff('src'))
         .pipe(diff.reporter({ fail: false }));
+});
+
+gulp.task('copy-changed-pulled-code', function (done) {
+    return gulp
+        .src(["dist/pull/**/*","dist/pull/**/.*"])
+        .pipe(changed('src'))
+        .pipe(gulp.dest('src'))
 });
 gulp.task('deploy',gulp.series('clean', 'build','clasp-push'));
 gulp.task('pull-code',gulp.series('clean', 'clasp-pull','un-google','diff-pulled-code'));

@@ -1,6 +1,9 @@
 // Require imports
 const Request = require('../src/jiraApi.gs');
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
+const debug = {
+    info: console.log
+}
 // End of Require imports
 /*
 * @desc Takes a 2 x 2 array of values and uses them to update JIRA 
@@ -8,7 +11,8 @@ const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
 * @param dataRows {array} A 2x2 array where each row is assumed to be data to be updated in an issue
 * @return {object}
 */
-function updateIssues(headerRow,dataRows, callback) {
+function updateJiraIssues(headerRow,dataRows) {
+    debug.info('updateJiraIssues called Keys:--%s  DATA ROWS %s', Object.keys(headerRow).join(","),dataRows);
     result = {rowsUpdated:0, status: true, message: null };
     if (headerRow === null || Object.keys(headerRow).length==0) {
         result.status = false;
@@ -18,9 +22,8 @@ function updateIssues(headerRow,dataRows, callback) {
             var rowData = packageRowForUpdate(headerRow,dataRows[i]);
             if (rowData.key != null) {
                 result.rowsUpdated++;
-                callback(rowData.key,true,null);
             } else {
-                callback(rowData.key, false, "No value for Key field");
+              // an error
             }
         }
         result.status = true;
@@ -78,4 +81,4 @@ function updateIssueinJira(issueData, callback) {
     
 }
 
-module.exports = {updateIssues: updateIssues, packageRowForUpdate: packageRowForUpdate, updateIssueinJira: updateIssueinJira};
+module.exports = {updateJiraIssues: updateJiraIssues, packageRowForUpdate: packageRowForUpdate, updateIssueinJira: updateIssueinJira};

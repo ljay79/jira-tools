@@ -6,52 +6,27 @@ beforeEach(() =>  {
 });
 
 test('processing headers and data rows', () => {
-    const updateIssues = require('../src/jiraUpdateTicket.gs').updateIssues;
-    const mockCallback = jest.fn((key, status) => {key});
-    var result = updateIssues({},[],mockCallback);
+    const updateJiraIssues = require('../src/jiraUpdateTicket.gs').updateJiraIssues;
+    var result = updateJiraIssues({},[]);
     expect(result.rowsUpdated).toBe(0);
     expect(result.status).toBe(false);
     expect(result.message).not.toBeNull();
-    expect(mockCallback.mock.calls.length).toBe(0);
 
-    mockCallback.mockClear();
-    var result = updateIssues({columnA:1,Key:0},[],mockCallback);
+    var result = updateJiraIssues({columnA:1,Key:0},[]);
     expect(result.rowsUpdated).toBe(0);
     expect(result.status).toBe(true);
-    expect(mockCallback.mock.calls.length).toBe(0);
 
-    mockCallback.mockClear();
-    var result = updateIssues({columnA:1,Key:0},[["PBI-1","column A value"]],mockCallback);
+    var result = updateJiraIssues({columnA:1,Key:0},[["PBI-1","column A value"]]);
     expect(result.rowsUpdated).toBe(1);
     expect(result.status).toBe(true);
-    expect(mockCallback.mock.calls.length).toBe(1);
-    expect(mockCallback.mock.calls[0][0]).toBe("PBI-1");
-    expect(mockCallback.mock.calls[0][1]).toBe(true);
 
-    mockCallback.mockClear();
-    var result = updateIssues({columnA:1,Key:0},[["PBI-1","column A value"],["PBI-2","column A value 2"]],mockCallback);
+    var result = updateJiraIssues({columnA:1,Key:0},[["PBI-1","column A value"],["PBI-2","column A value 2"]]);
     expect(result.rowsUpdated).toBe(2);
     expect(result.status).toBe(true);
-    expect(mockCallback.mock.calls.length).toBe(2);
-    expect(mockCallback.mock.calls[0][0]).toBe("PBI-1");
-    expect(mockCallback.mock.calls[0][1]).toBe(true);
-    expect(mockCallback.mock.calls[1][0]).toBe("PBI-2");
-    expect(mockCallback.mock.calls[1][1]).toBe(true);
 
-    mockCallback.mockClear();
-    var result = updateIssues({columnA:1,Key:0},[[null,"column A value"],["","column A value"],["PBI-2","column A value 2"]],mockCallback);
+    var result = updateJiraIssues({columnA:1,Key:0},[[null,"column A value"],["","column A value"],["PBI-2","column A value 2"]]);
     expect(result.rowsUpdated).toBe(1);
     expect(result.status).toBe(true);
-    expect(mockCallback.mock.calls.length).toBe(3);
-    expect(mockCallback.mock.calls[0][0]).toBe(null);
-    expect(mockCallback.mock.calls[0][1]).toBe(false);
-    expect(mockCallback.mock.calls[0][2]).not.toBeNull();
-    expect(mockCallback.mock.calls[1][0]).toBe(null);
-    expect(mockCallback.mock.calls[1][1]).toBe(false);
-    expect(mockCallback.mock.calls[1][2]).not.toBeNull();
-    expect(mockCallback.mock.calls[2][0]).toBe("PBI-2");
-    expect(mockCallback.mock.calls[2][1]).toBe(true);
-    expect(mockCallback.mock.calls[2][2]).toBeNull();
 });
 
 
