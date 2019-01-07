@@ -55,8 +55,8 @@ Either combination of your Atlassian account username/email + password or your A
 **You're all set and ready to go**
 
 # Features
-### Refresh Ticket Data
-“Add-ons" > “Jira Sheet Tools” > "Refresh Ticket Data"
+### Update Ticket Key Status
+“Add-ons" > “Jira Sheet Tools” > "Update Ticket Key Status "KEY-123 [Done]""
 
 Any Jira ticket Id in the form of "KEY-123" will be updated on the current active google sheet and extended with the current status of matching Jira ticket.
 
