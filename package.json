@@ -3,16 +3,19 @@
   "version": "1.0.0",
   "description": "Tools for Google sheets to work with Jira",
   "main": "Code.gs",
-  "dependencies": {},
+  "dependencies": {
+    "@types/google-apps-script": "0.0.33"
+  },
   "devDependencies": {
-    "jest": "^23.6.0",
+    "jest": "latest",
     "gulp": "latest",
     "gulp-replace": "latest",
     "gulp-rename": "latest",
     "exec-sh": "latest",
     "gulp-diff": "latest",
     "del": "latest",
-    "gulp-changed": "latest"
+    "gulp-changed": "latest",
+    "clasp": "latest"
   },
   "scripts": {
     "test": "jest"

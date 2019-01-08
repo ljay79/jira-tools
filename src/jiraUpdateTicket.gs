@@ -1,5 +1,6 @@
 // Require imports
 const Request = require('../src/jiraApi.gs');
+const getAllJiraFields = require('./jiraCommon.gs').getAllJiraFields;
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
 const debug = {
     info: console.log
@@ -12,35 +13,66 @@ const getMatchingJiraField = require("../src/jiraCommon.gs").getMatchingJiraFiel
 * @param dataRows {array} A 2x2 array where each row is assumed to be data to be updated in an issue
 * @return {object}
 */
-function updateJiraIssues(headerRow,dataRows) {
-    debug.info('updateJiraIssues called Keys:--%s  DATA ROWS %s', Object.keys(headerRow).join(","),dataRows);
-    result = {rowsUpdated:0, status: true, message: null };
+function updateJiraIssues(headerRow,dataRows, callback) {
+    //debug.info('updateJiraIssues called Keys:--%s  DATA ROWS %s', Object.keys(headerRow).join(","),dataRows);
+    result = {rowsUpdated:0, status: true, message: null, finished: false };
+    
     if (headerRow === null || Object.keys(headerRow).length==0) {
         result.status = false;
+        result.finished = true;
+        result.rowsUpdated = 0;
         result.message = "No Header Row sent";
-    } else {
-        for (var i=0;i<dataRows.length;i++) {
-            var rowData = packageRowForUpdate(headerRow,dataRows[i]);
-            if (rowData.key != null) {
-                result.rowsUpdated++;
-            } else {
-              // an error
-            }
-        }
+        return result;
+    } 
+    
+    if (dataRows == null || dataRows.length == 0) {
         result.status = true;
+        result.finished = true;
+        result.rowsUpdated = 0;
+        result.message = "No Data";
+        return result;
+
     }
+    getAllJiraFields(
+        function(allJiraFields) {
+            var callbackresult = {rowsUpdated:0, status: true, message: null, finished: false };
+            for (var i=0;i<dataRows.length;i++) {
+                var rowData = packageRowForUpdate(allJiraFields,headerRow,dataRows[i]);
+                if (rowData.key != null) {
+                    callbackresult.rowsUpdated++;
+                } else {
+                    callbackresult.message = "No Key value found in row "+i;
+                }
+            }
+            callbackresult.status = true;
+            callbackresult.finished = true;
+            if (callback != null) {
+                callback(callbackresult);
+            }
+        }, 
+        function(errorMessage) {
+            var callbackresult = {rowsUpdated:0, status: true, message: null, finished: false };
+            callbackresult.finished = true;
+            callbackresult.status = false;
+            callbackresult.message = errorMessage;
+            if (callback != null) {
+                callback(callbackresult);
+            }
+    });
     return result;
+
 }
 
-function packageRowForUpdate(headerRow, dataRow) {
-    var keyFieldName = "Key";
+function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
+    var keyFieldName = "issueKey";
     var result = {key:null,fields:{}};
-    for (var headerRowName in headerRow) {
-        var index = headerRow[headerRowName];
+    var filteredHeaders = getMatchingJiraFields(allJiraFields,headerRow);
+    for (var headerId in filteredHeaders) {
+        var index = filteredHeaders[headerId];
         var value = dataRow[index];
         if (value != null) {
-            if (headerRowName != keyFieldName) {
-                result.fields[headerRowName] = value;
+            if (headerId != keyFieldName) {
+                result.fields[headerId] = value;
             } else {
                 if (value.length > 0) {
                     result.key = value;

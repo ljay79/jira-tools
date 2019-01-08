@@ -1,3 +1,10 @@
+// Require imports
+const Request = require('../src/jiraApi.gs');
+const debug = {
+    info: console.log
+}
+// End of Require imports
+
 // const not available, but better solution needed
 var CELLTYPE_EMPTY = -1;
 var CELLTYPE_JIRAID = 10; // entire cell includes Jira ticket id only ("JIRA-123" or "JIRA-123 [Status]")
@@ -651,6 +658,7 @@ function getIssue(issueKey, fields) {
   return response;
 }
 
+
 /**
 @desc returns all fields in the JIRA instance
 @return array Array of objects for each field 
@@ -664,6 +672,21 @@ return {
         };
 */
 
+function convertJiraFieldResponseToFieldRecord(jiraFieldResponse) {
+  var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
+  var _type = (jiraFieldResponse.schema ? jiraFieldResponse.schema.type : null) || null;
+    if(jiraFieldResponse.schema && jiraFieldResponse.schema.items) {
+      _type += '|' + jiraFieldResponse.schema.items;
+    }
+  return {
+    key:        jiraFieldResponse.key || jiraFieldResponse.id, // Server API returns ".id" only while Cloud returns both with same value
+    name:       jiraFieldResponse.name,
+    custom:     jiraFieldResponse.custom,
+    schemaType: _type,
+    supported:  (arrSupportedTypes.indexOf(_type) > -1)
+  };
+}
+
 function getAllJiraFields(successCallBack,errorCallBack) {
   var request = new Request();
   var fieldMap = [];
@@ -672,20 +695,7 @@ function getAllJiraFields(successCallBack,errorCallBack) {
     if (!respData) {
       error(respData, httpResp, status);
     }
-    var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
-    fieldMap.push.apply(fieldMap, respData.map(function(cField) {
-      var _type = (cField.schema ? cField.schema.type : null) || null;
-        if(cField.schema && cField.schema.items) {
-          _type += '|' + cField.schema.items;
-        }
-      return {
-        key:        cField.key || cField.id, // Server API returns ".id" only while Cloud returns both with same value
-        name:       cField.name,
-        custom:     cField.custom,
-        schemaType: _type,
-        supported:  (arrSupportedTypes.indexOf(_type) > -1)
-      };
-    }) )
+    fieldMap.push.apply(fieldMap, respData.map(convertJiraFieldResponseToFieldRecord) )
     // sorting by supported type and name
     && fieldMap.sort(function(a, b) {
       var keyA = a.name.toLowerCase();
@@ -705,7 +715,6 @@ function getAllJiraFields(successCallBack,errorCallBack) {
                 + (respData.errorMessages.join("\\n") || respData.errorMessages);
     errorCallBack(msg);
   };
-
   request.call("field")
     .withSuccessHandler(ok)
     .withFailureHandler(error)
@@ -726,4 +735,4 @@ function getMatchingJiraField(listOfValidJiraFields, fieldName) {
   }
 }
 
-module.exports = {unifyIssueAttrib: unifyIssueAttrib, getMatchingJiraField:getMatchingJiraField}
+module.exports = {unifyIssueAttrib: unifyIssueAttrib, getMatchingJiraField:getMatchingJiraField, getAllJiraFields:getAllJiraFields, convertJiraFieldResponseToFieldRecord:convertJiraFieldResponseToFieldRecord}
