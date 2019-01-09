@@ -115,6 +115,6 @@ gulp.task('deploy',gulp.series('clean', 'build','clasp-push'));
 /*
 Pulls GAS source code into dist/pull and compares it visually so it can be copied over into src if required
 */
-gulp.task('pull-code',gulp.series('clean', 'clasp-pull','un-google','diff-pulled-code'));
+gulp.task('pull-code',gulp.series('clean', 'clasp-pull','un-google'));
 
  
