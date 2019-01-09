@@ -246,38 +246,94 @@ Of course it makes no sense that this information is not available on the REST A
 To enable build, deployment and running local unit test you need 
 * Latest version of Node.js installed - https://nodejs.org/en/download/ )
 * Gulp https://gulpjs.com/
-* Clasp installed
-** see https://developers.google.com/apps-script/guides/clasp
-** (also https://codelabs.developers.google.com/codelabs/clasp)
+* Clasp,
+ see https://developers.google.com/apps-script/guides/clasp
+ and https://codelabs.developers.google.com/codelabs/clasp for more details
 
-## Checkout
-To checkout local copy and develop
-git clone https://github.com/paul-lemon/jira-tools
- 
+## Checkout and setup
+Clone the code from Github onto your local machine. Then install dependencies
+```markdown
 cd jira-tools
 npm install
-gulp --tasks
+```
+Check gulp runs ok and displays list of tasks
+```markdown
+gulp --tasks >
 -- pull-code (fetches code from Google apps)
 -- deploy (pushes code to Google apps)
+```markdown
 
-## Running unit tests
-The Google Application S? (GAS) is a different runtime from Node.js
-Any function available in a .gs file in your project is available to call in all other files
+Check unit tests run
+```markdown
+npm test
+```
+
+You should now be good for development
+
+## Changes needed to run GAS files locally in Node
+The Google App Scripts (GAS) runtime environment differs from Node.js. For example, in the GAS runtime, any function available in a .gs file in your project is automatically available to call from other files.
 Node.js does not allow that.
-In enable to allow the running of the unit tests locally each .gs file requires the use of import and export statements
-These statements would cause an error on GAS so they are commented out by the gulp script when deployed.
-The gulp script uses 
+
+In enable to allow the running of the unit tests locally using Node JS each .gs file requires the use of import and export statements to make the files available e.g. The following require statements imports the 'getCfg', 'setCfg' and 'hasSettings' functions defined in 'settings.gs' into in another JS file (when running in Node)
+
+```markdown
+// Require imports
+const getCfg = require("./settings.gs").getCfg;
+const setCfg = require("./settings.gs").setCfg;
+const hasSettings = require("./settings.gs").hasSettings;
+// End of Require imports
+```
+This exports statement in 'settings.gs' is also required
+```markdown
+module.exports = {getCfg: getCfg, setCfg: setCfg, hasSettings: hasSettings}
+
+```
+
+These statements are unnecessary in GAS and would cause an error since 'Require' is a Node.js feature.
+
+The gulp scripts used to deploy the source code to GAS (via Clasp) include tasks to comment out these lines of code. The script looks for blocks starting and ending with the following lines and comments the whole block out. 
+
+```markdown
+// Require imports
+THIS WHOLE BLOCK WILL BE COMMENTED WHEN DEPLOYED BY THE GULP SCRIPT
+// End of Require imports
+```
+
+Another approach could be to use this code in the unit tests...
+https://github.com/mzagorny/gas-local
+This should be investigated.
 
 ## Testing and deploying using clasp
 ### Set up and linking to your project
-First need to create or clone the Google Project you want to use for deploying and testing.
+Some notes on how to create or clone the Google Project you want to use for deploying and testing.
 - if you already have a Project
 - if you don't 
-### Deploying using gulp task
-gulp deploy
-### Getting changes back from your google project
-If you make changes in the google project you can pull those changes down onto your local mache
 
+### Deploying using gulp task
+Using the following gulp task will clean the export and require statements and push the code to the configured GAS project.
+
+```markdown
+gulp deploy
+```
+
+### Getting changes back from your google project
+
+If you make changes to the code in the google project web interface  you can pull those changes down onto your local machine.
+
+Step 1 - execute this gulp task
+
+```markdown
 gulp pull-code
+```
+This will pull the changes down from your GAS project, and uncomment the require and exports statments. The files will be pulled into a temporary folder 'dist/pull'
+
+You can then see a diff of the code in your 'src' folder with that code in 'dist/pull' so you can visually verify that this is a change you want to have in your local copy and commit to GIT (just in case any temporary changes or debug code has been left)
+
+```markdown
 gulp diff-pulled-code
+```
+You can then use this gulp task to copy the changed files from 'dist/pull' to 'src/' so you can verify unit tests and commit back to git
+
+```markdown
 gulp copy-changed-pulled-code
+```
