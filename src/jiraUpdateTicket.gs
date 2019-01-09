@@ -85,7 +85,7 @@ function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
 
 function getMatchingJiraFields(allJiraFields,headerRow) {
     var filteredHeadings = {};
-    Object.keys(headerRow).forEach( (fieldTitle) => {
+    Object.keys(headerRow).forEach( function(fieldTitle) {
         var matchField = getMatchingJiraField(allJiraFields,fieldTitle);
         if (matchField != null) {
             filteredHeadings[matchField.key] = headerRow[fieldTitle];

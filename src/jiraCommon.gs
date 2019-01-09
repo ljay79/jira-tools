@@ -707,13 +707,17 @@ function getAllJiraFields(successCallBack,errorCallBack) {
         return 1;
       return 0;
     });
-    successCallBack(fieldMap);
+    if (successCallBack != null) {
+      successCallBack(fieldMap);
+    }
   };
 
   var error = function(respData, httpResp, status) {
     var msg = "Failed to retrieve Jira Fields info with status [" + status + "]!\\n" 
                 + (respData.errorMessages.join("\\n") || respData.errorMessages);
-    errorCallBack(msg);
+    if (errorCallBack != null) {
+      errorCallBack(msg);
+    }
   };
   request.call("field")
     .withSuccessHandler(ok)
@@ -722,10 +726,10 @@ function getAllJiraFields(successCallBack,errorCallBack) {
 }
 
 function getMatchingJiraField(listOfValidJiraFields, fieldName) {
-  var matchingFunction = (stringA, stringB) => {
+  var matchingFunction = function(stringA, stringB) {
     return stringA.toLowerCase().trim() == stringB.toLowerCase().trim();
   }
-  var results = listOfValidJiraFields.filter((fieldSpec) => {
+  var results = listOfValidJiraFields.filter(function(fieldSpec) {
     return matchingFunction(fieldSpec.name,fieldName) || matchingFunction(fieldSpec.key,fieldName)
   });
   if (results.length>0) {

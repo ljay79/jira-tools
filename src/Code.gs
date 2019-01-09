@@ -9,15 +9,14 @@
  * - use google auth with token based Jira RESTful API vs. cleartext password
  */
 
-var BUILD = '1.0.6';
+var BUILD = '1.0.8';
 
 /** 
  * Add a nice menu option for the users.
  */
 function onOpen(e) {
   addMenu();
-
-  if (e && e.authMode == ScriptApp.AuthMode.FULL) {
+  if (e && e.authMode == ScriptApp.AuthMode.LIMITED) {
     var userProps = PropertiesService.getUserProperties();
     debug.enable( (userProps.getProperty('debugging')=='true') );
   }
