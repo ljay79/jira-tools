@@ -239,3 +239,45 @@ You will get an email from Atlassian where you please click the provided link at
 Now on the Atlassian page where you can set/change your Atlassian (and not Google) password, enter a new password for your Atlassian account, not to mix up with your Google account.
 
 Of course it makes no sense that this information is not available on the REST API documentation page, since it is quite crucial to get it working.
+
+# Development
+
+## Pre-requisites
+To enable build, deployment and running local unit test you need 
+* Latest version of Node.js installed - https://nodejs.org/en/download/ )
+* Gulp https://gulpjs.com/
+* Clasp installed
+** see https://developers.google.com/apps-script/guides/clasp
+** (also https://codelabs.developers.google.com/codelabs/clasp)
+
+## Checkout
+To checkout local copy and develop
+git clone https://github.com/paul-lemon/jira-tools
+ 
+cd jira-tools
+npm install
+gulp --tasks
+-- pull-code (fetches code from Google apps)
+-- deploy (pushes code to Google apps)
+
+## Running unit tests
+The Google Application S? (GAS) is a different runtime from Node.js
+Any function available in a .gs file in your project is available to call in all other files
+Node.js does not allow that.
+In enable to allow the running of the unit tests locally each .gs file requires the use of import and export statements
+These statements would cause an error on GAS so they are commented out by the gulp script when deployed.
+The gulp script uses 
+
+## Testing and deploying using clasp
+### Set up and linking to your project
+First need to create or clone the Google Project you want to use for deploying and testing.
+- if you already have a Project
+- if you don't 
+### Deploying using gulp task
+gulp deploy
+### Getting changes back from your google project
+If you make changes in the google project you can pull those changes down onto your local mache
+
+gulp pull-code
+gulp diff-pulled-code
+gulp copy-changed-pulled-code
