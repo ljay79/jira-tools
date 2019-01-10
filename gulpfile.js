@@ -10,7 +10,7 @@ var changed = require('gulp-changed');
 Cleans out the dist folders of previously built or pulled code
 */
 gulp.task('clean', function(done) {
-    del(['build/**/*', 'build/**/.*', '!build']).then(paths => {
+    del(['dist/build/**/*', 'dist/build/**/.*','dist/pull/**/*', 'dist/pull/**/.*']).then(paths => {
         console.log('Deleted files and folders:\n', paths.join('\n'));
         done();
     });
