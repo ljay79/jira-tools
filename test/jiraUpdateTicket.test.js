@@ -161,7 +161,7 @@ test("Sending Individual Issues to Jira", () => {
 
     jiraApiMock.call.mockImplementationOnce(
         (method,params) => {
-            expect(method).toBe("issue");
+            expect(method).toBe("issueUpdate");
             expect(params.issueIdOrKey).toBe("PBI-1");
             return jiraApiMock;
         }
@@ -179,7 +179,7 @@ test("Sending Individual Issues to Jira", () => {
 
     jiraApiMock.call.mockImplementationOnce(
         (method,params) => {
-            expect(method).toBe("issue");
+            expect(method).toBe("issueUpdate");
             expect(params.issueIdOrKey).toBe("PBI-2");
             return jiraApiMock;
         }

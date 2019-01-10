@@ -291,3 +291,5 @@ function removeFromArray(array, element) {
   }
 }
 
+module.exports = {buildUrl:buildUrl, extend:extend}
+

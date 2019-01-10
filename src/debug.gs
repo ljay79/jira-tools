@@ -57,3 +57,5 @@ function toggleDebugging(formData) {
   debug.enable( debugging=='true' );
   console.log('Debugging switched [%s]', (debugging=='true' ? 'ON' : 'OFF'));
 }
+
+module.exports = debug;

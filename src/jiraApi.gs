@@ -2,6 +2,9 @@
 const getCfg = require("./settings.gs").getCfg;
 const setCfg = require("./settings.gs").setCfg;
 const hasSettings = require("./settings.gs").hasSettings;
+const debug = require("./debug.gs");
+const buildUrl = require("./jsLib.gs").buildUrl;
+const extend = require("./jsLib.gs").extend;
 // End of Require imports
 
 /**
@@ -13,6 +16,7 @@ var restMethods = {
   'onDemand': {
     'dashboard'     : '/dashboard',
     'issueStatus'   : {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
+    'issueUpdate'   : {method: '/issue/{issueIdOrKey}', httpMethod: 'put'},
     'worklogOfIssue': {method: '/issue/{issueIdOrKey}/worklog'},
     'filter'        : {method: '/filter/{filterId}'},
     //'search': {method: '/search', queryparams: {jql:'', fields: [], properties: [], maxResults: 100, validateQuery: 'strict'}} // GET
@@ -26,6 +30,7 @@ var restMethods = {
   'server': {
     'dashboard'     : '/dashboard',
     'issueStatus'   : {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
+    'issueUpdate'   : {method: '/issue/{issueIdOrKey}', httpMethod: 'put'},
     'worklogOfIssue': {method: '/issue/{issueIdOrKey}/worklog'},
     'filter'        : {method: '/filter/{filterId}'},
     'search'        : {method: '/search'}, // POST
@@ -90,7 +95,7 @@ function testConnection() {
  * Performs an request to Jira RESTfull API.
  */
 function Request() {
-  var statusCode, httpResponse, responseData,
+  var statusCode, httpResponse, httpMethod, responseData,
       available, url, username, password,
       jiraMethod = null,
       jiraQueryParams = {};
@@ -113,6 +118,7 @@ function Request() {
     var fetchArgs = {
       contentType: "application/json",
       headers: {"Authorization": "Basic "},
+      method: httpMethod,
       muteHttpExceptions : true
     };
     var encCred = Utilities.base64Encode(username + ":" + password);
@@ -169,9 +175,20 @@ function Request() {
     var timingLabel = 'JiraApi call('+method+')';
     debug.time(timingLabel);
 
-    jiraMethod = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].method : restMethods[server_type][method];
-    jiraQueryParams = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].queryparams : {};
-
+    var jiraMethodConfig = restMethods[server_type][method];
+    httpMethod = "get";
+    if (typeof jiraMethodConfig === 'object') {
+      jiraMethod = jiraMethodConfig.method ;
+      jiraQueryParams =  jiraMethodConfig.queryparams;
+      if (jiraMethodConfig['httpMethod'] != null) {
+        httpMethod = jiraMethodConfig['httpMethod'];
+      }
+  
+    } else {
+      jiraMethod = restMethods[server_type][method];
+      jiraQueryParams = {};
+    }
+    
     var fetchArgs = fetchArgs || {}, urlParams = {};
     this.prepareParams(urlParams, jiraQueryParams);
 
@@ -203,7 +220,6 @@ function Request() {
         delete payload[attr];
       }
     }
-
     fetchArgs.payload = JSON.stringify(payload);
     // do not add empty payload
     if(fetchArgs.payload == '{}') { delete fetchArgs['payload']; }
@@ -282,7 +298,7 @@ function Request() {
    * @return {Object}    Response object: {respData: {..}, httpResp: {}, statusCode: Integer}
    */
   this.getResponse = function() {
-    return {'respData': responseData, 'httpResp': httpResponse, 'statusCode': statusCode};
+    return {'respData': responseData, 'httpResp': httpResponse, 'statusCode': statusCode, 'method': httpMethod};
   };
 
   // call init
