@@ -95,7 +95,7 @@ function getMatchingJiraFields(allJiraFields,headerRow) {
 }
 
 function updateIssueinJira(issueData, callback) {
-    var method = "issueStatus";
+    var method = "issue";
     var request = new Request();
     var ok = function(responseData, httpResponse, statusCode){
         // Check the data is valid and the Jira fields exist

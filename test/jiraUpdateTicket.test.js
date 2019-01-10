@@ -157,13 +157,13 @@ test("Sending Individual Issues to Jira", () => {
     
     
 
-    jiraApiMock.withFailureHandler.mockImplementationOnce((callback) => { callback({}, null, 404); return chain});
+    jiraApiMock.withFailureHandler.mockImplementationOnce((callback) => { callback({}, null, 404); return jiraApiMock});
 
     jiraApiMock.call.mockImplementationOnce(
         (method,params) => {
-            expect(method).toBe("issue!!");
-            expect(params.keyOrIssueId).toBe("PBI-1");
-            return chain;
+            expect(method).toBe("issue");
+            expect(params.issueIdOrKey).toBe("PBI-1");
+            return jiraApiMock;
         }
     );
     const updateIssueinJira = require('../src/jiraUpdateTicket.gs').updateIssueinJira;
@@ -177,21 +177,24 @@ test("Sending Individual Issues to Jira", () => {
     expect(mockCallback.mock.calls[0][2]).toBe("PBI-1 Not found");
 
 
-    callMock.mockImplementationOnce(
+    jiraApiMock.call.mockImplementationOnce(
         (method,params) => {
             expect(method).toBe("issue");
-            expect(params.keyOrIssueId).toBe("PBI-2");
-            return chain;
+            expect(params.issueIdOrKey).toBe("PBI-2");
+            return jiraApiMock;
         }
     );
     mockCallback.mockClear();
-    withSuccessHandlerMock.mockImplementationOnce((callback) => { callback({}, null, 200); return chain});
-    updateIssueinJira({key:"PBI-1",fields:{a:"b"}},mockCallback);
-
+    jiraApiMock.withSuccessHandler.mockImplementationOnce(
+        (callback) => { 
+            callback({fields:{}}, null, 200); 
+            return jiraApiMock
+        }
+    );
+    updateIssueinJira({key:"PBI-2",fields:{a:"b"}},mockCallback);
     expect(mockCallback.mock.calls.length).toBe(1);
-    expect(mockCallback.mock.calls[0][0]).toBe("PBI-1");
-    expect(mockCallback.mock.calls[0][1]).toBe(false);
-    expect(mockCallback.mock.calls[0][2]).toBe("PBI-1 Not found");
+    expect(mockCallback.mock.calls[0][0]).toBe("PBI-2");
+    expect(mockCallback.mock.calls[0][1]).toBe(true);
 
 
 });
