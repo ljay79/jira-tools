@@ -261,7 +261,7 @@ Check gulp runs ok and displays list of tasks
 gulp --tasks >
 -- pull-code (fetches code from Google apps)
 -- deploy (pushes code to Google apps)
-```markdown
+```
 
 Check unit tests run
 ```markdown
@@ -270,7 +270,12 @@ npm test
 
 You should now be good for development
 
-## Changes needed to run GAS files locally in Node
+## Developing locally
+You will need to be able to test any development work using the code on the target deployment environment of the Google App Scripts (GAS) runtime with a connection to a JIRA instance.
+
+To speed up development of features the code is set up to be able to run locally on your development machine and use TDD to test code before running against the deployment environment. The use of TDD also enables the reduced risk of regression bugs when building new features.
+
+## Workarounds needed to run GAS files locally in Node
 The Google App Scripts (GAS) runtime environment differs from Node.js. For example, in the GAS runtime, any function available in a .gs file in your project is automatically available to call from other files.
 Node.js does not allow that.
 
@@ -303,11 +308,37 @@ Another approach could be to use this code in the unit tests...
 https://github.com/mzagorny/gas-local
 This should be investigated.
 
-## Testing and deploying using clasp
+## Testing and deploying to GAS using clasp
 ### Set up and linking to your project
 Some notes on how to create or clone the Google Project you want to use for deploying and testing.
 - if you already have a Project
 - if you don't 
+
+```markdown
+clasp login (go through authorisation)
+should see something like 
+Authorization successful.
+
+Default credentials saved to: ~/.clasprc.json (/Users/paullemon/.clasprc.json).
+
+gulp clean
+gulp build
+cd dist/build/
+```
+
+1. You already have a project
+use clasp list
+Copy of Jira-tools   – https://script.google.com/d/17K2nCY_jOgxCfJycQLCDj5_-EUZmFUHxWUrpiuNpjhRysPidWGkeegKq/edit
+clasp clone https://script.google.com/d/17K2nCY_jOgxCfJycQLCDj5_-EUZmFUHxWUrpiuNpjhRysPidWGkeegKq/edit
+check you have a .clasp.json file
+
+
+2. creating a new one
+clasp create --type Spreadsheet --title Jira-Tools-2
+
+Then cp .clasp.json ../../src
+cd ../../
+gulp deploy
 
 ### Deploying using gulp task
 Using the following gulp task will clean the export and require statements and push the code to the configured GAS project.
