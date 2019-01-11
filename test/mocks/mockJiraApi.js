@@ -37,13 +37,16 @@ function resetMockFunction() {
     initJiraApiMockMethods();
 }
 
-function setNextJiraResponse(expectedMethodCall,dataToReturn) {
+function setNextJiraResponse(httpStatusCode,expectedMethodCall,dataToReturn) {
+    if (httpStatusCode == null) {
+        httpStatusCode =200;
+    }
     jiraApiMock.call.mockImplementationOnce((method,params) => {
         expect(method).toBe(expectedMethodCall);
         return {
             call:jiraApiMock.call,
             withSuccessHandler: function (calback) {
-                calback(dataToReturn,null,200);
+                calback(dataToReturn,null,httpStatusCode);
                 return jiraApiMock;
             },
             withFailureHandler: jiraApiMock.withFailureHandler
@@ -51,25 +54,31 @@ function setNextJiraResponse(expectedMethodCall,dataToReturn) {
     })
 }
 
-function setAllResponsesSuccesfull(dummyDataToReturn) {
+function setAllResponsesSuccesfull(httpStatusCode,dummyDataToReturn) {
+    if (httpStatusCode == null) {
+        httpStatusCode =200;
+    }
     resetMockFunction();
     jiraApiMock.withSuccessHandler.mockImplementation(function (calback) {
-        calback(dummyDataToReturn,null,200);
+        calback(dummyDataToReturn,null,httpStatusCode);
         return jiraApiMock;
     });
     jiraApiMock.getResponse.mockImplementation(() =>{
-        return {'respData': dummyDataToReturn, 'httpResp': null, 'statusCode': 200, 'method': 'get'};
+        return {'respData': dummyDataToReturn, 'httpResp': null, 'statusCode': httpStatusCode, 'method': 'get', success:true};
     } );
 }
 
-function setAllResponsesFail(dummyDataToReturn) {
+function setAllResponsesFail(httpStatusCode,dummyDataToReturn) {
+    if (httpStatusCode == null) {
+        httpStatusCode =500;
+    }
     resetMockFunction();
     jiraApiMock.withFailureHandler.mockImplementation(function (calback) {
-        calback(dummyDataToReturn,null,500);
+        calback(dummyDataToReturn,null,httpStatusCode);
         return jiraApiMock;
     });
     jiraApiMock.getResponse.mockImplementation(() =>{
-        return {'respData': dummyDataToReturn, 'httpResp': null, 'statusCode': 500, 'method': 'get'};
+        return {'respData': dummyDataToReturn, 'httpResp': null, 'statusCode': httpStatusCode, 'method': 'get', success:false};
     } );
 }
 

@@ -71,14 +71,14 @@ test('processing list of Jira Issues', () => {
         },
         {
             schema:{type:"string"},
-            key: "issueKey",
+            key: "issuekey",
             name: "Key",
             custom: false
         }
     ];
 
-    jiraApiMock.setAllResponsesSuccesfull();
-    jiraApiMock.setNextJiraResponse("field",fieldList);
+    jiraApiMock.setAllResponsesSuccesfull(204);
+    jiraApiMock.setNextJiraResponse(200,"field",fieldList);
 
     var result = updateJiraIssues({columnA:1,Key:0},[["PBI-1","column A value"]]);
     expect(result.message).not.toBeNull();
@@ -88,8 +88,8 @@ test('processing list of Jira Issues', () => {
     expect(result.finished).toBe(true);
     expect(jiraApiMock.call.mock.calls.length).toBe(result.rowsUpdated+1);
 
-    jiraApiMock.setAllResponsesSuccesfull();
-    jiraApiMock.setNextJiraResponse("field",fieldList);
+    jiraApiMock.setAllResponsesSuccesfull(204);
+    jiraApiMock.setNextJiraResponse(200,"field",fieldList);
     var result = updateJiraIssues({columnA:1,Key:0},[["PBI-1","column A value"],["PBI-2","column A value 2"]]);
     expect(result.message).not.toBeNull();
     expect(result.rowsUpdated).toBe(2);
@@ -98,8 +98,8 @@ test('processing list of Jira Issues', () => {
     expect(result.finished).toBe(true);
     expect(jiraApiMock.call.mock.calls.length).toBe(result.rowsUpdated+1);
 
-    jiraApiMock.setAllResponsesSuccesfull();
-    jiraApiMock.setNextJiraResponse("field",fieldList);
+    jiraApiMock.setAllResponsesSuccesfull(204);
+    jiraApiMock.setNextJiraResponse(200,"field",fieldList);
     var result = updateJiraIssues({columnA:1,Key:0},[[null,"column A value"],["","column A value"],["PBI-2","column A value 2"]]);
     expect(result.message).not.toBeNull();
     expect(result.rowsUpdated).toBe(1);
@@ -112,7 +112,7 @@ test('processing list of Jira Issues', () => {
 
 
     jiraApiMock.setAllResponsesFail();
-    jiraApiMock.setNextJiraResponse("field",fieldList);
+    jiraApiMock.setNextJiraResponse(200,"field",fieldList);
     var result = updateJiraIssues({columnA:1,Key:0},[["PBI-1","column A value"],["PBI-2","column A value 2"]]);
     expect(result.message).not.toBeNull();
     expect(result.rowsUpdated).toBe(0);
@@ -172,7 +172,7 @@ test("Sending Individual Issues to Jira", () => {
     );
     jiraApiMock.getResponse.mockImplementationOnce(
         () => {
-            return {statusCode:404};
+            return {statusCode:404,success:false};
         }
     );
     const updateIssueinJira = require('../src/jiraUpdateTicket.gs').updateIssueinJira;
@@ -191,7 +191,7 @@ test("Sending Individual Issues to Jira", () => {
     expect(mockCallback.mock.calls[0][1]).toBe(false);
     expect(mockCallback.mock.calls[0][2]).toBe("PBI-1 Not found");
     
-    jiraApiMock.setAllResponsesSuccesfull();
+    jiraApiMock.setAllResponsesSuccesfull(204);
     mockCallback.mockClear();
     
     var result = updateIssueinJira({key:"PBI-2",fields:{a:"b"}},mockCallback);

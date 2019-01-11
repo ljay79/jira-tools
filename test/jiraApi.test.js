@@ -225,7 +225,7 @@ test('a PUT request is made for updating issues', () => {
     UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl,args) => {
         return {
             getResponseCode: function() {
-                return 200;
+                return 204;
             },
             getContentText: function() {
                 return "{}";
@@ -256,7 +256,7 @@ test('a PUT request is made for updating issues', () => {
     expect(payload["fields"]["summary"]).toBe("NEW Summary");
     expect(UrlFetchApp.fetch.mock.calls[0][1]["contentType"]).not.toBeNull();
     expect(UrlFetchApp.fetch.mock.calls[0][1]["contentType"]).toBe("application/json");
-    expect(result.statusCode).toBe(200);
+    expect(result.statusCode).toBe(204);
     expect(result.respData).not.toBeNull();
     expect(result.method).toBe('put');
     expect(result.respData.errorMessages).toBeUndefined();

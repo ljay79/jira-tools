@@ -63,14 +63,14 @@ function updateJiraIssues(headerRow,dataRows) {
 }
 
 function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
-    var keyFieldName = "issueKey";
+    var keyFieldName = "issuekey";
     var result = {key:null,fields:{}};
     var filteredHeaders = getMatchingJiraFields(allJiraFields,headerRow);
     for (var headerId in filteredHeaders) {
         var index = filteredHeaders[headerId];
         var value = dataRow[index];
         if (value != null) {
-            if (headerId != keyFieldName) {
+            if (headerId.toLowerCase() != keyFieldName) {
                 result.fields[headerId] = value;
             } else {
                 if (value.length > 0) {
@@ -98,14 +98,9 @@ function updateIssueinJira(issueData, callback) {
     var method = "issueUpdate";
     var request = new Request();
     var ok = function(responseData, httpResponse, statusCode){
-        // Check the data is valid and the Jira fields exist
-        if(statusCode==200) {
-            // it worked
-            var status = unifyIssueAttrib('status', responseData);
-            callback(issueData.key,true,"");
-        } else {
-            callback(issueData.key,false,responseData.message);
-        }
+        // it worked
+        var status = unifyIssueAttrib('status', responseData);
+        callback(issueData.key,true,"");
     };
 
     var error = function(responseData, httpResponse, statusCode) {
@@ -123,9 +118,9 @@ function updateIssueinJira(issueData, callback) {
         
     };
     request.call(method, {issueIdOrKey: issueData.key, fields: issueData.fields});
-    request.withSuccessHandler(ok)
-    request.withFailureHandler(error)
-    return (request.getResponse().statusCode == 200);
+    request.withSuccessHandler(ok);
+    request.withFailureHandler(error);
+    return (request.getResponse().success === true);
     
 }
 

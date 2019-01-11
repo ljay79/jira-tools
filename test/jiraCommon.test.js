@@ -123,7 +123,7 @@ test("Get all fields from Jira", () => {
             custom: true
         }
     ];
-    jiraApiMock.setNextJiraResponse("field",fieldList);
+    jiraApiMock.setNextJiraResponse(200,"field",fieldList);
 
     const getAllJiraFields = require('../src/jiraCommon.gs').getAllJiraFields;
     
@@ -148,5 +148,4 @@ test("Get all fields from Jira", () => {
     getAllJiraFields(successCallBack,errorCallBack);
     expect(successCallBack.mock.calls.length).toBe(0);
     expect(errorCallBack.mock.calls.length).toBe(1);
-    expect(errorCallBack.mock.calls[0][0]).toContain("404");
 });

@@ -153,6 +153,9 @@ function Request() {
     }
   };
 
+  function isHttpStatusIs2xx(status) {
+    return (status>=200 && status<300);
+  }
   /**
    * @desc Call method, perform API request
    * @param method {string}    Name of method to call on api, see restMethods[] 
@@ -242,7 +245,7 @@ function Request() {
     }
 
     if (httpResponse) {
-      if(statusCode !== 200){
+      if(!isHttpStatusIs2xx(statusCode)){
         debug.warn("Code: %s, ResponseHeaders: %s, httpResponse: %s", httpResponse.getResponseCode(), httpResponse.getAllHeaders(), httpResponse);
       } else {
         debug.log("Code: %s, httpResponse: %s", httpResponse.getResponseCode(), httpResponse);
@@ -275,7 +278,7 @@ function Request() {
    * @return {this}  Allow chaining
    */
   this.withSuccessHandler = function(fn) {
-    if(statusCode === 200) {
+    if(isHttpStatusIs2xx(statusCode)) {
       fn.call(this, responseData, httpResponse, statusCode);
     }
     return this;
@@ -287,7 +290,7 @@ function Request() {
    * @return {this}  Allow chaining
    */
   this.withFailureHandler = function(fn) {
-    if(statusCode !== 200) {
+    if(!isHttpStatusIs2xx(statusCode)) {
       fn.call(this, responseData, httpResponse, statusCode);
     }
     return this;
@@ -298,7 +301,7 @@ function Request() {
    * @return {Object}    Response object: {respData: {..}, httpResp: {}, statusCode: Integer}
    */
   this.getResponse = function() {
-    return {'respData': responseData, 'httpResp': httpResponse, 'statusCode': statusCode, 'method': httpMethod};
+    return {'respData': responseData, 'httpResp': httpResponse, 'statusCode': statusCode, 'method': httpMethod, 'success':isHttpStatusIs2xx(statusCode)};
   };
 
   // call init
