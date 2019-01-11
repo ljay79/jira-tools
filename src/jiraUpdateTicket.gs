@@ -2,9 +2,7 @@
 const Request = require('../src/jiraApi.gs');
 const getAllJiraFields = require('./jiraCommon.gs').getAllJiraFields;
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
-const debug = {
-    info: console.log
-}
+const debug = require("./debug.gs");
 const getMatchingJiraField = require("../src/jiraCommon.gs").getMatchingJiraField;
 // End of Require imports
 /*
@@ -13,52 +11,53 @@ const getMatchingJiraField = require("../src/jiraCommon.gs").getMatchingJiraFiel
 * @param dataRows {array} A 2x2 array where each row is assumed to be data to be updated in an issue
 * @return {object}
 */
-function updateJiraIssues(headerRow,dataRows, callback) {
-    //debug.info('updateJiraIssues called Keys:--%s  DATA ROWS %s', Object.keys(headerRow).join(","),dataRows);
-    result = {rowsUpdated:0, status: true, message: null, finished: false };
+function updateJiraIssues(headerRow,dataRows) {
+    debug.info('updateJiraIssues called Keys:--%s  DATA ROWS %s', Object.keys(headerRow).join(","),dataRows);
+    var result = {rowsUpdated:0, status: false, message: "", finished: false, errors:[] };
     
     if (headerRow === null || Object.keys(headerRow).length==0) {
-        result.status = false;
         result.finished = true;
-        result.rowsUpdated = 0;
-        result.message = "No Header Row sent";
-        return result;
-    } 
+        result.message = "No values in header row";
+    } else {
     
-    if (dataRows == null || dataRows.length == 0) {
-        result.status = true;
-        result.finished = true;
-        result.rowsUpdated = 0;
-        result.message = "No Data";
-        return result;
+        if (dataRows == null || dataRows.length == 0) {
+            result.status = true;
+            result.finished = true;
+            result.message = "No data sent";
+            return result;
 
-    }
-    getAllJiraFields(
-        function(allJiraFields) {
-            var callbackresult = {rowsUpdated:0, status: true, message: null, finished: false };
-            for (var i=0;i<dataRows.length;i++) {
-                var rowData = packageRowForUpdate(allJiraFields,headerRow,dataRows[i]);
-                if (rowData.key != null) {
-                    callbackresult.rowsUpdated++;
-                } else {
-                    callbackresult.message = "No Key value found in row "+i;
+        } else {
+            getAllJiraFields(
+                function(allJiraFields) {
+                    for (var i=0;i<dataRows.length;i++) {
+                        var rowData = packageRowForUpdate(allJiraFields,headerRow,dataRows[i]);
+                        if (rowData.key != null) {
+                            var updateResult = updateIssueinJira(rowData, 
+                                function(key,success,message){
+                                    if (!success) {
+                                        result.errors.push("Error with Issue "+key+" error="+message);
+                                    }
+                                });
+                            if (updateResult) {
+                                result.rowsUpdated++;
+                            } 
+                        } else {
+                            result.errors.push("No Key value found in row "+i);
+                        }
+                    }
+                    result.message = result.rowsUpdated+" jira issues(s) updated, "+result.errors.length+" errors.";
+                    result.status = (result.rowsUpdated>0);
+                    result.finished = true;
+                }, 
+                function(errorMessage) {
+                    result.finished = true;
+                    result.status = false;
+                    result.message = "Could not retrieve all field definitions from JIRA "+errorMessage;
                 }
-            }
-            callbackresult.status = true;
-            callbackresult.finished = true;
-            if (callback != null) {
-                callback(callbackresult);
-            }
-        }, 
-        function(errorMessage) {
-            var callbackresult = {rowsUpdated:0, status: true, message: null, finished: false };
-            callbackresult.finished = true;
-            callbackresult.status = false;
-            callbackresult.message = errorMessage;
-            if (callback != null) {
-                callback(callbackresult);
-            }
-    });
+            )
+        }
+    }
+
     return result;
 
 }
@@ -95,11 +94,12 @@ function getMatchingJiraFields(allJiraFields,headerRow) {
 }
 
 function updateIssueinJira(issueData, callback) {
+    debug.log("updateIssueinJira called issueData="+issueData);
     var method = "issueUpdate";
     var request = new Request();
     var ok = function(responseData, httpResponse, statusCode){
         // Check the data is valid and the Jira fields exist
-        if(responseData && responseData.fields) {
+        if(statusCode==200) {
             // it worked
             var status = unifyIssueAttrib('status', responseData);
             callback(issueData.key,true,"");
@@ -113,15 +113,19 @@ function updateIssueinJira(issueData, callback) {
             // JIRA ISSUE NOT FOUND
             callback(issueData.key,false,issueData.key+" Not found");
         } else {
-            var message = "Jira Error: " + responseData.errorMessages.join(",") || responseData.errorMessages;
+            var jiraErrorMessage = "";
+            if (responseData != null && responseData.errorMessages != null) {
+                jiraErrorMessage =responseData.errorMessages.join(",") || responseData.errorMessages;
+            }
+            var message = "Jira Error: " + jiraErrorMessage;
             callback(issueData.key,false,message);
         }
         
     };
-
-    request.call(method, {issueIdOrKey: issueData.key})
-        .withSuccessHandler(ok)
-        .withFailureHandler(error);
+    request.call(method, {issueIdOrKey: issueData.key, fields: issueData.fields});
+    request.withSuccessHandler(ok)
+    request.withFailureHandler(error)
+    return (request.getResponse().statusCode == 200);
     
 }
 

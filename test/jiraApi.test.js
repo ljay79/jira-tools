@@ -190,6 +190,33 @@ test('query parameters should be added to the url for user search method', () =>
 
 
 });
+test('a jira dashboard request is made correctly', () => {
+    initJiraDummyConfig();
+    var requestObj = new Request();
+    //  exception on UrlFetchApp should show a browser box
+    UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl,args) => {
+        return {
+            getResponseCode: function() {
+                return 200;
+            },
+            getContentText: function() {
+                return "{}";
+            },
+            getAllHeaders: function() {
+                return {};
+            }
+        };
+    });
+    requestObj.call("dashboard",{ })
+    var result = requestObj.getResponse();
+    expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
+    expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/dashboard");
+    expect(result.statusCode).toBe(200);
+    expect(result.respData).not.toBeNull();
+    expect(result.respData.errorMessages).toBeUndefined();
+
+
+});
 
 test('a PUT request is made for updating issues', () => {
     initJiraDummyConfig();
@@ -209,13 +236,26 @@ test('a PUT request is made for updating issues', () => {
         };
     });
     requestObj.call("issueUpdate",{
-        issueIdOrKey: "PBI-2"
-    })
+        issueIdOrKey: "PBI-2",
+        "fields" : {
+            "summary": "NEW Summary",
+            "description": "Description",
+            "customfield_10200" : "Test 1",
+            "customfield_10201" : "Value 1"
+        }
+    });
     var result = requestObj.getResponse();
     expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
     expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/issue/PBI-2");
     expect(UrlFetchApp.fetch.mock.calls[0][1]["method"]).not.toBeNull();
     expect(UrlFetchApp.fetch.mock.calls[0][1]["method"]).toBe("put");
+    expect(UrlFetchApp.fetch.mock.calls[0][1]["payload"]).not.toBeNull();
+    var payload = JSON.parse(UrlFetchApp.fetch.mock.calls[0][1]["payload"]);
+    expect(payload["fields"]).not.toBeNull();
+    expect(payload["fields"]["summary"]).not.toBeNull();
+    expect(payload["fields"]["summary"]).toBe("NEW Summary");
+    expect(UrlFetchApp.fetch.mock.calls[0][1]["contentType"]).not.toBeNull();
+    expect(UrlFetchApp.fetch.mock.calls[0][1]["contentType"]).toBe("application/json");
     expect(result.statusCode).toBe(200);
     expect(result.respData).not.toBeNull();
     expect(result.method).toBe('put');

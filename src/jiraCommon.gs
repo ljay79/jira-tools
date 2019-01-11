@@ -713,8 +713,12 @@ function getAllJiraFields(successCallBack,errorCallBack) {
   };
 
   var error = function(respData, httpResp, status) {
+    var jiraErrorMessage = "";
+    if (respData != null && respData.errorMessages != null) {
+        jiraErrorMessage =respData.errorMessages.join(",") || respData.errorMessages;
+    }
     var msg = "Failed to retrieve Jira Fields info with status [" + status + "]!\\n" 
-                + (respData.errorMessages.join("\\n") || respData.errorMessages);
+                + jiraErrorMessage;
     if (errorCallBack != null) {
       errorCallBack(msg);
     }
