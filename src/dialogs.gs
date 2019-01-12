@@ -168,7 +168,9 @@ function getDataForJiraUpdateFromSheet() {
   if (cellValues.length>0) {
     var firstRow = cellValues[0];
     for (var i=0;i<firstRow.length;i++) {
-      headerFields[firstRow[i]]=i;
+      if (firstRow[i] != null && firstRow[i] != "")  {
+        headerFields[firstRow[i]]=i;
+      }
     }
     cellValues.splice(0, 1);
     dataRows = cellValues;
@@ -191,29 +193,22 @@ function getValidFieldsToEditJira() {
 
 function dialogIssuesFromSheet() {
   if(!hasSettings(true)) return;
-  
   var selectedData = getDataForJiraUpdateFromSheet();
-  
-  var fieldsToUse = {"":"Please select",issueKey:"Key"};
+  var fieldsToUse = {"":"select a jira field...",issueKey:"Key"};
   fieldsToUse = extend(fieldsToUse, getValidFieldsToEditJira());
   selectedData.allJiraFields  = fieldsToUse;
   var dialog = getDialog('dialogIssuesFromSheet',selectedData);
-
   dialog
     .setWidth(420)
     .setHeight(360)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
-  debug.log('Processed: %s', dialog);
-
-  SpreadsheetApp.getUi().showModalDialog(dialog, 'Update Fields in Jira Issues from Spreadsheet');
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'Update Jira Issues from Spreadsheet');
 }
 
 function dialogProcessIssuesFromSheet(headerFieldsToUse) {
   if(!hasSettings(true)) return;
-  
   var selectedData = getDataForJiraUpdateFromSheet();
-  
   var data = selectedData.dataRows;
   return updateJiraIssues(headerFieldsToUse,data);
 }

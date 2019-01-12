@@ -71,6 +71,12 @@ test('processing list of Jira Issues', () => {
         },
         {
             schema:{type:"string"},
+            key: "columnB",
+            name: "ABC field",
+            custom: false
+        },
+        {
+            schema:{type:"string"},
             key: "issuekey",
             name: "Key",
             custom: false
@@ -120,6 +126,28 @@ test('processing list of Jira Issues', () => {
     expect(result.status).toBe(false);
     expect(result.finished).toBe(true);
     expect(jiraApiMock.call.mock.calls.length).toBe(3);
+
+    jiraApiMock.setAllResponsesFail(400,{
+        errors : {
+            columnA:"field specific error",
+            columnB:"something wrong here too"
+        }
+    });
+    jiraApiMock.setNextJiraResponse(200,"field",fieldList);
+    var result = updateJiraIssues({"XYZ field":1,Key:0,columnB:2},[["PBI-1","column A value",""],["PBI-2","column A value 2",""]]);
+    expect(result.message).not.toBeNull();
+    expect(result.rowsUpdated).toBe(0);
+    expect(result.errors.length).toBe(2);
+    expect(result.errors[0]).toContain("field specific error");
+    expect(result.errors[0]).toContain("XYZ field");
+    expect(result.errors[0]).toContain("ABC field");
+    expect(result.errors[1]).toContain("field specific error");
+    expect(result.errors[1]).toContain("XYZ field");
+    expect(result.errors[1]).toContain("ABC field");
+    expect(result.status).toBe(false);
+    expect(result.finished).toBe(true);
+    expect(jiraApiMock.call.mock.calls.length).toBe(3);
+    
 });
 
 
@@ -159,11 +187,25 @@ test('packing a row', () => {
     expect(result.fields).not.toBeNull();
     expect(result.fields.custom1234).toBe("column A value");
     expect(Object.keys(result.fields).length).toBe(1);
+
+
+    var result = packageRowForUpdate(jiraFieldList,{custom1234:1,issuekey:0},["PBI-22","column A value"]);
+    expect(result).not.toBeNull();
+    expect(result.key).toBe("PBI-22");
+    expect(result.fields).not.toBeNull();
+    expect(result.fields.custom1234).toBe("column A value");
+    expect(Object.keys(result.fields).length).toBe(1);
 });
 
-test("Sending Individual Issues to Jira", () => {
+test("Posting Individual Issues to Jira - Not Found Error", () => {
 
-    jiraApiMock.withFailureHandler.mockImplementationOnce((callback) => { callback({}, null, 404); return jiraApiMock});
+    jiraApiMock.withFailureHandler.mockImplementationOnce(
+        (callback) => { 
+            callback({
+                errors : {a:"A had an issue with its payload"}
+            }, null, 404); 
+            return jiraApiMock
+    });
 
     jiraApiMock.call.mockImplementationOnce(
         (method,params) => {
@@ -190,12 +232,37 @@ test("Sending Individual Issues to Jira", () => {
     expect(mockCallback.mock.calls[0][0]).toBe("PBI-1");
     expect(mockCallback.mock.calls[0][1]).toBe(false);
     expect(mockCallback.mock.calls[0][2]).toBe("PBI-1 Not found");
-    
-    jiraApiMock.setAllResponsesSuccesfull(204);
-    mockCallback.mockClear();
-    
-    var result = updateIssueinJira({key:"PBI-2",fields:{a:"b"}},mockCallback);
+});
 
+
+test("Posting Individual Issues to Jira - Error with data passed to field", () => {
+
+    jiraApiMock.setAllResponsesFail(400,{
+        errors : {a:"A had an issue with its payload"}
+    });
+    
+    const updateIssueinJira = require('../src/jiraUpdateTicket.gs').updateIssueinJira;
+    
+    const mockCallback = jest.fn((key, status, message) => {key});
+    var result = updateIssueinJira({key:"PBI-1",fields:{a:"b"}},mockCallback);
+
+    expect(result).toBe(false);
+    expect(jiraApiMock.call.mock.calls.length).toBe(1);
+    expect(jiraApiMock.call.mock.calls[0][0]).toBe("issueUpdate");
+    expect(jiraApiMock.call.mock.calls[0][1]["issueIdOrKey"]).toBe("PBI-1");
+    expect(jiraApiMock.call.mock.calls[0][1]["fields"]["a"]).toBe("b");
+
+    expect(mockCallback.mock.calls.length).toBe(1);
+    expect(mockCallback.mock.calls[0][0]).toBe("PBI-1");
+    expect(mockCallback.mock.calls[0][1]).toBe(false);
+    expect(mockCallback.mock.calls[0][2]).toContain("{Field:a}");
+});
+
+test("Posting Individual Issues to Jira - Success", () => {
+    const updateIssueinJira = require('../src/jiraUpdateTicket.gs').updateIssueinJira;
+    const mockCallback = jest.fn((key, status, message) => {key});
+    jiraApiMock.setAllResponsesSuccesfull(204);
+    var result = updateIssueinJira({key:"PBI-2",fields:{a:"b"}},mockCallback);
     expect(result).toBe(true);
     expect(mockCallback.mock.calls.length).toBe(1);
     expect(mockCallback.mock.calls[0][0]).toBe("PBI-2");
@@ -203,8 +270,6 @@ test("Sending Individual Issues to Jira", () => {
     expect(jiraApiMock.call.mock.calls[0][0]).toBe("issueUpdate");
     expect(jiraApiMock.call.mock.calls[0][1]["issueIdOrKey"]).toBe("PBI-2");
     expect(jiraApiMock.call.mock.calls[0][1]["fields"]["a"]).toBe("b");
-
-
 });
 
 test("field validation", () => {
@@ -220,7 +285,4 @@ test("field validation", () => {
     expect(getFilteredList["custom5678"]).toBe(3);
     expect(getFilteredList["Not a Match"]).not.toBeDefined();
     expect(getFilteredList["My custom field 2"]).not.toBeDefined();
-
-
-    
 });

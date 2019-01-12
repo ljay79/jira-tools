@@ -4,41 +4,42 @@
     <base target="_top">
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
     <style>
-    .error-container { display: none; width: 50%; float: right; margin-bottom: 5px; padding: 5px 10px; text-align: center; color: #fff; }
-    .filter-select { border: 1px solid #dfdfdf; height: 154px; overflow-y: auto; line-height: 28px; }
-    .filter-select > div { padding-left: 3px; padding-right: 24px; }
-    .filter-select > div:nth-child(even) { background: #f7f8f9; }
+    .error-container { display: none;  float: right; margin-bottom: 5px; padding: 5px 10px; text-align: center; color: #fff; }
     .is-loading { text-align: center; animation: blink .5s infinite; }
     @keyframes blink { 0% { color: #fff; } 50% { color: #777; } 100% { color: #fff; } }
     .is-favourite label { font-weight: bold; }
-    .filter-cols { display: flex; flex-direction: row; flex-wrap: wrap; align-items: left; justify-content: left; }
-    .filter-cols .label { flex: 0 0 100%; font-weight: bold; }
-    .filter-cols .empty { flex: 0 0 100%; }
-    .filter-cols .item { position: relative; flex: 0 0 25%; padding-left: 20px; box-sizing: border-box; }
-    .filter-cols .item input[type="checkbox"] { position: absolute; }
+    .field-list { display: flex; flex-direction: row; flex-wrap: wrap; align-items: left; justify-content: left; }
+    .field-list label { font-weight: bold;  }
+    .field-list .empty { flex: 0 0 100%; }
+    .field-list .item { padding: 5px 20px; width:100% }
+    .field-list select { float:right; font-weight: normal}
+    .field-list > div.item:nth-child(even) { background: #f7f8f9; }
+    .field-list div.not-imported { color:#cccccc }
+    .field-list div.not-imported select { color:#cccccc }
+    
+    .field-list .titles { padding: 5px 20px; width:100%; background: #f7f8f9; font-size:smaller; font-weight: bold}
+    .field-list .titles .headerTitle { }
+    .field-list .titles .jiraFieldTitle { display: block; float:right}
+    
+    
     .results p {color: #fff;}
-    select.fieldChooser {width: 100px}
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   </head>
   <body>
     <form name="issue-update"   action="" method="post">
-      <div class="block filter-cols">
-        <label class="label">Fields in Spreadsheet</label>
-        <table>
-        <tr>
-          <th colspan="2">Column in spreadsheet</th>
-          <th>Jira Field</th>
-        </tr>
+      <div class="block field-list">
+        <h2>Configure columns and jira fields</h2>
+        <div class = "titles">
+        <span class="headerTitle">Columns</span>
+        <span class="jiraFieldTitle">Jira Field</span>
+        </div>
         <? 
         for (var headerName in headerFields ) { ?>
-        <tr>
-        <td>
-          <input class="headerSelect" type="checkbox" id="column-<?= headerName ?>" name="columns[]" value="<?= headerFields[headerName] ?>" checked="checked" >
-        </td>
-        <td><label for="column-<?= headerName ?>"><?= headerName ?></label></td>
-        <td>
-           <select class="fieldChooser" id="jira-field-<?= headerFields[headerName] ?>">
+        <div class = "item">
+          <input class="headerSelect" title="should this column be imported" type="checkbox" id="column-<?= headerName ?>" name="columns[]" value="<?= headerFields[headerName] ?>" checked="checked" >
+          <label for="column-<?= headerName ?>" title="heading in spreadsheet"><?= headerName ?></label>
+          <select class="fieldChooser" id="jira-field-<?= headerFields[headerName] ?>" title="choose destination jira field">
             <? for (var fieldId in allJiraFields ) { 
             ?>
              <option value="<?= allJiraFields[fieldId] ?>"<? if (allJiraFields[fieldId] == headerName) { ?>selected<?}?> >
@@ -47,21 +48,18 @@
              <? 
              } ?>
            </select>
-        </td>
-        </tr>
+         </div>
         <? } ?>
-        </table>
       </div>
-
       <div class="block">
-        <button type="submit" class="action">Insert</button>
+        <button type="submit" class="action">Update Jira Issues</button>
         <button type="button" onclick="google.script.host.close()">Cancel</button>
         <div id="response-message" class="error-container" role="dialog"></div>
       </div>
+      <div id="results" class="block field-list">
+      </div>
     </form>
 
-    <div id="results">
-    </div>
     <script>
       /* global google */
       var timeout = null;
@@ -69,7 +67,9 @@
       var issueForm = document.forms['issue-update'];
       var input   = Array.prototype.slice.call(issueForm.elements).filter(function(el){ return el.nodeName === 'INPUT'; });
       
-      /*var JiraFields = /<//?= allJiraFieldsJson ?>;*/
+      $('input.headerSelect').click(function () {
+        $(this).parent().toggleClass('not-imported',!this.checked);
+      })
  
       function hideAlert(){
         if(timeout) timeout = clearTimeout(timeout);
@@ -114,16 +114,11 @@
         var done = result.status === true;
         showAlert(result.message, done, 10000);
         $('#results').empty();
-        for (var i=0;i<result.errors.length;i++) {
-             $('#results').append( "<p>"+result.errors[i]+"</p>" );
-        }
-        showAlert(result.message, done, 5000);
-        if(done) {
-          setTimeout(function() {
-           google.script.host.close();
-          },10000);
-        } else {
-           showAlert(result.message, done, 10000);
+        if (result.errors.length>0) {
+          $('#results').append( '<h2>'+result.message+'</h2>');
+          for (var i=0;i<result.errors.length;i++) {
+             $('#results').append( "<div class='item error'>"+result.errors[i]+"</div>" );
+          }
         }
       }
 

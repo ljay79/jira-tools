@@ -35,7 +35,15 @@ function updateJiraIssues(headerRow,dataRows) {
                             var updateResult = updateIssueinJira(rowData, 
                                 function(key,success,message){
                                     if (!success) {
-                                        result.errors.push("Issue ["+key+"] "+message);
+                                        // replace mention of specific fields
+                                        message = message.replace(/{Field:(.*?)}/g,function(match,fieldName) {
+                                            var errorField = getMatchingJiraField(allJiraFields,fieldName);
+                                            if (errorField != null) {
+                                                return errorField.name;
+                                            } 
+                                            return "";
+                                        });
+                                        result.errors.push("["+key+"] "+message);
                                     }
                                 });
                             if (updateResult) {
@@ -111,15 +119,15 @@ function updateIssueinJira(issueData, callback) {
           var jiraErrorMessage = "";
           if (responseData != null) {
             if (responseData.errorMessages != null) {
-                jiraErrorMessage = jiraErrorMessage + responseData.errorMessages.join(",");
+                jiraErrorMessage = jiraErrorMessage + responseData.errorMessages.join(", ");
             }
             if (responseData.errors != null) {
               Object.keys(responseData.errors).forEach(function (fieldid) {
-                jiraErrorMessage = jiraErrorMessage+responseData.errors[fieldid]+",";
+                jiraErrorMessage = jiraErrorMessage+"{Field:"+fieldid+"}: "+responseData.errors[fieldid]+", ";
               });
             }
           }
-            var message = "Jira Error: " + jiraErrorMessage;
+            var message = jiraErrorMessage;
             callback(issueData.key,false,message);
         }
         
