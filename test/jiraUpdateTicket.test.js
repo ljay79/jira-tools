@@ -41,6 +41,14 @@ const jiraFieldList = [
         schemaType: 'datetime',
         supported:  true
 
+    },
+    {
+        key:        "number1",
+        name:       "first number test field",
+        custom:     false,
+        schemaType: 'number',
+        supported:  true
+
     }
 ]
 
@@ -189,11 +197,11 @@ test('packing a row', () => {
     expect(Object.keys(result.fields).length).toBe(1);
 
 
-    var result = packageRowForUpdate(jiraFieldList,{custom1234:1,issuekey:0},["PBI-22","column A value"]);
+    var result = packageRowForUpdate(jiraFieldList,{number1:1,issuekey:0},["PBI-22",""]);
     expect(result).not.toBeNull();
     expect(result.key).toBe("PBI-22");
     expect(result.fields).not.toBeNull();
-    expect(result.fields.custom1234).toBe("column A value");
+    expect(result.fields.number1).toBe(null);
     expect(Object.keys(result.fields).length).toBe(1);
 });
 
@@ -281,8 +289,19 @@ test("field validation", () => {
     expect(getFilteredList).not.toBeNull();
     expect(Object.keys(getFilteredList).length).toBe(2);
     expect(getFilteredList["custom1234"]).not.toBeNull();
-    expect(getFilteredList["custom1234"]).toBe(1);
-    expect(getFilteredList["custom5678"]).toBe(3);
+    expect(getFilteredList["custom1234"].index).toBe(1);
+    expect(getFilteredList["custom1234"].definition.name).toBe("My custom field");
+    expect(getFilteredList["custom5678"].index).toBe(3);
     expect(getFilteredList["Not a Match"]).not.toBeDefined();
     expect(getFilteredList["My custom field 2"]).not.toBeDefined();
 });
+
+test("formatFieldValueForJira", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateTicket.gs').formatFieldValueForJira;
+    expect(jiraFieldList[0].key).toBe("issueKey"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldList[0],"PB-1")).toBe("PB-1");
+    expect(jiraFieldList[4].schemaType).toBe("number"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldList[4],"PB-1")).toBe("PB-1"); // just pass it a string
+    expect(formatFieldValueForJira(jiraFieldList[4],"1223")).toBe("1223"); // just pass it a string
+    expect(formatFieldValueForJira(jiraFieldList[4],"")).toBe(null); // null required to clear a number field
+})

@@ -70,16 +70,28 @@ function updateJiraIssues(headerRow,dataRows) {
 
 }
 
+function formatFieldValueForJira(fieldDefinition,value) {
+    if (fieldDefinition.schemaType=="number") {
+        if (value == "") {
+            value = null;
+        }
+    }
+    return value;
+}
+
 function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
     var keyFieldName = "issuekey";
     var result = {key:null,fields:{}};
     var filteredHeaders = getMatchingJiraFields(allJiraFields,headerRow);
     for (var headerId in filteredHeaders) {
-        var index = filteredHeaders[headerId];
+        var index = filteredHeaders[headerId].index;
+        var fieldDefinition = filteredHeaders[headerId].definition;
         var value = dataRow[index];
         if (value != null) {
+            value = formatFieldValueForJira(fieldDefinition,value);
             if (headerId.toLowerCase() != keyFieldName) {
                 result.fields[headerId] = value;
+                
             } else {
                 if (value.length > 0) {
                     result.key = value;
@@ -95,7 +107,10 @@ function getMatchingJiraFields(allJiraFields,headerRow) {
     Object.keys(headerRow).forEach( function(fieldTitle) {
         var matchField = getMatchingJiraField(allJiraFields,fieldTitle);
         if (matchField != null) {
-            filteredHeadings[matchField.key] = headerRow[fieldTitle];
+            filteredHeadings[matchField.key] = {
+                index: headerRow[fieldTitle],
+                definition: matchField
+            }
         } 
     });
     return filteredHeadings;
@@ -139,4 +154,4 @@ function updateIssueinJira(issueData, callback) {
     
 }
 
-module.exports = {updateJiraIssues: updateJiraIssues, packageRowForUpdate: packageRowForUpdate, updateIssueinJira: updateIssueinJira, getMatchingJiraFields:getMatchingJiraFields};
+module.exports = {updateJiraIssues: updateJiraIssues, packageRowForUpdate: packageRowForUpdate, updateIssueinJira: updateIssueinJira, getMatchingJiraFields:getMatchingJiraFields, formatFieldValueForJira:formatFieldValueForJira};
