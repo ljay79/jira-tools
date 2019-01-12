@@ -15,7 +15,7 @@ function getDialog(file, values) {
   if(debugValue.password) delete debugValue.password;
   if(debugValue.username) delete debugValue.username;
   debug.log('Processing: %s.html with %s', file, JSON.stringify(debugValue));
-
+  // I don't think this works because it still uses values in the loop below.
   for (var name in values) {
     template[name] = values[name];
   }
@@ -162,7 +162,6 @@ function dialogTimesheet() {
 * @return {object}
 */
 function getDataForJiraUpdateFromSheet() {
-  debug.log('getDataForJiraUpdateFromSheet:called');
   var cellValues = SpreadsheetApp.getActiveSheet().getActiveRange().getValues();
   var headerFields = {};
   var dataRows = [];
@@ -178,14 +177,26 @@ function getDataForJiraUpdateFromSheet() {
       headerFields:headerFields,
       dataRows:dataRows
   };
-  debug.log('getDataForJiraUpdateFromSheet result = : %s', result);
   return result;
+}
+
+function getValidFieldsToEditJira() {
+  var validFields = {};
+  var userSelectedcustomFields = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
+  var systemFields = ISSUE_COLUMNS;
+  validFields = extend(validFields, userSelectedcustomFields);
+  validFields = extend(validFields, systemFields);
+  return validFields;
 }
 
 function dialogIssuesFromSheet() {
   if(!hasSettings(true)) return;
   
   var selectedData = getDataForJiraUpdateFromSheet();
+  
+  var fieldsToUse = {"":"Please select",issueKey:"Key"};
+  fieldsToUse = extend(fieldsToUse, getValidFieldsToEditJira());
+  selectedData.allJiraFields  = fieldsToUse;
   var dialog = getDialog('dialogIssuesFromSheet',selectedData);
 
   dialog
@@ -202,13 +213,9 @@ function dialogProcessIssuesFromSheet(headerFieldsToUse) {
   if(!hasSettings(true)) return;
   
   var selectedData = getDataForJiraUpdateFromSheet();
-  var headerRowsToUpdate = {};
-  var allHeaderRows = selectedData.headerFields;
-  headerFieldsToUse.forEach(function(element) {
-       headerRowsToUpdate[element] = allHeaderRows[element];
-  });
+  
   var data = selectedData.dataRows;
-  return updateJiraIssues(headerRowsToUpdate,data);
+  return updateJiraIssues(headerFieldsToUse,data);
 }
 
 

@@ -35,7 +35,7 @@ function updateJiraIssues(headerRow,dataRows) {
                             var updateResult = updateIssueinJira(rowData, 
                                 function(key,success,message){
                                     if (!success) {
-                                        result.errors.push("Error with Issue "+key+" error="+message);
+                                        result.errors.push("Issue ["+key+"] "+message);
                                     }
                                 });
                             if (updateResult) {
@@ -108,10 +108,17 @@ function updateIssueinJira(issueData, callback) {
             // JIRA ISSUE NOT FOUND
             callback(issueData.key,false,issueData.key+" Not found");
         } else {
-            var jiraErrorMessage = "";
-            if (responseData != null && responseData.errorMessages != null) {
-                jiraErrorMessage =responseData.errorMessages.join(",") || responseData.errorMessages;
+          var jiraErrorMessage = "";
+          if (responseData != null) {
+            if (responseData.errorMessages != null) {
+                jiraErrorMessage = jiraErrorMessage + responseData.errorMessages.join(",");
             }
+            if (responseData.errors != null) {
+              Object.keys(responseData.errors).forEach(function (fieldid) {
+                jiraErrorMessage = jiraErrorMessage+responseData.errors[fieldid]+",";
+              });
+            }
+          }
             var message = "Jira Error: " + jiraErrorMessage;
             callback(issueData.key,false,message);
         }

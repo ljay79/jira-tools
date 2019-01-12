@@ -4,7 +4,7 @@
     <base target="_top">
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
     <style>
-    .error-container { display: none; width: 50%; float: right; margin-bottom: 16px; padding: 5px 10px; text-align: center; color: #fff; }
+    .error-container { display: none; width: 50%; float: right; margin-bottom: 5px; padding: 5px 10px; text-align: center; color: #fff; }
     .filter-select { border: 1px solid #dfdfdf; height: 154px; overflow-y: auto; line-height: 28px; }
     .filter-select > div { padding-left: 3px; padding-right: 24px; }
     .filter-select > div:nth-child(even) { background: #f7f8f9; }
@@ -16,18 +16,41 @@
     .filter-cols .empty { flex: 0 0 100%; }
     .filter-cols .item { position: relative; flex: 0 0 25%; padding-left: 20px; box-sizing: border-box; }
     .filter-cols .item input[type="checkbox"] { position: absolute; }
+    .results p {color: #fff;}
+    select.fieldChooser {width: 100px}
     </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   </head>
   <body>
     <form name="issue-update"   action="" method="post">
       <div class="block filter-cols">
         <label class="label">Fields in Spreadsheet</label>
-        <? for (var id in headerFields ) { ?>
-        <div class="item">
-          <input type="checkbox" id="column-<?= id ?>" name="columns[]" value="<?= id ?>" checked="checked" >
-          <label for="column-<?= id ?>"><?= id ?></label>
-        </div>
+        <table>
+        <tr>
+          <th colspan="2">Column in spreadsheet</th>
+          <th>Jira Field</th>
+        </tr>
+        <? 
+        for (var headerName in headerFields ) { ?>
+        <tr>
+        <td>
+          <input class="headerSelect" type="checkbox" id="column-<?= headerName ?>" name="columns[]" value="<?= headerFields[headerName] ?>" checked="checked" >
+        </td>
+        <td><label for="column-<?= headerName ?>"><?= headerName ?></label></td>
+        <td>
+           <select class="fieldChooser" id="jira-field-<?= headerFields[headerName] ?>">
+            <? for (var fieldId in allJiraFields ) { 
+            ?>
+             <option value="<?= allJiraFields[fieldId] ?>"<? if (allJiraFields[fieldId] == headerName) { ?>selected<?}?> >
+             <?= allJiraFields[fieldId]?>
+             </option>
+             <? 
+             } ?>
+           </select>
+        </td>
+        </tr>
         <? } ?>
+        </table>
       </div>
 
       <div class="block">
@@ -37,18 +60,17 @@
       </div>
     </form>
 
-    <div id="progress">
-
+    <div id="results">
     </div>
     <script>
       /* global google */
       var timeout = null;
       var alert   = document.getElementById('response-message');
       var issueForm = document.forms['issue-update'];
-      var progressBox = document.getElementById('progress');
       var input   = Array.prototype.slice.call(issueForm.elements).filter(function(el){ return el.nodeName === 'INPUT'; });
-      var columns = input.filter(function(el){ return el.type === 'checkbox'; });
       
+      /*var JiraFields = /<//?= allJiraFieldsJson ?>;*/
+ 
       function hideAlert(){
         if(timeout) timeout = clearTimeout(timeout);
         alert.style.display = 'none';
@@ -66,12 +88,21 @@
             hideAlert();
             
         showAlert("updating jira...",1);
-        var selectedColumns = columns.filter(function(el){ return el.checked; }).map(function(el) { return el.value; });
-  
+        $('#results').empty();
+        jiraFields = {};
+        $("input:checked").each( function (n) {
+          var headerIndex = $(this).val();
+          // find the drop down with the JIRA field name
+          var jirafieldChosen = $("#jira-field-"+headerIndex).val();
+          if (jirafieldChosen != "") {
+            jiraFields[jirafieldChosen]=headerIndex;
+          }
+        });
+        console.log(jiraFields);
         google.script.run
           .withSuccessHandler(onResponse)
           .withFailureHandler(errorInServerCallback)
-          .dialogProcessIssuesFromSheet(selectedColumns);
+          .dialogProcessIssuesFromSheet(jiraFields);
         
       }
       
@@ -81,9 +112,13 @@
 
       function onResponse(result) {
         var done = result.status === true;
-     
+        showAlert(result.message, done, 10000);
+        $('#results').empty();
+        for (var i=0;i<result.errors.length;i++) {
+             $('#results').append( "<p>"+result.errors[i]+"</p>" );
+        }
+        showAlert(result.message, done, 5000);
         if(done) {
-          showAlert(result.rowsUpdated+" issues updated in JIRA", done, 5000);
           setTimeout(function() {
            google.script.host.close();
           },10000);
