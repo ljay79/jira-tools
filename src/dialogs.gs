@@ -197,6 +197,9 @@ function dialogIssuesFromSheet() {
   var fieldsToUse = {"":"select a jira field...",issueKey:"Key"};
   fieldsToUse = extend(fieldsToUse, getValidFieldsToEditJira());
   selectedData.allJiraFields  = fieldsToUse;
+  
+  var readOnlyFields = {"Updated": true,"Issue Type": true, "Status": true, "Created": true};
+  selectedData.readOnlyFields = readOnlyFields;
   var dialog = getDialog('dialogIssuesFromSheet',selectedData);
   dialog
     .setWidth(420)

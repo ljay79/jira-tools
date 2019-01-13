@@ -18,7 +18,6 @@
     .field-list div.not-imported select { color:#cccccc }
     
     .field-list .titles { padding: 5px 20px; width:100%; background: #f7f8f9; font-size:smaller; font-weight: bold}
-    .field-list .titles .headerTitle { }
     .field-list .titles .jiraFieldTitle { display: block; float:right}
     
     
@@ -36,15 +35,16 @@
         <span class="jiraFieldTitle">Jira Field</span>
         </div>
         <? 
-        for (var headerName in headerFields ) { ?>
+        for (var headerName in headerFields ) { 
+        ?>
         <div class = "item">
           <input class="headerSelect" title="should this column be imported" type="checkbox" id="column-<?= headerName ?>" name="columns[]" value="<?= headerFields[headerName] ?>" checked="checked" >
           <label for="column-<?= headerName ?>" title="heading in spreadsheet"><?= headerName ?></label>
           <select class="fieldChooser" id="jira-field-<?= headerFields[headerName] ?>" title="choose destination jira field">
             <? for (var fieldId in allJiraFields ) { 
             ?>
-             <option value="<?= allJiraFields[fieldId] ?>"<? if (allJiraFields[fieldId] == headerName) { ?>selected<?}?> >
-             <?= allJiraFields[fieldId]?>
+             <option value="<?= allJiraFields[fieldId] ?>"<? if (allJiraFields[fieldId] == headerName) { ?>selected<?}?> <? if ( readOnlyFields[allJiraFields[fieldId]]) {?> data-readonly="true" class="readonly"<?}?> >
+             <?= allJiraFields[fieldId]?><? if ( readOnlyFields[allJiraFields[fieldId]]) {?> (Read only)<?}?>
              </option>
              <? 
              } ?>
@@ -63,6 +63,7 @@
 
     <script>
       /* global google */
+      
       var timeout = null;
       var alert   = document.getElementById('response-message');
       var issueForm = document.forms['issue-update'];
@@ -71,6 +72,7 @@
       $('input.headerSelect').click(function () {
         $(this).parent().toggleClass('not-imported',!this.checked);
       })
+      
  
       function hideAlert(){
         if(timeout) timeout = clearTimeout(timeout);
@@ -83,6 +85,12 @@
         alert.style.display = 'block';
         if (time) timeout = setTimeout(hideAlert,time);
       }
+      
+      function isReadOnlyJiraFieldChosen(jiraFieldDropDown) {
+          // find the seleted option and see if it was readonly
+          var readOnlyAttr = jiraFieldDropDown.find(":selected").attr('data-readonly');
+          return (readOnlyAttr == "true") ;
+      }
 
       function formSubmitHandler(event) {
         if (event) event.preventDefault();
@@ -94,9 +102,12 @@
         $("input:checked").each( function (n) {
           var headerIndex = $(this).val();
           // find the drop down with the JIRA field name
-          var jirafieldChosen = $("#jira-field-"+headerIndex).val();
-          if (jirafieldChosen != "") {
-            jiraFields[jirafieldChosen]=headerIndex;
+          var jiraFieldDropDown = $("#jira-field-"+headerIndex);
+          if (!isReadOnlyJiraFieldChosen(jiraFieldDropDown)) {
+            var jirafieldChosen = jiraFieldDropDown.val();
+            if (jirafieldChosen != "") {
+              jiraFields[jirafieldChosen]=headerIndex;
+            }
           }
         });
         console.log(jiraFields);
