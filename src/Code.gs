@@ -15,11 +15,13 @@ var BUILD = '1.0.6';
  * Add a nice menu option for the users.
  */
 function onOpen(e) {
-  addMenu();
+  var isDebugMode = false;
   if (e && e.authMode == ScriptApp.AuthMode.LIMITED) {
     var userProps = PropertiesService.getUserProperties();
-    debug.enable( (userProps.getProperty('debugging')=='true') );
+    isDebugMode = (userProps.getProperty('debugging')=='true');
+    debug.enable(isDebugMode);
   }
+  addMenu(isDebugMode);
 };
 
 /**
@@ -41,8 +43,9 @@ function onInstall(e) {
  * Add "Jira" Menu to UI.
  * @OnlyCurrentDoc
  */
-function addMenu() {
-  SpreadsheetApp.getUi().createAddonMenu()
+function addMenu(showBetaMenu) {
+
+  var menu = SpreadsheetApp.getUi().createAddonMenu()
     .addItem('Re-Calculate all formulas in active sheet', 'recalcCustomFunctions')
     .addItem('Update Ticket Key Status "KEY-123 [Done]"', 'dialogRefreshTicketsIds')
     .addItem('Show Jira Field Map', 'sidebarJiraFieldMap')
@@ -52,12 +55,14 @@ function addMenu() {
     .addItem('Create Time Report', 'dialogTimesheet')
   
     .addSeparator()
-    .addItem('Update Issues from Spreadsheet', 'dialogIssuesFromSheet')
-
-    .addSeparator()
     .addItem('Settings', 'dialogSettings')
     .addItem('Configure Custom Fields', 'dialogCustomFields')
-    .addItem('About', 'dialogAbout')
+    .addItem('About', 'dialogAbout');
 
-    .addToUi();
+    if (showBetaMenu) {
+        menu.addSeparator()
+        .addItem('Update Jira Issues from Spreadsheet (BETA)', 'dialogIssuesFromSheet');
+    }
+
+    menu.addToUi();
 }

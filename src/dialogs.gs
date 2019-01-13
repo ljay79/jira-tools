@@ -203,7 +203,7 @@ function dialogIssuesFromSheet() {
     .setHeight(360)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
-  SpreadsheetApp.getUi().showModalDialog(dialog, 'Update Jira Issues from Spreadsheet');
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'Update Jira Issues from Spreadsheet (BETA)');
 }
 
 function dialogProcessIssuesFromSheet(headerFieldsToUse) {
