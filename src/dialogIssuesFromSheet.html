@@ -13,11 +13,13 @@
     .field-list .empty { flex: 0 0 100%; }
     .field-list .item { padding: 5px 20px; width:100% }
     .field-list select { float:right; font-weight: normal}
+    .field-list select option.readonly { color:#cccccc}
     .field-list > div.item:nth-child(even) { background: #f7f8f9; }
     .field-list div.not-imported { color:#cccccc }
     .field-list div.not-imported select { color:#cccccc }
     
     .field-list .titles { padding: 5px 20px; width:100%; background: #f7f8f9; font-size:smaller; font-weight: bold}
+    .field-list .titles .headerTitle { }
     .field-list .titles .jiraFieldTitle { display: block; float:right}
     
     
@@ -43,7 +45,7 @@
           <select class="fieldChooser" id="jira-field-<?= headerFields[headerName] ?>" title="choose destination jira field">
             <? for (var fieldId in allJiraFields ) { 
             ?>
-             <option value="<?= allJiraFields[fieldId] ?>"<? if (allJiraFields[fieldId] == headerName) { ?>selected<?}?> <? if ( readOnlyFields[allJiraFields[fieldId]]) {?> data-readonly="true" class="readonly"<?}?> >
+             <option value="<?= fieldId ?>"<? if (allJiraFields[fieldId] == headerName) { ?>selected<?}?> <? if ( readOnlyFields[allJiraFields[fieldId]]) {?> data-readonly="true" class="readonly"<?}?> >
              <?= allJiraFields[fieldId]?><? if ( readOnlyFields[allJiraFields[fieldId]]) {?> (Read only)<?}?>
              </option>
              <? 
@@ -103,11 +105,12 @@
           var headerIndex = $(this).val();
           // find the drop down with the JIRA field name
           var jiraFieldDropDown = $("#jira-field-"+headerIndex);
-          if (!isReadOnlyJiraFieldChosen(jiraFieldDropDown)) {
-            var jirafieldChosen = jiraFieldDropDown.val();
-            if (jirafieldChosen != "") {
-              jiraFields[jirafieldChosen]=headerIndex;
-            }
+          var jirafieldChosen = jiraFieldDropDown.val();
+          if (isReadOnlyJiraFieldChosen(jiraFieldDropDown) || jirafieldChosen == "") {
+            $(this).parent().toggleClass('not-imported',true);
+            $(this).prop('checked', false); 
+          } else {
+            jiraFields[jirafieldChosen]=headerIndex;
           }
         });
         console.log(jiraFields);
