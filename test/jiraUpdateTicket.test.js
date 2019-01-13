@@ -48,7 +48,13 @@ const jiraFieldList = [
         custom:     false,
         schemaType: 'number',
         supported:  true
-
+    },
+    {
+        key: "custom_sprint",
+        name: "Sprint",
+        schemaType:"array|string",
+        custom: false,
+        supported:  true
     }
 ]
 
@@ -296,12 +302,32 @@ test("field validation", () => {
     expect(getFilteredList["My custom field 2"]).not.toBeDefined();
 });
 
-test("formatFieldValueForJira", () => {
+
+test("Format string fields for JIRA", () => {
     const formatFieldValueForJira = require('../src/jiraUpdateTicket.gs').formatFieldValueForJira;
-    expect(jiraFieldList[0].key).toBe("issueKey"); // just in case the test data gets re-ordered
-    expect(formatFieldValueForJira(jiraFieldList[0],"PB-1")).toBe("PB-1");
-    expect(jiraFieldList[4].schemaType).toBe("number"); // just in case the test data gets re-ordered
-    expect(formatFieldValueForJira(jiraFieldList[4],"PB-1")).toBe("PB-1"); // just pass it a string
-    expect(formatFieldValueForJira(jiraFieldList[4],"1223")).toBe("1223"); // just pass it a string
-    expect(formatFieldValueForJira(jiraFieldList[4],"")).toBe(null); // null required to clear a number field
+    var jiraFieldToUse = jiraFieldList[0];
+    expect(jiraFieldToUse.schemaType).toBe("string"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse,"PB-1")).toBe("PB-1"); // just pass it a string 
+    expect(formatFieldValueForJira(jiraFieldToUse,"1223")).toBe("1223"); // just pass it a string 
+    expect(formatFieldValueForJira(jiraFieldToUse,"")).toBe(""); // just pass it a string 
+})
+
+test("Format empty number fields for JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateTicket.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[4];
+    expect(jiraFieldToUse.key).toBe("number1"); // just in case the test data gets re-ordered
+    expect(jiraFieldToUse.schemaType).toBe("number"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse,"PB-1")).toBe("PB-1"); // just pass it a string
+    expect(formatFieldValueForJira(jiraFieldToUse,"1223")).toBe("1223"); // just pass it a string
+    expect(formatFieldValueForJira(jiraFieldToUse,"")).toBe(null); // null required to clear a number field
+})
+
+test("Format empty sprint fields for JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateTicket.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[5];
+    expect(jiraFieldToUse.key).toBe("custom_sprint"); // just in case the test data gets re-ordered
+    expect(jiraFieldToUse.schemaType).toBe("array|string"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse,"PB-1")).toBe("PB-1"); // just pass it a string - let JIRA error
+    expect(formatFieldValueForJira(jiraFieldToUse,"1223")).toBe(1223); // convert to number
+    expect(formatFieldValueForJira(jiraFieldToUse,"")).toBe(null); // null required to clear a number field
 })

@@ -76,6 +76,15 @@ function formatFieldValueForJira(fieldDefinition,value) {
             value = null;
         }
     }
+    if (fieldDefinition.schemaType=="array|string") {
+        // intended first to fix bug with setting sprint fields to empty
+        // currently there is no other way to identify the sprint field
+        if (value == "") {
+            value = null;
+        } else if (!isNaN(value)) {
+            value = +value;
+        }
+    }
     return value;
 }
 
