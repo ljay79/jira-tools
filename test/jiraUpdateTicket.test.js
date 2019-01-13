@@ -53,6 +53,13 @@ const jiraFieldList = [
         key: "custom_sprint",
         name: "Sprint",
         schemaType:"array|string",
+        custom: true,
+        supported:  true
+    },
+    {
+        key: "labels",
+        name: "Labels",
+        schemaType:"array|string",
         custom: false,
         supported:  true
     }
@@ -331,3 +338,14 @@ test("Format empty sprint fields for JIRA", () => {
     expect(formatFieldValueForJira(jiraFieldToUse,"1223")).toBe(1223); // convert to number
     expect(formatFieldValueForJira(jiraFieldToUse,"")).toBe(null); // null required to clear a number field
 })
+
+test("Sending labels to JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateTicket.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[6];
+    expect(jiraFieldToUse.key).toBe("labels"); // just in case the test data gets re-ordered
+    expect(jiraFieldToUse.schemaType).toBe("array|string"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse,"")).toBe(null); 
+    expect(formatFieldValueForJira(jiraFieldToUse,"GNS-Metapod")).toEqual(["GNS-Metapod"]); 
+    expect(formatFieldValueForJira(jiraFieldToUse,"GNS-Metapod,Test")).toEqual(["GNS-Metapod","Test"]); 
+    
+});

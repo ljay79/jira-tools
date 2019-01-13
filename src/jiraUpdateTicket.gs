@@ -71,12 +71,22 @@ function updateJiraIssues(headerRow,dataRows) {
 }
 
 function formatFieldValueForJira(fieldDefinition,value) {
+    if (fieldDefinition.key=="labels") {
+        if (value == "") {
+            value = null;
+        } else {
+            value = value.split(",");
+        }
+        return value;
+    }
+
     if (fieldDefinition.schemaType=="number") {
         if (value == "") {
             value = null;
         }
+        return value;
     }
-    if (fieldDefinition.schemaType=="array|string") {
+    if (fieldDefinition.custom && fieldDefinition.schemaType=="array|string") {
         // intended first to fix bug with setting sprint fields to empty
         // currently there is no other way to identify the sprint field
         if (value == "") {
@@ -84,6 +94,7 @@ function formatFieldValueForJira(fieldDefinition,value) {
         } else if (!isNaN(value)) {
             value = +value;
         }
+        return value;
     }
     return value;
 }
