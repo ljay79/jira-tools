@@ -18,7 +18,6 @@
   },
   "devDependencies": {
     "@google/clasp": "^1.7.0",
-    "clasp": "latest",
     "del": "3.x",
     "exec-sh": "0.3.x",
     "gulp": "^4.0.0",
