@@ -1,3 +1,7 @@
 /.project
 /.buildpath
 /.gitconfig
+/node_modules
+/dist
+/src/.clasp.json
+/.vscode
