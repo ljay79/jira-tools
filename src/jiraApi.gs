@@ -1,11 +1,12 @@
-// Require imports
+// Node required code block
 const getCfg = require("./settings.gs").getCfg;
 const setCfg = require("./settings.gs").setCfg;
 const hasSettings = require("./settings.gs").hasSettings;
 const debug = require("./debug.gs");
 const buildUrl = require("./jsLib.gs").buildUrl;
 const extend = require("./jsLib.gs").extend;
-// End of Require imports
+// End of Node required code block
+
 
 /**
  * Available/Supported REST calls for JIRA rest api.
@@ -312,4 +313,6 @@ function Request() {
   this.init();
 }
 
+// Node required code block
 module.exports = Request;
+// End of Node required code block

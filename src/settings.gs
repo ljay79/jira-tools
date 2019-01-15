@@ -1,7 +1,9 @@
-// Require imports
+// Node required code block
 const BUILD = require("./Code.gs").BUILD;
 const fieldEpic = require("./customFields.gs").fieldEpic;
 const Storage_ = require("./Storage.gs").Storage_;
+
+//Mock for google's PropertiesService
 const PropertiesService = function() {
   var data = {};
   var userProperties = {
@@ -19,7 +21,7 @@ const PropertiesService = function() {
     }
   }
 }();
-// End of Require imports
+// End of Node required code block
 
 var APP_STORAGE;
 
@@ -176,4 +178,11 @@ function deleteAllProperties_()
   userProperties.deleteAllProperties();
 }
 
-module.exports = {getCfg: getCfg, setCfg: setCfg, hasSettings: hasSettings}
+
+// Node required code block
+module.exports = {
+  getCfg: getCfg,
+  setCfg: setCfg,
+  hasSettings: hasSettings
+}
+// End of Node required code block

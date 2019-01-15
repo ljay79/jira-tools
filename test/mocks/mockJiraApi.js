@@ -1,5 +1,5 @@
 
-jirApiImport = require('../../src/jiraApi.gs');
+jiraApiImport = require('../../src/jiraApi.gs');
 jest.mock('../../src/jiraApi.gs',() => jest.fn());
 
 const jiraApiMock = {
@@ -47,7 +47,7 @@ function setNextJiraResponse(httpStatusCode,expectedMethodCall,dataToReturn) {
         return {
             call:jiraApiMock.call,
             withSuccessHandler: function (calback) {
-                calback(dataToReturn,null,httpStatusCode);
+                calback(dataToReturn, null, httpStatusCode);
                 return jiraApiMock;
             },
             withFailureHandler: jiraApiMock.withFailureHandler
@@ -114,18 +114,23 @@ function setAllResponsesSuccesfull(httpStatusCode,dummyDataToReturn) {
 
 function setAllResponsesFail(httpStatusCode,dummyDataToReturn) {
     if (httpStatusCode == null) {
-        httpStatusCode =500;
+        httpStatusCode = 500;
     }
     resetMockFunction();
     jiraApiMock.withFailureHandler.mockImplementation(function (calback) {
-        calback(dummyDataToReturn,null,httpStatusCode);
+        calback(dummyDataToReturn, null, httpStatusCode);
         return jiraApiMock;
     });
     jiraApiMock.getResponse.mockImplementation(() =>{
-        return {'respData': dummyDataToReturn, 'httpResp': null, 'statusCode': httpStatusCode, 'method': 'get', success:false};
+        return {
+        	'respData': dummyDataToReturn, 
+        	'httpResp': null, 
+        	'statusCode': httpStatusCode, 
+        	'method': 'get', 
+        	success:false
+    	};
     } );
 }
-
 
 function mockJiraApiConstructor() {
     this.call = jiraApiMock.call;
@@ -135,6 +140,6 @@ function mockJiraApiConstructor() {
 }
 
 initJiraApiMockMethods();
-jirApiImport.mockImplementation(mockJiraApiConstructor);
+jiraApiImport.mockImplementation(mockJiraApiConstructor);
 
 module.exports = jiraApiMock;

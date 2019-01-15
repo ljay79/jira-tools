@@ -121,4 +121,7 @@ Storage_.prototype.getPrefixedKey_ = function(key) {
   }
 };
 
+
+// Node required code block
 module.exports = {Storage_: Storage_};
+// End of Node required code block

@@ -6,11 +6,11 @@ const debug = require("../src/debug.gs");
 const Request = require('../src/jiraApi.gs');
 
 Browser = {
-    Buttons:{
-        OK:"OK"
+    Buttons: {
+        OK: "OK"
     },
-    msgBox: function(type,exception,button) {
-        debug.error("Browser.msgBox "+exception);
+    msgBox: function(type, exception, button) {
+        debug.error("Browser.msgBox " + exception);
     }
 };
 
@@ -31,18 +31,17 @@ beforeEach(() =>  {
 });
 
 function initJiraDummyConfig() {
-    setCfg('jira_url',"https://jiraserver");
-    setCfg('jira_username',"username");
-    setCfg('jira_password',"password");
-
+    setCfg('jira_url', "https://jiraserver");
+    setCfg('jira_username', "username");
+    setCfg('jira_password', "password");
 }
 
 test('no jira config should give an error when making a request', () => {
-    
     var requestObj = new Request();
 
     // no settings for Jira instance should give an error
-    requestObj.call("issueUpdate",{
+    //@TODO: require actual valid ticket number from used JIRA instance
+    requestObj.call("issueStatus", {
         issueIdOrKey: "PBI-1"
     });
     var result = requestObj.getResponse();
@@ -71,13 +70,12 @@ test('an exception when calling UrlFetchApp should be handled', () => {
     expect(result.respData.errorMessages).not.toBeNull();
 });
 
-
 test('invalid JSON from mock JIRA should be handled', () => {
     initJiraDummyConfig();
     var requestObj = new Request();
-    Utilities.base64Encode.mockImplementation((param) => "base64:"+param);
-    //  exception on UrlFetchApp should show a browser box
-    UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl,args) => {
+    Utilities.base64Encode.mockImplementation((param) => "base64:" + param);
+    // exception on UrlFetchApp should show a browser box
+    UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl, args) => {
         return {
             getResponseCode: function() {
                 return 500;
@@ -90,7 +88,6 @@ test('invalid JSON from mock JIRA should be handled', () => {
             }
         };
     });
-
 
     var successHandler = jest.fn();
     var errorHandler = jest.fn();
@@ -111,9 +108,9 @@ test('invalid JSON from mock JIRA should be handled', () => {
 test('a basic request should be handloed with password and username included', () => {
     initJiraDummyConfig();
     var requestObj = new Request();
-    Utilities.base64Encode.mockImplementation((param) => "base64:"+param);
+    Utilities.base64Encode.mockImplementation((param) => "base64:" + param);
     //  exception on UrlFetchApp should show a browser box
-    UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl,args) => {
+    UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl, args) => {
         return {
             getResponseCode: function() {
                 return 200;
@@ -157,8 +154,8 @@ test('a basic request should be handloed with password and username included', (
 test('query parameters should be added to the url for user search method', () => {
     initJiraDummyConfig();
     var requestObj = new Request();
-    //  exception on UrlFetchApp should show a browser box
-    UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl,args) => {
+    // exception on UrlFetchApp should show a browser box
+    UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl, args) => {
         return {
             getResponseCode: function() {
                 return 200;
@@ -173,12 +170,15 @@ test('query parameters should be added to the url for user search method', () =>
     });
     var successHandler = jest.fn();
     var errorHandler = jest.fn();
-    requestObj.call("userSearch",{
+
+    requestObj.call("userSearch", {
         username: "paul"
     }).withSuccessHandler(successHandler).withFailureHandler(errorHandler);
+
     var result = requestObj.getResponse();
+
     expect(Browser.msgBox.mock.calls.length).toBe(0);
-    // I expected this from the code - but it doesnt work (possibly a bug)
+    //@TODO: I expected this from the code - but it doesnt work (possibly a bug)
     //"https://jiraserver/rest/api/2/user/search?startAt=0&maxResults=100&username=paul"
     expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/user/search?username=paul");
     expect(result.statusCode).toBe(200);
@@ -207,7 +207,7 @@ test('a jira dashboard request is made correctly', () => {
             }
         };
     });
-    requestObj.call("dashboard",{ })
+    requestObj.call("dashboard", {})
     var result = requestObj.getResponse();
     expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
     expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/dashboard");

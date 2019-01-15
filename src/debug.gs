@@ -50,6 +50,10 @@ debug = (function(){
   return that;
 })();
 
+/**
+ * @desc Toggle debugging on/off from dialog from.
+ * @param formData {string}    "1" for enable, "0" for disable
+ */
 function toggleDebugging(formData) {
   var userProps = PropertiesService.getUserProperties();
   var debugging = formData=='1' ? 'true' : 'false';
@@ -58,4 +62,7 @@ function toggleDebugging(formData) {
   console.log('Debugging switched [%s]', (debugging=='true' ? 'ON' : 'OFF'));
 }
 
+
+// Node required code block
 module.exports = debug;
+// End of Node required code block

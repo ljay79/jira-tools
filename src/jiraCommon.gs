@@ -1,7 +1,9 @@
-// Require imports
+// Node required code block
 const Request = require('./jiraApi.gs');
-const debug = require('./debug.gs');
-// End of Require imports
+const debug = {
+    info: console.log
+}
+// End of Node required code block
 
 // const not available, but better solution needed
 var CELLTYPE_EMPTY = -1;
@@ -660,89 +662,6 @@ function getIssue(issueKey, fields) {
   return response;
 }
 
-
-/**
-@desc returns all fields in the JIRA instance
-@return array Array of objects for each field 
-
-return {
-          key:        cField.key || cField.id, // Server API returns ".id" only while Cloud returns both with same value
-          name:       cField.name,
-          custom:     cField.custom,
-          schemaType: _type,
-          supported:  (arrSupportedTypes.indexOf(_type) > -1)
-        };
-*/
-
-function convertJiraFieldResponseToFieldRecord(jiraFieldResponse) {
-  var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
-  var _type = (jiraFieldResponse.schema ? jiraFieldResponse.schema.type : null) || null;
-    if(jiraFieldResponse.schema && jiraFieldResponse.schema.items) {
-      _type += '|' + jiraFieldResponse.schema.items;
-    }
-  return {
-    key:        jiraFieldResponse.key || jiraFieldResponse.id, // Server API returns ".id" only while Cloud returns both with same value
-    name:       jiraFieldResponse.name,
-    custom:     jiraFieldResponse.custom,
-    schemaType: _type,
-    supported:  (arrSupportedTypes.indexOf(_type) > -1)
-  };
-}
-
-function getAllJiraFields(successCallBack,errorCallBack) {
-  var request = new Request();
-  var fieldMap = [];
-
-  var ok = function(respData, httpResp, status) {
-    if (!respData) {
-      error(respData, httpResp, status);
-    }
-    fieldMap.push.apply(fieldMap, respData.map(convertJiraFieldResponseToFieldRecord) )
-    // sorting by supported type and name
-    && fieldMap.sort(function(a, b) {
-      var keyA = a.name.toLowerCase();
-      var keyB = b.name.toLowerCase();
-
-      if (keyA < keyB)
-        return -1;
-      if (keyA > keyB)
-        return 1;
-      return 0;
-    });
-    if (successCallBack != null) {
-      successCallBack(fieldMap);
-    }
-  };
-
-  var error = function(respData, httpResp, status) {
-    var jiraErrorMessage = "";
-    if (respData != null && respData.errorMessages != null) {
-        jiraErrorMessage =respData.errorMessages.join(",") || respData.errorMessages;
-    }
-    var msg = "Failed to retrieve Jira Fields info with status [" + status + "]!\\n" 
-                + jiraErrorMessage;
-    if (errorCallBack != null) {
-      errorCallBack(msg);
-    }
-  };
-  request.call("field")
-    .withSuccessHandler(ok)
-    .withFailureHandler(error)
-  ;
-}
-
-function getMatchingJiraField(listOfValidJiraFields, fieldName) {
-  var matchingFunction = function(stringA, stringB) {
-    return stringA.toLowerCase().trim() == stringB.toLowerCase().trim();
-  }
-  var results = listOfValidJiraFields.filter(function(fieldSpec) {
-    return matchingFunction(fieldSpec.name,fieldName) || matchingFunction(fieldSpec.key,fieldName)
-  });
-  if (results.length>0) {
-    return results[0];
-  } else {
-    return null;
-  }
-}
-
-module.exports = {getIssue: getIssue, unifyIssueAttrib: unifyIssueAttrib, getMatchingJiraField:getMatchingJiraField, getAllJiraFields:getAllJiraFields, convertJiraFieldResponseToFieldRecord:convertJiraFieldResponseToFieldRecord}
+// Node required code block
+module.exports = {unifyIssueAttrib: unifyIssueAttrib};
+// End of Node required code block
