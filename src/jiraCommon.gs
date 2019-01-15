@@ -661,7 +661,6 @@ function getIssue(issueKey, fields) {
 // Node required imports
 module.exports = {
   unifyIssueAttrib: unifyIssueAttrib,
-  getMatchingJiraField: getMatchingJiraField,
   getAllJiraFields: getAllJiraFields,
   convertJiraFieldResponseToFieldRecord: convertJiraFieldResponseToFieldRecord
 };
