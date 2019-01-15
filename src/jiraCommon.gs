@@ -651,7 +651,7 @@ function getIssue(issueKey, fields) {
   var request = new Request();
   var requestParams = {issueIdOrKey: issueKey};
   if (fields!= null) {
-    requestParams["fields"] = "fields";
+    requestParams["fields"] = fields;
   }
   request.call('issueStatus', requestParams)
     .withSuccessHandler(ok)

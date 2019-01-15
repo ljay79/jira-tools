@@ -15,7 +15,6 @@ function getDialog(file, values) {
   if(debugValue.password) delete debugValue.password;
   if(debugValue.username) delete debugValue.username;
   debug.log('Processing: %s.html with %s', file, JSON.stringify(debugValue));
-  // I don't think this works because it still uses values in the loop below.
   for (var name in values) {
     template[name] = values[name];
   }
