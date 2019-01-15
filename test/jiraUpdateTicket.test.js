@@ -134,7 +134,6 @@ test('processing list of Jira Issues with status transition', () => {
     expect(result.finished).toBe(true);
     expect(jiraApiMock.call.mock.calls.length).toBe(2);
     // status should be removed when calling to save the other fields
-    console.log(jiraApiMock.call.mock.calls[1][1]);
     expect(Object.keys(jiraApiMock.call.mock.calls[1][1].fields).length).toBe(1);
     expect(jiraApiMock.call.mock.calls[1][1].fields["columnA"]).toBe("column A value");
 

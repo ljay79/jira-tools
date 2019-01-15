@@ -3,7 +3,7 @@ const Request = require('../src/jiraApi.gs');
 const getAllJiraFields = require('./jiraCommon.gs').getAllJiraFields;
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
 const debug = require("./debug.gs");
-const getMatchingJiraField = require("../src/jiraCommon.gs").getMatchingJiraField;
+const getMatchingJiraField = require("./jiraCommon.gs").getMatchingJiraField;
 const IssueTransitioner = require('./jiraIssueStatusUpdates/issueTransitioner.js');
 // End of Require imports
 /*
@@ -185,4 +185,12 @@ function updateIssueinJira(issueData, callback) {
     
 }
 
-module.exports = {updateJiraIssues: updateJiraIssues, packageRowForUpdate: packageRowForUpdate, updateIssueinJira: updateIssueinJira, getMatchingJiraFields:getMatchingJiraFields, formatFieldValueForJira:formatFieldValueForJira};
+// Node required code block
+module.exports = {
+    updateJiraIssues: updateJiraIssues, 
+    packageRowForUpdate: packageRowForUpdate, 
+    updateIssueinJira: updateIssueinJira, 
+    getMatchingJiraFields: getMatchingJiraFields, 
+    formatFieldValueForJira: formatFieldValueForJira
+};
+// End of Node required code block
