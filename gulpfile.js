@@ -25,8 +25,8 @@ gulp.task('build', function(done) {
     var stream = gulp
     .src(["src/**/*","src/**/.*"])
     .pipe(replace("module.exports","//module.exports"))
-    .pipe(replace(/\/\/ Require imports/, "/* Require imports"))
-    .pipe(replace(/\/\/*.?End of Require imports/, "// End of Require imports*/"))
+    .pipe(replace(/\/\/ Node required imports/, "/* Node required imports"))
+    .pipe(replace(/\/\/*.?End of Node required imports/, "// End of Node required imports*/"))
     .pipe(gulp.dest("dist/build"));
 
     stream.on('end',function () {
@@ -79,8 +79,8 @@ gulp.task('un-google', function (done) {
         path.extname = ".gs";
       }))
     .pipe(replace("//module.exports","module.exports"))
-    .pipe(replace(/\/\* Require imports/, "// Require imports"))
-    .pipe(replace(/\/\/*.?End of Require imports\*\//, "// End of Require imports"))
+    .pipe(replace(/\/\* Node required imports/, "// Node required imports"))
+    .pipe(replace(/\/\/*.?Node required imports\*\//, "// Node required imports"))
     .pipe(gulp.dest("dist/pull"));
 
     stream.on('end',function () {
