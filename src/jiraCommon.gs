@@ -1,3 +1,10 @@
+// Node required imports
+const Request = require('./jiraApi.gs');
+const debug = {
+    info: console.log
+}
+// End of Node required imports
+
 // const not available, but better solution needed
 var CELLTYPE_EMPTY = -1;
 var CELLTYPE_JIRAID = 10; // entire cell includes Jira ticket id only ("JIRA-123" or "JIRA-123 [Status]")
@@ -650,3 +657,12 @@ function getIssue(issueKey, fields) {
   
   return response;
 }
+
+// Node required imports
+module.exports = {
+  unifyIssueAttrib: unifyIssueAttrib,
+  getMatchingJiraField: getMatchingJiraField,
+  getAllJiraFields: getAllJiraFields,
+  convertJiraFieldResponseToFieldRecord: convertJiraFieldResponseToFieldRecord
+};
+// End of Node required imports

@@ -1,3 +1,13 @@
+// Node required imports
+const getCfg = require("./settings.gs").getCfg;
+const setCfg = require("./settings.gs").setCfg;
+const hasSettings = require("./settings.gs").hasSettings;
+const debug = require("./debug.gs");
+const buildUrl = require("./jsLib.gs").buildUrl;
+const extend = require("./jsLib.gs").extend;
+// End of Node required imports
+
+
 /**
  * Available/Supported REST calls for JIRA rest api.
  * Reference: https://docs.atlassian.com/jira/REST/cloud/
@@ -282,3 +292,7 @@ function Request() {
   // call init
   this.init();
 }
+
+// Node required imports
+module.exports = Request;
+// End of Node required imports
