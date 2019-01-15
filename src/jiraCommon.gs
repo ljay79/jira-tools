@@ -1,8 +1,6 @@
 // Require imports
-const Request = require('../src/jiraApi.gs');
-const debug = {
-    info: console.log
-}
+const Request = require('./jiraApi.gs');
+const debug = require('./debug.gs');
 // End of Require imports
 
 // const not available, but better solution needed
@@ -651,7 +649,11 @@ function getIssue(issueKey, fields) {
   };
 
   var request = new Request();
-  request.call('issueStatus', {issueIdOrKey: issueKey, fields: fields})
+  var requestParams = {issueIdOrKey: issueKey};
+  if (fields!= null) {
+    requestParams["fields"] = "fields";
+  }
+  request.call('issueStatus', requestParams)
     .withSuccessHandler(ok)
     .withFailureHandler(error);
   
@@ -743,4 +745,4 @@ function getMatchingJiraField(listOfValidJiraFields, fieldName) {
   }
 }
 
-module.exports = {unifyIssueAttrib: unifyIssueAttrib, getMatchingJiraField:getMatchingJiraField, getAllJiraFields:getAllJiraFields, convertJiraFieldResponseToFieldRecord:convertJiraFieldResponseToFieldRecord}
+module.exports = {getIssue: getIssue, unifyIssueAttrib: unifyIssueAttrib, getMatchingJiraField:getMatchingJiraField, getAllJiraFields:getAllJiraFields, convertJiraFieldResponseToFieldRecord:convertJiraFieldResponseToFieldRecord}

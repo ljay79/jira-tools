@@ -17,6 +17,8 @@ var restMethods = {
     'dashboard'     : '/dashboard',
     'issueStatus'   : {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
     'issueUpdate'   : {method: '/issue/{issueIdOrKey}', httpMethod: 'put'},
+    'issueTransitions': {method: '/issue/{issueIdOrKey}/transitions'},
+    'issueTransitionUpdate': {method: '/issue/{issueIdOrKey}/transitions', httpMethod: 'post'},
     'worklogOfIssue': {method: '/issue/{issueIdOrKey}/worklog'},
     'filter'        : {method: '/filter/{filterId}'},
     //'search': {method: '/search', queryparams: {jql:'', fields: [], properties: [], maxResults: 100, validateQuery: 'strict'}} // GET
@@ -31,6 +33,8 @@ var restMethods = {
     'dashboard'     : '/dashboard',
     'issueStatus'   : {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
     'issueUpdate'   : {method: '/issue/{issueIdOrKey}', httpMethod: 'put'},
+    'issueTransitionUpdate': {method: '/issue/{issueIdOrKey}/transitions', httpMethod: 'post'},
+    'issueTransitions': {method: '/issue/{issueIdOrKey}/transitions'},
     'worklogOfIssue': {method: '/issue/{issueIdOrKey}/worklog'},
     'filter'        : {method: '/filter/{filterId}'},
     'search'        : {method: '/search'}, // POST

@@ -65,6 +65,101 @@ const jiraFieldList = [
     }
 ]
 
+test('processing list of Jira Issues with status transition', () => {
+    
+    // set up field types
+    var fieldList = [
+        {
+            schema:{type:"string"},
+            key: "columnA",
+            name: "XYZ field",
+            custom: false
+        },
+        {
+            schema:{type:"string"},
+            key: "columnB",
+            name: "ABC field",
+            custom: false
+        },
+        {
+            schema:{type:"string"},
+            key: "issuekey",
+            name: "Key",
+            custom: false
+        },
+        {
+            schema:{type:"string"},
+            key: "issuekey",
+            name: "Key",
+            custom: false
+        },
+        {
+            schema:{type:"string"},
+            key: "status",
+            name: "Status",
+            custom: false
+        }
+    ];
+
+    jiraApiMock.setAllResponsesSuccesfull(204);
+    jiraApiMock.setNextJiraResponse(200,"field",fieldList);
+    var jiraStatusTransitioner = require('../src/jiraIssueStatusUpdates/issueTransitioner.js');
+    jest.mock('../src/jiraIssueStatusUpdates/issueTransitioner.js',() => jest.fn());
+    var mockTransitionFunction = jest.fn().mockImplementation(function() {
+        return {success:true,errors:[]};
+    });
+    jiraStatusTransitioner.mockImplementation(function() {
+        return {
+            transition: mockTransitionFunction
+        }
+    });
+    mockTransitionFunction
+
+    const updateJiraIssues = require('../src/jiraUpdateTicket.gs').updateJiraIssues;
+    
+    var result = updateJiraIssues({columnA:1,Key:0},[["PBI-1","column A value"]]);
+    expect(mockTransitionFunction.mock.calls.length).toBe(0);
+
+    jiraApiMock.resetMocks();
+    jiraApiMock.setAllResponsesSuccesfull(204);
+    jiraApiMock.setNextJiraResponse(200,"field",fieldList);
+    var result = updateJiraIssues({status:2,columnA:1,Key:0},[["PBI-1","column A value","DONE"]]);
+    expect(mockTransitionFunction.mock.calls.length).toBe(1);
+    expect(mockTransitionFunction.mock.calls[0][0]).toBe("PBI-1");
+    expect(mockTransitionFunction.mock.calls[0][1]).toBe("DONE");
+    expect(result.message).not.toBeNull();
+    expect(result.rowsUpdated).toBe(1);
+    expect(result.errors.length).toBe(0);
+    expect(result.status).toBe(true);
+    expect(result.finished).toBe(true);
+    expect(jiraApiMock.call.mock.calls.length).toBe(2);
+    // status should be removed when calling to save the other fields
+    console.log(jiraApiMock.call.mock.calls[1][1]);
+    expect(Object.keys(jiraApiMock.call.mock.calls[1][1].fields).length).toBe(1);
+    expect(jiraApiMock.call.mock.calls[1][1].fields["columnA"]).toBe("column A value");
+
+    jiraApiMock.resetMocks();
+    mockTransitionFunction.mockClear();
+    mockTransitionFunction.mockImplementationOnce(function() {
+        return {success:false,errors:["an error"]};
+    });
+    jiraApiMock.setAllResponsesSuccesfull(204);
+    jiraApiMock.setNextJiraResponse(200,"field",fieldList);
+    var result = updateJiraIssues({status:2,columnA:1,Key:0},[["PBI-1","column A value","DONE"]]);
+    expect(mockTransitionFunction.mock.calls.length).toBe(1);
+    expect(mockTransitionFunction.mock.calls[0][0]).toBe("PBI-1");
+    expect(mockTransitionFunction.mock.calls[0][1]).toBe("DONE");
+    expect(result.message).not.toBeNull();
+    expect(result.rowsUpdated).toBe(1);
+    expect(result.errors.length).toBe(1);
+    expect(result.status).toBe(true);
+    expect(result.finished).toBe(true);
+    expect(jiraApiMock.call.mock.calls.length).toBe(2);
+    // status should be removed when calling to save the other fields
+    expect(Object.keys(jiraApiMock.call.mock.calls[1][1].fields).length).toBe(1);
+    expect(jiraApiMock.call.mock.calls[1][1].fields["columnA"]).toBe("column A value");
+
+});
 
 test('processing list of Jira Issues', () => {
 

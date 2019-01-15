@@ -4,6 +4,7 @@ const getAllJiraFields = require('./jiraCommon.gs').getAllJiraFields;
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
 const debug = require("./debug.gs");
 const getMatchingJiraField = require("../src/jiraCommon.gs").getMatchingJiraField;
+const IssueTransitioner = require('./jiraIssueStatusUpdates/issueTransitioner.js');
 // End of Require imports
 /*
 * @desc Takes a 2 x 2 array of values and uses them to update JIRA 
@@ -27,11 +28,21 @@ function updateJiraIssues(headerRow,dataRows) {
             return result;
 
         } else {
-            getAllJiraFields(
+            var statusTransitioner = new IssueTransitioner();
+            allJiraFields = getAllJiraFields(
                 function(allJiraFields) {
                     for (var i=0;i<dataRows.length;i++) {
                         var rowData = packageRowForUpdate(allJiraFields,headerRow,dataRows[i]);
                         if (rowData.key != null) {
+                            if (rowData.fields["status"]!= null) {
+                                var statusTransition = statusTransitioner.transition(rowData.key,rowData.fields["status"]);
+                                delete(rowData.fields["status"]);
+                                if (!statusTransition.success) {
+                                    statusTransition.errors.forEach(function(message) {
+                                        result.errors.push("["+rowData.key+"] "+message);
+                                    });
+                                }
+                            }
                             var updateResult = updateIssueinJira(rowData, 
                                 function(key,success,message){
                                     if (!success) {

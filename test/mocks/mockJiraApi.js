@@ -10,7 +10,8 @@ const jiraApiMock = {
     resetMocks: resetMockFunction,
     setNextJiraResponse: setNextJiraResponse,
     setAllResponsesSuccesfull: setAllResponsesSuccesfull,
-    setAllResponsesFail: setAllResponsesFail
+    setAllResponsesFail: setAllResponsesFail,
+    setResponseSequence: setResponseSequence
 };
 
 
@@ -30,10 +31,10 @@ function initJiraApiMockMethods() {
 }
 
 function resetMockFunction() {
-    jiraApiMock.call.mockClear();
-    jiraApiMock.withSuccessHandler.mockClear();
-    jiraApiMock.withFailureHandler.mockClear();
-    jiraApiMock.getResponse.mockClear();
+    jiraApiMock.call.mockReset();
+    jiraApiMock.withSuccessHandler.mockReset();
+    jiraApiMock.withFailureHandler.mockReset();
+    jiraApiMock.getResponse.mockReset();
     initJiraApiMockMethods();
 }
 
@@ -52,6 +53,49 @@ function setNextJiraResponse(httpStatusCode,expectedMethodCall,dataToReturn) {
             withFailureHandler: jiraApiMock.withFailureHandler
         }
     })
+}
+
+function setResponseSequence(sequenceArray) {
+    var index = 0;
+    var currentResponse = null;
+    if (index<sequenceArray.length) {
+        jiraApiMock.call.mockImplementation((method,params) => {
+            if (index>=sequenceArray.length) {
+                throw "setResponseSequence index="+index+" which exceeds the number of items in the sequenceArray";
+            }
+            currentResponse = sequenceArray[index];
+            index++;
+            if (currentResponse.statusCode == null) {
+                if (currentResponse.success) {
+                    currentResponse.statusCode = 200;
+                } else {
+                    currentResponse.statusCode = 500;
+                }
+            }
+            if (currentResponse.method == null) {
+                currentResponse.method = "get;"
+            }
+
+            return jiraApiMock;
+        });
+        jiraApiMock.withSuccessHandler.mockImplementation(function(callback) {
+            if (currentResponse.success) {
+                callback(currentResponse.respData,null,currentResponse.statusCode);
+            }
+            return jiraApiMock;
+        });
+
+        jiraApiMock.withFailureHandler.mockImplementation(function(callback) {
+            if (!currentResponse.success) {
+                callback(currentResponse.respData,null,currentResponse.statusCode);
+            }
+            return jiraApiMock;
+        });
+
+        jiraApiMock.getResponse.mockImplementation(function() {
+            return currentResponse;
+        });
+    }
 }
 
 function setAllResponsesSuccesfull(httpStatusCode,dummyDataToReturn) {
