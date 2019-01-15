@@ -24,9 +24,9 @@ gulp.task('clean', function(done) {
 gulp.task('build', function(done) {
     var stream = gulp
     .src(["src/**/*","src/**/.*"])
-    .pipe(replace("module.exports","//module.exports"))
-    .pipe(replace(/\/\/ Node required imports/, "/* Node required imports"))
-    .pipe(replace(/\/\/*.?End of Node required imports/, "// End of Node required imports*/"))
+    //.pipe(replace("module.exports","//module.exports"))
+    .pipe(replace(/\/\/ Node required code block/g, "/* Node required code block"))
+    .pipe(replace(/\/\/*.?End of Node required code block/g, "// End of Node required code block*/"))
     .pipe(gulp.dest("dist/build"));
 
     stream.on('end',function () {
@@ -78,9 +78,9 @@ gulp.task('un-google', function (done) {
     .pipe(rename(function (path) {
         path.extname = ".gs";
       }))
-    .pipe(replace("//module.exports","module.exports"))
-    .pipe(replace(/\/\* Node required imports/, "// Node required imports"))
-    .pipe(replace(/\/\/*.?Node required imports\*\//, "// Node required imports"))
+    //.pipe(replace("//module.exports","module.exports"))
+    .pipe(replace(/\/\* Node required code block/g, "// Node required code block"))
+    .pipe(replace(/\/\/*.?Node required code block\*\//g, "// Node required code block"))
     .pipe(gulp.dest("dist/pull"));
 
     stream.on('end',function () {

@@ -1,9 +1,9 @@
-// Node required imports
+// Node required code block
 const Request = require('./jiraApi.gs');
 const debug = {
     info: console.log
 }
-// End of Node required imports
+// End of Node required code block
 
 // const not available, but better solution needed
 var CELLTYPE_EMPTY = -1;
@@ -658,6 +658,6 @@ function getIssue(issueKey, fields) {
   return response;
 }
 
-// Node required imports
+// Node required code block
 module.exports = {unifyIssueAttrib: unifyIssueAttrib};
-// End of Node required imports
+// End of Node required code block

@@ -292,6 +292,9 @@ function removeFromArray(array, element) {
 }
 
 
-// Node required imports
-module.exports = {buildUrl: buildUrl, extend: extend};
-// End of Node required imports
+// Node required code block
+module.exports = {
+  buildUrl: buildUrl,
+  extend: extend
+};
+// End of Node required code block

@@ -344,16 +344,18 @@ Node.js does not allow that.
 In enable to allow the running of the unit tests locally using Node.js each _.gs_ file requires the use of import and export statements to make the files available e.g. The following `require` statements imports the '`getCfg`', '`setCfg`' and '`hasSettings`' functions defined in '_settings.gs_' into in another JS file (when running in Node).
 
 ```markdown
-// Node required imports
+// Node required code block
 const getCfg = require("./settings.gs").getCfg;
 const setCfg = require("./settings.gs").setCfg;
 const hasSettings = require("./settings.gs").hasSettings;
-// End of Node required imports
+// End of Node required code block
 ```
 
 This exports statement in 'settings.gs' is also required
 ```markdown
+// Node required code block
 module.exports = {getCfg: getCfg, setCfg: setCfg, hasSettings: hasSettings}
+// End of Node required code block
 ```
 
 These statements are unnecessary in GAS and would cause an error since 'Require' is a Node.js feature.
@@ -361,9 +363,9 @@ These statements are unnecessary in GAS and would cause an error since 'Require'
 The gulp scripts used to deploy the source code to GAS (via Clasp) include tasks to comment out these lines of code. The script looks for blocks starting and ending with the following lines and comments the whole block out. 
 
 ```markdown
-// Node required imports
+// Node required code block
 THIS WHOLE BLOCK WILL BE COMMENTED WHEN DEPLOYED BY THE GULP SCRIPT
-// End of Node required imports
+// Node required code block
 ```
 
 Another approach could be to use this code in the unit tests...

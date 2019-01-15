@@ -1,4 +1,4 @@
-// Node required imports
+// Node required code block
 const BUILD = require("./Code.gs").BUILD;
 const fieldEpic = require("./customFields.gs").fieldEpic;
 const Storage_ = require("./Storage.gs").Storage_;
@@ -21,7 +21,7 @@ const PropertiesService = function() {
     }
   }
 }();
-// End of Node required imports
+// End of Node required code block
 
 var APP_STORAGE;
 
@@ -179,10 +179,10 @@ function deleteAllProperties_()
 }
 
 
-// Node required imports
+// Node required code block
 module.exports = {
   getCfg: getCfg,
   setCfg: setCfg,
   hasSettings: hasSettings
 }
-// End of Node required imports
+// End of Node required code block
