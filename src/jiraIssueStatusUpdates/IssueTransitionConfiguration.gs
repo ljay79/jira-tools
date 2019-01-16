@@ -15,7 +15,7 @@ function IssueTransitionConfiguration() {
     
     /**
      * Does the configuration have details for the Issues project to transition from the sourceState to another
-     * 
+     * @param {string} issueKey the id of the issue - this will be truncated to get the project id
      */
     this.hasTransitionIds = function(issueKey, sourceState) {
         sourceState = sourceState.toLowerCase();
@@ -30,7 +30,9 @@ function IssueTransitionConfiguration() {
 
     /**
      * Store configuration for the Issues' project to transition from the sourceState to the data in transitionData
-     * 
+     * @param {string} issueKey the id of the issue - this will be truncated to get the project id
+     * @param {string} sourceState the state for which the transitions are valid to move from
+     * @param {string} transitionData the list of transition options from the JIRA REST Api
      */
     this.setTransitions = function (issueKey, sourceState, transitionData) {
         sourceState = sourceState.toLowerCase();
@@ -50,6 +52,9 @@ function IssueTransitionConfiguration() {
      * The funtion will return the id if there has been data stored for the 
      * transition from sourceState -> destinationState for an issue with the same
      * project prefix as the data in issueKey
+     * @param {string} issueKey the id of the issue - this will be truncated to get the project id
+     * @param {string} sourceState the state for which the transitions are valid to move from
+     * @param {string} transitionData the list of transition options from the JIRA REST Api
      */
     this.getTransitionId = function (issueKey, sourceState, destinationState) {
         sourceState = sourceState.toLowerCase();
@@ -65,5 +70,6 @@ function IssueTransitionConfiguration() {
         return config[projectKey][sourceState][destinationState].id;
     }
 }
-
+// Node required code block
 module.exports = IssueTransitionConfiguration;
+// End of Node required code block

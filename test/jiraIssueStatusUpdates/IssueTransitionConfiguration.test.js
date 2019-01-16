@@ -2,7 +2,7 @@
 var testTransitionResponses = require('./mockIssueTransitionData.js');
 
 test("Storages and access to transition info", () => {
-    const IssueTransitionConfiguration = require('../../src/jiraIssueStatusUpdates/IssueTransitionConfiguration.js');
+    const IssueTransitionConfiguration = require('../../src/jiraIssueStatusUpdates/IssueTransitionConfiguration.gs');
 
     var config = new IssueTransitionConfiguration();
     expect(config.hasTransitionIds("PB-22","Testing")).toBe(false);

@@ -9,7 +9,7 @@ beforeEach(() =>  {
 });
 
 test("Dealing with transitioning issues error cases", () => {
-    const IssueTransitioner = require('../../src/jiraIssueStatusUpdates/issueTransitioner.js');
+    const IssueTransitioner = require('../../src/jiraIssueStatusUpdates/issueTransitioner.gs');
     var issueTransitioner = new IssueTransitioner();
     jiraApiMock.setAllResponsesFail(500,{errorMessages:["Mocked Error"]});
     var transitionResponse = issueTransitioner.transition("PBI-1","Testing");
@@ -57,7 +57,7 @@ test("Dealing with transitioning issues error cases", () => {
 });
 
 test("Dealing with transitioning issues from one project", () => {
-    const IssueTransitioner = require('../../src/jiraIssueStatusUpdates/issueTransitioner.js');
+    const IssueTransitioner = require('../../src/jiraIssueStatusUpdates/issueTransitioner.gs');
     var issueTransitioner =  new IssueTransitioner();
 
     // first test issue is already in the required status

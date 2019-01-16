@@ -103,8 +103,8 @@ test('processing list of Jira Issues with status transition', () => {
 
     jiraApiMock.setAllResponsesSuccesfull(204);
     jiraApiMock.setNextJiraResponse(200,"field",fieldList);
-    var jiraStatusTransitioner = require('../src/jiraIssueStatusUpdates/issueTransitioner.js');
-    jest.mock('../src/jiraIssueStatusUpdates/issueTransitioner.js',() => jest.fn());
+    var jiraStatusTransitioner = require('../src/jiraIssueStatusUpdates/issueTransitioner.gs');
+    jest.mock('../src/jiraIssueStatusUpdates/issueTransitioner.gs',() => jest.fn());
     var mockTransitionFunction = jest.fn().mockImplementation(function() {
         return {success:true,errors:[]};
     });

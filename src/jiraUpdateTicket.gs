@@ -1,11 +1,11 @@
-// Require imports
+// Node required code block
 const Request = require('../src/jiraApi.gs');
 const getAllJiraFields = require('./jiraCommon.gs').getAllJiraFields;
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
 const debug = require("./debug.gs");
 const getMatchingJiraField = require("./jiraCommon.gs").getMatchingJiraField;
-const IssueTransitioner = require('./jiraIssueStatusUpdates/issueTransitioner.js');
-// End of Require imports
+const IssueTransitioner = require('./jiraIssueStatusUpdates/issueTransitioner.gs');
+// End of Node required code block
 /*
 * @desc Takes a 2 x 2 array of values and uses them to update JIRA 
 * @param headerRow {object} A dictionary where each key is the name of a Jira field and the value is the column index of that field in the data
