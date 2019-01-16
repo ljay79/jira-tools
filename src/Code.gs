@@ -17,7 +17,8 @@ var BUILD = '1.0.6';
 function onOpen(e) {
   addMenu();
 
-  if (e && e.authMode == ScriptApp.AuthMode.FULL) {
+  if (e && e.authMode != ScriptApp.AuthMode.NONE) {
+    // Code below can run in AuthMode.LIMITED and AuthMode.FULL
     var userProps = PropertiesService.getUserProperties();
     debug.enable( (userProps.getProperty('debugging')=='true') );
   }
