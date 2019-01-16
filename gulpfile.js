@@ -80,7 +80,7 @@ gulp.task('un-google', function (done) {
     }))
   // .pipe(replace("//module.exports","module.exports"))
   .pipe(replace(/\/\* Node required code block/g, "// Node required code block"))
-  .pipe(replace(/\/\/*.?Node required code block\*\//g, "// Node required code block"))
+  .pipe(replace(/\/\/*.?End of Node required code block\*\//g, "// End of Node required code block"))
   .pipe(gulp.dest("dist/pull"));
 
   stream.on('end',function () {
