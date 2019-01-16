@@ -16,7 +16,7 @@ var BUILD = '1.0.6';
  */
 function onOpen(e) {
   var isDebugMode = false;
-  if (e && e.authMode == ScriptApp.AuthMode.FULL) {
+  if (e && e.authMode != ScriptApp.AuthMode.NONE) {
     var userProps = PropertiesService.getUserProperties();
     isDebugMode = (userProps.getProperty('debugging')=='true');
     debug.enable(isDebugMode);
