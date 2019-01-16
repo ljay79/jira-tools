@@ -13,6 +13,19 @@ No manual status update copy&paste anymore.
 
 > Tested with latest Jira Cloud (OnDemand) - compatible with latest Jira Server. Please provide feedback if you expirience any issue.
 
+# Table of Content
+[Install / Get started](#install--get-started)
+
+[Features](#features)
+
+[Custom Functions](#custom-functions)
+
+[Known Limitations](#known-limitations)
+
+[Known Issues](#known-issues)
+
+[Development](#development)
+
 # Install / Get started
 * Open up your chrome browser
 * Open or create a Google Sheet
@@ -239,3 +252,253 @@ You will get an email from Atlassian where you please click the provided link at
 Now on the Atlassian page where you can set/change your Atlassian (and not Google) password, enter a new password for your Atlassian account, not to mix up with your Google account.
 
 Of course it makes no sense that this information is not available on the REST API documentation page, since it is quite crucial to get it working.
+
+
+# Development
+
+## Pre-requisites
+To enable Google-Apps-Script (GAS) build, deployment and running unit test on local environment you will need `node`, `gulp` and `clasp`.
+
+* Install latest version of Node.js - https://nodejs.org/en/download/
+* Gulp - https://gulpjs.com/
+* Clasp - https://codelabs.developers.google.com/codelabs/clasp
+
+Installing `node` will differ from your environment, see install instructions on https://nodejs.org/ .
+
+Assuming `node` is already installed, first install `gulp`:
+
+```sh
+sudo npm install gulp-cli -g
+sudo npm install gulp -D
+```
+
+Now you can install `clasp`:
+```sh
+sudo npm i @google/clasp -g
+```
+
+Then enable Apps Script API: https://script.google.com/home/usersettings
+
+(If that fails, run this:)
+```sh
+sudo npm i -g grpc @google/clasp --unsafe-perm
+```
+
+## Checkout and Setup
+Clone the code from Github onto your local machine
+
+```sh
+git clone https://github.com/ljay79/jira-tools.git jira-tools
+cd jira-tools
+```
+
+Then install dependencies
+
+```sh
+npm install
+```
+
+> *Note:* It will most likely throw a warning about `gulp-util` which you can safly ignore for now.
+> `npm WARN deprecated gulp-util@3.0.8: gulp-util is deprecated - replace it, following the guidelines at https://medium.com/gulpjs/gulp-util-ca3b1f9f9ac5` 
+
+
+Check gulp runs ok and displays list of tasks
+```sh
+$ gulp --tasks
+[10:49:24] Tasks for /jira-tools/gulpfile.js
+[10:49:25] ├── clean
+[10:49:25] ├── build
+[10:49:25] ├── clasp-push
+[10:49:25] ├── clasp-pull
+[10:49:25] ├── un-google
+[10:49:25] ├── diff-pulled-code
+[10:49:25] ├── copy-changed-pulled-code
+[10:49:25] ├─┬ deploy
+[10:49:25] │ └─┬ <series>
+[10:49:25] │   ├── clean
+[10:49:25] │   ├── build
+[10:49:25] │   └── clasp-push
+[10:49:25] └─┬ pull
+[10:49:25]   └─┬ <series>
+[10:49:25]     ├── clean
+[10:49:25]     ├── clasp-pull
+[10:49:25]     └── un-google
+```
+
+Check unit tests are running
+```sh
+npm test
+```
+
+You should now be good for development.
+
+## Developing locally
+You will need to be able to test any development work using the code on the target deployment environment of the Google App Scripts (GAS) runtime with a connection to a JIRA instance.
+
+To speed up development of features the code is set up to be able to run locally on your development machine and use TDD ("Test Driven Development") to test code before running against the deployment environment. The use of TDD also enables the reduced risk of regression bugs when building new features.
+
+*Reflected Work Flow:*
+1. TDD / Development on local source code
+2. Deploy to GAS with `gulp deploy`
+3. Test within GAS and tweak code in the GAS interface (if easier)
+4. Pull the code with `gulp pull` from GAS back locally and merge with source (_./src_)
+5. Commit and push changes to `git`
+
+### Workarounds needed to run GAS files locally in Node
+The Google App Scripts (GAS) runtime environment differs from Node.js. For example, in the GAS runtime, any function available in a _.gs_ file in your project is automatically available to call from other files.
+Node.js does not allow that.
+
+In enable to allow the running of the unit tests locally using Node.js each _.gs_ file requires the use of import and export statements to make the files available e.g. The following `require` statements imports the '`getCfg`', '`setCfg`' and '`hasSettings`' functions defined in '_settings.gs_' into in another JS file (when running in Node).
+
+```markdown
+// Node required code block
+const getCfg = require("./settings.gs").getCfg;
+const setCfg = require("./settings.gs").setCfg;
+const hasSettings = require("./settings.gs").hasSettings;
+// End of Node required code block
+```
+
+This exports statement in 'settings.gs' is also required
+```markdown
+// Node required code block
+module.exports = {getCfg: getCfg, setCfg: setCfg, hasSettings: hasSettings}
+// End of Node required code block
+```
+
+These statements are unnecessary in GAS and would cause an error since 'Require' is a Node.js feature.
+
+The gulp scripts used to deploy the source code to GAS (via Clasp) include tasks to comment out these lines of code. The script looks for blocks starting and ending with the following lines and comments the whole block out. 
+
+```markdown
+// Node required code block
+THIS WHOLE BLOCK WILL BE COMMENTED WHEN DEPLOYED BY THE GULP SCRIPT
+// Node required code block
+```
+
+> ToDo: Another approach could be to use this code in the unit tests...
+> https://github.com/mzagorny/gas-local
+
+## Testing and deploying to GAS
+### Set up and linking to your project using `clasp`
+Enabling your local project to deploy and test in a Google project requires you to link either an existing Google project using `clasp clone <scriptId>` or *recommended* creating a new Google project with `clasp create`.
+
+Details and options for `clasp clone` you can find here: https://github.com/google/clasp#clone
+
+for `clasp create` please see here https://github.com/google/clasp#create
+
+In both cases, you must login to GAS first and go through the authorisation:
+```sh
+clasp login
+```
+
+you should see something like
+```markdown
+Logging in globally...
+  Authorize clasp by visiting this url:
+https://accounts.google.com/o/oauth2/v2/auth?...
+  
+Authorization successful.
+
+Default credentials saved to: ~/.clasprc.json (/.clasprc.json).
+```
+
+#### 1. Create and deploy to a new Google project
+```sh
+cd ./src
+clasp create --type sheets --title "Jira Sheet Tools"
+cd ..
+gulp deploy
+```
+
+#### 2. You already have a existing Google project
+The clasp command is currently not yet able to list container bound app scripts such as this Google Sheet (container) bound script.
+The command `clasp list` (which lists all your existing projects) might not show you the existing Sheet project [Issue#208](https://github.com/google/clasp/issues/208).
+In this case you must obtain the Google Script Id in a different way. One way, which worked for me, is described here: https://github.com/google/clasp/issues/208#issuecomment-395608767
+
+Once you have the correct projects script ID;
+
+```sh
+cd ./src
+clasp clone <scriptId>
+cd ..
+```
+
+check you have a _.clasp.json_ file in your _./src/.clasp.json_ folder then perform your first deploy
+```sh
+gulp deploy
+```
+
+### Testing unit tests
+In the folder _./test_ are already a few unit test defined to verify the projects functionality.
+You can add further to enhance the testing.
+
+To run the tests:
+
+```sh
+npm test
+```
+
+which will execute all available tests and gives a result like
+
+```markdown
+...
+Test Suites: 2 passed, 2 total
+Tests:       7 passed, 7 total
+Snapshots:   0 total
+Time:        10.195s
+Ran all test suites.
+```
+
+- list all available tests
+
+```sh
+npm test -- --listTests
+```
+
+- exec specific test
+
+```sh
+npm test ./test/jiraApi.test.js
+```
+
+### Deploying using `gulp` task
+
+Using the following gulp task will clean the export and require statements and push the code to the configured GAS project.
+
+```sh
+gulp deploy
+```
+
+This task does actually 3 steps as one; `clean`, `build` and `clasp-push`.
+
+### Pulling changes back from your Google project
+
+If you make changes to the code in the google project web interface you can pull those changes down onto your local machine.
+
+```sh
+gulp pull
+```
+
+This will pull the changes down from your GAS project, and uncomment the require and exports statments. The files will be pulled into a temporary folder 'dist/pull'. It does execute multiple tasks as one; `clean`, `clasp-pull` and `un-google`.
+
+You can then see a diff of the code in your _./src_ folder with the code in 'dist/pull' so you can visually verify that this is a change you want to have in your local copy and commit to GIT (just in case any temporary changes or debug code has been left)
+
+```sh
+gulp diff-pulled-code
+```
+You can then use this gulp task to copy the changed files from 'dist/pull' to _./src_ so you can verify unit tests and commit back to git
+
+```sh
+gulp copy-changed-pulled-code
+```
+
+### Commit and push changes to git repository
+
+Committing and pushing all your tested and verified changes to a git repository works just as usual.
+
+```sh
+git add .
+git commit
+git push
+```
+
