@@ -73,15 +73,15 @@ gulp.task('clasp-pull', function (done) {
  * which is required for the code base to run locally in Node
  */
 gulp.task('un-google', function (done) {
-  var stream = gulp
-  .src(["dist/pull/**/*.js"])
-  .pipe(rename(function (path) {
-    path.extname = ".gs";
-    }))
-  // .pipe(replace("//module.exports","module.exports"))
-  .pipe(replace(/\/\* Node required code block/g, "// Node required code block"))
-  .pipe(replace(/\/\/*.?Node required code block\*\//g, "// Node required code block"))
-  .pipe(gulp.dest("dist/pull"));
+    var stream = gulp
+    .src(["dist/pull/**/*.js"])
+    .pipe(rename(function (path) {
+        path.extname = ".gs";
+      }))
+    //.pipe(replace("//module.exports","module.exports"))
+    .pipe(replace(/\/\* Node required code block/g, "// Node required code block"))
+    .pipe(replace(/\/\/*.?End of Node required code block\*\//g, "// End of Node required code block"))
+    .pipe(gulp.dest("dist/pull"));
 
   stream.on('end',function () {
     del(["dist/pull/**/*.js"]);
