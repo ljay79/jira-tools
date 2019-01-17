@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/css/pikaday.min.css">
+    <style>
+    .error-container { display: none; margin-bottom: 16px; padding: 5px 10px; text-align: center; color: #fff; }
+    .is-loading { animation: blink .5s infinite; }
+    @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+    
+    // some overwrites google-styles vs. pikaday styles
+    .pika-lendar { margin: 4px; }
+    .pika-label {font-size: 12px; }
+    .pika-table th { font-size: 10px; }
+    button.pika-button, button.pika-prev, button.pika-next { min-width: initial; height: auto; border: 0;}
+    button.pika-button {font-size: 10px; line-height: 12px; padding: 4px 3px; }
+    .is-rtl button.pika-next, button.pika-prev { background: none no-repeat; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAeCAYAAAAsEj5rAAAAUklEQVR42u3VMQoAIBADQf8Pgj+OD9hG2CtONJB2ymQkKe0HbwAP0xucDiQWARITIDEBEnMgMQ8S8+AqBIl6kKgHiXqQqAeJepBo/z38J/U0uAHlaBkBl9I4GwAAAABJRU5ErkJggg==); border: 0; }
+    .is-rtl button.pika-prev, button.pika-next { background: none no-repeat; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAeCAYAAAAsEj5rAAAAU0lEQVR42u3VOwoAMAgE0dwfAnNjU26bYkBCFGwfiL9VVWoO+BJ4Gf3gtsEKKoFBNTCoCAYVwaAiGNQGMUHMkjGbgjk2mIONuXo0nC8XnCf1JXgArVIZAQh5TKYAAAAASUVORK5CYII=); border: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="response-message" class="error-container" role="dialog"></div>
+    
+    <form name="worklog" action="" method="post">
+      <fieldset class="block">
+        <legend>Select User</legend>
+        
+        <div class="block">
+          <!--<label for="wlUser">Select user</label>-->
+          <select name="wlUser" id="wlUser" class="block is-loading">
+            <option value=""></option>
+          </select>
+        </div>
+        
+        <!-- Groups not supported yet 
+        <div class="block">OR</div>
+        <div class"block">
+          <label for="wlGroup">Select Group</label>
+          <select name="wlGroup" id="wlGroup" class="block is-loading">
+            <option value=""></option>
+          </select>
+        </div>
+        -->
+      </fieldset>
+
+      <fieldset class="block">
+        <legend>Options</legend>
+        
+        <? var now = (new Date()).getTime(), MilliPerDay = 1000 * 60 * 60 * 24; ?>
+        <div class="block">
+          <div class="inline" style="vertical-align:top;">
+            <label for="wlStartDate">Start Date:</label><!-- default to now()-7 days -->
+            <input type="text" name="wlStartDate" class="block" style="width:80%" value="<?= Utilities.formatDate(new Date(now - 7 * MilliPerDay), 'Etc/GMT', 'yyyy-MM-dd') ?>" />
+          </div>
+          <div class="inline" style="vertical-align:top;">
+            <label for="wlEndDate">End Date:</label><!-- default to now() -->
+            <input type="text" name="wlEndDate" class="block" style="width:80%" value="<?= Utilities.formatDate(new Date(now), 'Etc/GMT', 'yyyy-MM-dd') ?>" />
+          </div>
+        </div>
+        
+        <div class="block">
+          <label for="wlTimeFormat" class="block">Reporting Time Format:</label>
+          <input type="radio" id="wlTimeFormatOne" name="wlTimeFormat" value="1" checked /> <label for="wlTimeFormatOne" title="human readable">1d 7h 59m</label><br/>
+          <input type="radio" id="wlTimeFormatTwo" name="wlTimeFormat" value="2" /> <label for="wlTimeFormatTwo" title="workhours as float, good for post calculations">7.5</label>
+        </div>
+      </fieldset>
+
+      <div class="block">
+        <button type="submit" class="action">View Report</button>
+        <button type="button" onclick="google.script.host.close()">Cancel</button>
+      </div>
+    </form>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/pikaday.min.js"></script>
+    <script>
+      var frmWorklog  = document.forms['worklog'];
+      var valid   = false;
+      var timeout = null;
+      var alert   = document.getElementById('response-message');
+      var action  = frmWorklog.querySelector('[type=submit]');
+      
+      function onInitWorklog(response) {
+        /* DEV */
+
+        // gen user dropdown
+        var sel = document.getElementById('wlUser');
+        var fragment = document.createDocumentFragment();
+        response.users.forEach(function(user, index) {
+          var opt = document.createElement('option');
+          opt.innerHTML = user.displayName;
+          opt.value = user.name;
+          fragment.appendChild(opt);
+        });
+        sel.appendChild(fragment);
+        sel.className = 'block';
+
+        // gen group dropdown
+        sel = document.getElementById('wlGroup');
+        fragment = document.createDocumentFragment();
+        response.groups.forEach(function(group, index) {
+          var opt = document.createElement('option');
+          opt.innerHTML = group.name; //group.displayName;
+          opt.value = group.name;
+          fragment.appendChild(opt);
+        });
+        sel.appendChild(fragment);
+        sel.className = 'block';
+      }
+
+      function formSubmitHandler(event) {
+        if (event) event.preventDefault();
+
+        //hideAlert();
+        //if (!valid) return;
+        //showAlert('fetch data ...', 1);
+        var formData = {
+          wlAuthorU: frmWorklog.wlUser.value,
+          //wlAuthorG: frmWorklog.wlGroup.value,
+          wlAuthorName: frmWorklog.wlUser.options[frmWorklog.wlUser.selectedIndex].text,
+          wlStartDate: frmWorklog.wlStartDate.value,
+          wlEndDate: frmWorklog.wlEndDate.value,
+          wlTimeFormat: frmWorklog.querySelector('input[name="wlTimeFormat"]:checked').value
+        };
+
+        google.script.run
+          //.withSuccessHandler(onResponse)
+          //.withFailureHandler(onResponse)
+          .createWorklog(formData);
+
+        // dont wait for response - bubble up all states not possible
+        // instead,show loading animation for 2sec and then close dialog
+        // success/error feedback handled inside sheet.
+        google.script.host.close();
+      }
+
+      google.script.run
+        .withSuccessHandler(onInitWorklog)
+        .fetchUsersAndGroups(true);
+
+      frmWorklog.addEventListener('submit', formSubmitHandler);
+      //input.forEach(function(el){ el.addEventListener('change', inputValidatyHandler); });
+      //window.addEventListener('load', );
+      
+      var pickerFrom = new Pikaday({
+        field: frmWorklog.wlStartDate, 
+        format: 'yyyy-MM-dd',
+        maxDate: new Date(),
+        onSelect: function() {
+          if (this.getDate() > pickerTo.getDate()) {
+            pickerTo.setDate(this.getDate());
+          }
+        },
+        toString(date) {
+          return date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+        }
+      });
+      var pickerTo = new Pikaday({
+        field: frmWorklog.wlEndDate, 
+        format: 'yyyy-MM-dd',
+        maxDate: new Date(),
+        onSelect: function() {
+          if (this.getDate() < pickerFrom.getDate()) {
+            pickerFrom.setDate(this.getDate());
+          }
+        },
+        toString(date) {
+          return date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+        }
+      });
+    </script>
+  </body>
+</html>
