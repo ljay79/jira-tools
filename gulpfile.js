@@ -3,7 +3,6 @@ var replace = require('gulp-replace');
 var del = require('del');
 var execSh = require('exec-sh');
 var rename = require('gulp-rename');
-var diff = require('gulp-diff');
 var changed = require('gulp-changed');
 
 /**
@@ -90,17 +89,6 @@ gulp.task('un-google', function (done) {
   })
 
 /**
- * Diffs the code in dist/pull which has been downloaded from GAS with the
- * current source
- */
-gulp.task('diff-pulled-code', function (done) {
-  return gulp
-    .src(["dist/pull/**/*","dist/pull/**/.*"])
-    .pipe(diff('src'))
-    .pipe(diff.reporter({ fail: false }));
-});
-
-/**
  * Copys the changed code in dist/pull which has been downloaded from GAS into
  * the src folder
  */
@@ -117,7 +105,6 @@ gulp.task('copy-changed-pulled-code', function (done) {
 gulp.task('deploy', gulp.series('clean', 'build', 'clasp-push'));
 
 /**
- * Pulls GAS source code into dist/pull and compares it visually so it can be
- * copied over into src if required
+ * Pulls GAS source code into dist/pull and copys changed files into src
  */
-gulp.task('pull', gulp.series('clean', 'clasp-pull', 'un-google'));
+gulp.task('pull', gulp.series('clean', 'clasp-pull', 'un-google', 'copy-changed-pulled-code'));

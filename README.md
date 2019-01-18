@@ -311,7 +311,6 @@ $ gulp --tasks
 [10:49:25] ├── clasp-push
 [10:49:25] ├── clasp-pull
 [10:49:25] ├── un-google
-[10:49:25] ├── diff-pulled-code
 [10:49:25] ├── copy-changed-pulled-code
 [10:49:25] ├─┬ deploy
 [10:49:25] │ └─┬ <series>
@@ -323,6 +322,7 @@ $ gulp --tasks
 [10:49:25]     ├── clean
 [10:49:25]     ├── clasp-pull
 [10:49:25]     └── un-google
+[10:49:25]     └── copy-changed-pulled-code
 ```
 
 Check unit tests are running
@@ -479,18 +479,7 @@ If you make changes to the code in the google project web interface you can pull
 gulp pull
 ```
 
-This will pull the changes down from your GAS project, and uncomment the require and exports statments. The files will be pulled into a temporary folder 'dist/pull'. It does execute multiple tasks as one; `clean`, `clasp-pull` and `un-google`.
-
-You can then see a diff of the code in your _./src_ folder with the code in 'dist/pull' so you can visually verify that this is a change you want to have in your local copy and commit to GIT (just in case any temporary changes or debug code has been left)
-
-```sh
-gulp diff-pulled-code
-```
-You can then use this gulp task to copy the changed files from 'dist/pull' to _./src_ so you can verify unit tests and commit back to git
-
-```sh
-gulp copy-changed-pulled-code
-```
+This will pull the changes down from your GAS project, and uncomment the require and exports statments. The files will be pulled into a temporary folder 'dist/pull' and changed files copied bac into against _./src_ . It does execute multiple tasks as one; `clean`, `clasp-pull`, `un-google` , `copy-changed-pulled-code`.
 
 ### Commit and push changes to git repository
 

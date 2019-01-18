@@ -22,7 +22,6 @@
     "exec-sh": "0.3.x",
     "gulp": "^4.0.0",
     "gulp-changed": "latest",
-    "gulp-diff": "latest",
     "gulp-rename": "latest",
     "gulp-replace": "latest",
     "jest": "23.6.x"
