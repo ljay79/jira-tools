@@ -4,11 +4,16 @@
 
  */
 
-const ScriptApp = require('./mocks/ScriptApp');
-const PropertiesService = require('./mocks/PropertiesService');
-const SpreadsheetApp = require('./mocks/SpreadsheetApp');
+ScriptApp = require('./mocks/ScriptApp');
+PropertiesService = require('./mocks/PropertiesService');
+SpreadsheetApp = require('./mocks/SpreadsheetApp');
 environmentConfiguration = require('../src/environmentConfiguration.gs');
+debug = require('../src/debug.gs');
 
+beforeEach(() => {
+  SpreadsheetApp.resetMocks();
+  PropertiesService.resetMocks(); 
+});
 test('onOpen function in various authmodes', () => {
   var onOpen = require('../src/Code.gs').onOpen;
   var e = {
