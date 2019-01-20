@@ -1,12 +1,11 @@
-
 jiraApiImport = require('../../src/jiraApi.gs');
-jest.mock('../../src/jiraApi.gs',() => jest.fn());
+jest.mock('../../src/jiraApi.gs', () => jest.fn());
 
 const jiraApiMock = {
-    call:jest.fn(),
-    withSuccessHandler:jest.fn(),
-    withFailureHandler:jest.fn(),
-    getResponse:jest.fn(),
+    call: jest.fn(),
+    withSuccessHandler: jest.fn(),
+    withFailureHandler: jest.fn(),
+    getResponse: jest.fn(),
     resetMocks: resetMockFunction,
     setNextJiraResponse: setNextJiraResponse,
     setAllResponsesSuccesfull: setAllResponsesSuccesfull,
@@ -14,20 +13,19 @@ const jiraApiMock = {
     setResponseSequence: setResponseSequence
 };
 
-
 function initJiraApiMockMethods() {
-    jiraApiMock.call.mockImplementation(() =>{
+    jiraApiMock.call.mockImplementation(() => {
         return jiraApiMock;
-    } );
-    jiraApiMock.withSuccessHandler.mockImplementation(() =>{
+    });
+    jiraApiMock.withSuccessHandler.mockImplementation(() => {
         return jiraApiMock;
-    } );
-    jiraApiMock.withFailureHandler.mockImplementation(() =>{
+    });
+    jiraApiMock.withFailureHandler.mockImplementation(() => {
         return jiraApiMock;
-    } );
-    jiraApiMock.getResponse.mockImplementation(() =>{
+    });
+    jiraApiMock.getResponse.mockImplementation(() => {
         return {};
-    } );
+    });
 }
 
 function resetMockFunction() {
@@ -38,14 +36,14 @@ function resetMockFunction() {
     initJiraApiMockMethods();
 }
 
-function setNextJiraResponse(httpStatusCode,expectedMethodCall,dataToReturn) {
+function setNextJiraResponse(httpStatusCode, expectedMethodCall, dataToReturn) {
     if (httpStatusCode == null) {
-        httpStatusCode =200;
+        httpStatusCode = 200;
     }
-    jiraApiMock.call.mockImplementationOnce((method,params) => {
+    jiraApiMock.call.mockImplementationOnce((method, params) => {
         expect(method).toBe(expectedMethodCall);
         return {
-            call:jiraApiMock.call,
+            call: jiraApiMock.call,
             withSuccessHandler: function (calback) {
                 calback(dataToReturn, null, httpStatusCode);
                 return jiraApiMock;
@@ -58,10 +56,10 @@ function setNextJiraResponse(httpStatusCode,expectedMethodCall,dataToReturn) {
 function setResponseSequence(sequenceArray) {
     var index = 0;
     var currentResponse = null;
-    if (index<sequenceArray.length) {
-        jiraApiMock.call.mockImplementation((method,params) => {
-            if (index>=sequenceArray.length) {
-                throw "setResponseSequence index="+index+" which exceeds the number of items in the sequenceArray";
+    if (index < sequenceArray.length) {
+        jiraApiMock.call.mockImplementation((method, params) => {
+            if (index >= sequenceArray.length) {
+                throw "setResponseSequence index=" + index + " which exceeds the number of items in the sequenceArray";
             }
             currentResponse = sequenceArray[index];
             index++;
@@ -78,41 +76,41 @@ function setResponseSequence(sequenceArray) {
 
             return jiraApiMock;
         });
-        jiraApiMock.withSuccessHandler.mockImplementation(function(callback) {
+        jiraApiMock.withSuccessHandler.mockImplementation(function (callback) {
             if (currentResponse.success) {
-                callback(currentResponse.respData,null,currentResponse.statusCode);
+                callback(currentResponse.respData, null, currentResponse.statusCode);
             }
             return jiraApiMock;
         });
 
-        jiraApiMock.withFailureHandler.mockImplementation(function(callback) {
+        jiraApiMock.withFailureHandler.mockImplementation(function (callback) {
             if (!currentResponse.success) {
-                callback(currentResponse.respData,null,currentResponse.statusCode);
+                callback(currentResponse.respData, null, currentResponse.statusCode);
             }
             return jiraApiMock;
         });
 
-        jiraApiMock.getResponse.mockImplementation(function() {
+        jiraApiMock.getResponse.mockImplementation(function () {
             return currentResponse;
         });
     }
 }
 
-function setAllResponsesSuccesfull(httpStatusCode,dummyDataToReturn) {
+function setAllResponsesSuccesfull(httpStatusCode, dummyDataToReturn) {
     if (httpStatusCode == null) {
-        httpStatusCode =200;
+        httpStatusCode = 200;
     }
     resetMockFunction();
     jiraApiMock.withSuccessHandler.mockImplementation(function (calback) {
-        calback(dummyDataToReturn,null,httpStatusCode);
+        calback(dummyDataToReturn, null, httpStatusCode);
         return jiraApiMock;
     });
-    jiraApiMock.getResponse.mockImplementation(() =>{
-        return {'respData': dummyDataToReturn, 'httpResp': null, 'statusCode': httpStatusCode, 'method': 'get', success:true};
-    } );
+    jiraApiMock.getResponse.mockImplementation(() => {
+        return { 'respData': dummyDataToReturn, 'httpResp': null, 'statusCode': httpStatusCode, 'method': 'get', success: true };
+    });
 }
 
-function setAllResponsesFail(httpStatusCode,dummyDataToReturn) {
+function setAllResponsesFail(httpStatusCode, dummyDataToReturn) {
     if (httpStatusCode == null) {
         httpStatusCode = 500;
     }
@@ -121,15 +119,15 @@ function setAllResponsesFail(httpStatusCode,dummyDataToReturn) {
         calback(dummyDataToReturn, null, httpStatusCode);
         return jiraApiMock;
     });
-    jiraApiMock.getResponse.mockImplementation(() =>{
+    jiraApiMock.getResponse.mockImplementation(() => {
         return {
-        	'respData': dummyDataToReturn, 
-        	'httpResp': null, 
-        	'statusCode': httpStatusCode, 
-        	'method': 'get', 
-        	success:false
-    	};
-    } );
+            'respData': dummyDataToReturn,
+            'httpResp': null,
+            'statusCode': httpStatusCode,
+            'method': 'get',
+            success: false
+        };
+    });
 }
 
 function mockJiraApiConstructor() {

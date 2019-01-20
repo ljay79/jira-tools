@@ -6,68 +6,67 @@ const debug = require("../src/debug.gs");
 const Request = require('../src/jiraApi.gs');
 
 Browser = {
-    Buttons: {
-        OK: "OK"
-    },
-    msgBox: function(type, exception, button) {
-        debug.error("Browser.msgBox " + exception);
-    }
+  Buttons: {
+    OK: "OK"
+  },
+  msgBox: function(type, exception, button) {
+    debug.error("Browser.msgBox " + exception);
+  }
 };
 
 UrlFetchApp = {
-    fetch: function() {}
+  fetch: function() {}
 }
 
 Utilities = {
-    base64Encode : function() {}
+  base64Encode : function() {}
 }
 
 beforeEach(() =>  {
-    Browser.msgBox = jest.fn();
-    Utilities.base64Encode = jest.fn();
-    UrlFetchApp.fetch = jest.fn();
-    debug.enable(false);
-   
+  Browser.msgBox = jest.fn();
+  Utilities.base64Encode = jest.fn();
+  UrlFetchApp.fetch = jest.fn();
+  debug.enable(false);
 });
 
 function initJiraDummyConfig() {
-    setCfg('jira_url', "https://jiraserver");
-    setCfg('jira_username', "username");
-    setCfg('jira_password', "password");
+  setCfg('jira_url', "https://jiraserver");
+  setCfg('jira_username', "username");
+  setCfg('jira_password', "password");
 }
 
 test('no jira config should give an error when making a request', () => {
-    var requestObj = new Request();
+  var requestObj = new Request();
 
-    // no settings for Jira instance should give an error
-    //@TODO: require actual valid ticket number from used JIRA instance
-    requestObj.call("issueStatus", {
-        issueIdOrKey: "PBI-1"
-    });
-    var result = requestObj.getResponse();
-    expect(result.statusCode).toBe(-1);
-    expect(result.respData).not.toBeNull();
-    expect(result.respData.errorMessages).not.toBeNull();
+  // no settings for Jira instance should give an error
+  // @TODO: require actual valid ticket number from used JIRA instance
+  requestObj.call("issueStatus", {
+    issueIdOrKey: "PBI-1"
+  });
+  var result = requestObj.getResponse();
+  expect(result.statusCode).toBe(-1);
+  expect(result.respData).not.toBeNull();
+  expect(result.respData.errorMessages).not.toBeNull();
 });
 
 test('an exception when calling UrlFetchApp should be handled', () => {
-    initJiraDummyConfig();
-    var requestObj = new Request();
-    //  exception on UrlFetchApp should show a browser box
-    UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl,args) => {
-        throw "Error";
-    });
-    requestObj.call("issueStatus",{
-        issueIdOrKey: "PBI-1"
-    });
-    var result = requestObj.getResponse();
-    expect(Browser.msgBox.mock.calls.length).toBe(1);
-    expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
-    expect(Utilities.base64Encode.mock.calls.length).toBe(1);
-    expect(Utilities.base64Encode.mock.calls[0][0]).toBe("username:password");
-    expect(result.statusCode).toBe(500);
-    expect(result.respData).not.toBeNull();
-    expect(result.respData.errorMessages).not.toBeNull();
+  initJiraDummyConfig();
+  var requestObj = new Request();
+  // exception on UrlFetchApp should show a browser box
+  UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl,args) => {
+    throw "Error";
+  });
+  requestObj.call("issueStatus",{
+    issueIdOrKey: "PBI-1"
+  });
+  var result = requestObj.getResponse();
+  expect(Browser.msgBox.mock.calls.length).toBe(1);
+  expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
+  expect(Utilities.base64Encode.mock.calls.length).toBe(1);
+  expect(Utilities.base64Encode.mock.calls[0][0]).toBe("username:password");
+  expect(result.statusCode).toBe(500);
+  expect(result.respData).not.toBeNull();
+  expect(result.respData.errorMessages).not.toBeNull();
 });
 
 test('invalid JSON from mock JIRA should be handled', () => {

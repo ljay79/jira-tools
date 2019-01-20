@@ -67,8 +67,7 @@ function JST_getTotalForSearchResult(JQL) {
   };
 
   response = request.call('search', data, {'method' : 'post'}).getResponse();
-
-  if(response.statusCode === 200 && response.respData && response.respData.total) {
+  if(response.statusCode === 200 && response.respData && response.respData.total >= 0) {
     debug.log("JST_getTotalForSearchResult [%s]: response: %s", response.statusCode, response);
     return parseInt(response.respData.total || 0);
   } else {
@@ -123,7 +122,7 @@ function JST_search(JQL, Fields, Limit, StartAt) {
 
   response = request.call('search', data, {'method' : 'post'}).getResponse();
 
-  if(response.statusCode === 200 && response.respData && response.respData.total) {
+  if(response.statusCode === 200 && response.respData && response.respData.total >= 0) {
     //debug.log("JST_search [%s], Total: %s: response: %s", response.statusCode, response.respData.total, response);
     debug.log("JST_search [%s], Total: %s", response.statusCode, response.respData.total);
 

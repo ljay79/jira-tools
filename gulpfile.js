@@ -10,10 +10,10 @@ var changed = require('gulp-changed');
  * Cleans out the dist folders of previously built or pulled code
  */
 gulp.task('clean', function(done) {
-    del(['dist/build/**/*', 'dist/build/**/.*','dist/pull/**/*', 'dist/pull/**/.*']).then(paths => {
-        console.log('Deleted files and folders:\n', paths.join('\n'));
-        done();
-    });
+  del(['dist/build/**/*', 'dist/build/**/.*','dist/pull/**/*', 'dist/pull/**/.*']).then(paths => {
+    console.log('Deleted files and folders:\n', paths.join('\n'));
+    done();
+  });
 });
 
 
@@ -22,15 +22,16 @@ gulp.task('clean', function(done) {
  * required for the code base to run locally in Node and would error in GAS
  */
 gulp.task('build', function(done) {
-    var stream = gulp
-    .src(["src/**/*","src/**/.*"])
-    .pipe(replace(/\/\/ Node required code block/g, "/* Node required code block"))
-    .pipe(replace(/\/\/*.?End of Node required code block/g, "// End of Node required code block*/"))
-    .pipe(gulp.dest("dist/build"));
+  var stream = gulp
+  .src(["src/**/*","src/**/.*"])
+  // .pipe(replace("module.exports","//module.exports"))
+  .pipe(replace(/\/\/ Node required code block/g, "/* Node required code block"))
+  .pipe(replace(/\/\/*.?End of Node required code block/g, "// End of Node required code block*/"))
+  .pipe(gulp.dest("dist/build"));
 
-    stream.on('end',function () {
-        done();
-    });
+  stream.on('end',function () {
+    done();
+  });
 });
 
 /**
@@ -38,13 +39,13 @@ gulp.task('build', function(done) {
  * https://github.com/google/clasp
  */
 gulp.task('clasp-push', function (done) {
-    process.chdir('dist/build');
-    execSh('clasp push', function (err, stdout, stderr) {
-      console.log(stdout);
-      console.log(stderr);
-      process.chdir('/');
-      done(err);
-    });
+  process.chdir('dist/build');
+  execSh('clasp push', function (err, stdout, stderr) {
+    console.log(stdout);
+    console.log(stderr);
+    process.chdir('/');
+    done(err);
+  });
   });
 
 /**
@@ -52,19 +53,19 @@ gulp.task('clasp-push', function (done) {
  * https://github.com/google/clasp
  */
 gulp.task('clasp-pull', function (done) {
-    var stream = gulp
-    .src(["src/.clasp.json"])
-    .pipe(gulp.dest("dist/pull"));
+  var stream = gulp
+  .src(["src/.clasp.json"])
+  .pipe(gulp.dest("dist/pull"));
 
-    stream.on('end',function () {
-        process.chdir('dist/pull');
-        execSh('clasp pull', function (err, stdout, stderr) {
-            console.log(stdout);
-            console.log(stderr);
-            process.chdir('../../');
-            done(err);
-        });
+  stream.on('end',function () {
+    process.chdir('dist/pull');
+    execSh('clasp pull', function (err, stdout, stderr) {
+      console.log(stdout);
+      console.log(stderr);
+      process.chdir('../../');
+      done(err);
     });
+  });
 })
 
 /**
@@ -72,20 +73,20 @@ gulp.task('clasp-pull', function (done) {
  * which is required for the code base to run locally in Node
  */
 gulp.task('un-google', function (done) {
-    var stream = gulp
-    .src(["dist/pull/**/*.js"])
-    .pipe(rename(function (path) {
-        path.extname = ".gs";
-      }))
-    //.pipe(replace("//module.exports","module.exports"))
-    .pipe(replace(/\/\* Node required code block/g, "// Node required code block"))
-    .pipe(replace(/\/\/*.?End of Node required code block\*\//g, "// End of Node required code block"))
-    .pipe(gulp.dest("dist/pull"));
+  var stream = gulp
+  .src(["dist/pull/**/*.js"])
+  .pipe(rename(function (path) {
+    path.extname = ".gs";
+    }))
+  // .pipe(replace("//module.exports","module.exports"))
+  .pipe(replace(/\/\* Node required code block/g, "// Node required code block"))
+  .pipe(replace(/\/\/*.?End of Node required code block\*\//g, "// End of Node required code block"))
+  .pipe(gulp.dest("dist/pull"));
 
-    stream.on('end',function () {
-        del(["dist/pull/**/*.js"]);
-        done();
-    });
+  stream.on('end',function () {
+    del(["dist/pull/**/*.js"]);
+    done();
+  });
   })
 
 /**
@@ -93,10 +94,10 @@ gulp.task('un-google', function (done) {
  * current source
  */
 gulp.task('diff-pulled-code', function (done) {
-    return gulp
-        .src(["dist/pull/**/*","dist/pull/**/.*"])
-        .pipe(diff('src'))
-        .pipe(diff.reporter({ fail: false }));
+  return gulp
+    .src(["dist/pull/**/*","dist/pull/**/.*"])
+    .pipe(diff('src'))
+    .pipe(diff.reporter({ fail: false }));
 });
 
 /**
@@ -104,10 +105,10 @@ gulp.task('diff-pulled-code', function (done) {
  * the src folder
  */
 gulp.task('copy-changed-pulled-code', function (done) {
-    return gulp
-        .src(["dist/pull/**/*","dist/pull/**/.*"])
-        .pipe(changed('src'))
-        .pipe(gulp.dest('src'))
+  return gulp
+    .src(["dist/pull/**/*","dist/pull/**/.*"])
+    .pipe(changed('src'))
+    .pipe(gulp.dest('src'))
 });
 
 /**
@@ -119,6 +120,4 @@ gulp.task('deploy', gulp.series('clean', 'build', 'clasp-push'));
  * Pulls GAS source code into dist/pull and compares it visually so it can be
  * copied over into src if required
  */
-gulp.task('pull-code', gulp.series('clean', 'clasp-pull', 'un-google'));
-
- 
+gulp.task('pull', gulp.series('clean', 'clasp-pull', 'un-google'));

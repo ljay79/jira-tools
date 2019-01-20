@@ -1,4 +1,5 @@
 /.project
+/.settings
 /.buildpath
 /.gitconfig
 /node_modules
