@@ -298,31 +298,38 @@ Then install dependencies
 npm install
 ```
 
-> *Note:* It will most likely throw a warning about `gulp-util` which you can safly ignore for now.
-> `npm WARN deprecated gulp-util@3.0.8: gulp-util is deprecated - replace it, following the guidelines at https://medium.com/gulpjs/gulp-util-ca3b1f9f9ac5` 
-
-
 Check gulp runs ok and displays list of tasks
 ```sh
 $ gulp --tasks
-[10:49:24] Tasks for /jira-tools/gulpfile.js
-[10:49:25] ├── clean
-[10:49:25] ├── build
-[10:49:25] ├── clasp-push
-[10:49:25] ├── clasp-pull
-[10:49:25] ├── un-google
-[10:49:25] ├── copy-changed-pulled-code
-[10:49:25] ├─┬ deploy
-[10:49:25] │ └─┬ <series>
-[10:49:25] │   ├── clean
-[10:49:25] │   ├── build
-[10:49:25] │   └── clasp-push
-[10:49:25] └─┬ pull
-[10:49:25]   └─┬ <series>
-[10:49:25]     ├── clean
-[10:49:25]     ├── clasp-pull
-[10:49:25]     └── un-google
-[10:49:25]     └── copy-changed-pulled-code
+├── clean
+├── build
+├── set-environment-config
+├── use-test-environment
+├── clasp-push
+├── clasp-pull
+├── un-google
+├── copy-changed-pulled-code
+├─┬ deploy
+│ └─┬ <series>
+│   ├── clean
+│   ├── build
+│   ├── set-environment-config
+│   └── clasp-push
+├─┬ deploy-test
+│ └─┬ <series>
+│   ├── use-test-environment
+│   └─┬ deploy
+│     └─┬ <series>
+│       ├── clean
+│       ├── build
+│       ├── set-environment-config
+│       └── clasp-push
+└─┬ pull
+  └─┬ <series>
+    ├── clean
+    ├── clasp-pull
+    ├── un-google
+    └── copy-changed-pulled-code
 ```
 
 Check unit tests are running
@@ -461,6 +468,11 @@ npm test -- --listTests
 npm test ./test/jiraApi.test.js
 ```
 
+- see unit test coverage
+```sh
+npx jest --coverage
+```
+
 ### Deploying using `gulp` task
 
 Using the following gulp task will clean the export and require statements and push the code to the configured GAS project.
@@ -469,7 +481,14 @@ Using the following gulp task will clean the export and require statements and p
 gulp deploy
 ```
 
-This task does actually 3 steps as one; `clean`, `build` and `clasp-push`.
+This task does actually 4 steps as one; `clean`, `build`, `set-environment-config` and `clasp-push`.
+The deployment will update the configuration using one for the files in _/configuration/test_ or configuration/production. This will overwrite the default configuration file _./src/environmentConfiguration.gs_ .By default the _production_ folder is used but you can specify the environment you wish by using the following tasks
+
+```sh
+gulp deploy --environment test
+gulp deploy-test
+```
+Both commands above will use the test config file. The second task being a shortcut to avoid entering the parameter/
 
 ### Pulling changes back from your Google project
 
@@ -479,7 +498,8 @@ If you make changes to the code in the google project web interface you can pull
 gulp pull
 ```
 
-This will pull the changes down from your GAS project, and uncomment the require and exports statments. The files will be pulled into a temporary folder 'dist/pull' and changed files copied bac into against _./src_ . It does execute multiple tasks as one; `clean`, `clasp-pull`, `un-google` , `copy-changed-pulled-code`.
+Use this script if you have changed the source code within the GAS editors while testing on the GAS envrironment.
+This task will pull the changes down from your GAS project into a temporary folder 'dist/pull'. Then the script will uncomment the require and exports statments. The files copied into the_./src_ folder. It does execute multiple tasks as one; `clean`, `clasp-pull`, `un-google` , `copy-changed-pulled-code`.
 
 ### Commit and push changes to git repository
 
