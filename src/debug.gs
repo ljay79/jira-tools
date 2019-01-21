@@ -64,5 +64,5 @@ function toggleDebugging(formData) {
 
 
 // Node required code block
-module.exports = debug;
+module.exports = {debug:debug, toggleDebugging:toggleDebugging}
 // End of Node required code block
