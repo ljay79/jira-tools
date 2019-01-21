@@ -1,4 +1,6 @@
 
+
+global.environmentConfiguration = require('../src/environmentConfiguration.gs');
 const getCfg = require("../src/settings.gs").getCfg;
 const setCfg = require("../src/settings.gs").setCfg;
 const hasSettings = require("../src/settings.gs").hasSettings;

@@ -1,6 +1,6 @@
 
 PropertiesService = require('./mocks/PropertiesService');
-environmentConfiguration = require('../src/environmentConfiguration.gs');
+global.environmentConfiguration = require('../src/environmentConfiguration.gs');
 
 beforeEach(() =>  {
   jest.resetAllMocks();
