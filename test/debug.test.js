@@ -1,11 +1,12 @@
 
 PropertiesService = require('./mocks/PropertiesService');
-
+environmentConfiguration = require('../src/environmentConfiguration.gs');
 
 beforeEach(() =>  {
   jest.resetAllMocks();
   jest.resetModules();
   PropertiesService.resetMocks();
+  environmentConfiguration.debugEnabled = false;
 });
 
 test("debugging calls console when enabled",() =>{
@@ -46,7 +47,9 @@ test("debugging makes no calls to console when disabled",() =>{
   expect(consoleWarnSpy).toBeCalledTimes(0);
 });
 
-test("Init function does not cause and exception when PropertiesService.getUserProperties  is not valid",() =>{
+test("Init function handles exceptions when PropertiesService.getUserProperties is not availble",() =>{
+  //PropertiesService.getUserProperties throws an exception in Authmode.NONE
+  // ensure it causes no issues
   PropertiesService.getUserProperties.mockImplementation( ()=> {
     throw "getUserProperties is not availble"
   });
@@ -71,6 +74,7 @@ test("Debugging is enabled by default when PropertiesService.getUserProperties r
 
 
 test("Debugging is disabled by default when PropertiesService.getUserProperties returns null or false",() =>{
+  
   PropertiesService.mockUserProps.getProperty.mockImplementation( ()=> {
       return '';
   });
@@ -90,6 +94,18 @@ test("Debugging is disabled by default when PropertiesService.getUserProperties 
   debug2.log("log message should not be output");
   expect(PropertiesService.getUserProperties().getProperty).toBeCalled();
   expect(consoleLogSpy).toBeCalledTimes(0);
+});
+
+test("Environment default debugging as true overrides user preferences",() =>{
+  PropertiesService.mockUserProps.getProperty.mockImplementation(() => {
+    return '';
+  });
+  environmentConfiguration.debugEnabled = true;
+  var debug = require("../src/debug.gs").debug;
+  var consoleLogSpy = jest.spyOn(global.console, 'log');
+  debug.log("log message should be output");
+  expect(PropertiesService.getUserProperties().getProperty).toBeCalled();
+  expect(consoleLogSpy).toBeCalledTimes(1);
 });
 
 test("Toggling debugging works when turning ON debugging",() =>{
@@ -120,4 +136,21 @@ test("Toggling debugging works when turning OFF debugging",() =>{
   expect(PropertiesService.mockUserProps.setProperty).toBeCalledWith("debugging","false");
   debug.log("this should NOT be logged out");
   expect(consoleLogSpy).toBeCalledTimes(1);
+});
+
+
+test("Toggling debugging works when turning OFF debugging but is overriden by environmentconfig",() =>{
+  PropertiesService.mockUserProps.getProperty.mockImplementation(() => {
+    return 'false';
+  });
+  environmentConfiguration.debugEnabled = true;
+  var debug = require("../src/debug.gs").debug;
+  var toggleDebugging = require("../src/debug.gs").toggleDebugging;
+  var consoleLogSpy = jest.spyOn(global.console, 'log');
+  toggleDebugging('0');
+  expect(consoleLogSpy).toBeCalledTimes(1);// there is a console.log call in toggleDebugging
+  expect(PropertiesService.mockUserProps.setProperty).toBeCalledTimes(1);
+  expect(PropertiesService.mockUserProps.setProperty).toBeCalledWith("debugging","false");
+  debug.log("this should be be logged because its set in the enviroment by default");
+  expect(consoleLogSpy).toBeCalledTimes(2);
 });

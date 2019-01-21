@@ -38,6 +38,7 @@ debug = (function(){
 
   // init debug enabled by getting users store property value
   init = (function(){
+
     // little hacky, but had to come arround the add-on lifecycle when trying to access userproperty onOpen()
     // as this debug function is parsed and executed on all events and triggers.
     try {
@@ -45,6 +46,9 @@ debug = (function(){
       var uDebugging = userProps.getProperty('debugging');
       that.enable( uDebugging == 'true' );
     } catch(e){}
+    if (environmentConfiguration.debugEnabled) {
+      that.enable(true);
+    }
   })();
 
   return that;
@@ -58,7 +62,7 @@ function toggleDebugging(formData) {
   var userProps = PropertiesService.getUserProperties();
   var debugging = formData=='1' ? 'true' : 'false';
   userProps.setProperty('debugging', debugging);
-  debug.enable( debugging=='true' );
+  debug.enable( (debugging=='true') ||  environmentConfiguration.debugEnabled );
   console.log('Debugging switched [%s]', (debugging=='true' ? 'ON' : 'OFF'));
 }
 
