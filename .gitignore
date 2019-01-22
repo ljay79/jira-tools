@@ -6,3 +6,4 @@
 /dist
 /src/.clasp.json
 /.vscode
+/coverage
