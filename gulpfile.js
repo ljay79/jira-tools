@@ -6,6 +6,7 @@ var rename = require('gulp-rename');
 var changed = require('gulp-changed');
 var argv = require('yargs').argv;
 var directoryExists = require('directory-exists');
+var defaultBuildEnvironment = "production";
 
 /**
  * Cleans out the dist folders of previously built or pulled code
@@ -36,18 +37,22 @@ gulp.task('build', function (done) {
 });
 
 /**
- * Reads an environemt parameter, Selects the correct enviroment config and drops it into the dist/build folder.
- * Default (no environment set) is "test"
+ * Reads an environemt parameter, Selects the correct enviroment config and drops it into the dist/build folder
+ * 
  */
-var set_environment_config = function (done) {
-  var isProduction = (argv.production === undefined && argv.test !== undefined) ? false : true;
-  var environment = isProduction ? 'production' : 'test';
-
+gulp.task('set-environment-config', function (done) {
+  var environment = defaultBuildEnvironment;
+  if (argv.environment) {
+    environment = argv.environment;
+    console.log("Using environment specified in --environment parameter");
+  } else {
+    console.log("No environment specified in --environment parameter, using default");
+  }
   console.log("Using configuration for '" + environment + "' environment");
-  var configDirectory = "config/" + environment;
+  var configDirectory = "configuration/" + environment;
   directoryExists(configDirectory, (error, directoryFound) => {
     if (!directoryFound) {
-      throw "Config directory not found (" + configDirectory + ") - was environement set correctly";
+      throw "Configuration directory not found (" + configDirectory + ") - was environement set correctly";
       done(false);
     } else {
       var stream = gulp
@@ -59,17 +64,10 @@ var set_environment_config = function (done) {
       });
     }
   });
-};
-gulp.task('set-environment-config', set_environment_config);
-gulp.task('set-env', set_environment_config); // alias
+});
 
-/**
- * Forcing the environment to be "test".
- * @param done
- * @returns TRUE
- */
 gulp.task('use-test-environment', function (done) {
-  argv.test = true;
+  defaultBuildEnvironment = "test";
   done();
   return true;
 });
@@ -142,15 +140,17 @@ gulp.task('copy-changed-pulled-code', function (done) {
 
 /**
  * Deploys code from source upto GAS
- * use --production or --test parameter to specify production or test environment
+ * use --environment parameter to specify production or test
  */
 gulp.task('deploy', gulp.series('clean', 'build', 'set-environment-config', 'clasp-push'));
+
 
 /**
  * Deploys code from source upto GAS
  * forces deployment environment to use test config
  */
 gulp.task('deploy-test', gulp.series('use-test-environment', 'deploy'));
+
 
 /**
  * Pulls GAS source code into dist/pull and copys changed files into src
