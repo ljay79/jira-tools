@@ -37,10 +37,11 @@ gulp.task('build', function (done) {
 
 /**
  * Reads an environemt parameter, Selects the correct enviroment config and drops it into the dist/build folder.
- * Default (no environment set) is "test"
+ * If no environment set the default is "production"
  */
-var set_environment_config = function (done) {
-  var isProduction = (argv.production === undefined && argv.test !== undefined) ? false : true;
+gulp.task('set-environment-config', function (done) {
+  var isProduction = true;
+  isProduction = (argv.test !== undefined) ? false : true;
   var environment = isProduction ? 'production' : 'test';
 
   console.log("Using configuration for '" + environment + "' environment");
@@ -59,9 +60,7 @@ var set_environment_config = function (done) {
       });
     }
   });
-};
-gulp.task('set-environment-config', set_environment_config);
-gulp.task('set-env', set_environment_config); // alias
+});
 
 /**
  * Forcing the environment to be "test".
