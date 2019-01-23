@@ -6,7 +6,6 @@ var rename = require('gulp-rename');
 var changed = require('gulp-changed');
 var argv = require('yargs').argv;
 var directoryExists = require('directory-exists');
-var defaultBuildEnvironment = "production";
 
 /**
  * Cleans out the dist folders of previously built or pulled code
@@ -37,22 +36,19 @@ gulp.task('build', function (done) {
 });
 
 /**
- * Reads an environemt parameter, Selects the correct enviroment config and drops it into the dist/build folder
- * 
+ * Reads an environemt parameter, Selects the correct enviroment config and drops it into the dist/build folder.
+ * If no environment set the default is "production"
  */
 gulp.task('set-environment-config', function (done) {
-  var environment = defaultBuildEnvironment;
-  if (argv.environment) {
-    environment = argv.environment;
-    console.log("Using environment specified in --environment parameter");
-  } else {
-    console.log("No environment specified in --environment parameter, using default");
-  }
+  var isProduction = true;
+  isProduction = (argv.test !== undefined) ? false : true;
+  var environment = isProduction ? 'production' : 'test';
+
   console.log("Using configuration for '" + environment + "' environment");
-  var configDirectory = "configuration/" + environment;
+  var configDirectory = "config/" + environment;
   directoryExists(configDirectory, (error, directoryFound) => {
     if (!directoryFound) {
-      throw "Configuration directory not found (" + configDirectory + ") - was environement set correctly";
+      throw "Config directory not found (" + configDirectory + ") - was environement set correctly";
       done(false);
     } else {
       var stream = gulp
@@ -66,8 +62,13 @@ gulp.task('set-environment-config', function (done) {
   });
 });
 
+/**
+ * Forcing the environment to be "test".
+ * @param done
+ * @returns TRUE
+ */
 gulp.task('use-test-environment', function (done) {
-  defaultBuildEnvironment = "test";
+  argv.test = true;
   done();
   return true;
 });
@@ -140,17 +141,15 @@ gulp.task('copy-changed-pulled-code', function (done) {
 
 /**
  * Deploys code from source upto GAS
- * use --environment parameter to specify production or test
+ * use --production or --test parameter to specify production or test environment
  */
 gulp.task('deploy', gulp.series('clean', 'build', 'set-environment-config', 'clasp-push'));
-
 
 /**
  * Deploys code from source upto GAS
  * forces deployment environment to use test config
  */
 gulp.task('deploy-test', gulp.series('use-test-environment', 'deploy'));
-
 
 /**
  * Pulls GAS source code into dist/pull and copys changed files into src

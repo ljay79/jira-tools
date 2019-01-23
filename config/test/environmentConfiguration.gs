@@ -3,7 +3,7 @@
  */
 
 var environmentConfiguration = {
-  "name": "Production",
-  "description": "Production deployment of Add On",
-  "debugEnabled": false
-}
+  "name": "Test",
+  "description": "GAS test enviroment",
+  "debugEnabled": true
+};
