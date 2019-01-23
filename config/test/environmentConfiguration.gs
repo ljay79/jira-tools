@@ -6,4 +6,4 @@ var environmentConfiguration = {
   "name": "Test",
   "description": "GAS test enviroment",
   "debugEnabled": true
-}
+};
