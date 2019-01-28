@@ -16,15 +16,6 @@ var BUILD = '1.0.6';
  */
 function onOpen(e) {
   addMenu();
-
-  if (e && e.authMode == ScriptApp.AuthMode.FULL) {
-    var userProps = PropertiesService.getUserProperties();
-    debug.enable( (userProps.getProperty('debugging')=='true') );
-  }
-  if (environmentConfiguration.debugEnabled) { 
-    debug.enable(true) 
-  }
-  
 };
 
 /**
