@@ -39,22 +39,24 @@ debug = (function(){
    * @return {this}    Allows chaining
    */
   that.enable = function( enable ) {
-    log_enabled = false;
-	try {
+    var userDebugFlag = false;
+	  try {
       // getUserProperties may not be available at this point in the lifecycle
       var userProps = PropertiesService.getUserProperties();
       var uDebugging = userProps.getProperty('debugging');
-      log_enabled = (uDebugging == 'true');
+      userDebugFlag = (uDebugging == 'true');
     } catch(e){
       // do nothing - its expected that there may be an exception
     }
-
-    log_enabled = enable || log_enabled || environmentConfiguration.debugEnabled;
+    log_enabled = enable || userDebugFlag || environmentConfiguration.debugEnabled;
     // if this has been called the debugger has been initialised
     initialised = true;
-
     return that;
   };
+
+  that.isEnabled = function() {
+    return log_enabled;
+  }
 
   return that;
 })();
@@ -72,7 +74,7 @@ function toggleDebugging(formData) {
     'Debugging preference switched to [%s] Environment setting is [%s] Debugging is [%s]', 
     (debugging=='true' ? 'ON' : 'OFF'), 
     (environmentConfiguration.debugEnabled ? 'ON' : 'OFF'),
-    (debugEnabled ? 'ON' : 'OFF')
+    (debug.isEnabled() ? 'ON' : 'OFF')
   );
 }
 

@@ -210,13 +210,6 @@ test('check if debug mode is turned on appropriately', () => {
     
     var debug = require("../src/debug.gs").debug;
    
-    // track the value sent to debug.enable to see whether it is activated or not.
-    // this will give us the result if debugging is enabled.
-    var finalDebugState = false; // by default debugging is not on
-    debug.enable = jest.fn().mockImplementation((enabled) => {
-      finalDebugState = enabled;
-    });
-
     // try to log on the debugger which will trigger a call to debug.enable
     debug.log("Just a test");
 
@@ -224,7 +217,7 @@ test('check if debug mode is turned on appropriately', () => {
     // this makes it easier to see the failed scenario from the jest output
 
     var actual = extend({}, scenario);
-    actual.debugIsEnabled = finalDebugState;
+    actual.debugIsEnabled = debug.isEnabled();
     expect(actual).toEqual(scenario);
 
   });
