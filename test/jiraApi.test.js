@@ -9,20 +9,20 @@ Browser = {
   Buttons: {
     OK: "OK"
   },
-  msgBox: function(type, exception, button) {
+  msgBox: function (type, exception, button) {
     debug.error("Browser.msgBox " + exception);
   }
 };
 
 UrlFetchApp = {
-  fetch: function() {}
+  fetch: function () { }
 }
 
 Utilities = {
-  base64Encode : function() {}
+  base64Encode: function () { }
 }
 
-beforeEach(() =>  {
+beforeEach(() => {
   Browser.msgBox = jest.fn();
   Utilities.base64Encode = jest.fn();
   UrlFetchApp.fetch = jest.fn();
@@ -53,10 +53,10 @@ test('an exception when calling UrlFetchApp should be handled', () => {
   initJiraDummyConfig();
   var requestObj = new Request();
   // exception on UrlFetchApp should show a browser box
-  UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl,args) => {
+  UrlFetchApp.fetch.mockImplementationOnce((fetchUrl, args) => {
     throw "Error";
   });
-  requestObj.call("issueStatus",{
+  requestObj.call("issueStatus", {
     issueIdOrKey: "PBI-1"
   });
   var result = requestObj.getResponse();
@@ -70,195 +70,195 @@ test('an exception when calling UrlFetchApp should be handled', () => {
 });
 
 test('invalid JSON from mock JIRA should be handled', () => {
-    initJiraDummyConfig();
-    var requestObj = new Request();
-    Utilities.base64Encode.mockImplementation((param) => "base64:" + param);
-    // exception on UrlFetchApp should show a browser box
-    UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl, args) => {
-        return {
-            getResponseCode: function() {
-                return 500;
-            },
-            getContentText: function() {
-                return "THIS IS NOT VALID JSON";
-            },
-            getAllHeaders: function() {
-                return {};
-            }
-        };
-    });
+  initJiraDummyConfig();
+  var requestObj = new Request();
+  Utilities.base64Encode.mockImplementation((param) => "base64:" + param);
+  // exception on UrlFetchApp should show a browser box
+  UrlFetchApp.fetch.mockImplementationOnce((fetchUrl, args) => {
+    return {
+      getResponseCode: function () {
+        return 500;
+      },
+      getContentText: function () {
+        return "THIS IS NOT VALID JSON";
+      },
+      getAllHeaders: function () {
+        return {};
+      }
+    };
+  });
 
-    var successHandler = jest.fn();
-    var errorHandler = jest.fn();
-    requestObj.call("issueStatus",{
-        issueIdOrKey: "PBI-2"
-    }).withSuccessHandler(successHandler).withFailureHandler(errorHandler);
+  var successHandler = jest.fn();
+  var errorHandler = jest.fn();
+  requestObj.call("issueStatus", {
+    issueIdOrKey: "PBI-2"
+  }).withSuccessHandler(successHandler).withFailureHandler(errorHandler);
 
-    var result = requestObj.getResponse();
-    expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
-    expect(successHandler.mock.calls.length).toBe(0);
-    expect(errorHandler.mock.calls.length).toBe(1);
-    expect(result.statusCode).toBe(500);
-    expect(result.method).toBe('get');
-    expect(result.respData).not.toBeNull();
-    expect(result.respData.errorMessages).not.toBeNull();
+  var result = requestObj.getResponse();
+  expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
+  expect(successHandler.mock.calls.length).toBe(0);
+  expect(errorHandler.mock.calls.length).toBe(1);
+  expect(result.statusCode).toBe(500);
+  expect(result.method).toBe('get');
+  expect(result.respData).not.toBeNull();
+  expect(result.respData.errorMessages).not.toBeNull();
 });
 
 test('a basic request should be handloed with password and username included', () => {
-    initJiraDummyConfig();
-    var requestObj = new Request();
-    Utilities.base64Encode.mockImplementation((param) => "base64:" + param);
-    //  exception on UrlFetchApp should show a browser box
-    UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl, args) => {
-        return {
-            getResponseCode: function() {
-                return 200;
-            },
-            getContentText: function() {
-                return "{}";
-            },
-            getAllHeaders: function() {
-                return {};
-            }
-        };
-    });
-    var successHandler = jest.fn();
-    var errorHandler = jest.fn();
-    requestObj.call("issueStatus",{
-        issueIdOrKey: "PBI-2"
-    })
-    expect(Browser.msgBox.mock.calls.length).toBe(0);
-    expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
-    expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/issue/PBI-2?fields=status");
-    expect(UrlFetchApp.fetch.mock.calls[0][1]).not.toBeNull();
-    expect(UrlFetchApp.fetch.mock.calls[0][1]["method"]).not.toBeNull();
-    expect(UrlFetchApp.fetch.mock.calls[0][1]["method"]).toBe("get");
-    expect(UrlFetchApp.fetch.mock.calls[0][1]["headers"]).not.toBeNull();
-    expect(UrlFetchApp.fetch.mock.calls[0][1]["headers"]["Authorization"]).not.toBeNull();
-    expect(UrlFetchApp.fetch.mock.calls[0][1]["headers"]["Authorization"]).toBe("Basic base64:username:password");
-    
-    requestObj.withSuccessHandler(successHandler).withFailureHandler(errorHandler);
-    expect(successHandler.mock.calls.length).toBe(1);
-    expect(errorHandler.mock.calls.length).toBe(0);
+  initJiraDummyConfig();
+  var requestObj = new Request();
+  Utilities.base64Encode.mockImplementation((param) => "base64:" + param);
+  //  exception on UrlFetchApp should show a browser box
+  UrlFetchApp.fetch.mockImplementationOnce((fetchUrl, args) => {
+    return {
+      getResponseCode: function () {
+        return 200;
+      },
+      getContentText: function () {
+        return "{}";
+      },
+      getAllHeaders: function () {
+        return {};
+      }
+    };
+  });
+  var successHandler = jest.fn();
+  var errorHandler = jest.fn();
+  requestObj.call("issueStatus", {
+    issueIdOrKey: "PBI-2"
+  })
+  expect(Browser.msgBox.mock.calls.length).toBe(0);
+  expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
+  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/issue/PBI-2?fields=status");
+  expect(UrlFetchApp.fetch.mock.calls[0][1]).not.toBeNull();
+  expect(UrlFetchApp.fetch.mock.calls[0][1]["method"]).not.toBeNull();
+  expect(UrlFetchApp.fetch.mock.calls[0][1]["method"]).toBe("get");
+  expect(UrlFetchApp.fetch.mock.calls[0][1]["headers"]).not.toBeNull();
+  expect(UrlFetchApp.fetch.mock.calls[0][1]["headers"]["Authorization"]).not.toBeNull();
+  expect(UrlFetchApp.fetch.mock.calls[0][1]["headers"]["Authorization"]).toBe("Basic base64:username:password");
 
-    var result = requestObj.getResponse();
-    expect(result.statusCode).toBe(200);
-    expect(result.method).toBe('get');
-    expect(result.respData).not.toBeNull();
-    expect(result.respData.errorMessages).toBeUndefined();
+  requestObj.withSuccessHandler(successHandler).withFailureHandler(errorHandler);
+  expect(successHandler.mock.calls.length).toBe(1);
+  expect(errorHandler.mock.calls.length).toBe(0);
+
+  var result = requestObj.getResponse();
+  expect(result.statusCode).toBe(200);
+  expect(result.method).toBe('get');
+  expect(result.respData).not.toBeNull();
+  expect(result.respData.errorMessages).toBeUndefined();
 
 
 });
 
 test('query parameters should be added to the url for user search method', () => {
-    initJiraDummyConfig();
-    var requestObj = new Request();
-    // exception on UrlFetchApp should show a browser box
-    UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl, args) => {
-        return {
-            getResponseCode: function() {
-                return 200;
-            },
-            getContentText: function() {
-                return "{}";
-            },
-            getAllHeaders: function() {
-                return {};
-            }
-        };
-    });
-    var successHandler = jest.fn();
-    var errorHandler = jest.fn();
+  initJiraDummyConfig();
+  var requestObj = new Request();
+  // exception on UrlFetchApp should show a browser box
+  UrlFetchApp.fetch.mockImplementationOnce((fetchUrl, args) => {
+    return {
+      getResponseCode: function () {
+        return 200;
+      },
+      getContentText: function () {
+        return "{}";
+      },
+      getAllHeaders: function () {
+        return {};
+      }
+    };
+  });
+  var successHandler = jest.fn();
+  var errorHandler = jest.fn();
 
-    requestObj.call("userSearch", {
-        username: "paul"
-    }).withSuccessHandler(successHandler).withFailureHandler(errorHandler);
+  requestObj.call("userSearch", {
+    username: "paul"
+  }).withSuccessHandler(successHandler).withFailureHandler(errorHandler);
 
-    var result = requestObj.getResponse();
+  var result = requestObj.getResponse();
 
-    expect(Browser.msgBox.mock.calls.length).toBe(0);
-    //@TODO: I expected this from the code - but it doesnt work (possibly a bug)
-    //"https://jiraserver/rest/api/2/user/search?startAt=0&maxResults=100&username=paul"
-    expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/user/search?username=paul");
-    expect(result.statusCode).toBe(200);
-    expect(result.respData).not.toBeNull();
-    expect(result.method).toBe('get');
-    expect(result.respData.errorMessages).toBeUndefined();
-    expect(successHandler.mock.calls.length).toBe(1);
-    expect(errorHandler.mock.calls.length).toBe(0);
+  expect(Browser.msgBox.mock.calls.length).toBe(0);
+  //@TODO: I expected this from the code - but it doesnt work (possibly a bug)
+  //"https://jiraserver/rest/api/2/user/search?startAt=0&maxResults=100&username=paul"
+  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/user/search?username=paul");
+  expect(result.statusCode).toBe(200);
+  expect(result.respData).not.toBeNull();
+  expect(result.method).toBe('get');
+  expect(result.respData.errorMessages).toBeUndefined();
+  expect(successHandler.mock.calls.length).toBe(1);
+  expect(errorHandler.mock.calls.length).toBe(0);
 
 
 });
 test('a jira dashboard request is made correctly', () => {
-    initJiraDummyConfig();
-    var requestObj = new Request();
-    //  exception on UrlFetchApp should show a browser box
-    UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl,args) => {
-        return {
-            getResponseCode: function() {
-                return 200;
-            },
-            getContentText: function() {
-                return "{}";
-            },
-            getAllHeaders: function() {
-                return {};
-            }
-        };
-    });
-    requestObj.call("dashboard", {})
-    var result = requestObj.getResponse();
-    expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
-    expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/dashboard");
-    expect(result.statusCode).toBe(200);
-    expect(result.respData).not.toBeNull();
-    expect(result.respData.errorMessages).toBeUndefined();
+  initJiraDummyConfig();
+  var requestObj = new Request();
+  //  exception on UrlFetchApp should show a browser box
+  UrlFetchApp.fetch.mockImplementationOnce((fetchUrl, args) => {
+    return {
+      getResponseCode: function () {
+        return 200;
+      },
+      getContentText: function () {
+        return "{}";
+      },
+      getAllHeaders: function () {
+        return {};
+      }
+    };
+  });
+  requestObj.call("dashboard", {})
+  var result = requestObj.getResponse();
+  expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
+  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/dashboard");
+  expect(result.statusCode).toBe(200);
+  expect(result.respData).not.toBeNull();
+  expect(result.respData.errorMessages).toBeUndefined();
 
 
 });
 
 test('a PUT request is made for updating issues', () => {
-    initJiraDummyConfig();
-    var requestObj = new Request();
-    //  exception on UrlFetchApp should show a browser box
-    UrlFetchApp.fetch.mockImplementationOnce( (fetchUrl,args) => {
-        return {
-            getResponseCode: function() {
-                return 204;
-            },
-            getContentText: function() {
-                return "{}";
-            },
-            getAllHeaders: function() {
-                return {};
-            }
-        };
-    });
-    requestObj.call("issueUpdate",{
-        issueIdOrKey: "PBI-2",
-        "fields" : {
-            "summary": "NEW Summary",
-            "description": "Description",
-            "customfield_10200" : "Test 1",
-            "customfield_10201" : "Value 1"
-        }
-    });
-    var result = requestObj.getResponse();
-    expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
-    expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/issue/PBI-2");
-    expect(UrlFetchApp.fetch.mock.calls[0][1]["method"]).not.toBeNull();
-    expect(UrlFetchApp.fetch.mock.calls[0][1]["method"]).toBe("put");
-    expect(UrlFetchApp.fetch.mock.calls[0][1]["payload"]).not.toBeNull();
-    var payload = JSON.parse(UrlFetchApp.fetch.mock.calls[0][1]["payload"]);
-    expect(payload["fields"]).not.toBeNull();
-    expect(payload["fields"]["summary"]).not.toBeNull();
-    expect(payload["fields"]["summary"]).toBe("NEW Summary");
-    expect(UrlFetchApp.fetch.mock.calls[0][1]["contentType"]).not.toBeNull();
-    expect(UrlFetchApp.fetch.mock.calls[0][1]["contentType"]).toBe("application/json");
-    expect(result.statusCode).toBe(204);
-    expect(result.respData).not.toBeNull();
-    expect(result.method).toBe('put');
-    expect(result.respData.errorMessages).toBeUndefined();
+  initJiraDummyConfig();
+  var requestObj = new Request();
+  //  exception on UrlFetchApp should show a browser box
+  UrlFetchApp.fetch.mockImplementationOnce((fetchUrl, args) => {
+    return {
+      getResponseCode: function () {
+        return 204;
+      },
+      getContentText: function () {
+        return "{}";
+      },
+      getAllHeaders: function () {
+        return {};
+      }
+    };
+  });
+  requestObj.call("issueUpdate", {
+    issueIdOrKey: "PBI-2",
+    "fields": {
+      "summary": "NEW Summary",
+      "description": "Description",
+      "customfield_10200": "Test 1",
+      "customfield_10201": "Value 1"
+    }
+  });
+  var result = requestObj.getResponse();
+  expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
+  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/issue/PBI-2");
+  expect(UrlFetchApp.fetch.mock.calls[0][1]["method"]).not.toBeNull();
+  expect(UrlFetchApp.fetch.mock.calls[0][1]["method"]).toBe("put");
+  expect(UrlFetchApp.fetch.mock.calls[0][1]["payload"]).not.toBeNull();
+  var payload = JSON.parse(UrlFetchApp.fetch.mock.calls[0][1]["payload"]);
+  expect(payload["fields"]).not.toBeNull();
+  expect(payload["fields"]["summary"]).not.toBeNull();
+  expect(payload["fields"]["summary"]).toBe("NEW Summary");
+  expect(UrlFetchApp.fetch.mock.calls[0][1]["contentType"]).not.toBeNull();
+  expect(UrlFetchApp.fetch.mock.calls[0][1]["contentType"]).toBe("application/json");
+  expect(result.statusCode).toBe(204);
+  expect(result.respData).not.toBeNull();
+  expect(result.method).toBe('put');
+  expect(result.respData.errorMessages).toBeUndefined();
 
 
 });

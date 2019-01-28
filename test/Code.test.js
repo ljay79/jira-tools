@@ -74,12 +74,12 @@ test('check if debug mode is turned on appropriately', () => {
     { userDebug: true, defaultDebug: false, authmode: ScriptApp.AuthMode.NONE, debugIsEnabled: false },
     { userDebug: true, defaultDebug: false, authmode: ScriptApp.AuthMode.LIMITED, debugIsEnabled: true },
     { userDebug: true, defaultDebug: false, authmode: ScriptApp.AuthMode.FULL, debugIsEnabled: true },
-   // { userDebug: true, defaultDebug: true, authmode: ScriptApp.AuthMode.NONE, debugIsEnabled: true },
+    // { userDebug: true, defaultDebug: true, authmode: ScriptApp.AuthMode.NONE, debugIsEnabled: true },
     { userDebug: true, defaultDebug: true, authmode: ScriptApp.AuthMode.LIMITED, debugIsEnabled: true },
     { userDebug: true, defaultDebug: true, authmode: ScriptApp.AuthMode.FULL, debugIsEnabled: true },
     //{ userDebug: false, defaultDebug: true, authmode: ScriptApp.AuthMode.NONE, debugIsEnabled: true },
     //{ userDebug: false, defaultDebug: true, authmode: ScriptApp.AuthMode.LIMITED, debugIsEnabled: true },
-   // { userDebug: false, defaultDebug: true, authmode: ScriptApp.AuthMode.FULL, debugIsEnabled: true },
+    // { userDebug: false, defaultDebug: true, authmode: ScriptApp.AuthMode.FULL, debugIsEnabled: true },
   ];
   scenarioList.forEach((scenario) => {
     // reset the test environment and mocks from previous tests

@@ -35,7 +35,7 @@ function getPossibleTransitions(issueKey) {
     msgs = msgs.concat((resp.hasOwnProperty('warningMessages') ? resp.warningMessages : []));
 
     response.status = status;
-    response.errorMessage = "Could not fetch issues transition states: "+msgs.join("\n");
+    response.errorMessage = "Could not fetch issues transition states: " + msgs.join("\n");
   };
 
   var request = new Request();
@@ -53,14 +53,14 @@ function getPossibleTransitions(issueKey) {
  */
 function makeTransition(issueKey, transitionId) {
   var request = new Request();
-  request.call('issueTransitionUpdate', {issueIdOrKey: issueKey,"transition": {"id": transitionId}});
+  request.call('issueTransitionUpdate', { issueIdOrKey: issueKey, "transition": { "id": transitionId } });
   var resp = request.getResponse();
-  returnData = {success:false, errorMessage:null};
+  returnData = { success: false, errorMessage: null };
   returnData.success = (resp.statusCode == 204);
   if (!returnData.success) {
     var msgs = resp.hasOwnProperty('errorMessages') ? resp.errorMessages : [];
-      msgs = msgs.concat((resp.hasOwnProperty('warningMessages') ? resp.warningMessages : []));
-      returnData.errorMessage = "Could not fetch issues transition states: "+msgs.join("\n");
+    msgs = msgs.concat((resp.hasOwnProperty('warningMessages') ? resp.warningMessages : []));
+    returnData.errorMessage = "Could not fetch issues transition states: " + msgs.join("\n");
   }
   return returnData;
 
@@ -73,47 +73,47 @@ function makeTransition(issueKey, transitionId) {
  * applies (if possible) the new status to the issue
  */
 function IssueTransitioner() {
-    var config = new IssueTransitionConfiguration();
-    /**
-     * @param issueKey the key of the issue to transition
-     * @param newStatus the status that it is desired to transition to.
-     */
-    this.transition = function(issueKey,newStatus) {
-        newStatus = newStatus.toLowerCase();
-        var result = getIssue(issueKey);
-        var returnData = {success:false, updated:false,errors: []}
-        if (result.status != 200) {
-            returnData.errors.push(result.errorMessage);
-            return returnData;
-        }
-        var srcStatus = result.data.fields.status.name;
-        srcStatus = srcStatus.toLowerCase();
-        if (srcStatus == newStatus) {
-            returnData.success = true;
-            return returnData;
-        }
-        if (!config.hasTransitionIds(issueKey,srcStatus)) {
-            var transitionsResponse = getPossibleTransitions(issueKey);
-            if (transitionsResponse.status != 200) {
-              returnData.errors.push(transitionsResponse.errorMessage);
-              return returnData;
-            }
-            config.setTransitions(issueKey,srcStatus,transitionsResponse.data.transitions);
-        }
-        var transitionId = config.getTransitionId(issueKey,srcStatus,newStatus);
-        if (transitionId == null) {
-          returnData.errors.push("Issue cannot be transition from "+srcStatus+" to "+newStatus+", please check your JIRA project configuration");
-          return returnData;
-        }
-        transitionResult = makeTransition(issueKey,transitionId);
-        returnData.success = transitionResult.success;
-        if (transitionResult.errorMessage != null & transitionResult.errorMessage != "") {
-          console
-          returnData.errors = [transitionResult.errorMessage];
-        }
-        returnData.updated =  returnData.success;
-        return returnData;
+  var config = new IssueTransitionConfiguration();
+  /**
+   * @param issueKey the key of the issue to transition
+   * @param newStatus the status that it is desired to transition to.
+   */
+  this.transition = function (issueKey, newStatus) {
+    newStatus = newStatus.toLowerCase();
+    var result = getIssue(issueKey);
+    var returnData = { success: false, updated: false, errors: [] }
+    if (result.status != 200) {
+      returnData.errors.push(result.errorMessage);
+      return returnData;
     }
+    var srcStatus = result.data.fields.status.name;
+    srcStatus = srcStatus.toLowerCase();
+    if (srcStatus == newStatus) {
+      returnData.success = true;
+      return returnData;
+    }
+    if (!config.hasTransitionIds(issueKey, srcStatus)) {
+      var transitionsResponse = getPossibleTransitions(issueKey);
+      if (transitionsResponse.status != 200) {
+        returnData.errors.push(transitionsResponse.errorMessage);
+        return returnData;
+      }
+      config.setTransitions(issueKey, srcStatus, transitionsResponse.data.transitions);
+    }
+    var transitionId = config.getTransitionId(issueKey, srcStatus, newStatus);
+    if (transitionId == null) {
+      returnData.errors.push("Issue cannot be transition from " + srcStatus + " to " + newStatus + ", please check your JIRA project configuration");
+      return returnData;
+    }
+    transitionResult = makeTransition(issueKey, transitionId);
+    returnData.success = transitionResult.success;
+    if (transitionResult.errorMessage != null & transitionResult.errorMessage != "") {
+      console
+      returnData.errors = [transitionResult.errorMessage];
+    }
+    returnData.updated = returnData.success;
+    return returnData;
+  }
 }
 
 // Node required code block
