@@ -9,6 +9,9 @@ debug = (function(){
     // Public object to be returned.
     that = {},
 
+    // has the debugger been initialised
+    initialised = false,
+
       // switch logger on/off; default: off
     log_enabled = false,
 
@@ -19,6 +22,9 @@ debug = (function(){
   while ( --idx >= 0 ) {
     (function( idx, method ){
       that[ method ] = function() {
+        if (!initialised) {
+          that.init();
+        }
         var args = aps.call( arguments, 0 );
 
         if ( !con || !log_enabled ) { return; }
@@ -32,30 +38,32 @@ debug = (function(){
    * @return {this}    Allows chaining
    */
   that.enable = function( enable ) {
+    // if this has been called the debugger has been initialised
+    initialised = true;
     log_enabled = enable ? enable : false;
-    return this;
+    return that;
   };
 
   // init debug enabled by getting users store property value
-  init = (function(){
-
-    // little hacky, but had to come arround the add-on lifecycle when trying to access userproperty onOpen()
-    // as this debug function is parsed and executed on all events and triggers.
+  that.init = function(){
     try {
+      // getUserProperties may not be available at this point in the lifecycle
       var userProps = PropertiesService.getUserProperties();
       var uDebugging = userProps.getProperty('debugging');
       that.enable( uDebugging == 'true' );
-    } catch(e){}
+    } catch(e){
+      // do nothing - its expected that there may be an exception
+    }
     if (environmentConfiguration.debugEnabled) {
       that.enable(true);
     }
-  })();
-
+    initialised = true;
+  };
   return that;
 })();
 
 /**
- * @desc Toggle debugging on/off from dialog from.
+ * @desc Toggle user preference for debugging on/off from about dialog.
  * @param formData {string}    "1" for enable, "0" for disable
  */
 function toggleDebugging(formData) {
@@ -63,7 +71,11 @@ function toggleDebugging(formData) {
   var debugging = formData=='1' ? 'true' : 'false';
   userProps.setProperty('debugging', debugging);
   debug.enable( (debugging=='true') ||  environmentConfiguration.debugEnabled );
-  console.log('Debugging switched [%s]', (debugging=='true' ? 'ON' : 'OFF'));
+  console.log(
+    'Debugging preference switched to [%s] Debugging is [%s]', 
+    (debugging=='true' ? 'ON' : 'OFF'), 
+    (environmentConfiguration.debugEnabled ? 'ON' : 'OFF')
+  );
 }
 
 

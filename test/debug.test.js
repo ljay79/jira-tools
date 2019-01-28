@@ -1,5 +1,6 @@
 
 PropertiesService = require('./mocks/PropertiesService');
+ScriptApp = require('./mocks/ScriptApp');
 global.environmentConfiguration = require('../src/environmentConfiguration.gs');
 
 beforeEach(() =>  {
@@ -153,4 +154,78 @@ test("Toggling debugging works when turning OFF debugging but is overriden by en
   expect(PropertiesService.mockUserProps.setProperty).toBeCalledWith("debugging","false");
   debug.log("this should be be logged because its set in the enviroment by default");
   expect(consoleLogSpy).toBeCalledTimes(2);
+});
+
+
+test('check if debug mode is turned on appropriately', () => {
+  var extend = require('../src/jsLib.gs').extend;
+  // covering all the scenarios
+  // userDebug - has the use selected debugging (stored in user preferences).
+  // environmentDebug - value for debug set in enviroment config. 
+  // authmode - value of authmode the plugin should run in. This impacts access to user preferences
+  // debugIsEnabled - will debug actually be enabled - the expected outcome
+  // debugIsEnabled - this should be true if (userDebug || environmentDebug)
+  var scenarioList = [
+    { num:1, userDebug: false, environmentDebug: false, authmode: ScriptApp.AuthMode.NONE, debugIsEnabled: false },
+    { num:2, userDebug: false, environmentDebug: false, authmode: ScriptApp.AuthMode.LIMITED, debugIsEnabled: false },
+    { num:3, userDebug: false, environmentDebug: false, authmode: ScriptApp.AuthMode.FULL, debugIsEnabled: false },
+    { num:4, userDebug: true, environmentDebug: false, authmode: ScriptApp.AuthMode.NONE, debugIsEnabled: false },
+    { num:5, userDebug: true, environmentDebug: false, authmode: ScriptApp.AuthMode.LIMITED, debugIsEnabled: true },
+    { num:6, userDebug: true, environmentDebug: false, authmode: ScriptApp.AuthMode.FULL, debugIsEnabled: true },
+    { num:7, userDebug: true, environmentDebug: true, authmode: ScriptApp.AuthMode.NONE, debugIsEnabled: true },
+    { num:8, userDebug: true, environmentDebug: true, authmode: ScriptApp.AuthMode.LIMITED, debugIsEnabled: true },
+    { num:9, userDebug: true, environmentDebug: true, authmode: ScriptApp.AuthMode.FULL, debugIsEnabled: true },
+    { num:10, userDebug: false, environmentDebug: true, authmode: ScriptApp.AuthMode.NONE, debugIsEnabled: true },
+    { num:11, userDebug: false, environmentDebug: true, authmode: ScriptApp.AuthMode.LIMITED, debugIsEnabled: true },
+    { num:12, userDebug: false, environmentDebug: true, authmode: ScriptApp.AuthMode.FULL, debugIsEnabled: true },
+  ];
+  scenarioList.forEach((scenario) => {
+    // reset imported modules so that the debug code re-initiliases
+    jest.resetModules();
+    // reset the test environment and mocks from previous tests
+    //SpreadsheetApp.resetMocks();
+    PropertiesService.resetMocks();
+    // set up the values from the scenario in mocks and configuration
+
+    PropertiesService.getUserProperties.mockImplementation(() => {
+      // Authmode will cause getUserProperties to throw an exception in NONE
+      if (scenario.authmode == ScriptApp.AuthMode.NONE) {
+        throw Error("This is not available when in ScriptApp.AuthMode.NONE");
+      }
+      // other wise return the mock functions
+      return PropertiesService.mockUserProps;
+    });
+    
+    // set up the value for whether the user has selected debugging should be available
+    PropertiesService.mockUserProps.getProperty.mockImplementation(() => {
+      if (scenario.userDebug === true) {
+        return "true";
+      } else {
+        return "false"
+      }
+    });
+
+    // set up the value in the environment congige
+    environmentConfiguration.debugEnabled = scenario.environmentDebug;
+    
+    var debug = require("../src/debug.gs").debug;
+   
+    // track the value sent to debug.enable to see whether it is activated or not.
+    // this will give us the result if debugging is enabled.
+    var finalDebugState = false; // by default debugging is not on
+    debug.enable = jest.fn().mockImplementation((enabled) => {
+      finalDebugState = enabled;
+    });
+
+    // try to log on the debugger which will trigger a call to debug.enable
+    debug.log("Just a test");
+
+    // put the final state into an object and compare to the desired scenario in the current test
+    // this makes it easier to see the failed scenario from the jest output
+
+    var actual = extend({}, scenario);
+    actual.debugIsEnabled = finalDebugState;
+    expect(actual).toEqual(scenario);
+
+  });
 });
