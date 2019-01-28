@@ -318,14 +318,14 @@ function unifyIssueAttrib(attrib, data) {
           var _date = data.fields[attrib] || null;
           resp = {
             value : _date,
-            date  : new Date(getDateFromIso(_date)) || new Date(),
+            date  : getDateFromIso(_date),
             format: "dd.mm.yyyy hh:mm"
           };
           break;
         case 'date':
           var _date = data.fields[attrib] || null;
           _date     = (_date.length == 10) ? _date + 'T12:00:00' : _date;
-          var date  = new Date(getDateFromIso(_date)) || new Date();
+          var date  = getDateFromIso(_date);
           date.setHours(0,0,0);
           resp      = {
             value : _date,
@@ -467,7 +467,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'lastViewed':
       resp = {
         value: data.fields[attrib] || null,
-        date: new Date(getDateFromIso(data.fields[attrib])) || new Date(),
+        date: getDateFromIso(data.fields[attrib]),
         format: "dd.mm.yyyy hh:mm"
       };
       break;
@@ -478,7 +478,7 @@ function unifyIssueAttrib(attrib, data) {
       _duedate = (_duedate.length == 10) ? _duedate + 'T12:00:00' : _duedate;
       resp = {
         value: _duedate,
-        date: new Date(getDateFromIso(_duedate)) || new Date(),
+        date: getDateFromIso(_duedate),
         format: "dd.mm.yyyy"
       };
       break;

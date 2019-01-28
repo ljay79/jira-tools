@@ -11,6 +11,14 @@
 
 var BUILD = '1.0.7';
 
+// Node required code block
+const ScriptApp = require("../test/mocks/ScriptApp.js");
+const PropertiesService = require("../test/mocks/PropertiesService.js");
+const SpreadsheetApp = require('../test/mocks/SpreadsheetApp.js');
+const debug = require('./debug.gs');
+const environmentConfiguration = require('./environmentConfiguration.gs');
+// End of Node required code block
+
 /** 
  * Add a nice menu option for the users.
  */
@@ -66,3 +74,9 @@ function addMenu(showBetaMenu) {
 
     menu.addToUi();
 }
+// Node required code block
+module.exports = {
+  onOpen: onOpen,
+
+}
+// End of Node required code block

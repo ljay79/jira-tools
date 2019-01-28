@@ -11,6 +11,10 @@ assignees: ''
 
 ** Provide a more detailed information of the issue **
 
+** Provide Debugging information **
+For further investigation, please activate Debugging in "About" dialog, provide us with your "Temp. User Key" and then perform at least one another try. This way it will log the error and debug information to project owners StackDriver logging account where we can analyze it better.
+>Note: User credentials are not transmitted in any log data.
+
 ### Steps to reproduce
 ** Provide a set of unambiguous steps to reproduce this bug include code, if relevant **
 1.
