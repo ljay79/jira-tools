@@ -110,6 +110,19 @@ Additionally you can configure many different types of custom Jira field, which 
 > It may even break earlier when the requests takes longer then Google's maximum execution timeout.
 > Depending on Jira response time i had successfully listed 1000 issues but sometimes only about >850.
 
+
+### Update Jira Issues from Spreadsheet
+“Add-ons" > “Jira Sheet Tools” > "Update Jira Issues from Spreadsheet"
+
+Allows you to update values in multiple Jira issues from the values in your spreadsheet.
+This feature allows you to select an area of your spreadsheet with header rows and each row below it corresponding to an issue.
+The dialog will let you configure the columns from your spreadsheet and map them to Jira issue fields.
+It will let you select from most common fields and the custom fields you have configured (“Add-ons" > “Jira Sheet Tools” > "Configure Custom Fields")
+Not all fields will update in Jira as there may not be enough data in the spreadsheet for the Add on to set the value. Error messages are shown from Jira when this was the case.
+
+> Each row requires at least one call to Jira REST API to update it.
+> Setting the status of a Jira Issue can required 3 calls per row, do not include this field if you do not need to.
+
 ### Time Report
 “Add-ons" > “Jira Sheet Tools” > "Create Time Report"
 
