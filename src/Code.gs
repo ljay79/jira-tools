@@ -29,7 +29,7 @@ function onOpen(e) {
     isDebugMode = (userProps.getProperty('debugging')=='true');
     debug.enable(isDebugMode);
   }
-  addMenu(isDebugMode);
+  addMenu();
 };
 
 /**
@@ -51,7 +51,7 @@ function onInstall(e) {
  * Add "Jira" Menu to UI.
  * @OnlyCurrentDoc
  */
-function addMenu(showBetaMenu) {
+function addMenu() {
 
   var menu = SpreadsheetApp.getUi().createAddonMenu()
     .addItem('Re-Calculate all formulas in active sheet', 'recalcCustomFunctions')
@@ -67,7 +67,7 @@ function addMenu(showBetaMenu) {
     .addItem('Configure Custom Fields', 'dialogCustomFields')
     .addItem('About', 'dialogAbout');
 
-    if (showBetaMenu) {
+    if (environmentConfiguration.features.updateJira.enabled) {
         menu.addSeparator()
         .addItem('Update Jira Issues from Spreadsheet (BETA)', 'dialogIssuesFromSheet');
     }

@@ -59,6 +59,32 @@ test('onOpen function in various authmodes', () => {
   expect(PropertiesService.getUserProperties().getProperty.mock.calls.length).toBe(1);
 });
 
+test('Update Jira menu option appears based on feature switch', () => {
+  SpreadsheetApp.resetMocks();
+  var onOpen = require('../src/Code.gs').onOpen;
+  var e = {
+    authMode: ScriptApp.AuthMode.LIMITED
+  }
+  // see how many menu items are created without the feature switch
+  environmentConfiguration.features.updateJira.enabled = false;
+  onOpen(e);
+  var addItemMock =  SpreadsheetApp.getUi().createAddonMenu().addItem.mock;
+  var menuItemsCreatedWithoutFeature = addItemMock.calls.length;
+  expect(addItemMock.calls[menuItemsCreatedWithoutFeature-1][0]).not.toBe('Update Jira Issues from Spreadsheet (BETA)');
+  expect(addItemMock.calls[menuItemsCreatedWithoutFeature-1][1]).not.toBe('dialogIssuesFromSheet');
+  SpreadsheetApp.resetMocks();
+
+  // now enable the feature and check if its added.
+  environmentConfiguration.features.updateJira.enabled = true;
+  onOpen(e);
+  var addItemMock =  SpreadsheetApp.getUi().createAddonMenu().addItem.mock;
+  var menuItemsCreatedWithFeature = addItemMock.calls.length;
+  expect(menuItemsCreatedWithFeature).toBe(menuItemsCreatedWithoutFeature+1)
+  expect(addItemMock.calls[menuItemsCreatedWithFeature-1][0]).toBe('Update Jira Issues from Spreadsheet (BETA)');
+  expect(addItemMock.calls[menuItemsCreatedWithFeature-1][1]).toBe('dialogIssuesFromSheet');
+  
+});
+
 
 test('check if debug mode is turned on appropriately', () => {
   var extend = require('../src/jsLib.gs').extend;
