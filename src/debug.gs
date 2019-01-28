@@ -70,11 +70,13 @@ function toggleDebugging(formData) {
   var userProps = PropertiesService.getUserProperties();
   var debugging = formData=='1' ? 'true' : 'false';
   userProps.setProperty('debugging', debugging);
-  debug.enable( (debugging=='true') ||  environmentConfiguration.debugEnabled );
+  var debugEnabled = (debugging=='true') ||  environmentConfiguration.debugEnabled;
+  debug.enable( debugEnabled );
   console.log(
-    'Debugging preference switched to [%s] Debugging is [%s]', 
+    'Debugging preference switched to [%s] Environment setting is [%s] Debugging is [%s]', 
     (debugging=='true' ? 'ON' : 'OFF'), 
-    (environmentConfiguration.debugEnabled ? 'ON' : 'OFF')
+    (environmentConfiguration.debugEnabled ? 'ON' : 'OFF'),
+    (debugEnabled ? 'ON' : 'OFF')
   );
 }
 
