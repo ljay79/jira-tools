@@ -2,7 +2,7 @@
 const Request = require('../src/jiraApi.gs');
 const getAllJiraFields = require('./jiraCommon.gs').getAllJiraFields;
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
-const debug = require("./debug.gs");
+const debug = require("./debug.gs").debug;
 const getMatchingJiraField = require("./jiraCommon.gs").getMatchingJiraField;
 const IssueTransitioner = require('./jiraIssueStatusUpdates/issueTransitioner.gs');
 // End of Node required code block

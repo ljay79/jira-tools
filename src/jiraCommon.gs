@@ -1,6 +1,6 @@
 // Node required code block
 const Request = require('./jiraApi.gs');
-const debug = require('./debug.gs');
+const debug = require('./debug.gs').debug;
 // End of Node required code block
 
 // const not available, but better solution needed

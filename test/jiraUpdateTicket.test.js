@@ -1,6 +1,7 @@
 
 jiraApiMock = require('./mocks/mockJiraApi.js');
-const debug = require("../src/debug.gs");
+const debug = require("../src/debug.gs").debug;
+global.environmentConfiguration = require('../src/environmentConfiguration.gs');
 
 
 beforeEach(() =>  {

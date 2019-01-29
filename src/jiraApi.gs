@@ -2,7 +2,7 @@
 const getCfg = require("./settings.gs").getCfg;
 const setCfg = require("./settings.gs").setCfg;
 const hasSettings = require("./settings.gs").hasSettings;
-const debug = require("./debug.gs");
+const debug = require("./debug.gs").debug;
 const buildUrl = require("./jsLib.gs").buildUrl;
 const extend = require("./jsLib.gs").extend;
 // End of Node required code block
