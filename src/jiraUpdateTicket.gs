@@ -6,6 +6,7 @@ const debug = require("./debug.gs").debug;
 const getMatchingJiraField = require("./jiraCommon.gs").getMatchingJiraField;
 const IssueTransitioner = require('./jiraIssueStatusUpdates/issueTransitioner.gs');
 // End of Node required code block
+
 /*
 * @desc Takes a 2 x 2 array of values and uses them to update JIRA 
 * @param headerRow {object} A dictionary where each key is the name of a Jira field and the value is the column index of that field in the data
@@ -81,6 +82,13 @@ function updateJiraIssues(headerRow, dataRows) {
 
 }
 
+/**
+ * Takes a value from the spreadsheet and the definition of the field (retrieved from JIRA)
+ * and converts it to JSON which JIRA should accept
+ * Does not cover all fields
+ * @param fieldDefinition - the definition of the field from JIRA
+ * @param value - the value from the spreadsheet for the specified field
+ */
 function formatFieldValueForJira(fieldDefinition, value) {
   if (fieldDefinition.key == "labels") {
     if (value == "") {
@@ -98,6 +106,7 @@ function formatFieldValueForJira(fieldDefinition, value) {
     return value;
   }
   if (fieldDefinition.custom && fieldDefinition.schemaType == "array|string") {
+    // array|string as a schematpe is used by many fields
     // intended first to fix bug with setting sprint fields to empty
     // currently there is no other way to identify the sprint field
     if (value == "") {
@@ -110,6 +119,13 @@ function formatFieldValueForJira(fieldDefinition, value) {
   return value;
 }
 
+/**
+ * Takes a row of data from the spreadsheet and converts it into a JSON object to be posted
+ * to the JIRA rest API
+ * @param allJiraFields  - the definition of all JIRA fields retrieved from the RESt API
+ * @param headerRow - the header row from the spreadsheet
+ * @param dataRow - the row of data from the spreadsheet
+ */
 function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
   var keyFieldName = "issuekey";
   var result = { key: null, fields: {} };
@@ -133,6 +149,12 @@ function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
   return result;
 }
 
+/**
+ * Filters through the values in the header row from the spreadshet to find
+ * the best matching fields defined in the JIRA instance
+ * @param allJiraFields 
+ * @param headerRow 
+ */
 function getMatchingJiraFields(allJiraFields, headerRow) {
   var filteredHeadings = {};
   Object.keys(headerRow).forEach(function (fieldTitle) {
@@ -147,6 +169,12 @@ function getMatchingJiraFields(allJiraFields, headerRow) {
   return filteredHeadings;
 }
 
+/**
+ * Updates a JIRA issue by making a call to the configured JIRA server
+ * @param issueData - the JSON data for posting to the server
+ * @param callback - a call back function when the request is made. 
+ * @returns boolean - true if the issue has been updated succesfully
+ */
 function updateIssueinJira(issueData, callback) {
   debug.log("updateIssueinJira called issueData=" + issueData);
   var method = "issueUpdate";

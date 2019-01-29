@@ -12,7 +12,7 @@ debug = (function () {
     // has the debugger been initialised
     initialised = false,
 
-      // switch logger on/off; default: off
+    // switch logger on/off; default: off
     log_enabled = false,
 
     // Logging methods, in "priority order". Not all console implementations
@@ -37,14 +37,14 @@ debug = (function () {
    * @param {boolean}
    * @return {this}    Allows chaining
    */
-  that.enable = function( enable ) {
+  that.enable = function (enable) {
     var userDebugFlag = false;
-	  try {
+    try {
       // getUserProperties may not be available at this point in the lifecycle
       var userProps = PropertiesService.getUserProperties();
       var uDebugging = userProps.getProperty('debugging');
       userDebugFlag = (uDebugging == 'true');
-    } catch(e){
+    } catch (e) {
       // do nothing - its expected that there may be an exception
     }
     log_enabled = enable || userDebugFlag || environmentConfiguration.debugEnabled;
@@ -53,7 +53,7 @@ debug = (function () {
     return that;
   };
 
-  that.isEnabled = function() {
+  that.isEnabled = function () {
     return log_enabled;
   }
 
@@ -68,10 +68,10 @@ function toggleDebugging(formData) {
   var userProps = PropertiesService.getUserProperties();
   var debugging = formData == '1' ? 'true' : 'false';
   userProps.setProperty('debugging', debugging);
-  debug.enable( (debugging=='true') );
+  debug.enable((debugging == 'true'));
   console.log(
-    'Debugging preference switched to [%s] Environment setting is [%s] Debugging is [%s]', 
-    (debugging=='true' ? 'ON' : 'OFF'), 
+    'Debugging preference switched to [%s] Environment setting is [%s] Debugging is [%s]',
+    (debugging == 'true' ? 'ON' : 'OFF'),
     (environmentConfiguration.debugEnabled ? 'ON' : 'OFF'),
     (debug.isEnabled() ? 'ON' : 'OFF')
   );
@@ -79,5 +79,5 @@ function toggleDebugging(formData) {
 
 
 // Node required code block
-module.exports = {debug:debug, toggleDebugging:toggleDebugging}
+module.exports = { debug: debug, toggleDebugging: toggleDebugging }
 // End of Node required code block

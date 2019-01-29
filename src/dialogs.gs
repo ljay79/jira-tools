@@ -12,13 +12,13 @@ function getDialog(file, values) {
   // privacy (remove clear text password and username from possible debug logging
   var debugValue = {};
   extend(debugValue, values);
-  if(debugValue.password) delete debugValue.password;
-  if(debugValue.username) delete debugValue.username;
+  if (debugValue.password) delete debugValue.password;
+  if (debugValue.username) delete debugValue.username;
   debug.log('Processing: %s.html with %s', file, JSON.stringify(debugValue));
   for (var name in values) {
     template[name] = values[name];
   }
-  
+
   return template.evaluate();
 }
 
@@ -29,7 +29,7 @@ function getDialog(file, values) {
  */
 function dialogSettings() {
   initDefaults();
-  
+
   var dialog = getDialog('dialogSettings', getServerCfg());
 
   dialog
@@ -67,8 +67,8 @@ function getServerCfg() {
  * @return void
  */
 function dialogRefreshTicketsIds() {
-  if(!hasSettings(true)) return;
-  
+  if (!hasSettings(true)) return;
+
   refreshTickets();
 }
 
@@ -78,7 +78,7 @@ function dialogRefreshTicketsIds() {
  * @desc Dialog to choose issues filter
  */
 function dialogIssueFromFilter() {
-  if(!hasSettings(true)) return;
+  if (!hasSettings(true)) return;
 
   var customFields = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
   var userColumns = getStorage_().getValue('userColumns') || [];
@@ -139,7 +139,7 @@ function dialogAbout() {
  * @desc Dialog to create worklog based on user/group selection
  */
 function dialogTimesheet() {
-  if(!hasSettings(true)) return;
+  if (!hasSettings(true)) return;
 
   var dialog = getDialog('dialogTimesheet');
 
@@ -164,19 +164,19 @@ function getDataForJiraUpdateFromSheet() {
   var cellValues = SpreadsheetApp.getActiveSheet().getActiveRange().getValues();
   var headerFields = {};
   var dataRows = [];
-  if (cellValues.length>0) {
+  if (cellValues.length > 0) {
     var firstRow = cellValues[0];
-    for (var i=0;i<firstRow.length;i++) {
-      if (firstRow[i] != null && firstRow[i] != "")  {
-        headerFields[firstRow[i]]=i;
+    for (var i = 0; i < firstRow.length; i++) {
+      if (firstRow[i] != null && firstRow[i] != "") {
+        headerFields[firstRow[i]] = i;
       }
     }
     cellValues.splice(0, 1);
     dataRows = cellValues;
   }
   var result = {
-      headerFields:headerFields,
-      dataRows:dataRows
+    headerFields: headerFields,
+    dataRows: dataRows
   };
   return result;
 }
@@ -191,15 +191,15 @@ function getValidFieldsToEditJira() {
 }
 
 function dialogIssuesFromSheet() {
-  if(!hasSettings(true)) return;
+  if (!hasSettings(true)) return;
   var selectedData = getDataForJiraUpdateFromSheet();
-  var fieldsToUse = {"":"select a jira field...",issueKey:"Key"};
+  var fieldsToUse = { "": "select a jira field...", issueKey: "Key" };
   fieldsToUse = extend(fieldsToUse, getValidFieldsToEditJira());
-  selectedData.allJiraFields  = fieldsToUse;
-  
-  var readOnlyFields = {"Updated": true,"Issue Type": true, "Created": true};
+  selectedData.allJiraFields = fieldsToUse;
+
+  var readOnlyFields = { "Updated": true, "Issue Type": true, "Created": true };
   selectedData.readOnlyFields = readOnlyFields;
-  var dialog = getDialog('dialogIssuesFromSheet',selectedData);
+  var dialog = getDialog('dialogIssuesFromSheet', selectedData);
   dialog
     .setWidth(420)
     .setHeight(360)
@@ -209,10 +209,10 @@ function dialogIssuesFromSheet() {
 }
 
 function dialogProcessIssuesFromSheet(headerFieldsToUse) {
-  if(!hasSettings(true)) return;
+  if (!hasSettings(true)) return;
   var selectedData = getDataForJiraUpdateFromSheet();
   var data = selectedData.dataRows;
-  return updateJiraIssues(headerFieldsToUse,data);
+  return updateJiraIssues(headerFieldsToUse, data);
 }
 
 
@@ -224,9 +224,9 @@ function dialogProcessIssuesFromSheet(headerFieldsToUse) {
  * @desc Dialog to configure Jira custom fields
  */
 function dialogCustomFields() {
-  if(!hasSettings(true)) return;
+  if (!hasSettings(true)) return;
 
-  var dialog = getDialog('dialogCustomFields', {favoriteCustomFields: (getStorage_().getValue('favoriteCustomFields') || [])});
+  var dialog = getDialog('dialogCustomFields', { favoriteCustomFields: (getStorage_().getValue('favoriteCustomFields') || []) });
 
   dialog
     .setWidth(480)
@@ -248,14 +248,14 @@ function dialogCustomFields() {
  * @param fieldMap {object}
  */
 function sidebarFieldMap(fieldMap) {
-  var dialog = getDialog('sidebarFieldMap', {fieldMap: fieldMap});
+  var dialog = getDialog('sidebarFieldMap', { fieldMap: fieldMap });
 
   debug.log('Processed: %s', dialog);
 
-  var html = HtmlService.createHtmlOutput( dialog.getContent() )
+  var html = HtmlService.createHtmlOutput(dialog.getContent())
     .setTitle('Jira Field Map')
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-  ;
+    ;
 
   SpreadsheetApp.getUi().showSidebar(html);
 }
@@ -273,10 +273,10 @@ function sidebarQuickMenu() {
 
   debug.log('Processed: %s', dialog);
 
-  var html = HtmlService.createHtmlOutput( dialog.getContent() )
+  var html = HtmlService.createHtmlOutput(dialog.getContent())
     .setTitle('Quick Menu')
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-  ;
+    ;
 
   SpreadsheetApp.getUi().showSidebar(html);
 }

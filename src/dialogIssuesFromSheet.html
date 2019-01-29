@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base target="_top">
-    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
-    <style>
+
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+  <style>
     .error-container { display: none;  float: right; margin-bottom: 5px; padding: 5px 10px; text-align: center; color: #fff; }
     .is-loading { text-align: center; animation: blink .5s infinite; }
     @keyframes blink { 0% { color: #fff; } 50% { color: #777; } 100% { color: #fff; } }
@@ -25,120 +26,129 @@
     
     .results p {color: #fff;}
     </style>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  </head>
-  <body>
-    <form name="issue-update"   action="" method="post">
-      <p>This is BETA functionality</p>
-      <div class="block field-list">
-        <h2>Configure columns and jira fields</h2>
-        <div class = "titles">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <form name="issue-update" action="" method="post">
+    <p>This is BETA functionality</p>
+    <div class="block field-list">
+      <h2>Configure columns and jira fields</h2>
+      <div class="titles">
         <span class="headerTitle">Columns</span>
         <span class="jiraFieldTitle">Jira Field</span>
-        </div>
-        <? 
+      </div>
+      <? 
         for (var headerName in headerFields ) { 
         ?>
-        <div class = "item">
-          <input class="headerSelect" title="should this column be imported" type="checkbox" id="column-<?= headerName ?>" name="columns[]" value="<?= headerFields[headerName] ?>" checked="checked" >
-          <label for="column-<?= headerName ?>" title="heading in spreadsheet"><?= headerName ?></label>
-          <select class="fieldChooser" id="jira-field-<?= headerFields[headerName] ?>" title="choose destination jira field">
-            <? for (var fieldId in allJiraFields ) { 
+      <div class="item">
+        <input class="headerSelect" title="should this column be imported" type="checkbox" id="column-<?= headerName ?>"
+          name="columns[]" value="<?= headerFields[headerName] ?>" checked="checked">
+        <label for="column-<?= headerName ?>" title="heading in spreadsheet">
+          <?= headerName ?></label>
+        <select class="fieldChooser" id="jira-field-<?= headerFields[headerName] ?>" title="choose destination jira field">
+          <? for (var fieldId in allJiraFields ) { 
             ?>
-             <option value="<?= fieldId ?>"<? if (allJiraFields[fieldId] == headerName) { ?>selected<?}?> <? if ( readOnlyFields[allJiraFields[fieldId]]) {?> data-readonly="true" class="readonly"<?}?> >
-             <?= allJiraFields[fieldId]?><? if ( readOnlyFields[allJiraFields[fieldId]]) {?> (Read only)<?}?>
-             </option>
-             <? 
+          <option value="<?= fieldId ?>" <? if (allJiraFields[fieldId]==headerName) { ?>selected
+            <?}?>
+            <? if ( readOnlyFields[allJiraFields[fieldId]]) {?> data-readonly="true" class="readonly"
+            <?}?> >
+            <?= allJiraFields[fieldId]?>
+            <? if ( readOnlyFields[allJiraFields[fieldId]]) {?> (Read only)
+            <?}?>
+          </option>
+          <? 
              } ?>
-           </select>
-         </div>
-        <? } ?>
+        </select>
       </div>
-      <div class="block">
-        <button type="submit" class="action">Update Jira Issues</button>
-        <button type="button" onclick="google.script.host.close()">Cancel</button>
-        <div id="response-message" class="error-container" role="dialog"></div>
-      </div>
-      <div id="results" class="block field-list">
-      </div>
-    </form>
+      <? } ?>
+    </div>
+    <div class="block">
+      <button type="submit" class="action">Update Jira Issues</button>
+      <button type="button" onclick="google.script.host.close()">Cancel</button>
+      <div id="response-message" class="error-container" role="dialog"></div>
+    </div>
+    <div id="results" class="block field-list">
+    </div>
+  </form>
 
-    <script>
-      /* global google */
-      
-      var timeout = null;
-      var alert   = document.getElementById('response-message');
-      var issueForm = document.forms['issue-update'];
-      var input   = Array.prototype.slice.call(issueForm.elements).filter(function(el){ return el.nodeName === 'INPUT'; });
-      
-      $('input.headerSelect').click(function () {
-        $(this).parent().toggleClass('not-imported',!this.checked);
-      })
-      
- 
-      function hideAlert(){
-        if(timeout) timeout = clearTimeout(timeout);
-        alert.style.display = 'none';
-      }
-      
-      function showAlert(text,type,time) {
-        alert.innerText = text;
-        alert.style.backgroundColor = type ? 'rgb(139,195,74)' : 'rgb(213,0,0)';
-        alert.style.display = 'block';
-        if (time) timeout = setTimeout(hideAlert,time);
-      }
-      
-      function isReadOnlyJiraFieldChosen(jiraFieldDropDown) {
-          // find the seleted option and see if it was readonly
-          var readOnlyAttr = jiraFieldDropDown.find(":selected").attr('data-readonly');
-          return (readOnlyAttr == "true") ;
-      }
+  <script>
+    /* global google */
 
-      function formSubmitHandler(event) {
-        if (event) event.preventDefault();
-            hideAlert();
-            
-        showAlert("updating jira...",1);
-        $('#results').empty();
-        jiraFields = {};
-        $("input:checked").each( function (n) {
-          var headerIndex = $(this).val();
-          // find the drop down with the JIRA field name
-          var jiraFieldDropDown = $("#jira-field-"+headerIndex);
-          var jirafieldChosen = jiraFieldDropDown.val();
-          if (isReadOnlyJiraFieldChosen(jiraFieldDropDown) || jirafieldChosen == "") {
-            $(this).parent().toggleClass('not-imported',true);
-            $(this).prop('checked', false); 
-          } else {
-            jiraFields[jirafieldChosen]=headerIndex;
-          }
-        });
-        console.log(jiraFields);
-        google.script.run
-          .withSuccessHandler(onResponse)
-          .withFailureHandler(errorInServerCallback)
-          .dialogProcessIssuesFromSheet(jiraFields);
-        
-      }
-      
-     function errorInServerCallback(response) {
-          showAlert(response.message, false, 10000);
-     }
+    var timeout = null;
+    var alert = document.getElementById('response-message');
+    var issueForm = document.forms['issue-update'];
+    var input = Array.prototype.slice.call(issueForm.elements).filter(function (el) { return el.nodeName === 'INPUT'; });
 
-      function onResponse(result) {
-        var done = result.status === true;
-        showAlert(result.message, done, 10000);
-        $('#results').empty();
-        if (result.errors.length>0) {
-          $('#results').append( '<h2>'+result.message+'</h2>');
-          for (var i=0;i<result.errors.length;i++) {
-             $('#results').append( "<div class='item error'>"+result.errors[i]+"</div>" );
-          }
+    $('input.headerSelect').click(function () {
+      $(this).parent().toggleClass('not-imported', !this.checked);
+    })
+
+
+    function hideAlert() {
+      if (timeout) timeout = clearTimeout(timeout);
+      alert.style.display = 'none';
+    }
+
+    function showAlert(text, type, time) {
+      alert.innerText = text;
+      alert.style.backgroundColor = type ? 'rgb(139,195,74)' : 'rgb(213,0,0)';
+      alert.style.display = 'block';
+      if (time) timeout = setTimeout(hideAlert, time);
+    }
+
+    function isReadOnlyJiraFieldChosen(jiraFieldDropDown) {
+      // find the seleted option and see if it was readonly
+      var readOnlyAttr = jiraFieldDropDown.find(":selected").attr('data-readonly');
+      return (readOnlyAttr == "true");
+    }
+
+    function formSubmitHandler(event) {
+      if (event) event.preventDefault();
+      hideAlert();
+
+      showAlert("updating jira...", 1);
+      $('#results').empty();
+      jiraFields = {};
+      $("input:checked").each(function (n) {
+        var headerIndex = $(this).val();
+        // find the drop down with the JIRA field name
+        var jiraFieldDropDown = $("#jira-field-" + headerIndex);
+        var jirafieldChosen = jiraFieldDropDown.val();
+        if (isReadOnlyJiraFieldChosen(jiraFieldDropDown) || jirafieldChosen == "") {
+          $(this).parent().toggleClass('not-imported', true);
+          $(this).prop('checked', false);
+        } else {
+          jiraFields[jirafieldChosen] = headerIndex;
+        }
+      });
+      console.log(jiraFields);
+      google.script.run
+        .withSuccessHandler(onResponse)
+        .withFailureHandler(errorInServerCallback)
+        .dialogProcessIssuesFromSheet(jiraFields);
+
+    }
+
+    function errorInServerCallback(response) {
+      showAlert(response.message, false, 10000);
+    }
+
+    function onResponse(result) {
+      var done = result.status === true;
+      showAlert(result.message, done, 10000);
+      $('#results').empty();
+      if (result.errors.length > 0) {
+        $('#results').append('<h2>' + result.message + '</h2>');
+        for (var i = 0; i < result.errors.length; i++) {
+          $('#results').append("<div class='item error'>" + result.errors[i] + "</div>");
         }
       }
+    }
 
 
-      issueForm.addEventListener('submit', formSubmitHandler);
-    </script>
-  </body>
+    issueForm.addEventListener('submit', formSubmitHandler);
+  </script>
+</body>
+
 </html>
