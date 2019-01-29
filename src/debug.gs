@@ -23,7 +23,7 @@ debug = (function(){
     (function( idx, method ){
       that[ method ] = function() {
         if (!initialised) {
-          that.init();
+          that.enable();
         }
         var args = aps.call( arguments, 0 );
 
@@ -35,30 +35,29 @@ debug = (function(){
 
   /**
    * @desc Toggle logging on/off
+   * @param {boolean}
    * @return {this}    Allows chaining
    */
   that.enable = function( enable ) {
-    // if this has been called the debugger has been initialised
-    initialised = true;
-    log_enabled = enable ? enable : false;
-    return that;
-  };
-
-  // init debug enabled by getting users store property value
-  that.init = function(){
-    try {
+    var userDebugFlag = false;
+	  try {
       // getUserProperties may not be available at this point in the lifecycle
       var userProps = PropertiesService.getUserProperties();
       var uDebugging = userProps.getProperty('debugging');
-      that.enable( uDebugging == 'true' );
+      userDebugFlag = (uDebugging == 'true');
     } catch(e){
       // do nothing - its expected that there may be an exception
     }
-    if (environmentConfiguration.debugEnabled) {
-      that.enable(true);
-    }
+    log_enabled = enable || userDebugFlag || environmentConfiguration.debugEnabled;
+    // if this has been called the debugger has been initialised
     initialised = true;
+    return that;
   };
+
+  that.isEnabled = function() {
+    return log_enabled;
+  }
+
   return that;
 })();
 
@@ -70,13 +69,12 @@ function toggleDebugging(formData) {
   var userProps = PropertiesService.getUserProperties();
   var debugging = formData=='1' ? 'true' : 'false';
   userProps.setProperty('debugging', debugging);
-  var debugEnabled = (debugging=='true') ||  environmentConfiguration.debugEnabled;
-  debug.enable( debugEnabled );
+  debug.enable( (debugging=='true') );
   console.log(
     'Debugging preference switched to [%s] Environment setting is [%s] Debugging is [%s]', 
     (debugging=='true' ? 'ON' : 'OFF'), 
     (environmentConfiguration.debugEnabled ? 'ON' : 'OFF'),
-    (debugEnabled ? 'ON' : 'OFF')
+    (debug.isEnabled() ? 'ON' : 'OFF')
   );
 }
 
