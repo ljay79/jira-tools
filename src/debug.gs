@@ -9,6 +9,9 @@ debug = (function(){
     // Public object to be returned.
     that = {},
 
+    // has the debugger been initialised
+    initialised = false,
+
       // switch logger on/off; default: off
     log_enabled = false,
 
@@ -19,6 +22,9 @@ debug = (function(){
   while ( --idx >= 0 ) {
     (function( idx, method ){
       that[ method ] = function() {
+        if (!initialised) {
+          that.enable();
+        }
         var args = aps.call( arguments, 0 );
 
         if ( !con || !log_enabled ) { return; }
@@ -29,40 +35,50 @@ debug = (function(){
 
   /**
    * @desc Toggle logging on/off
+   * @param {boolean}
    * @return {this}    Allows chaining
    */
   that.enable = function( enable ) {
-    log_enabled = enable ? enable : false;
-    return this;
-  };
-
-  // init debug enabled by getting users store property value
-  init = (function(){
-    // little hacky, but had to come arround the add-on lifecycle when trying to access userproperty onOpen()
-    // as this debug function is parsed and executed on all events and triggers.
-    try {
+    var userDebugFlag = false;
+	  try {
+      // getUserProperties may not be available at this point in the lifecycle
       var userProps = PropertiesService.getUserProperties();
       var uDebugging = userProps.getProperty('debugging');
-      that.enable( uDebugging == 'true' );
-    } catch(e){}
-  })();
+      userDebugFlag = (uDebugging == 'true');
+    } catch(e){
+      // do nothing - its expected that there may be an exception
+    }
+    log_enabled = enable || userDebugFlag || environmentConfiguration.debugEnabled;
+    // if this has been called the debugger has been initialised
+    initialised = true;
+    return that;
+  };
+
+  that.isEnabled = function() {
+    return log_enabled;
+  }
 
   return that;
 })();
 
 /**
- * @desc Toggle debugging on/off from dialog from.
+ * @desc Toggle user preference for debugging on/off from about dialog.
  * @param formData {string}    "1" for enable, "0" for disable
  */
 function toggleDebugging(formData) {
   var userProps = PropertiesService.getUserProperties();
   var debugging = formData=='1' ? 'true' : 'false';
   userProps.setProperty('debugging', debugging);
-  debug.enable( debugging=='true' );
-  console.log('Debugging switched [%s]', (debugging=='true' ? 'ON' : 'OFF'));
+  debug.enable( (debugging=='true') );
+  console.log(
+    'Debugging preference switched to [%s] Environment setting is [%s] Debugging is [%s]', 
+    (debugging=='true' ? 'ON' : 'OFF'), 
+    (environmentConfiguration.debugEnabled ? 'ON' : 'OFF'),
+    (debug.isEnabled() ? 'ON' : 'OFF')
+  );
 }
 
 
 // Node required code block
-module.exports = debug;
+module.exports = {debug:debug, toggleDebugging:toggleDebugging}
 // End of Node required code block

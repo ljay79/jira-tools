@@ -1,8 +1,10 @@
 
+
+global.environmentConfiguration = require('../src/environmentConfiguration.gs');
 const getCfg = require("../src/settings.gs").getCfg;
 const setCfg = require("../src/settings.gs").setCfg;
 const hasSettings = require("../src/settings.gs").hasSettings;
-const debug = require("../src/debug.gs");
+const debug = require("../src/debug.gs").debug;
 const Request = require('../src/jiraApi.gs');
 
 Browser = {

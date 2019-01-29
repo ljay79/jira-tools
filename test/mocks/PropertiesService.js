@@ -1,6 +1,7 @@
 
 var UserProps = {
-  getProperty: jest.fn()
+  getProperty: jest.fn(),
+  setProperty: jest.fn(),
 }
 
 
@@ -9,6 +10,7 @@ var PropertiesService = {
   resetMocks: function () {
     var mocks = [
       [UserProps.getProperty, ""],
+      [UserProps.setProperty, null],
       [PropertiesService.getUserProperties,UserProps]
     ];
     mocks.forEach((pair) => {
