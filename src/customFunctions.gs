@@ -94,6 +94,8 @@ function JST_search(JQL, Fields, Limit, StartAt) {
 
   if (undefined == Fields || Fields == '') {
     throw new Error("{Fields} can not be empty.");
+  } else if(typeof Fields !== 'string') {
+    throw new Error("{Fields} must be a string. A comma separated list of JIRA field names.");
   }
 
   Limit = parseInt(Limit) || 1;
