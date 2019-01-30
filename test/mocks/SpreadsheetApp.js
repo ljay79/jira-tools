@@ -5,7 +5,8 @@ var ADDONMENU = {
   addToUi : jest.fn().mockImplementation(()=> ADDONMENU)
 }
 var UI = {
-  createAddonMenu : jest.fn().mockImplementation(()=> ADDONMENU)
+  createAddonMenu : jest.fn().mockImplementation(()=> ADDONMENU),
+  showModalDialog : jest.fn()
 }
 
 var SpreadsheetApp = {

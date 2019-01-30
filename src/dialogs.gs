@@ -1,3 +1,8 @@
+// Node required code block
+const extend = require('./jsLib.gs').extend;
+// End of Node required code block
+
+
 //*** All UI Dialogs for this add-on ***//
 
 /**
@@ -118,7 +123,9 @@ function dialogAbout() {
   var dialog = getDialog('dialogAbout', {
     buildNumber: BUILD,
     debugging: userProps.getProperty('debugging'),
-    tempUserKey: tempActiveUserKey
+    tempUserKey: tempActiveUserKey,
+    environmentConfiguration: environmentConfiguration,
+    debugEnabled: debug.isEnabled()
   });
 
   dialog
@@ -220,3 +227,8 @@ function sidebarQuickMenu() {
   SpreadsheetApp.getUi().showSidebar(html);
 }
 /* Sidebar: Quick Menu - END */
+
+
+// Node required code block
+module.exports = { dialogAbout: dialogAbout, getDialog: getDialog }
+// End of Node required code block
