@@ -23,19 +23,6 @@ const PropertiesService = function() {
 }();
 // End of Node required code block
 
-var APP_STORAGE;
-
-/**
- * Gets the storage layer.
- * @return {Storage} The JST storage.
- */
-var getStorage_ = function() {
-  if (!APP_STORAGE) {
-    APP_STORAGE = new Storage_('jst', PropertiesService.getUserProperties()||{});
-  }
-  return APP_STORAGE;
-};
-
 
 // default issue fields/columns for issue listings
 var jiraColumnDefault = [
@@ -48,6 +35,29 @@ var jiraColumnDefault = [
   'duedate',
   'project'
 ];
+
+/**
+ * @desc Short Helper to set a server config property into users storage
+ * @param key {string}
+ * @param value {string}
+ * @return {this}  Allow chaining
+ */
+
+function setCfg(key, value) {
+  var keyname = 'serverConfig.' + key;
+  Storage.setValue(keyname, value);
+  return this;
+}
+
+/**
+ * @desc Short Helper to get a server config property from users storage
+ * @param key {string}
+ * @return {string}||NULL
+ */
+function getCfg(key) {
+  var keyname = 'serverConfig.' + key;
+  return Storage.getValue(keyname);
+}
 
 /**
  * @desc Helper to check if server settings are available
@@ -85,29 +95,6 @@ function hasSettings(alert) {
 }
 
 /**
- * @desc Short Helper to set a server config property into users storage
- * @param key {string}
- * @param value {string}
- * @return {this}  Allow chaining
- */
-
-function setCfg(key, value) {
-  var keyname = 'serverConfig.' + key;
-  getStorage_().setValue(keyname, value);
-  return this;
-}
-
-/**
- * @desc Short Helper to get a server config property from users storage
- * @param key {string}
- * @return {string}||NULL
- */
-function getCfg(key) {
-  var keyname = 'serverConfig.' + key;
-  return getStorage_().getValue(keyname);
-}
-
-/**
  * @desc  Storage init / setting defaults
  *        Google Guide states, we should not access property storage during onInstall or onOpen,
  *        So we have to do it somehow else, initializing some vars.
@@ -115,24 +102,24 @@ function getCfg(key) {
  *
  */
 function initDefaults() {
-  var build         = getStorage_().getValue('BUILD') || 0;
-  var isInitialized = getStorage_().getValue('defaults_initialized') || 'false';
+  var build         = Storage.getValue('BUILD') || 0;
+  var isInitialized = Storage.getValue('defaults_initialized') || 'false';
   if (isInitialized == 'true' && build == BUILD) return;
 
-  getStorage_().setValue('BUILD', BUILD);
+  Storage.setValue('BUILD', BUILD);
 
-  var _tmp = getStorage_().getValue('jst_epic');
+  var _tmp = Storage.getValue('jst_epic');
   if (_tmp == null || _tmp.usable === false) 
-    getStorage_().setValue('jst_epic', fieldEpic);
+    Storage.setValue('jst_epic', fieldEpic);
 
-  if (null == getStorage_().getValue('workhours'))
-    getStorage_().setValue('workhours', 8);
+  if (null == Storage.getValue('workhours'))
+    Storage.setValue('workhours', 8);
 
-  if (null == getStorage_().getValue('dspuseras_name'))
-    getStorage_().setValue('dspuseras_name', 1);
+  if (null == Storage.getValue('dspuseras_name'))
+    Storage.setValue('dspuseras_name', 1);
 
-  if (null == getStorage_().getValue('dspdurationas'))
-    getStorage_().setValue('dspdurationas', "w");
+  if (null == Storage.getValue('dspdurationas'))
+    Storage.setValue('dspdurationas', "w");
 
   // Jira onDemand or Server
   var server_type = getCfg('server_type');
@@ -140,7 +127,7 @@ function initDefaults() {
   setCfg('server_type', server_type);
 
   // set done
-  getStorage_().setValue('defaults_initialized', 'true');
+  Storage.setValue('defaults_initialized', 'true');
 }
 
 /**
@@ -155,9 +142,9 @@ function saveSettings(jsonFormData) {
   setCfg('jira_url', url);
   setCfg('jira_username', jsonFormData.jira_username);
   setCfg('jira_password', jsonFormData.jira_password);
-  getStorage_().setValue('workhours', jsonFormData.ts_workhours);
-  getStorage_().setValue('dspuseras_name', parseInt(jsonFormData.ts_dspuseras_name));
-  getStorage_().setValue('dspdurationas', jsonFormData.ts_dspdurationas);
+  Storage.setValue('workhours', jsonFormData.ts_workhours);
+  Storage.setValue('dspuseras_name', parseInt(jsonFormData.ts_dspuseras_name));
+  Storage.setValue('dspdurationas', jsonFormData.ts_dspdurationas);
 
   var test = testConnection();
 
