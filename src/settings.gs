@@ -148,9 +148,7 @@ function saveSettings(jsonFormData) {
 
   var test = testConnection();
 
-  if (url.indexOf('atlassian.net') == -1) {
-    setCfg('server_type', 'server');
-  }
+  setCfg('server_type', (url.indexOf('atlassian.net') == -1) ? 'server' : 'onDemand');
 
   return {status: test.status, message: test.response};
 }
