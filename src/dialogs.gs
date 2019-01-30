@@ -130,7 +130,7 @@ function dialogAbout() {
 
   dialog
     .setWidth(480)
-    .setHeight(400)
+    .setHeight(420)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   debug.log('Processed: %s', dialog);
