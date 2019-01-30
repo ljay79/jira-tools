@@ -73,6 +73,11 @@ test("Debugging is enabled by default when PropertiesService.getUserProperties r
   expect(consoleLogSpy).toBeCalledTimes(1);
 });
 
+test("Calling debug.enabled gives correct value",() =>{
+  environmentConfiguration.debugEnabled = true;
+  var debug = require("../src/debug.gs").debug;
+  expect(debug.isEnabled()).toBe(true);
+});
 
 test("Debugging is disabled by default when PropertiesService.getUserProperties returns null or false",() =>{
   
