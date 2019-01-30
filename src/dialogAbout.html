@@ -35,7 +35,7 @@
     <div class="block about">
       <label>Github:</label> <span><a href="https://github.com/ljay79/jira-tools">https://github.com/ljay79/jira-tools</a></span>
       <label>Support:</label> <span><a href="https://github.com/ljay79/jira-tools/issues">https://github.com/ljay79/jira-tools/issues</a></span>
-    </div>
+     </div>
     <fieldset class="block debug">
       <legend>Debug</legend>
       <div class="block">
@@ -45,10 +45,10 @@
           <input type="radio" name="debugging" value="0" <?!= (debugging!='true') ? ' checked="checked"' : '' ?>/>Off
         </span>
         <label>Temp. User Key:</label> <span><input type="text" class="temp-user-key" name="tempUserKey" id="tempUserKey" value="<?= tempUserKey ?>" /></span>
-      </div>
-      <span>Help the Authors find bugs faster by enabling Debugging when asked in your Github Issue (Bug Report).</span>
+        <label>Environment:</label><span><?= environmentConfiguration.name ?>, Logging <?!= (debugEnabled) ? 'enabled' : ' disabled' ?></span> 
+     </div>
+     <span>Help the Authors find bugs faster by enabling Debugging when asked in your Github Issue (Bug Report).</span>
     </fieldset>
-    
     <script>
     var tempUserKeyField = document.getElementById("tempUserKey");
     tempUserKeyField.addEventListener('click', function(e) {

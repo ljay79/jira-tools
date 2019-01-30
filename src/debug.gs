@@ -54,7 +54,10 @@ debug = (function(){
     return that;
   };
 
-  that.isEnabled = function() {
+  that.isEnabled = function () {
+    if (!initialised) {
+      that.enable();
+    }
     return log_enabled;
   }
 
