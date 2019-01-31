@@ -1,5 +1,5 @@
 // Copyright 2017 Google Inc. All Rights Reserved.
-// https://github.com/gsuitedevs/apps-script-oauth2/blob/master/src/UserStorage.js
+// https://github.com/gsuitedevs/apps-script-oauth2/blob/master/src/Storage.js
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -171,6 +171,6 @@ var UserStorage = {
 // Node required code block
 module.exports = {
   Storage_: Storage_,
-  Storage : Storage
+  UserStorage: UserStorage
 };
 // End of Node required code block

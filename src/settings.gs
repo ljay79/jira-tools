@@ -1,8 +1,8 @@
 // Node required code block
 const BUILD = require("./Code.gs").BUILD;
 const fieldEpic = require("./customFields.gs").fieldEpic;
-const Storage_ = require("./UserStorage.gs").Storage_;
-const Storage = require("./UserStorage.gs").Storage;
+const Storage_ = require("./Storage.gs").Storage_;
+const UserStorage = require("./Storage.gs").UserStorage;
 // End of Node required code block
 
 
