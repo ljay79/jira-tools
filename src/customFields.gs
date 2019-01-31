@@ -19,7 +19,7 @@ var fieldEpic = {
  */
 function getCustomFields( format ) {
   format = format || CUSTOMFIELD_FORMAT_RAW;
-  var customFields = Storage.getValue('favoriteCustomFields') || [];
+  var customFields = UserStorage.getValue('favoriteCustomFields') || [];
   var fieldsFormatted = {};
 
   if ( format === CUSTOMFIELD_FORMAT_RAW ) {
@@ -53,7 +53,7 @@ function fetchCustomFields() {
       debug.log("Response of fetchCustomFields(); respData: %s", respData);
 
       // reset custom epic field
-      Storage.setValue('jst_epic', fieldEpic);
+      UserStorage.setValue('jst_epic', fieldEpic);
 
       var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
 
@@ -112,7 +112,7 @@ function fetchCustomFields() {
       // EPIC usable?
       if (fieldEpic.link_key != null && fieldEpic.label_key != null) {
         fieldEpic.usable = true;
-        Storage.setValue('jst_epic', fieldEpic);
+        UserStorage.setValue('jst_epic', fieldEpic);
 
         // add custom field 'Epic' to beginning of array
         customFields.unshift({
@@ -149,7 +149,7 @@ function fetchCustomFields() {
  * @return {object} Object({status: [boolean], response: [string]})
  */
 function saveCustomFields(jsonFormData) {
-  Storage.setValue('favoriteCustomFields', jsonFormData.favoriteCustomFields);
+  UserStorage.setValue('favoriteCustomFields', jsonFormData.favoriteCustomFields);
   debug.log("Saved favoriteCustomFields: %s", jsonFormData.favoriteCustomFields);
   return {status: true, message: 'Ok'};
 }

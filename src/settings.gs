@@ -1,8 +1,8 @@
 // Node required code block
 const BUILD = require("./Code.gs").BUILD;
 const fieldEpic = require("./customFields.gs").fieldEpic;
-const Storage_ = require("./Storage.gs").Storage_;
-const Storage = require("./Storage.gs").Storage;
+const Storage_ = require("./UserStorage.gs").Storage_;
+const Storage = require("./UserStorage.gs").Storage;
 // End of Node required code block
 
 
@@ -27,7 +27,7 @@ var jiraColumnDefault = [
 
 function setCfg(key, value) {
   var keyname = 'serverConfig.' + key;
-  Storage.setValue(keyname, value);
+  UserStorage.setValue(keyname, value);
   return this;
 }
 
@@ -38,7 +38,7 @@ function setCfg(key, value) {
  */
 function getCfg(key) {
   var keyname = 'serverConfig.' + key;
-  return Storage.getValue(keyname);
+  return UserStorage.getValue(keyname);
 }
 
 /**
@@ -84,24 +84,24 @@ function hasSettings(alert) {
  *
  */
 function initDefaults() {
-  var build         = Storage.getValue('BUILD') || 0;
-  var isInitialized = Storage.getValue('defaults_initialized') || 'false';
+  var build         = UserStorage.getValue('BUILD') || 0;
+  var isInitialized = UserStorage.getValue('defaults_initialized') || 'false';
   if (isInitialized == 'true' && build == BUILD) return;
 
-  Storage.setValue('BUILD', BUILD);
+  UserStorage.setValue('BUILD', BUILD);
 
-  var _tmp = Storage.getValue('jst_epic');
+  var _tmp = UserStorage.getValue('jst_epic');
   if (_tmp == null || _tmp.usable === false) 
-    Storage.setValue('jst_epic', fieldEpic);
+    UserStorage.setValue('jst_epic', fieldEpic);
 
-  if (null == Storage.getValue('workhours'))
-    Storage.setValue('workhours', 8);
+  if (null == UserStorage.getValue('workhours'))
+    UserStorage.setValue('workhours', 8);
 
-  if (null == Storage.getValue('dspuseras_name'))
-    Storage.setValue('dspuseras_name', 1);
+  if (null == UserStorage.getValue('dspuseras_name'))
+    UserStorage.setValue('dspuseras_name', 1);
 
-  if (null == Storage.getValue('dspdurationas'))
-    Storage.setValue('dspdurationas', "w");
+  if (null == UserStorage.getValue('dspdurationas'))
+    UserStorage.setValue('dspdurationas', "w");
 
   // Jira onDemand or Server
   var server_type = getCfg('server_type');
@@ -109,7 +109,7 @@ function initDefaults() {
   setCfg('server_type', server_type);
 
   // set done
-  Storage.setValue('defaults_initialized', 'true');
+  UserStorage.setValue('defaults_initialized', 'true');
 }
 
 /**
@@ -124,9 +124,9 @@ function saveSettings(jsonFormData) {
   setCfg('jira_url', url);
   setCfg('jira_username', jsonFormData.jira_username);
   setCfg('jira_password', jsonFormData.jira_password);
-  Storage.setValue('workhours', jsonFormData.ts_workhours);
-  Storage.setValue('dspuseras_name', parseInt(jsonFormData.ts_dspuseras_name));
-  Storage.setValue('dspdurationas', jsonFormData.ts_dspdurationas);
+  UserStorage.setValue('workhours', jsonFormData.ts_workhours);
+  UserStorage.setValue('dspuseras_name', parseInt(jsonFormData.ts_dspuseras_name));
+  UserStorage.setValue('dspdurationas', jsonFormData.ts_dspdurationas);
 
   var test = testConnection();
 

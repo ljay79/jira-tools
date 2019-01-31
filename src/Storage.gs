@@ -1,5 +1,5 @@
 // Copyright 2017 Google Inc. All Rights Reserved.
-// https://github.com/gsuitedevs/apps-script-oauth2/blob/master/src/Storage.js
+// https://github.com/gsuitedevs/apps-script-oauth2/blob/master/src/UserStorage.js
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -123,9 +123,9 @@ Storage_.prototype.getPrefixedKey_ = function(key) {
 
 
 /**
- * Creates a new Storage object, a helper to easily access Storage_ instance.
+ * Creates a new UserStorage object, a helper to easily access Storage_ instance.
  */
-var Storage = {
+var UserStorage = {
   _appStorage: false,
 
   /**
