@@ -6,6 +6,10 @@ global.PropertiesService = require('./mocks/PropertiesService');
 test('test hasSettings method', () => {
   expect(hasSettings()).toBeFalsy();
   setCfg('jira_url', "1");
-  setCfg('jira_username', "1");
-  setCfg('jira_password', "1");
+  setCfg('jira_username', "2");
+  setCfg('jira_password', "3");
+
+  expect(getCfg('jira_url')).toBe("1");
+  expect(getCfg('jira_username')).toBe("2");
+  expect(getCfg('jira_password')).toBe("3");
 });

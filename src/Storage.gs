@@ -15,7 +15,7 @@ var Storage = {
   getValue: function(key) {
     // Check memory.
     if (Storage.memory_[key]) {
-      return this.memory_[key];
+      return Storage.memory_[key];
     }
     var prefixedKey = Storage.getPrefixedKey_(key);
     var jsonValue;
@@ -24,7 +24,7 @@ var Storage = {
     // Check properties.
     if (jsonValue = PropertiesService.getUserProperties().getProperty(prefixedKey)) {
       value = JSON.parse(jsonValue);
-      this.memory_[key] = value;
+      Storage.memory_[key] = value;
       return value;
     }
 
