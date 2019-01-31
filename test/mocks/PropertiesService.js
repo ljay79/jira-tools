@@ -5,6 +5,7 @@ var _userPropData = {};
 var UserProps = {
   getProperty: jest.fn().mockImplementation((key)=>  _userPropData[key]),
   setProperty: jest.fn().mockImplementation(function(key) { _userPropData[key] = data; }),
+  deleteProperty: jest.fn()
 }
 
 
@@ -14,6 +15,7 @@ var PropertiesService = {
     var mocks = [
       [UserProps.getProperty, ""],
       [UserProps.setProperty, null],
+      [UserProps.deleteProperty, null],
       [PropertiesService.getUserProperties,UserProps]
     ];
     mocks.forEach((pair) => {
