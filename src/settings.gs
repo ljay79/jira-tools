@@ -2,25 +2,7 @@
 const BUILD = require("./Code.gs").BUILD;
 const fieldEpic = require("./customFields.gs").fieldEpic;
 const Storage_ = require("./Storage.gs").Storage_;
-
-//Mock for google's PropertiesService
-const PropertiesService = function() {
-  var data = {};
-  var userProperties = {
-    getProperty: function (key) {
-      return data[key];
-    },
-    setProperty: function (key, value) {
-      data[key] = value;
-    }
-  }
-
-  return {
-    getUserProperties: function() {
-      return userProperties;
-    }
-  }
-}();
+const Storage = require("./Storage.gs").Storage;
 // End of Node required code block
 
 
