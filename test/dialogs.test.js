@@ -20,9 +20,9 @@ test("About dialog is populated with correct values", () => {
   expect(templateParams.environmentConfiguration.name).toBe("UNITTEST");
   expect(templateParams.debugEnabled).toBe(debug.isEnabled());
   expect(HtmlService.dialogMock.setWidth).toBeCalledTimes(1);
-  expect(HtmlService.dialogMock.setWidth.mock.calls[0][0]).toBe(480);
+  expect(HtmlService.dialogMock.setWidth.mock.calls[0][0]).toBeGreaterThan(400);
   expect(HtmlService.dialogMock.setHeight).toBeCalledTimes(1);
-  expect(HtmlService.dialogMock.setHeight.mock.calls[0][0]).toBe(400);
+  expect(HtmlService.dialogMock.setHeight.mock.calls[0][0]).toBeGreaterThan(400);
   expect(HtmlService.dialogMock.setSandboxMode).toBeCalledTimes(1);
   expect(HtmlService.dialogMock.setSandboxMode.mock.calls[0][0]).toBe("IFRAME");
 
