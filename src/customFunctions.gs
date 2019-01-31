@@ -18,7 +18,7 @@ function recalcCustomFunctions() {
 function JST_EPICLABEL(TicketId) {
   var request   = new Request();
   var response  = {};
-  var epicField = getStorage_().getValue('jst_epic');
+  var epicField = UserStorage.getValue('jst_epic');
 
   if(TicketId == '') {
     throw new Error("{TicketId} can not be empty.");
@@ -108,7 +108,7 @@ function JST_search(JQL, Fields, Limit, StartAt) {
   debug.log("JST_search([%s]; [%s]; [%s])", JQL, Fields, Limit);
 
   // sanitize string and split to array
-  var aFields = Fields.replace(/;/g, ",").replace(/(^,)|(,$)/g, "").split(',');
+  var aFields = Fields.replace(/;/g, ",").replace(/(^,)|(,$)/g, "").replace(/\s+/g, '').split(',');
   aFields.filter(function(item) { 
     return item != ' ';
   });

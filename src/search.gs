@@ -63,7 +63,7 @@ function Search(searchQuery) {
       fields = aFields;
       // has custom Epic field 'jst_epic'?
       if (fields.indexOf('jst_epic') > -1) {
-        var epicField = getStorage_().getValue('jst_epic');
+        var epicField = UserStorage.getValue('jst_epic');
         if(epicField.link_key) fields.push(epicField.link_key);
       }
     } else {

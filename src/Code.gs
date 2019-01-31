@@ -1,7 +1,7 @@
 /**
  * @author Jens Rosemeier <github@jens79.de>
  * @github  https://github.com/ljay79/jira-tools
- * @copyright Jens Rosemeier, 2017-2018
+ * @copyright Jens Rosemeier, 2017-2019
  * 
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  *
@@ -60,9 +60,9 @@ function addMenu() {
 
     menu.addToUi();
 }
+
 // Node required code block
 module.exports = {
-  onOpen: onOpen,
-
+  onOpen: onOpen
 }
 // End of Node required code block

@@ -206,7 +206,7 @@ function formatTimeDiff() {
   }
 
   // calculate (and subtract) whole days (workday=8h)
-  var workhoursInSeconds = parseFloat(getStorage_().getValue('workhours')) * 3600;
+  var workhoursInSeconds = parseFloat(UserStorage.getValue('workhours')) * 3600;
   var days = Math.floor(delta / workhoursInSeconds);
   delta -= days * workhoursInSeconds;
 

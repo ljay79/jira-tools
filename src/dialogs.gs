@@ -57,9 +57,9 @@ function getServerCfg() {
     url: getCfg('jira_url'),
     username: getCfg('jira_username'),
     password: getCfg('jira_password'),
-    workhours: getStorage_().getValue('workhours'),
-    dspuseras_name: getStorage_().getValue('dspuseras_name'),
-    dspdurationas: getStorage_().getValue('dspdurationas')
+    workhours: UserStorage.getValue('workhours'),
+    dspuseras_name: UserStorage.getValue('dspuseras_name'),
+    dspdurationas: UserStorage.getValue('dspdurationas')
   };
 }
 
@@ -86,7 +86,7 @@ function dialogIssueFromFilter() {
   if (!hasSettings(true)) return;
 
   var customFields = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
-  var userColumns = getStorage_().getValue('userColumns') || [];
+  var userColumns = UserStorage.getValue('userColumns') || [];
   var dialog = getDialog('dialogIssuesFromFilter', {
     columns: ISSUE_COLUMNS,
     customFields: customFields,
@@ -233,7 +233,7 @@ function dialogProcessIssuesFromSheet(headerFieldsToUse) {
 function dialogCustomFields() {
   if (!hasSettings(true)) return;
 
-  var dialog = getDialog('dialogCustomFields', { favoriteCustomFields: (getStorage_().getValue('favoriteCustomFields') || []) });
+  var dialog = getDialog('dialogCustomFields', {favoriteCustomFields: (UserStorage.getValue('favoriteCustomFields') || [])});
 
   dialog
     .setWidth(480)
