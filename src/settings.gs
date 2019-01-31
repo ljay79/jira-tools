@@ -2,39 +2,8 @@
 const BUILD = require("./Code.gs").BUILD;
 const fieldEpic = require("./customFields.gs").fieldEpic;
 const Storage_ = require("./Storage.gs").Storage_;
-
-//Mock for google's PropertiesService
-const PropertiesService = function() {
-  var data = {};
-  var userProperties = {
-    getProperty: function (key) {
-      return data[key];
-    },
-    setProperty: function (key, value) {
-      data[key] = value;
-    }
-  }
-
-  return {
-    getUserProperties: function() {
-      return userProperties;
-    }
-  }
-}();
+const UserStorage = require("./Storage.gs").UserStorage;
 // End of Node required code block
-
-var APP_STORAGE;
-
-/**
- * Gets the storage layer.
- * @return {Storage} The JST storage.
- */
-var getStorage_ = function() {
-  if (!APP_STORAGE) {
-    APP_STORAGE = new Storage_('jst', PropertiesService.getUserProperties()||{});
-  }
-  return APP_STORAGE;
-};
 
 
 // default issue fields/columns for issue listings
@@ -48,6 +17,29 @@ var jiraColumnDefault = [
   'duedate',
   'project'
 ];
+
+/**
+ * @desc Short Helper to set a server config property into users storage
+ * @param key {string}
+ * @param value {string}
+ * @return {this}  Allow chaining
+ */
+
+function setCfg(key, value) {
+  var keyname = 'serverConfig.' + key;
+  UserStorage.setValue(keyname, value);
+  return this;
+}
+
+/**
+ * @desc Short Helper to get a server config property from users storage
+ * @param key {string}
+ * @return {string}||NULL
+ */
+function getCfg(key) {
+  var keyname = 'serverConfig.' + key;
+  return UserStorage.getValue(keyname);
+}
 
 /**
  * @desc Helper to check if server settings are available
@@ -85,29 +77,6 @@ function hasSettings(alert) {
 }
 
 /**
- * @desc Short Helper to set a server config property into users storage
- * @param key {string}
- * @param value {string}
- * @return {this}  Allow chaining
- */
-
-function setCfg(key, value) {
-  var keyname = 'serverConfig.' + key;
-  getStorage_().setValue(keyname, value);
-  return this;
-}
-
-/**
- * @desc Short Helper to get a server config property from users storage
- * @param key {string}
- * @return {string}||NULL
- */
-function getCfg(key) {
-  var keyname = 'serverConfig.' + key;
-  return getStorage_().getValue(keyname);
-}
-
-/**
  * @desc  Storage init / setting defaults
  *        Google Guide states, we should not access property storage during onInstall or onOpen,
  *        So we have to do it somehow else, initializing some vars.
@@ -115,24 +84,24 @@ function getCfg(key) {
  *
  */
 function initDefaults() {
-  var build         = getStorage_().getValue('BUILD') || 0;
-  var isInitialized = getStorage_().getValue('defaults_initialized') || 'false';
+  var build         = UserStorage.getValue('BUILD') || 0;
+  var isInitialized = UserStorage.getValue('defaults_initialized') || 'false';
   if (isInitialized == 'true' && build == BUILD) return;
 
-  getStorage_().setValue('BUILD', BUILD);
+  UserStorage.setValue('BUILD', BUILD);
 
-  var _tmp = getStorage_().getValue('jst_epic');
+  var _tmp = UserStorage.getValue('jst_epic');
   if (_tmp == null || _tmp.usable === false) 
-    getStorage_().setValue('jst_epic', fieldEpic);
+    UserStorage.setValue('jst_epic', fieldEpic);
 
-  if (null == getStorage_().getValue('workhours'))
-    getStorage_().setValue('workhours', 8);
+  if (null == UserStorage.getValue('workhours'))
+    UserStorage.setValue('workhours', 8);
 
-  if (null == getStorage_().getValue('dspuseras_name'))
-    getStorage_().setValue('dspuseras_name', 1);
+  if (null == UserStorage.getValue('dspuseras_name'))
+    UserStorage.setValue('dspuseras_name', 1);
 
-  if (null == getStorage_().getValue('dspdurationas'))
-    getStorage_().setValue('dspdurationas', "w");
+  if (null == UserStorage.getValue('dspdurationas'))
+    UserStorage.setValue('dspdurationas', "w");
 
   // Jira onDemand or Server
   var server_type = getCfg('server_type');
@@ -140,7 +109,7 @@ function initDefaults() {
   setCfg('server_type', server_type);
 
   // set done
-  getStorage_().setValue('defaults_initialized', 'true');
+  UserStorage.setValue('defaults_initialized', 'true');
 }
 
 /**
@@ -155,15 +124,13 @@ function saveSettings(jsonFormData) {
   setCfg('jira_url', url);
   setCfg('jira_username', jsonFormData.jira_username);
   setCfg('jira_password', jsonFormData.jira_password);
-  getStorage_().setValue('workhours', jsonFormData.ts_workhours);
-  getStorage_().setValue('dspuseras_name', parseInt(jsonFormData.ts_dspuseras_name));
-  getStorage_().setValue('dspdurationas', jsonFormData.ts_dspdurationas);
+  UserStorage.setValue('workhours', jsonFormData.ts_workhours);
+  UserStorage.setValue('dspuseras_name', parseInt(jsonFormData.ts_dspuseras_name));
+  UserStorage.setValue('dspdurationas', jsonFormData.ts_dspdurationas);
 
   var test = testConnection();
 
-  if (url.indexOf('atlassian.net') == -1) {
-    setCfg('server_type', 'server');
-  }
+  setCfg('server_type', (url.indexOf('atlassian.net') == -1) ? 'server' : 'onDemand');
 
   return {status: test.status, message: test.response};
 }

@@ -482,7 +482,7 @@ gulp deploy
 ```
 
 This task does actually 4 steps as one; `clean`, `build`, `set-environment-config` and `clasp-push`.
-The deployment will update the configuration using one for the files in _/config/test_ or _config/production_. This will overwrite the default configuration file _./src/environmentConfiguration.gs_ .By default the _production_ folder is used but you can specify the environment you wish by using the following tasks
+The deployment will update the configuration using one for the files in _/config/test_ or _/config/production_. This will overwrite the default configuration file _./src/environmentConfiguration.gs_ .By default the _production_ folder is used but you can specify the environment you wish by using the following tasks
 
 ```sh
 gulp deploy --test

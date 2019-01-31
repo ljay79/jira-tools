@@ -300,7 +300,7 @@ function unifyIssueAttrib(attrib, data) {
   if ( attrib.substring(0, 12) == 'customfield_' ) {
     var customFields = getCustomFields(CUSTOMFIELD_FORMAT_UNIFY);
     // custom epic
-    var epicField = getStorage_().getValue('jst_epic');
+    var epicField = UserStorage.getValue('jst_epic');
     if (epicField.usable === true) {
       customFields[epicField.link_key] = 'jst_epic';
     }
@@ -377,13 +377,13 @@ function unifyIssueAttrib(attrib, data) {
           break;
         case 'user':
           resp = {
-            value: (getStorage_().getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
+            value: (UserStorage.getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
             avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
           };
           break;
         case 'array|user':
           resp.value = data.fields[attrib].map(function(el){
-            return ((getStorage_().getValue('dspuseras_name') == 1 ? el.displayName : el.name) || 'Unknown');
+            return ((UserStorage.getValue('dspuseras_name') == 1 ? el.displayName : el.name) || 'Unknown');
           }).join(', ');
           break;
         case 'group':
@@ -453,7 +453,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'creator':
     case 'reporter':
       resp = {
-        value: (getStorage_().getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
+        value: (UserStorage.getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
         avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
       };
       break;
@@ -490,7 +490,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'aggregatetimespent':
     case 'aggregatetimeestimate':
       resp = {
-        value: (getStorage_().getValue('dspdurationas') == "w") ? formatTimeDiff(parseInt(data.fields[attrib]) || 0) : parseInt(data.fields[attrib]) || 0
+        value: (UserStorage.getValue('dspdurationas') == "w") ? formatTimeDiff(parseInt(data.fields[attrib]) || 0) : parseInt(data.fields[attrib]) || 0
       };
       break;
     case 'project':
@@ -601,7 +601,7 @@ function headerNames(header) {
   extend(labels, getCustomFields(CUSTOMFIELD_FORMAT_SEARCH));
 
   // custom epic
-  var epicField = getStorage_().getValue('jst_epic');
+  var epicField = UserStorage.getValue('jst_epic');
   if (epicField.usable === true) {
     labels[epicField.link_key] = 'Epic';
   }

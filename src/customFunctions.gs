@@ -18,7 +18,7 @@ function recalcCustomFunctions() {
 function JST_EPICLABEL(TicketId) {
   var request   = new Request();
   var response  = {};
-  var epicField = getStorage_().getValue('jst_epic');
+  var epicField = UserStorage.getValue('jst_epic');
 
   if(TicketId == '') {
     throw new Error("{TicketId} can not be empty.");

@@ -1,7 +1,10 @@
 
+
+var _userPropData = {};
+
 var UserProps = {
-  getProperty: jest.fn(),
-  setProperty: jest.fn(),
+  getProperty: jest.fn().mockImplementation((key)=>  _userPropData[key]),
+  setProperty: jest.fn().mockImplementation(function(key) { _userPropData[key] = data; }),
 }
 
 

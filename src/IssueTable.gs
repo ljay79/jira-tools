@@ -50,7 +50,7 @@ function insertIssuesFromFilter(jsonFormData) {
   };
 
   var columns = jsonFormData['columns'] || jiraColumnDefault;
-  getStorage_().setValue('userColumns', columns); //store for re-use by user
+  UserStorage.setValue('userColumns', columns); //store for re-use by user
 
   var search = new Search(jql);
   search.setOrderBy()
@@ -74,7 +74,7 @@ function insertIssuesFromFilter(jsonFormData) {
  */
 function IssueTable(sheet, initRange, data) {
   var headers = [], rowIndex = 0, numColumns = 0;
-  var epicField = getStorage_().getValue('jst_epic');
+  var epicField = UserStorage.getValue('jst_epic');
 
   /**
    * @desc Initialization, validation

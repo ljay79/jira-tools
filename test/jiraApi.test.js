@@ -6,6 +6,7 @@ const setCfg = require("../src/settings.gs").setCfg;
 const hasSettings = require("../src/settings.gs").hasSettings;
 const debug = require("../src/debug.gs").debug;
 const Request = require('../src/jiraApi.gs');
+PropertiesService = require('./mocks/PropertiesService');
 
 Browser = {
   Buttons: {
