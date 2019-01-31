@@ -52,7 +52,7 @@ var Storage = {
   removeValue: function(key) {
     var prefixKey = Storage.getPrefixedKey_(key);
     PropertiesService.getUserProperties().deleteProperty(prefixedKey);
-    delete this.memory_[prefixKey];
+    delete this.memory_[key];
   },
   
   /**
