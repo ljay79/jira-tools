@@ -59,10 +59,11 @@ var Storage = {
   * private method to prefix a key
   */
   getPrefixedKey_ : function(key) {
-  if (key) {
-    return "jst" + '.' + key;
-  } else {
-    return "jst";
+    if (key) {
+     return "jst" + '.' + key;
+    } else {
+     return "jst";
+    }
   }
 
 };
@@ -70,7 +71,6 @@ var Storage = {
 
 // Node required code block
 module.exports = {
-  Storage_: Storage_,
   Storage : Storage
 };
 // End of Node required code block
