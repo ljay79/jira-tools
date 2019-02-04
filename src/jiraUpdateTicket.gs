@@ -47,7 +47,7 @@ function updateJiraIssues(headerRow, dataRows) {
               var updateResult = updateIssueinJira(rowData,
                 function (key, success, message) {
                   if (!success) {
-                    // replace mention of specific fields
+                    // replace mention of specific field ids in error messages, try use field name
                     message = message.replace(/{Field:(.*?)}/g, function (match, fieldName) {
                       var errorField = getMatchingJiraField(allJiraFields, fieldName);
                       if (errorField != null) {
@@ -206,7 +206,17 @@ function updateIssueinJira(issueData, callback) {
     }
 
   };
-  request.call(method, { issueIdOrKey: issueData.key, fields: issueData.fields });
+  request.call(method, {
+    issueIdOrKey: issueData.key,
+    fields: issueData.fields,
+    update: {
+      comment: [{
+        add: {
+          body: "Updated by Jira Sheet Tools https://github.com/ljay79/jira-tool"
+        }
+      }]
+    }
+  });
   request.withSuccessHandler(ok);
   request.withFailureHandler(error);
   return (request.getResponse().success === true);

@@ -114,7 +114,6 @@ test('processing list of Jira Issues with status transition', () => {
             transition: mockTransitionFunction
         }
     });
-    mockTransitionFunction
 
     const updateJiraIssues = require('../src/jiraUpdateTicket.gs').updateJiraIssues;
     
@@ -138,6 +137,27 @@ test('processing list of Jira Issues with status transition', () => {
     expect(Object.keys(jiraApiMock.call.mock.calls[1][1].fields).length).toBe(1);
     expect(jiraApiMock.call.mock.calls[1][1].fields["columnA"]).toBe("column A value");
 
+
+    // only the status is changed but a comment should still be added to the issue
+    jiraApiMock.resetMocks();
+    jiraApiMock.setAllResponsesSuccesfull(204);
+    jiraApiMock.setNextJiraResponse(200,"field",fieldList);
+    var result = updateJiraIssues({status:1,Key:0},[["PBI-1","DONE"]]);
+    expect(mockTransitionFunction.mock.calls.length).toBe(2);
+    expect(mockTransitionFunction.mock.calls[0][0]).toBe("PBI-1");
+    expect(mockTransitionFunction.mock.calls[0][1]).toBe("DONE");
+    expect(result.message).not.toBeNull();
+    expect(result.rowsUpdated).toBe(1);
+    expect(result.errors.length).toBe(0);
+    expect(result.status).toBe(true);
+    expect(result.finished).toBe(true);
+    expect(jiraApiMock.call.mock.calls.length).toBe(2);
+    // status should be removed when calling to save the other fields
+    expect(Object.keys(jiraApiMock.call.mock.calls[1][1].fields).length).toBe(0);
+    // a comment was made
+    expect(jiraApiMock.call.mock.calls[1][1]["update"]["comment"][0]["add"]["body"]).toBeDefined();
+
+
     jiraApiMock.resetMocks();
     mockTransitionFunction.mockClear();
     mockTransitionFunction.mockImplementationOnce(function() {
@@ -158,6 +178,8 @@ test('processing list of Jira Issues with status transition', () => {
     // status should be removed when calling to save the other fields
     expect(Object.keys(jiraApiMock.call.mock.calls[1][1].fields).length).toBe(1);
     expect(jiraApiMock.call.mock.calls[1][1].fields["columnA"]).toBe("column A value");
+    // a comment was made
+    expect(jiraApiMock.call.mock.calls[1][1]["update"]["comment"][0]["add"]["body"]).toBeDefined();
 
 });
 
@@ -386,6 +408,8 @@ test("Posting Individual Issues to Jira - Success", () => {
     expect(jiraApiMock.call.mock.calls[0][0]).toBe("issueUpdate");
     expect(jiraApiMock.call.mock.calls[0][1]["issueIdOrKey"]).toBe("PBI-2");
     expect(jiraApiMock.call.mock.calls[0][1]["fields"]["a"]).toBe("b");
+    // should have a comment
+    expect(jiraApiMock.call.mock.calls[0][1]["update"]["comment"][0]["add"]["body"]).toBeDefined();
 });
 
 test("field validation", () => {
