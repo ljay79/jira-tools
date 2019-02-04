@@ -55,7 +55,7 @@ function addMenu() {
 
     if (environmentConfiguration.features.updateJira.enabled) {
         menu.addSeparator()
-        .addItem('Update Jira Issues from Spreadsheet (BETA)', 'dialogIssuesFromSheet');
+        .addItem('Update Jira Issues (BETA)', 'dialogIssuesFromSheet');
     }
 
     menu.addToUi();
