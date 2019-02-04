@@ -165,7 +165,7 @@ function sidebarJiraFieldMap() {
 
   var error = function(msg) {
     Browser.msgBox(msg, Browser.Buttons.OK);
-    debug.error(msg);
+    debug.error(msg + " httpResp: %s", httpResp);
   };
 
   getAllJiraFields(ok,error);
