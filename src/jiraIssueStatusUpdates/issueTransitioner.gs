@@ -1,7 +1,7 @@
 // Node required code block
 const Request = require('../jiraApi.gs');
 const getIssue = require('../jiraCommon.gs').getIssue;
-const IssueTransitionConfiguration = require('./issueTransitionConfiguration.gs');
+const IssueTransitionConfiguration = require('./IssueTransitionConfiguration.gs');
 // End of Node required code block
 
 /**
