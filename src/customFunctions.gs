@@ -43,7 +43,7 @@ function JST_EPICLABEL(TicketId) {
     return value;
   } else {
     debug.error("In JST_EPICLABEL; Response %s", response);
-    throw new Error("Jira Error: " + response.respData.errorMessages.join(",") || response.respData.errorMessages);
+    throw new Error(response.respData.errorMessages.join(",") || response.respData.errorMessages);
   }
 }
 
