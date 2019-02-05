@@ -38,7 +38,7 @@ test('Update Jira menu option appears based on feature switch', () => {
   onOpen(e);
   var addItemMock =  SpreadsheetApp.getUi().createAddonMenu().addItem.mock;
   var menuItemsCreatedWithoutFeature = addItemMock.calls.length;
-  expect(addItemMock.calls[menuItemsCreatedWithoutFeature-1][0]).not.toBe('Update Jira Issues from Spreadsheet (BETA)');
+  expect(addItemMock.calls[menuItemsCreatedWithoutFeature-1][0]).not.toBe('Update Jira Issues (BETA)');
   expect(addItemMock.calls[menuItemsCreatedWithoutFeature-1][1]).not.toBe('dialogIssuesFromSheet');
   SpreadsheetApp.resetMocks();
 
