@@ -158,7 +158,7 @@ function Request() {
     }
   };
 
-  function isHttpStatusIs2xx(status) {
+  function isHttpStatus2xx(status) {
     return (status>=200 && status<300);
   }
   /**
@@ -250,7 +250,7 @@ function Request() {
     }
 
     if (httpResponse) {
-      if(!isHttpStatusIs2xx(statusCode)){
+      if(!isHttpStatus2xx(statusCode)){
         debug.warn("Code: %s, ResponseHeaders: %s, httpResponse: %s", httpResponse.getResponseCode(), httpResponse.getAllHeaders(), httpResponse);
       } else {
         debug.log("Code: %s, httpResponse: %s", httpResponse.getResponseCode(), httpResponse);
@@ -283,7 +283,7 @@ function Request() {
    * @return {this}  Allow chaining
    */
   this.withSuccessHandler = function(fn) {
-    if(isHttpStatusIs2xx(statusCode)) {
+    if(isHttpStatus2xx(statusCode)) {
       fn.call(this, responseData, httpResponse, statusCode);
     }
     return this;
@@ -295,7 +295,7 @@ function Request() {
    * @return {this}  Allow chaining
    */
   this.withFailureHandler = function(fn) {
-    if(!isHttpStatusIs2xx(statusCode)) {
+    if(!isHttpStatus2xx(statusCode)) {
       fn.call(this, responseData, httpResponse, statusCode);
     }
     return this;
@@ -306,7 +306,7 @@ function Request() {
    * @return {Object}    Response object: {respData: {..}, httpResp: {}, statusCode: Integer}
    */
   this.getResponse = function() {
-    return {'respData': responseData, 'httpResp': httpResponse, 'statusCode': statusCode, 'method': httpMethod, 'success':isHttpStatusIs2xx(statusCode)};
+    return {'respData': responseData, 'httpResp': httpResponse, 'statusCode': statusCode, 'method': httpMethod, 'success':isHttpStatus2xx(statusCode)};
   };
 
   // call init
