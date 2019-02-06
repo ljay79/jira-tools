@@ -179,9 +179,7 @@ test('query parameters should be added to the url for user search method', () =>
   var result = requestObj.getResponse();
 
   expect(Browser.msgBox.mock.calls.length).toBe(0);
-  //@TODO: I expected this from the code - but it doesnt work (possibly a bug)
-  //"https://jiraserver/rest/api/2/user/search?startAt=0&maxResults=100&username=paul"
-  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/user/search?username=paul");
+  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/user/search?startAt=0&maxResults=250&username=paul");
   expect(result.statusCode).toBe(200);
   expect(result.respData).not.toBeNull();
   expect(result.method).toBe('get');
