@@ -69,7 +69,6 @@ test('an exception when calling UrlFetchApp should be handled', () => {
   expect(Utilities.base64Encode.mock.calls[0][0]).toBe("username:password");
   expect(result.statusCode).toBe(500);
   expect(result.respData).not.toBeNull();
-  expect(result.respData.errorMessages).not.toBeNull();
 });
 
 test('invalid JSON from mock JIRA should be handled', () => {
