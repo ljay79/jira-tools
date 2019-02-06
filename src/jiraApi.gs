@@ -143,7 +143,8 @@ function Request() {
           case (typeof jiraQueryParams[attr] == 'object'):
             this.prepareParams(urlParams, jiraQueryParams[attr]);
             break;
-          case (typeof jiraQueryParams[attr] == 'string'):
+          //case (typeof jiraQueryParams[attr] == 'string' || typeof jiraQueryParams[attr] == 'number'):
+          default:
             urlParams[attr] = jiraQueryParams[attr];
             break;
         }
