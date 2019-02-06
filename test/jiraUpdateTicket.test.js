@@ -195,7 +195,7 @@ test('processing list of Jira Issues', () => {
 
     var result = updateJiraIssues({columnA:1,Key:0},[]);
     expect(result.rowsUpdated).toBe(0);
-    expect(result.status).toBe(true);
+    expect(result.status).toBe(false);
     expect(result.finished).toBe(true);
 
     
