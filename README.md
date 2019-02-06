@@ -59,13 +59,25 @@ Simply provide your individual Jira server settings before you use any feature.
 
 In any Google sheet, go in the menu to “Add-ons" > "Jira Sheet Tools" > "Settings”.
 Enter your "Jira Domain" and your log on credentials.
-Either combination of your Atlassian account username/email + password or your Atlassian account email + API Token.
-> Use API Token for improved security. [How to obtain API Token](https://confluence.atlassian.com/cloud/api-tokens-938839638.html)
+
+#### (A) Email / Username and Password
+Either combination of your Atlassian account username/email + password are possible to be used.
+Depending on your JIRA instance setup, there is a chance that you will expirience authentication issues with this.
+
+In case your Jira instance is connected to a third-party authentication service such as Google Domain, you should use your email or username and the Jira (Atlassian) password, not the password from your Google account - if it differs.
+Read more here in section [Known Issues](#known-issues)
+
+#### (B) Atlassian API Token
+A little more effort to prepare, but once done, it will be the safest way of authenticating the sheets add-on.
+Using the Atlassian API Token instead of a password in combination with your Atlassian (Jira) username or email address.
+
+For this, you will need to obtain a unique and secure API Token upfront first (you need to do only once).
+Best described here -> [How to obtain API Token](https://confluence.atlassian.com/cloud/api-tokens-938839638.html)
 
 > It is recommended to use this Add-on only with an Jira Cloud/Server instance which runs via SSL (https).
 > This Add-on is using simple Basic Auth mechanism to authenticate with Jira, which means, user credentials are transmitted unencrypted when used without SSL.
 
-**You're all set and ready to go**
+You're all set and ready to go.
 
 # Features
 ### Update Ticket Key Status
@@ -412,7 +424,7 @@ Default credentials saved to: ~/.clasprc.json (/.clasprc.json).
 #### 1. Create and deploy to a new Google project
 ```sh
 cd ./src
-clasp create --type sheets --title "Jira Sheet Tools"
+clasp create --type sheets --title "Jira Sheet Tools - Devel"
 cd ..
 gulp deploy
 ```
@@ -488,7 +500,7 @@ The deployment will update the configuration using one for the files in _/config
 gulp deploy --test
 gulp deploy-test
 ```
-Both commands above will use the test config file. The second task being a shortcut to avoid entering the parameter/
+Both commands above will use the test config file. The second task being a shortcut to avoid entering the parameter.
 
 ### Pulling changes back from your Google project
 
@@ -499,7 +511,7 @@ gulp pull
 ```
 
 Use this script if you have changed the source code within the GAS editors while testing on the GAS envrironment.
-This task will pull the changes down from your GAS project into a temporary folder 'dist/pull'. Then the script will uncomment the require and exports statments. The files copied into the_./src_ folder. It does execute multiple tasks as one; `clean`, `clasp-pull`, `un-google` , `copy-changed-pulled-code`.
+This task will pull the changes down from your GAS project into a temporary folder './dist/pull'. Then the script will uncomment the require and exports statments. The files copied into the _./src_ folder. It does execute multiple tasks as one; `clean`, `clasp-pull`, `un-google` , `copy-changed-pulled-code`.
 
 ### Commit and push changes to git repository
 
