@@ -243,10 +243,13 @@ function Request() {
       statusCode = parseInt( httpResponse.getResponseCode() );
     } catch (e) {
       statusCode = 500;
-
+      responseData = e.message;
       debug.error('UrlFetchApp.fetch(%s) yielded an error: ' + e, fetchUrl);
       // add Browser Msg
-      Browser.msgBox("Exception", e, Browser.Buttons.OK);
+      try {
+        // ie:for "Re-calculate all Formulars" Browser is not accessible
+        Browser.msgBox("Exception", e, Browser.Buttons.OK);
+      } catch (e){}
     }
 
     if (httpResponse) {
@@ -263,8 +266,6 @@ function Request() {
         if(httpErrorCodes[statusCode]) responseData = httpErrorCodes[statusCode];
         else responseData = 'Unable to make requests to Jira (02)!';
       }
-    } else {
-      responseData = 'Unable to make requests to Jira (01)!';
     }
 
     if( typeof responseData == 'string' ) {
