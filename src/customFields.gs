@@ -1,3 +1,9 @@
+// Node required code block
+const Request = require('../src/jiraApi.gs');
+const debug = require("./debug.gs").debug;
+const UserStorage = require("./UserStorage.gs").UserStorage;
+// End of Node required code block
+
 var CUSTOMFIELD_FORMAT_RAW    = 1;
 var CUSTOMFIELD_FORMAT_SEARCH = 2;
 var CUSTOMFIELD_FORMAT_UNIFY  = 3;
@@ -170,3 +176,7 @@ function sidebarJiraFieldMap() {
 
   getAllJiraFields(ok,error);
 }
+
+// Node required code block
+module.exports = { fetchCustomFields: fetchCustomFields, fieldEpic: fieldEpic }
+// End of Node required code block

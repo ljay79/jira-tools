@@ -1,8 +1,6 @@
 
 
 global.environmentConfiguration = require('../src/environmentConfiguration.gs');
-const getCfg = require("../src/settings.gs").getCfg;
-const setCfg = require("../src/settings.gs").setCfg;
 const hasSettings = require("../src/settings.gs").hasSettings;
 const debug = require("../src/debug.gs").debug;
 const Request = require('../src/jiraApi.gs');
@@ -33,6 +31,8 @@ beforeEach(() => {
 });
 
 function initJiraDummyConfig() {
+  var getCfg = require("../src/settings.gs").getCfg;
+  var setCfg = require("../src/settings.gs").setCfg;
   setCfg('jira_url', "https://jiraserver");
   setCfg('jira_username', "username");
   setCfg('jira_password', "password");
