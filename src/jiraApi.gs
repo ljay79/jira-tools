@@ -26,8 +26,8 @@ var restMethods = {
     'search'        : {method: '/search'}, // POST
     'myFilters'     : {method: '/filter/my', queryparams: {includeFavourites: 'false'}},
 
-    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 100, username:'%'}},
-    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 100, query: ''}},
+    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'%'}},
+    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
     'field'         : {method: '/field'}
   },
   'server': {
@@ -42,8 +42,8 @@ var restMethods = {
     // server api doesnt support /filter/my
     'myFilters'     : {method: '/filter/favourite', queryparams: {includeFavourites: 'false'}},
 
-    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 100, username:'%'}},
-    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 100, query: ''}},
+    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'%'}},
+    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
     'field'         : {method: '/field'}
   }
 };
@@ -150,7 +150,8 @@ function Request() {
           case (typeof jiraQueryParams[attr] == 'object'):
             this.prepareParams(urlParams, jiraQueryParams[attr]);
             break;
-          case (typeof jiraQueryParams[attr] == 'string'):
+          //case (typeof jiraQueryParams[attr] == 'string' || typeof jiraQueryParams[attr] == 'number'):
+          default:
             urlParams[attr] = jiraQueryParams[attr];
             break;
         }
