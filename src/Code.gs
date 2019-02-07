@@ -38,7 +38,8 @@ function onInstall(e) {
  * @OnlyCurrentDoc
  */
 function addMenu() {
-  SpreadsheetApp.getUi().createAddonMenu()
+
+  var menu = SpreadsheetApp.getUi().createAddonMenu()
     .addItem('Re-Calculate all formulas in active sheet', 'recalcCustomFunctions')
     .addItem('Update Ticket Key Status "KEY-123 [Done]"', 'dialogRefreshTicketsIds')
     .addItem('Show Jira Field Map', 'sidebarJiraFieldMap')
@@ -46,13 +47,18 @@ function addMenu() {
     .addSeparator()
     .addItem('List Issues from Filter', 'dialogIssueFromFilter')
     .addItem('Create Time Report', 'dialogTimesheet')
-
+  
     .addSeparator()
     .addItem('Settings', 'dialogSettings')
     .addItem('Configure Custom Fields', 'dialogCustomFields')
-    .addItem('About', 'dialogAbout')
+    .addItem('About', 'dialogAbout');
 
-    .addToUi();
+    if (environmentConfiguration.features.updateJira.enabled) {
+        menu.addSeparator()
+        .addItem('Update Jira Issues (BETA)', 'dialogIssuesFromSheet');
+    }
+
+    menu.addToUi();
 }
 
 // Node required code block

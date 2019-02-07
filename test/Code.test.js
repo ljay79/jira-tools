@@ -12,17 +12,12 @@ debug = require('../src/debug.gs').debug;
 
 beforeEach(() => {
   SpreadsheetApp.resetMocks();
-  PropertiesService.resetMocks(); 
 });
-test('onOpen function in various authmodes', () => {
+test('onOpen builds menu', () => {
   var onOpen = require('../src/Code.gs').onOpen;
   var e = {
     authMode: ScriptApp.AuthMode.NONE
   }
-  // getUserProperties will throw an exception when in ScriptApp.AuthMode.NONE
-  PropertiesService.getUserProperties.mockImplementation(() => {
-    throw Error("This is not available when in ScriptApp.AuthMode.NONE")
-  });
   onOpen(e);
   // a menu was build
   expect(SpreadsheetApp.getUi.mock.calls.length).toBe(1);
@@ -30,35 +25,30 @@ test('onOpen function in various authmodes', () => {
   expect(SpreadsheetApp.getUi().createAddonMenu().addToUi.mock.calls.length).toBe(1);
   expect(SpreadsheetApp.getUi().createAddonMenu().addItem.mock.calls.length).toBeGreaterThan(1);
   expect(SpreadsheetApp.getUi().createAddonMenu().addSeparator.mock.calls.length).toBeGreaterThan(1);
+});
 
-  // properties service was not used 
-  expect(PropertiesService.getUserProperties.mock.calls.length).toBe(0);
-
-
+test('Update Jira menu option appears based on feature switch', () => {
   SpreadsheetApp.resetMocks();
-  PropertiesService.resetMocks(); // clear exception throwing mock implementation 
-  e.authMode = ScriptApp.AuthMode.LIMITED;
+  var onOpen = require('../src/Code.gs').onOpen;
+  var e = {
+    authMode: ScriptApp.AuthMode.LIMITED
+  }
+  // see how many menu items are created without the feature switch
+  environmentConfiguration.features.updateJira.enabled = false;
   onOpen(e);
-  // a menu was build
-  expect(SpreadsheetApp.getUi.mock.calls.length).toBe(1);
-  expect(SpreadsheetApp.getUi().createAddonMenu.mock.calls.length).toBe(1);
-  expect(SpreadsheetApp.getUi().createAddonMenu().addToUi.mock.calls.length).toBe(1);
-  expect(SpreadsheetApp.getUi().createAddonMenu().addItem.mock.calls.length).toBeGreaterThan(1);
-  // properties service was not used 
-  expect(PropertiesService.getUserProperties().getProperty.mock.calls.length).toBe(0);
-  expect(SpreadsheetApp.getUi().createAddonMenu().addSeparator.mock.calls.length).toBeGreaterThan(1);
-
-
+  var addItemMock =  SpreadsheetApp.getUi().createAddonMenu().addItem.mock;
+  var menuItemsCreatedWithoutFeature = addItemMock.calls.length;
+  expect(addItemMock.calls[menuItemsCreatedWithoutFeature-1][0]).not.toBe('Update Jira Issues (BETA)');
+  expect(addItemMock.calls[menuItemsCreatedWithoutFeature-1][1]).not.toBe('dialogIssuesFromSheet');
   SpreadsheetApp.resetMocks();
-  PropertiesService.getUserProperties().getProperty.mockImplementation(() => "false");
-  e.authMode = ScriptApp.AuthMode.FULL;
+
+  // now enable the feature and check if its added.
+  environmentConfiguration.features.updateJira.enabled = true;
   onOpen(e);
-  // a menu was built
-  expect(SpreadsheetApp.getUi.mock.calls.length).toBe(1);
-  expect(SpreadsheetApp.getUi().createAddonMenu.mock.calls.length).toBe(1);
-  expect(SpreadsheetApp.getUi().createAddonMenu().addToUi.mock.calls.length).toBe(1);
-  expect(SpreadsheetApp.getUi().createAddonMenu().addItem.mock.calls.length).toBeGreaterThan(1);
-  expect(SpreadsheetApp.getUi().createAddonMenu().addSeparator.mock.calls.length).toBeGreaterThan(1);
-  // properties service WAS used 
-  //expect(PropertiesService.getUserProperties().getProperty.mock.calls.length).toBe(1);
+  var addItemMock =  SpreadsheetApp.getUi().createAddonMenu().addItem.mock;
+  var menuItemsCreatedWithFeature = addItemMock.calls.length;
+  expect(menuItemsCreatedWithFeature).toBe(menuItemsCreatedWithoutFeature+1)
+  expect(addItemMock.calls[menuItemsCreatedWithFeature-1][0]).toBe('Update Jira Issues (BETA)');
+  expect(addItemMock.calls[menuItemsCreatedWithFeature-1][1]).toBe('dialogIssuesFromSheet');
+  
 });

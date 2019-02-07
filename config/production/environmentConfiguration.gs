@@ -5,5 +5,10 @@
 var environmentConfiguration = {
   "name": "Production",
   "description": "Production deployment of Add On",
-  "debugEnabled": false
+  "debugEnabled": false,
+  "features": {
+    "updateJira": {
+      "enabled": false
+    }
+  }
 };
