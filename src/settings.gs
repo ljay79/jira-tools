@@ -61,18 +61,6 @@ function hasSettings(alert) {
     return false;
   }
 
-  /*
-   * backwards compatibility <0.12.0 jira url http vs https
-   * Until v0.12.0 we expected settings for Jira domain/url to be domain name only
-   * and assumed its always running under https .
-   * Now we have user enter full url including the scheme in case he wants to use http:// over https:// .
-   */
-  if( url.indexOf('http') != 0 ) { //catched both 'http' and 'https' at beginning of url
-    // old var, need to attached https as default scheme
-    url = 'https://' + url;
-    setCfg('jira_url', url);
-  }
-  
   return true;
 }
 
