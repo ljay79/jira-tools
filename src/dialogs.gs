@@ -168,7 +168,7 @@ function dialogTimesheet() {
 * @return {object}
 */
 function getDataForJiraUpdateFromSheet() {
-  var cellValues = SpreadsheetApp.getActiveSheet().getActiveRange().getValues();
+  var cellValues = getTicketSheet().getActiveRange().getValues();
   var headerFields = {};
   var dataRows = [];
   if (cellValues.length > 0) {

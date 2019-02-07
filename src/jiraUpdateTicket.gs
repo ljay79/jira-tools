@@ -20,63 +20,65 @@ function updateJiraIssues(headerRow, dataRows) {
   if (headerRow === null || Object.keys(headerRow).length == 0) {
     result.finished = true;
     result.message = "No values in header row";
-  } else {
+    return result;
+  }
 
-    if (dataRows == null || dataRows.length == 0) {
-      result.status = true;
-      result.finished = true;
-      result.message = "No data sent";
-      return result;
+  if (dataRows == null || dataRows.length == 0) {
+    result.status = false;
+    result.finished = true;
+    result.message = "No issues were selected from your sheet";
+    return result;
 
-    } else {
-      var statusTransitioner = new IssueTransitioner();
-      allJiraFields = getAllJiraFields(
-        function (allJiraFields) {
-          for (var i = 0; i < dataRows.length; i++) {
-            var rowData = packageRowForUpdate(allJiraFields, headerRow, dataRows[i]);
-            if (rowData.key != null) {
-              if (rowData.fields["status"] != null) {
-                var statusTransition = statusTransitioner.transition(rowData.key, rowData.fields["status"]);
-                delete (rowData.fields["status"]);
-                if (!statusTransition.success) {
-                  statusTransition.errors.forEach(function (message) {
-                    result.errors.push("[" + rowData.key + "] " + message);
-                  });
-                }
-              }
-              var updateResult = updateIssueinJira(rowData,
-                function (key, success, message) {
-                  if (!success) {
-                    // replace mention of specific field ids in error messages, try use field name
-                    message = message.replace(/{Field:(.*?)}/g, function (match, fieldName) {
-                      var errorField = getMatchingJiraField(allJiraFields, fieldName);
-                      if (errorField != null) {
-                        return errorField.name;
-                      }
-                      return "";
-                    });
-                    result.errors.push("[" + key + "] " + message);
-                  }
-                });
-              if (updateResult) {
-                result.rowsUpdated++;
-              }
-            } else {
-              result.errors.push("No Key value found in row " + i);
+  }
+
+  var statusTransitioner = new IssueTransitioner();
+  allJiraFields = getAllJiraFields(
+    function (allJiraFields) {
+      for (var i = 0; i < dataRows.length; i++) {
+        var rowData = packageRowForUpdate(allJiraFields, headerRow, dataRows[i]);
+        if (rowData.key != null) {
+          if (rowData.fields["status"] != null) {
+            var statusTransition = statusTransitioner.transition(rowData.key, rowData.fields["status"]);
+            delete (rowData.fields["status"]);
+            if (!statusTransition.success) {
+              statusTransition.errors.forEach(function (message) {
+                result.errors.push("[" + rowData.key + "] " + message);
+              });
             }
           }
-          result.message = result.rowsUpdated + " jira issues(s) updated, " + result.errors.length + " errors.";
-          result.status = (result.rowsUpdated > 0);
-          result.finished = true;
-        },
-        function (errorMessage) {
-          result.finished = true;
-          result.status = false;
-          result.message = "Could not retrieve all field definitions from JIRA " + errorMessage;
+          var updateResult = updateIssueinJira(rowData,
+            function (key, success, message) {
+              if (!success) {
+                // replace mention of specific field ids in error messages, try use field name
+                message = message.replace(/{Field:(.*?)}/g, function (match, fieldName) {
+                  var errorField = getMatchingJiraField(allJiraFields, fieldName);
+                  if (errorField != null) {
+                    return errorField.name;
+                  }
+                  return "";
+                });
+                result.errors.push("[" + key + "] " + message);
+              }
+            });
+          if (updateResult) {
+            result.rowsUpdated++;
+          }
+        } else {
+          result.errors.push("No Key value found in row " + i);
         }
-      )
+      }
+      result.message = result.rowsUpdated + " jira issues(s) updated, " + result.errors.length + " errors.";
+      result.status = (result.rowsUpdated > 0);
+      result.finished = true;
+    },
+    function (errorMessage) {
+      result.finished = true;
+      result.status = false;
+      result.message = "Could not retrieve all field definitions from JIRA " + errorMessage;
     }
-  }
+  )
+
+
 
   return result;
 

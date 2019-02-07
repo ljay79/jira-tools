@@ -26,8 +26,8 @@ var restMethods = {
     'search'        : {method: '/search'}, // POST
     'myFilters'     : {method: '/filter/my', queryparams: {includeFavourites: 'false'}},
 
-    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 100, username:'%'}},
-    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 100, query: ''}},
+    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'%'}},
+    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
     'field'         : {method: '/field'}
   },
   'server': {
@@ -42,8 +42,8 @@ var restMethods = {
     // server api doesnt support /filter/my
     'myFilters'     : {method: '/filter/favourite', queryparams: {includeFavourites: 'false'}},
 
-    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 100, username:'%'}},
-    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 100, query: ''}},
+    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'%'}},
+    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
     'field'         : {method: '/field'}
   }
 };
@@ -150,7 +150,8 @@ function Request() {
           case (typeof jiraQueryParams[attr] == 'object'):
             this.prepareParams(urlParams, jiraQueryParams[attr]);
             break;
-          case (typeof jiraQueryParams[attr] == 'string'):
+          //case (typeof jiraQueryParams[attr] == 'string' || typeof jiraQueryParams[attr] == 'number'):
+          default:
             urlParams[attr] = jiraQueryParams[attr];
             break;
         }
@@ -158,7 +159,7 @@ function Request() {
     }
   };
 
-  function isHttpStatusIs2xx(status) {
+  function isHttpStatus2xx(status) {
     return (status>=200 && status<300);
   }
   /**
@@ -243,14 +244,17 @@ function Request() {
       statusCode = parseInt( httpResponse.getResponseCode() );
     } catch (e) {
       statusCode = 500;
-
+      responseData = e.message;
       debug.error('UrlFetchApp.fetch(%s) yielded an error: ' + e, fetchUrl);
       // add Browser Msg
-      Browser.msgBox("Exception", e, Browser.Buttons.OK);
+      try {
+        // ie:for "Re-calculate all Formulars" Browser is not accessible
+        Browser.msgBox("Exception", e, Browser.Buttons.OK);
+      } catch (e){}
     }
 
     if (httpResponse) {
-      if(!isHttpStatusIs2xx(statusCode)){
+      if(!isHttpStatus2xx(statusCode)){
         debug.warn("Code: %s, ResponseHeaders: %s, httpResponse: %s", httpResponse.getResponseCode(), httpResponse.getAllHeaders(), httpResponse);
       } else {
         debug.log("Code: %s, httpResponse: %s", httpResponse.getResponseCode(), httpResponse);
@@ -263,8 +267,6 @@ function Request() {
         if(httpErrorCodes[statusCode]) responseData = httpErrorCodes[statusCode];
         else responseData = 'Unable to make requests to Jira (02)!';
       }
-    } else {
-      responseData = 'Unable to make requests to Jira (01)!';
     }
 
     if( typeof responseData == 'string' ) {
@@ -283,7 +285,7 @@ function Request() {
    * @return {this}  Allow chaining
    */
   this.withSuccessHandler = function(fn) {
-    if(isHttpStatusIs2xx(statusCode)) {
+    if(isHttpStatus2xx(statusCode)) {
       fn.call(this, responseData, httpResponse, statusCode);
     }
     return this;
@@ -295,7 +297,7 @@ function Request() {
    * @return {this}  Allow chaining
    */
   this.withFailureHandler = function(fn) {
-    if(!isHttpStatusIs2xx(statusCode)) {
+    if(!isHttpStatus2xx(statusCode)) {
       fn.call(this, responseData, httpResponse, statusCode);
     }
     return this;
@@ -306,7 +308,7 @@ function Request() {
    * @return {Object}    Response object: {respData: {..}, httpResp: {}, statusCode: Integer}
    */
   this.getResponse = function() {
-    return {'respData': responseData, 'httpResp': httpResponse, 'statusCode': statusCode, 'method': httpMethod, 'success':isHttpStatusIs2xx(statusCode)};
+    return {'respData': responseData, 'httpResp': httpResponse, 'statusCode': statusCode, 'method': httpMethod, 'success':isHttpStatus2xx(statusCode)};
   };
 
   // call init

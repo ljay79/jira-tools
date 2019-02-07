@@ -46,25 +46,6 @@ function getPossibleTransitions(issueKey) {
   return response;
 }
 
-/**
- * Makes a request to the JIRA API to apply the transition to an issue
- * @param {string} issueKey issue key 
- * @param {integer} transitionId the id of the transition to move it to the desired state
- */
-function makeTransition(issueKey, transitionId) {
-  var request = new Request();
-  request.call('issueTransitionUpdate', { issueIdOrKey: issueKey, "transition": { "id": transitionId } });
-  var resp = request.getResponse();
-  returnData = { success: false, errorMessage: null };
-  returnData.success = (resp.statusCode == 204);
-  if (!returnData.success) {
-    var msgs = resp.hasOwnProperty('errorMessages') ? resp.errorMessages : [];
-    msgs = msgs.concat((resp.hasOwnProperty('warningMessages') ? resp.warningMessages : []));
-    returnData.errorMessage = "Could not fetch issues transition states: " + msgs.join("\n");
-  }
-  return returnData;
-
-}
 
 /**
  * Constuctor for transitioning an issue from one status to another
@@ -102,7 +83,7 @@ function IssueTransitioner() {
     }
     var transitionId = config.getTransitionId(issueKey, srcStatus, newStatus);
     if (transitionId == null) {
-      returnData.errors.push("Issue cannot be transition from " + srcStatus + " to " + newStatus + ", please check your JIRA project configuration");
+      returnData.errors.push("Status cannot be changed from '" + srcStatus + "' to '" + newStatus + "', please check your the spelling of the status in your spreadsheet and the JIRA project configuration if the spelling is correct");
       return returnData;
     }
     transitionResult = makeTransition(issueKey, transitionId);
@@ -113,6 +94,28 @@ function IssueTransitioner() {
     }
     returnData.updated = returnData.success;
     return returnData;
+  }
+
+
+  /**
+   * Private function
+   * Makes a request to the JIRA API to apply the transition to an issue
+   * @param {string} issueKey issue key 
+   * @param {integer} transitionId the id of the transition to move it to the desired state
+   */
+  function makeTransition(issueKey, transitionId) {
+    var request = new Request();
+    request.call('issueTransitionUpdate', { issueIdOrKey: issueKey, "transition": { "id": transitionId } });
+    var resp = request.getResponse();
+    returnData = { success: false, errorMessage: null };
+    returnData.success = (resp.statusCode == 204);
+    if (!returnData.success) {
+      var msgs = resp.hasOwnProperty('errorMessages') ? resp.errorMessages : [];
+      msgs = msgs.concat((resp.hasOwnProperty('warningMessages') ? resp.warningMessages : []));
+      returnData.errorMessage = "Could not fetch issues transition states: " + msgs.join("\n");
+    }
+    return returnData;
+
   }
 }
 
