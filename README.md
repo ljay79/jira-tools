@@ -80,8 +80,8 @@ Best described here -> [How to obtain API Token](https://confluence.atlassian.co
 You're all set and ready to go.
 
 # Features
-### Update Ticket Key Status
-“Add-ons" > “Jira Sheet Tools” > "Update Ticket Key Status "KEY-123 [Done]""
+### Update issue key status
+“Add-ons" > “Jira Sheet Tools” > "Update issue key status "KEY-123 [Done]""
 
 Any Jira ticket Id in the form of "KEY-123" will be updated on the current active google sheet and extended with the current status of matching Jira ticket.
 
@@ -96,21 +96,21 @@ Even when used within text it will search for keys and add the status.
 If a Jira issue key is found in a single cell, the value will be linked automatically to the Jira issue page.
 
 
-### Re-Calculate all formulas in active sheet
-“Add-ons" > “Jira Sheet Tools” > "Re-Calculate all formulas in active sheet"
+### Update formulas in active sheet
+“Add-ons" > “Jira Sheet Tools” > "Update formulas in active sheet"
 
 When anu custom function or other formula is used, this simple 'click' will refresh / re-calculate all the formulas and custom functions used in the current active google sheet.
 If a sheet is re-opened this will re-calculate all custom functions by default anyway, but usually not while editing or watching the current sheet.
 
 
-### Show Jira Field Map
-“Add-ons" > “Jira Sheet Tools” > "Show Jira Field Map"
+### Jira field map
+“Add-ons" > “Jira Sheet Tools” > "Jira field map"
 
 Fetch and show all your Jira fields name and id in a sidebar. Very useful for our custom functions where you can make use of JQL queries.
 
 
-### List Issues From Filter
-“Add-ons" > “Jira Sheet Tools” > "List Issues from Filter"
+### List issues from filter
+“Add-ons" > “Jira Sheet Tools” > "List issues from filter"
 
 Allows you to add a table/list of all found Jira issues based on your favorite Jira Filter.
 The dialog will let you choose from all your Jira filters and then insert all results into the active Google sheet.
@@ -136,7 +136,7 @@ Not all fields will update in Jira as there may not be enough data in the spread
 > Setting the status of a Jira Issue can required 3 calls per row, do not include this field if you do not need to.
 
 ### Time Report
-“Add-ons" > “Jira Sheet Tools” > "Create Time Report"
+“Add-ons" > “Jira Sheet Tools” > "Create time report"
 
 Lets you pick a user from Jira and a date period to filter for and generates a nice Time sheet report based on all worklogs for the filtered user and date period.
 Supports two different time report formats; "1d 7h 59m" for better readibility or "7.5" (work hours as decimal number) for better calculations in the sheet.
@@ -147,12 +147,12 @@ Under “Settings” you can configure which time format you prefer to use.
 ### Configure Custom Fields
 “Add-ons" > “Jira Sheet Tools” > "Configure Custom Fields"
 
-If you wish to list issues in your sheet with the function "List Issues From Filter" you can specify which columns to insert.
+If you wish to list issues in your sheet with the function "List issues from filter" you can specify which columns to insert.
 By default only most common Jira default Fields (Columns) are available to choose from.
 In case you use custom Jira fields you can now go to the settings section and select some of these customs fields as your favorites.
 > Note: Not all custom field formats are supported, these are indicated in the list of fields.
 
-Once you configured your custom fields, these fields are available to create column of in the "List Issues From Filter" dialog.
+Once you configured your custom fields, these fields are available to create column of in the "List issues from filter" dialog.
 
 > Supported custom fields are of type: **string**, **number**, **date**, **datetime**
 **option**, **array of options**, **array of strings**, **user**, **array of users**, **group**, **array of groups**, **version** and **array of versions**
@@ -202,7 +202,7 @@ Little but quite powerful function to search for Jira issues and fill your sheet
 Using JQL ([Jira Query Language](https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries)) queries as you would inside Jira.
 Can return just a single cell value or entire list of issues spanning over multiple columns.
 Expecting a valid JQL query as 1st parameter and a comma-separated list of Jira field IDs as the 2nd.
-If your dont know the exact names and syntax of Jira fields, then look at the Field Map (“Add-ons" > “Jira Sheet Tools” > "Show Jira Field Map").
+If your dont know the exact names and syntax of Jira fields, then look at the Field Map (“Add-ons" > “Jira Sheet Tools” > "Jira field map").
 
 **Limitation**: This custom function can return a maximum of **100** results/issues. Search and processing is limited to **30 seconds** per call (Google Limitation), if the Jira Server responds slow, it might not be able to provide full result to you.
 
@@ -249,7 +249,7 @@ It is described here on [Atlassian.com](https://confluence.atlassian.com/jirakb/
 Therefore i do use already pagination where ever possible to fetch as many data as possible.
 
 Current existing limitations by this Add-On:
-* "List Issues from Filter" is limited to a total amount of **10.000** issues to be listed per request
+* "List issues from filter" is limited to a total amount of **10.000** issues to be listed per request
   * To comply with Atlassians policy, it does internally fetch only *50* records per page which can result in quite some delay when dealing with too many issues.
 * Listing of Jira users and groups (within dialogs) is limited to **100** user/group records
 * "Time Report" is limited to report max **1.000** worklogs per Jira issue (max **1.000** issues) per Time sheet
