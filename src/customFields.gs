@@ -1,9 +1,8 @@
 // Node required code block
-const Request = require('../src/jiraApi.gs');
 const debug = require("./debug.gs").debug;
 const EpicField = require("./models/jira/EpicField.gs");
 const UserStorage = require("./UserStorage.gs").UserStorage;
-const convertJiraFieldResponseToFieldRecord = require("./jiraCommon.gs").convertJiraFieldResponseToFieldRecord;
+const getAllJiraFields = require("./jiraCommon.gs").getAllJiraFields;
 // End of Node required code block
 
 var CUSTOMFIELD_FORMAT_RAW    = 1;
@@ -44,22 +43,11 @@ function getCustomFields( format ) {
  * @return {Array}    Array of custom Jira Fields
  */
 function fetchCustomFields() {
-  var method = "field", _customFieldsRaw = [], customFields = [];
+  var customFields = [];
 
-  var ok = function(respData, httpResp, status) {
-    if(respData) {
-      debug.log("Response of fetchCustomFields(); respData: %s", respData);
-
-      // reset custom epic field
-      EpicField.resetValue();
-
-      
-      // add data to export
-      _customFieldsRaw.push.apply(_customFieldsRaw, respData.map(function(cField) {
-        return convertJiraFieldResponseToFieldRecord(cField)
-      }) )
+  var ok = function(_customFieldsRaw) {
       // sorting by supported type and name
-      && _customFieldsRaw.sort(function(a, b) {
+      _customFieldsRaw.sort(function(a, b) {
         var keyA = (a.supported ? '0' : '1') + a.name.toLowerCase();
         var keyB = (b.supported ? '0' : '1') + b.name.toLowerCase();
 
@@ -87,23 +75,12 @@ function fetchCustomFields() {
           supported:  true
         });
       }
-
-    } else {
-      // Something funky is up with the JSON response.
-      debug.warn("Failed to retrieve Jira Custom Fields with status [" + status + "]; httpResp: %s", httpResp);
-    }
   };
 
-  var error = function(respData, httpResp, status) {
-    debug.error("Failed to retrieve Jira Custom Fields with status [" + status + "]!\\n" + respData.errorMessages.join("\\n") + " httpResp: %s", httpResp);
+  var error = function(message) {
+    debug.error(message);
   };
-
-  var request = new Request();
-
-  request.call(method)
-    .withSuccessHandler(ok)
-    .withFailureHandler(error);
-
+  getAllJiraFields(ok, error);
   return customFields;
 }
 

@@ -29,13 +29,13 @@ test("Custom fields should be returned", () => {
   expect(customFields[0].key).toBe("jst_epic");
   expect(customFields[1].key).toBe("custom000");
   expect(customFields[1].supported).toBe(true);
-  expect(customFields[1].type).toBe("string");
+  expect(customFields[1].schemaType).toBe("string");
   expect(customFields[2].key).toBe("custom001");
   expect(customFields[2].supported).toBe(true);
-  expect(customFields[2].type).toBe("number");
+  expect(customFields[2].schemaType).toBe("number");
   expect(customFields[5].key).toBe("custom0ZZ");
   expect(customFields[5].supported).toBe(false);
-  expect(customFields[5].type).toBe("notsupported");
+  expect(customFields[5].schemaType).toBe("notsupported");
   // epic should be set
   var epicField = EpicField.getJson();
   expect(epicField.key).toBe("jst_epic");
