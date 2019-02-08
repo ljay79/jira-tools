@@ -8,6 +8,7 @@ const UserStorage = require("../../UserStorage.gs").UserStorage;
  */
 EpicField = (function () {
 
+  // default fields for epic storage
   function _getDefault() {
     return {
       usable: false,  // true|false
@@ -17,7 +18,8 @@ EpicField = (function () {
       label_key: null  // customfield_10005
     };
   }
-  // internal cache for epicfield value
+  
+  // function called lazily to initialise the epic settings
   function _init() {
     if (_epicField == null) {
       _epicField = UserStorage.getValue('jst_epic');
@@ -27,7 +29,8 @@ EpicField = (function () {
     }
   };
 
-  function _checkUsable() {
+  // sets the value on usable when link and label values are set
+  function _setUsable() {
     _epicField.usable = false;
     if (_epicField.link_key != null && _epicField.label_key != null) {
       _epicField.usable = true;
@@ -38,14 +41,10 @@ EpicField = (function () {
   var _epicField = null;
 
   return {
-    // get the epicField
+    // get the epicField JSON
     getJson: function () {
       _init();
       return copyObject(_epicField);
-    },
-    setJson: function (newEpicField) {
-      _epicField = copyObject(newEpicField);
-      _checkUsable();
     },
     resetValue: function() {
       _epicField = _getDefault();
@@ -62,7 +61,7 @@ EpicField = (function () {
     setLabelKey: function(value) {
       _init();
       _epicField.label_key = value;
-      _checkUsable();
+      _setUsable();
     },
     getLinkKey: function() {
       _init();
@@ -71,7 +70,7 @@ EpicField = (function () {
     setLinkKey: function(value) {
       _init();
       _epicField.link_key =value;
-      _checkUsable();
+      _setUsable();
     },
     getKey: function() {
       _init();

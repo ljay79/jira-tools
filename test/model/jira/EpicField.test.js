@@ -22,19 +22,6 @@ test("Initialises the object from the Properties Service and saves to Properties
   UserStorage.getValue.mockReset();
 
 
-  // setting values should be stored in user props
-  epicFieldJson.label_key = "abce";
-  epicFieldJson.link_key = "defgh";
-  EpicField.setJson(epicFieldJson);
-  expect(UserStorage.setValue).toBeCalled();
-  expect(UserStorage.setValue.mock.calls[0][0]).toBe("jst_epic");
-  epicFieldJson = EpicField.getJson();
-  expect(UserStorage.getValue).not.toBeCalled();
-  expect(epicFieldJson.usable).toBe(true);
-  expect(epicFieldJson.key).toBe("jst_epic");
-  expect(epicFieldJson.name).toBe("Epic");
-  expect(epicFieldJson.label_key).toBe("abce");
-  expect(epicFieldJson.link_key).toBe("defgh");
 });
 
 test("Retrieves the object from the Properties Service",()=> {
@@ -67,12 +54,6 @@ test("Check for sideeffects on the JSON object returned",()=> {
   var epicFieldJson2 = EpicField.getJson();
   expect(epicFieldJson2).not.toBe("New name");
 
-  EpicField.setJson(epicFieldJson);
-
-  epicFieldJson.name = "Newer name";
-
-  var epicFieldJson3 = EpicField.getJson();
-  expect(epicFieldJson3.name).toBe("New name");
 
 });
 
