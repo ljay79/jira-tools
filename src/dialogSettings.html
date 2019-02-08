@@ -75,7 +75,6 @@
         <button type="button" onclick="google.script.host.close()">Cancel</button>
       </div>
     </form>
-    
     <script>
       // The code in this function runs when the page is loaded.
       var valid   = false;
@@ -84,13 +83,13 @@
       var alert   = document.getElementById('response-message');
       var action  = document.querySelector('[type=submit]');
       var timeout = null;
-      
+
       function hideAlert(){
         if(timeout) timeout = clearTimeout(timeout);
         alert.style.display = 'none';
       }
-      
-      function showAlert(text,type,time) {
+
+      function showAlert(text, type, time) {
         alert.innerText = text;
         alert.style.backgroundColor = type ? 'rgb(139,195,74)' : 'rgb(213,0,0)';
         alert.style.display = 'block';
@@ -99,11 +98,11 @@
 
       function formSubmitHandler(event) {
         if (event) event.preventDefault();
-        
+
         hideAlert();
-        
+
         if (!valid) return;
-        
+
         showAlert('saving ...', 1, 1500);
 
         google.script.run
@@ -111,26 +110,31 @@
           .withFailureHandler(onResponse)
           .saveSettings(this);
       }
-      
+
       function inputValidatyHandler() {
         var validaty = true;
-        input.forEach(function(el){ return validaty && (validaty = el.nodeName !== 'INPUT' || el.value.length > 0); });
+        input.forEach(function(el) { return validaty && (validaty = el.nodeName !== 'INPUT' || el.value.length > 0); });
         valid = validaty;
         action.disabled = valid ? false : 'disabled';
       }
 
       function onResponse(response) {
         var done = response.status === true;
-
         hideAlert();
         showAlert(response.message, done, 10000);
-        
         if(done) google.script.host.close();
       }
 
       setup.addEventListener('submit', formSubmitHandler);
       input.forEach(function(el){ el.addEventListener('keyup', inputValidatyHandler); });
       window.addEventListener('load', inputValidatyHandler);
+
+      // deprecation notice
+      document.getElementById('jira-url').addEventListener('focusout', function(e){
+        if(this.value.indexOf('https://') == -1) {
+          showAlert('Security Warning' + "\n" + 'Using JIRA without SSL is deprecated. Make sure to use a URL starting with "https://".', false, 5000);
+        }
+      });
     </script>
   </body>
 </html>

@@ -1,26 +1,22 @@
 /**
- * @author Jens Rosemeier <github@jens79.de>
+ * @copyright Copyright (c) 2017-2019, Jens Rosemeier. All rights reserved.
+ *            Copyrights licensed under GNU GENERAL PUBLIC LICENSE v3.
+ * 
  * @github  https://github.com/ljay79/jira-tools
- * @copyright Jens Rosemeier, 2017-2018
+ * @author  Jens Rosemeier <github@jens79.de> - https://github.com/ljay79
+ * @author  Paul Lemon - https://github.com/paul-lemon
+ * @author  Daniel Kulbe - https://github.com/DanielKulbe
  * 
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
- *
- * ToDo/Notes:
- * - use google auth with token based Jira RESTful API vs. cleartext password
  */
 
-var BUILD = '1.0.7';
+var BUILD = '1.1.0';
 
 /** 
  * Add a nice menu option for the users.
  */
 function onOpen(e) {
   addMenu();
-
-  if (e && e.authMode == ScriptApp.AuthMode.FULL) {
-    var userProps = PropertiesService.getUserProperties();
-    debug.enable( (userProps.getProperty('debugging')=='true') );
-  }
 };
 
 /**
@@ -43,7 +39,8 @@ function onInstall(e) {
  * @OnlyCurrentDoc
  */
 function addMenu() {
-  SpreadsheetApp.getUi().createAddonMenu()
+
+  var menu = SpreadsheetApp.getUi().createAddonMenu()
     .addItem('Re-Calculate all formulas in active sheet', 'recalcCustomFunctions')
     .addItem('Update Ticket Key Status "KEY-123 [Done]"', 'dialogRefreshTicketsIds')
     .addItem('Show Jira Field Map', 'sidebarJiraFieldMap')
@@ -51,11 +48,22 @@ function addMenu() {
     .addSeparator()
     .addItem('List Issues from Filter', 'dialogIssueFromFilter')
     .addItem('Create Time Report', 'dialogTimesheet')
-
+  
     .addSeparator()
     .addItem('Settings', 'dialogSettings')
     .addItem('Configure Custom Fields', 'dialogCustomFields')
-    .addItem('About', 'dialogAbout')
+    .addItem('About', 'dialogAbout');
 
-    .addToUi();
+    if (environmentConfiguration.features.updateJira.enabled) {
+        menu.addSeparator()
+        .addItem('Update Jira Issues (BETA)', 'dialogIssuesFromSheet');
+    }
+
+    menu.addToUi();
 }
+
+// Node required code block
+module.exports = {
+  onOpen: onOpen
+}
+// End of Node required code block

@@ -59,13 +59,25 @@ Simply provide your individual Jira server settings before you use any feature.
 
 In any Google sheet, go in the menu to “Add-ons" > "Jira Sheet Tools" > "Settings”.
 Enter your "Jira Domain" and your log on credentials.
-Either combination of your Atlassian account username/email + password or your Atlassian account email + API Token.
-> Use API Token for improved security. [How to obtain API Token](https://confluence.atlassian.com/cloud/api-tokens-938839638.html)
+
+#### (A) Email / Username and Password
+Either combination of your Atlassian account username/email + password are possible to be used.
+Depending on your JIRA instance setup, there is a chance that you will expirience authentication issues with this.
+
+In case your Jira instance is connected to a third-party authentication service such as Google Domain, you should use your email or username and the Jira (Atlassian) password, not the password from your Google account - if it differs.
+Read more here in section [Known Issues](#known-issues)
+
+#### (B) Atlassian API Token
+A little more effort to prepare, but once done, it will be the safest way of authenticating the sheets add-on.
+Using the Atlassian API Token instead of a password in combination with your Atlassian (Jira) username or email address.
+
+For this, you will need to obtain a unique and secure API Token upfront first (you need to do only once).
+Best described here -> [How to obtain API Token](https://confluence.atlassian.com/cloud/api-tokens-938839638.html)
 
 > It is recommended to use this Add-on only with an Jira Cloud/Server instance which runs via SSL (https).
 > This Add-on is using simple Basic Auth mechanism to authenticate with Jira, which means, user credentials are transmitted unencrypted when used without SSL.
 
-**You're all set and ready to go**
+You're all set and ready to go.
 
 # Features
 ### Update Ticket Key Status
@@ -109,6 +121,19 @@ Additionally you can configure many different types of custom Jira field, which 
 > Note: This feature is currently limited to list a maximum of 1000 jira issues.
 > It may even break earlier when the requests takes longer then Google's maximum execution timeout.
 > Depending on Jira response time i had successfully listed 1000 issues but sometimes only about >850.
+
+
+### Update Jira Issues
+“Add-ons" > “Jira Sheet Tools” > "Update Jira Issues"
+
+Allows you to update values in multiple Jira issues from the values in your spreadsheet.
+This feature allows you to select an area of your spreadsheet with header rows and each row below it corresponding to an issue.
+The dialog will let you configure the columns from your spreadsheet and map them to Jira issue fields.
+It will let you select from most common fields and the custom fields you have configured (“Add-ons" > “Jira Sheet Tools” > "Configure Custom Fields")
+Not all fields will update in Jira as there may not be enough data in the spreadsheet for the Add on to set the value. Error messages are shown from Jira when this was the case.
+
+> Each row requires at least one call to Jira REST API to update it.
+> Setting the status of a Jira Issue can required 3 calls per row, do not include this field if you do not need to.
 
 ### Time Report
 “Add-ons" > “Jira Sheet Tools” > "Create Time Report"
@@ -298,31 +323,38 @@ Then install dependencies
 npm install
 ```
 
-> *Note:* It will most likely throw a warning about `gulp-util` which you can safly ignore for now.
-> `npm WARN deprecated gulp-util@3.0.8: gulp-util is deprecated - replace it, following the guidelines at https://medium.com/gulpjs/gulp-util-ca3b1f9f9ac5` 
-
-
 Check gulp runs ok and displays list of tasks
 ```sh
 $ gulp --tasks
-[10:49:24] Tasks for /jira-tools/gulpfile.js
-[10:49:25] ├── clean
-[10:49:25] ├── build
-[10:49:25] ├── clasp-push
-[10:49:25] ├── clasp-pull
-[10:49:25] ├── un-google
-[10:49:25] ├── diff-pulled-code
-[10:49:25] ├── copy-changed-pulled-code
-[10:49:25] ├─┬ deploy
-[10:49:25] │ └─┬ <series>
-[10:49:25] │   ├── clean
-[10:49:25] │   ├── build
-[10:49:25] │   └── clasp-push
-[10:49:25] └─┬ pull
-[10:49:25]   └─┬ <series>
-[10:49:25]     ├── clean
-[10:49:25]     ├── clasp-pull
-[10:49:25]     └── un-google
+├── clean
+├── build
+├── set-environment-config
+├── use-test-environment
+├── clasp-push
+├── clasp-pull
+├── un-google
+├── copy-changed-pulled-code
+├─┬ deploy
+│ └─┬ <series>
+│   ├── clean
+│   ├── build
+│   ├── set-environment-config
+│   └── clasp-push
+├─┬ deploy-test
+│ └─┬ <series>
+│   ├── use-test-environment
+│   └─┬ deploy
+│     └─┬ <series>
+│       ├── clean
+│       ├── build
+│       ├── set-environment-config
+│       └── clasp-push
+└─┬ pull
+  └─┬ <series>
+    ├── clean
+    ├── clasp-pull
+    ├── un-google
+    └── copy-changed-pulled-code
 ```
 
 Check unit tests are running
@@ -405,7 +437,7 @@ Default credentials saved to: ~/.clasprc.json (/.clasprc.json).
 #### 1. Create and deploy to a new Google project
 ```sh
 cd ./src
-clasp create --type sheets --title "Jira Sheet Tools"
+clasp create --type sheets --title "Jira Sheet Tools - Devel"
 cd ..
 gulp deploy
 ```
@@ -461,6 +493,11 @@ npm test -- --listTests
 npm test ./test/jiraApi.test.js
 ```
 
+- see unit test coverage
+```sh
+npx jest --coverage
+```
+
 ### Deploying using `gulp` task
 
 Using the following gulp task will clean the export and require statements and push the code to the configured GAS project.
@@ -469,7 +506,14 @@ Using the following gulp task will clean the export and require statements and p
 gulp deploy
 ```
 
-This task does actually 3 steps as one; `clean`, `build` and `clasp-push`.
+This task does actually 4 steps as one; `clean`, `build`, `set-environment-config` and `clasp-push`.
+The deployment will update the configuration using one for the files in _/config/test_ or _/config/production_. This will overwrite the default configuration file _./src/environmentConfiguration.gs_ .By default the _production_ folder is used but you can specify the environment you wish by using the following tasks
+
+```sh
+gulp deploy --test
+gulp deploy-test
+```
+Both commands above will use the test config file. The second task being a shortcut to avoid entering the parameter.
 
 ### Pulling changes back from your Google project
 
@@ -479,18 +523,8 @@ If you make changes to the code in the google project web interface you can pull
 gulp pull
 ```
 
-This will pull the changes down from your GAS project, and uncomment the require and exports statments. The files will be pulled into a temporary folder 'dist/pull'. It does execute multiple tasks as one; `clean`, `clasp-pull` and `un-google`.
-
-You can then see a diff of the code in your _./src_ folder with the code in 'dist/pull' so you can visually verify that this is a change you want to have in your local copy and commit to GIT (just in case any temporary changes or debug code has been left)
-
-```sh
-gulp diff-pulled-code
-```
-You can then use this gulp task to copy the changed files from 'dist/pull' to _./src_ so you can verify unit tests and commit back to git
-
-```sh
-gulp copy-changed-pulled-code
-```
+Use this script if you have changed the source code within the GAS editors while testing on the GAS envrironment.
+This task will pull the changes down from your GAS project into a temporary folder './dist/pull'. Then the script will uncomment the require and exports statments. The files copied into the _./src_ folder. It does execute multiple tasks as one; `clean`, `clasp-pull`, `un-google` , `copy-changed-pulled-code`.
 
 ### Commit and push changes to git repository
 

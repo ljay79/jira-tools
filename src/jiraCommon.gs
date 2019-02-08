@@ -1,8 +1,6 @@
 // Node required code block
 const Request = require('./jiraApi.gs');
-const debug = {
-    info: console.log
-}
+const debug = require('./debug.gs').debug;
 // End of Node required code block
 
 // const not available, but better solution needed
@@ -300,7 +298,7 @@ function unifyIssueAttrib(attrib, data) {
   if ( attrib.substring(0, 12) == 'customfield_' ) {
     var customFields = getCustomFields(CUSTOMFIELD_FORMAT_UNIFY);
     // custom epic
-    var epicField = getStorage_().getValue('jst_epic');
+    var epicField = UserStorage.getValue('jst_epic');
     if (epicField.usable === true) {
       customFields[epicField.link_key] = 'jst_epic';
     }
@@ -320,14 +318,14 @@ function unifyIssueAttrib(attrib, data) {
           var _date = data.fields[attrib] || null;
           resp = {
             value : _date,
-            date  : new Date(getDateFromIso(_date)) || new Date(),
+            date  : getDateFromIso(_date),
             format: "dd.mm.yyyy hh:mm"
           };
           break;
         case 'date':
           var _date = data.fields[attrib] || null;
           _date     = (_date.length == 10) ? _date + 'T12:00:00' : _date;
-          var date  = new Date(getDateFromIso(_date)) || new Date();
+          var date  = getDateFromIso(_date);
           date.setHours(0,0,0);
           resp      = {
             value : _date,
@@ -377,13 +375,13 @@ function unifyIssueAttrib(attrib, data) {
           break;
         case 'user':
           resp = {
-            value: (getStorage_().getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
+            value: (UserStorage.getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
             avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
           };
           break;
         case 'array|user':
           resp.value = data.fields[attrib].map(function(el){
-            return ((getStorage_().getValue('dspuseras_name') == 1 ? el.displayName : el.name) || 'Unknown');
+            return ((UserStorage.getValue('dspuseras_name') == 1 ? el.displayName : el.name) || 'Unknown');
           }).join(', ');
           break;
         case 'group':
@@ -453,7 +451,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'creator':
     case 'reporter':
       resp = {
-        value: (getStorage_().getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
+        value: (UserStorage.getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
         avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
       };
       break;
@@ -469,7 +467,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'lastViewed':
       resp = {
         value: data.fields[attrib] || null,
-        date: new Date(getDateFromIso(data.fields[attrib])) || new Date(),
+        date: getDateFromIso(data.fields[attrib]),
         format: "dd.mm.yyyy hh:mm"
       };
       break;
@@ -480,7 +478,7 @@ function unifyIssueAttrib(attrib, data) {
       _duedate = (_duedate.length == 10) ? _duedate + 'T12:00:00' : _duedate;
       resp = {
         value: _duedate,
-        date: new Date(getDateFromIso(_duedate)) || new Date(),
+        date: getDateFromIso(_duedate),
         format: "dd.mm.yyyy"
       };
       break;
@@ -490,7 +488,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'aggregatetimespent':
     case 'aggregatetimeestimate':
       resp = {
-        value: (getStorage_().getValue('dspdurationas') == "w") ? formatTimeDiff(parseInt(data.fields[attrib]) || 0) : parseInt(data.fields[attrib]) || 0
+        value: (UserStorage.getValue('dspdurationas') == "w") ? formatTimeDiff(parseInt(data.fields[attrib]) || 0) : parseInt(data.fields[attrib]) || 0
       };
       break;
     case 'project':
@@ -601,7 +599,7 @@ function headerNames(header) {
   extend(labels, getCustomFields(CUSTOMFIELD_FORMAT_SEARCH));
 
   // custom epic
-  var epicField = getStorage_().getValue('jst_epic');
+  var epicField = UserStorage.getValue('jst_epic');
   if (epicField.usable === true) {
     labels[epicField.link_key] = 'Epic';
   }
@@ -616,7 +614,7 @@ function headerNames(header) {
 }
 
 /**
- * @TODO: not used yet / to be used in convertEpicCell() and further places
+ * Fetches a JIRA issue from the REST API
  * @desc Get single jira issue data from api, calling method 'issueStatus'
  * @return {object}    Returns json object of issue
  */
@@ -651,13 +649,121 @@ function getIssue(issueKey, fields) {
   };
 
   var request = new Request();
-  request.call('issueStatus', {issueIdOrKey: issueKey, fields: fields})
+  var requestParams = {issueIdOrKey: issueKey};
+  if (fields!= null) {
+    requestParams["fields"] = fields;
+  }
+  request.call('issueStatus', requestParams)
     .withSuccessHandler(ok)
     .withFailureHandler(error);
   
   return response;
 }
 
+/**
+ * Takes the native JSON response from JIRA for a field definition and returns an object
+ * with the fields used in the Application 
+ * @param jiraFieldResponse - the response from JIRA
+ * @return array Array of objects for each field 
+return {
+          key:        cField.key || cField.id, // Server API returns ".id" only while Cloud returns both with same value
+          name:       cField.name,
+          custom:     cField.custom,
+          schemaType: _type,
+          supported:  (arrSupportedTypes.indexOf(_type) > -1)
+        };
+ */
+function convertJiraFieldResponseToFieldRecord(jiraFieldResponse) {
+  var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
+  var _type = (jiraFieldResponse.schema ? jiraFieldResponse.schema.type : null) || null;
+  if (jiraFieldResponse.schema && jiraFieldResponse.schema.items) {
+    _type += '|' + jiraFieldResponse.schema.items;
+  }
+  return {
+    key: jiraFieldResponse.key || jiraFieldResponse.id, // Server API returns ".id" only while Cloud returns both with same value
+    name: jiraFieldResponse.name,
+    custom: jiraFieldResponse.custom,
+    schemaType: _type,
+    supported: (arrSupportedTypes.indexOf(_type) > -1)
+  };
+}
+
+/**
+ * Returns all of the fields in the configured JIRA rest server
+ * @param successCallBack - function to call back if this call to the JIRA rest server is succesful
+ * @param errorCallBack - funcion callback if there is an issue with the server call or response
+ */
+function getAllJiraFields(successCallBack, errorCallBack) {
+  var request = new Request();
+  var fieldMap = [];
+
+  var ok = function (respData, httpResp, status) {
+    if (!respData) {
+      error(respData, httpResp, status);
+    }
+    fieldMap.push.apply(fieldMap, respData.map(convertJiraFieldResponseToFieldRecord))
+      // sorting by supported type and name
+      && fieldMap.sort(function (a, b) {
+        var keyA = a.name.toLowerCase();
+        var keyB = b.name.toLowerCase();
+
+        if (keyA < keyB)
+          return -1;
+        if (keyA > keyB)
+          return 1;
+        return 0;
+      });
+    if (successCallBack != null) {
+      successCallBack(fieldMap);
+    }
+  };
+
+  var error = function (respData, httpResp, status) {
+    var jiraErrorMessage = "";
+    if (respData != null && respData.errorMessages != null) {
+      jiraErrorMessage = respData.errorMessages.join(",") || respData.errorMessages;
+    }
+    var msg = "Failed to retrieve Jira Fields info with status [" + status + "]!\\n"
+      + jiraErrorMessage;
+    if (errorCallBack != null) {
+      errorCallBack(msg);
+    }
+  };
+  request.call("field")
+    .withSuccessHandler(ok)
+    .withFailureHandler(error)
+    ;
+}
+
+/**
+ * Looks through an array of valid JIRA fields and finds the best matching one
+ * Will compare on both the name of the field (the text displayed in the jira GUI)
+ * amd on the key of the the field (the id used in JSON interactions with the REST API)
+ * @param listOfValidJiraFields - an array of fields, each item is a object with name and key defined 
+ * @param fieldName - the name used for matching
+ */
+function getMatchingJiraField(listOfValidJiraFields, fieldName) {
+  var matchingFunction = function (stringA, stringB) {
+    return stringA.toLowerCase().trim() == stringB.toLowerCase().trim();
+  }
+  var results = listOfValidJiraFields.filter(function (fieldSpec) {
+    return matchingFunction(fieldSpec.name, fieldName) || matchingFunction(fieldSpec.key, fieldName)
+  });
+  if (results.length > 0) {
+    return results[0];
+  } else {
+    return null;
+  }
+}
+
+
 // Node required code block
-module.exports = {unifyIssueAttrib: unifyIssueAttrib};
+module.exports = {
+  getIssue: getIssue, 
+  unifyIssueAttrib: unifyIssueAttrib, 
+  getMatchingJiraField:getMatchingJiraField, 
+  getAllJiraFields:getAllJiraFields, 
+  convertJiraFieldResponseToFieldRecord:convertJiraFieldResponseToFieldRecord
+};
+
 // End of Node required code block

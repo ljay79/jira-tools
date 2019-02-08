@@ -19,7 +19,7 @@ var fieldEpic = {
  */
 function getCustomFields( format ) {
   format = format || CUSTOMFIELD_FORMAT_RAW;
-  var customFields = getStorage_().getValue('favoriteCustomFields') || [];
+  var customFields = UserStorage.getValue('favoriteCustomFields') || [];
   var fieldsFormatted = {};
 
   if ( format === CUSTOMFIELD_FORMAT_RAW ) {
@@ -53,7 +53,7 @@ function fetchCustomFields() {
       debug.log("Response of fetchCustomFields(); respData: %s", respData);
 
       // reset custom epic field
-      getStorage_().setValue('jst_epic', fieldEpic);
+      UserStorage.setValue('jst_epic', fieldEpic);
 
       var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
 
@@ -112,7 +112,7 @@ function fetchCustomFields() {
       // EPIC usable?
       if (fieldEpic.link_key != null && fieldEpic.label_key != null) {
         fieldEpic.usable = true;
-        getStorage_().setValue('jst_epic', fieldEpic);
+        UserStorage.setValue('jst_epic', fieldEpic);
 
         // add custom field 'Epic' to beginning of array
         customFields.unshift({
@@ -149,7 +149,7 @@ function fetchCustomFields() {
  * @return {object} Object({status: [boolean], response: [string]})
  */
 function saveCustomFields(jsonFormData) {
-  getStorage_().setValue('favoriteCustomFields', jsonFormData.favoriteCustomFields);
+  UserStorage.setValue('favoriteCustomFields', jsonFormData.favoriteCustomFields);
   debug.log("Saved favoriteCustomFields: %s", jsonFormData.favoriteCustomFields);
   return {status: true, message: 'Ok'};
 }
@@ -158,43 +158,15 @@ function saveCustomFields(jsonFormData) {
  * @desc Fetch list of all Jira fields (name and id) and show them in a sidebar.
  */
 function sidebarJiraFieldMap() {
-  var request = new Request();
-  var fieldMap = [];
 
-  var ok = function(respData, httpResp, status) {
-    if (!respData) {
-      return error(respData, httpResp, status);
-    }
-    fieldMap.push.apply(fieldMap, respData.map(function(cField) {
-      return {
-        key:  cField.key || cField.id, // Server API returns ".id" only while Cloud returns both with same value
-        name: cField.name
-      };
-    }) )
-    // sorting by supported type and name
-    && fieldMap.sort(function(a, b) {
-      var keyA = a.name.toLowerCase();
-      var keyB = b.name.toLowerCase();
-
-      if (keyA < keyB)
-        return -1;
-      if (keyA > keyB)
-        return 1;
-      return 0;
-    });
-    
+  var ok = function(fieldMap) {
     sidebarFieldMap(fieldMap);
   };
 
-  var error = function(respData, httpResp, status) {
-    var msg = "Failed to retrieve Jira Fields info with status [" + status + "]!\\n" 
-                + (respData.errorMessages.join("\\n") || respData.errorMessages);
+  var error = function(msg) {
     Browser.msgBox(msg, Browser.Buttons.OK);
     debug.error(msg + " httpResp: %s", httpResp);
   };
 
-  request.call("field")
-    .withSuccessHandler(ok)
-    .withFailureHandler(error)
-  ;
+  getAllJiraFields(ok,error);
 }

@@ -34,6 +34,7 @@ function reverse(string) {
 function buildUrl(url, parameters){
   var qs = "";
   for(var key in parameters) {
+	if(!parameters.hasOwnProperty(key)) continue;
     var value = parameters[key];
     qs += encodeURIComponent(key) + "=" + encodeURIComponent(value) + "&";
   }
@@ -60,7 +61,7 @@ function camelize(str) {
 /**
  * @desc Converts ISO 8601 date string into JS date object
  * @param string {string}
- * @return {Date}
+ * @return {Date}    In case of any issue or bad param it returns new Date()
  */
 function getDateFromIso(string) {
   try{
@@ -86,9 +87,10 @@ function getDateFromIso(string) {
 
     offset -= date.getTimezoneOffset();
     time = (Number(date) + (offset * 60 * 1000));
-    return aDate.setTime(Number(time));
+    aDate.setTime(Number(time));
+    return aDate;
   } catch(e){
-    return;
+    return new Date();
   }
 }
 
@@ -204,7 +206,7 @@ function formatTimeDiff() {
   }
 
   // calculate (and subtract) whole days (workday=8h)
-  var workhoursInSeconds = parseFloat(getStorage_().getValue('workhours')) * 3600;
+  var workhoursInSeconds = parseFloat(UserStorage.getValue('workhours')) * 3600;
   var days = Math.floor(delta / workhoursInSeconds);
   delta -= days * workhoursInSeconds;
 
@@ -295,6 +297,7 @@ function removeFromArray(array, element) {
 // Node required code block
 module.exports = {
   buildUrl: buildUrl,
+  getDateFromIso: getDateFromIso,
   extend: extend
 };
 // End of Node required code block

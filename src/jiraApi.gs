@@ -2,7 +2,7 @@
 const getCfg = require("./settings.gs").getCfg;
 const setCfg = require("./settings.gs").setCfg;
 const hasSettings = require("./settings.gs").hasSettings;
-const debug = require("./debug.gs");
+const debug = require("./debug.gs").debug;
 const buildUrl = require("./jsLib.gs").buildUrl;
 const extend = require("./jsLib.gs").extend;
 // End of Node required code block
@@ -17,27 +17,33 @@ var restMethods = {
   'onDemand': {
     'dashboard'     : '/dashboard',
     'issueStatus'   : {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
+    'issueUpdate'   : {method: '/issue/{issueIdOrKey}', httpMethod: 'put'},
+    'issueTransitions': {method: '/issue/{issueIdOrKey}/transitions'},
+    'issueTransitionUpdate': {method: '/issue/{issueIdOrKey}/transitions', httpMethod: 'post'},
     'worklogOfIssue': {method: '/issue/{issueIdOrKey}/worklog'},
     'filter'        : {method: '/filter/{filterId}'},
     //'search': {method: '/search', queryparams: {jql:'', fields: [], properties: [], maxResults: 100, validateQuery: 'strict'}} // GET
     'search'        : {method: '/search'}, // POST
     'myFilters'     : {method: '/filter/my', queryparams: {includeFavourites: 'false'}},
 
-    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 100, username:'%'}},
-    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 100, query: ''}},
+    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'%'}},
+    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
     'field'         : {method: '/field'}
   },
   'server': {
     'dashboard'     : '/dashboard',
     'issueStatus'   : {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
+    'issueUpdate'   : {method: '/issue/{issueIdOrKey}', httpMethod: 'put'},
+    'issueTransitionUpdate': {method: '/issue/{issueIdOrKey}/transitions', httpMethod: 'post'},
+    'issueTransitions': {method: '/issue/{issueIdOrKey}/transitions'},
     'worklogOfIssue': {method: '/issue/{issueIdOrKey}/worklog'},
     'filter'        : {method: '/filter/{filterId}'},
     'search'        : {method: '/search'}, // POST
     // server api doesnt support /filter/my
     'myFilters'     : {method: '/filter/favourite', queryparams: {includeFavourites: 'false'}},
 
-    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 100, username:'%'}},
-    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 100, query: ''}},
+    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'%'}},
+    'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
     'field'         : {method: '/field'}
   }
 };
@@ -94,7 +100,7 @@ function testConnection() {
  * Performs an request to Jira RESTfull API.
  */
 function Request() {
-  var statusCode, httpResponse, responseData,
+  var statusCode, httpResponse, httpMethod, responseData,
       available, url, username, password,
       jiraMethod = null,
       jiraQueryParams = {};
@@ -117,6 +123,7 @@ function Request() {
     var fetchArgs = {
       contentType: "application/json",
       headers: {"Authorization": "Basic "},
+      method: httpMethod,
       muteHttpExceptions : true
     };
     var encCred = Utilities.base64Encode(username + ":" + password);
@@ -143,7 +150,8 @@ function Request() {
           case (typeof jiraQueryParams[attr] == 'object'):
             this.prepareParams(urlParams, jiraQueryParams[attr]);
             break;
-          case (typeof jiraQueryParams[attr] == 'string'):
+          //case (typeof jiraQueryParams[attr] == 'string' || typeof jiraQueryParams[attr] == 'number'):
+          default:
             urlParams[attr] = jiraQueryParams[attr];
             break;
         }
@@ -151,6 +159,9 @@ function Request() {
     }
   };
 
+  function isHttpStatus2xx(status) {
+    return (status>=200 && status<300);
+  }
   /**
    * @desc Call method, perform API request
    * @param method {string}    Name of method to call on api, see restMethods[] 
@@ -173,9 +184,20 @@ function Request() {
     var timingLabel = 'JiraApi call('+method+')';
     debug.time(timingLabel);
 
-    jiraMethod = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].method : restMethods[server_type][method];
-    jiraQueryParams = (typeof restMethods[server_type][method] === 'object') ? restMethods[server_type][method].queryparams : {};
-
+    var jiraMethodConfig = restMethods[server_type][method];
+    httpMethod = "get";
+    if (typeof jiraMethodConfig === 'object') {
+      jiraMethod = jiraMethodConfig.method ;
+      jiraQueryParams =  jiraMethodConfig.queryparams;
+      if (jiraMethodConfig['httpMethod'] != null) {
+        httpMethod = jiraMethodConfig['httpMethod'];
+      }
+  
+    } else {
+      jiraMethod = restMethods[server_type][method];
+      jiraQueryParams = {};
+    }
+    
     var fetchArgs = fetchArgs || {}, urlParams = {};
     this.prepareParams(urlParams, jiraQueryParams);
 
@@ -207,7 +229,6 @@ function Request() {
         delete payload[attr];
       }
     }
-
     fetchArgs.payload = JSON.stringify(payload);
     // do not add empty payload
     if(fetchArgs.payload == '{}') { delete fetchArgs['payload']; }
@@ -223,14 +244,17 @@ function Request() {
       statusCode = parseInt( httpResponse.getResponseCode() );
     } catch (e) {
       statusCode = 500;
-
+      responseData = e.message;
       debug.error('UrlFetchApp.fetch(%s) yielded an error: ' + e, fetchUrl);
       // add Browser Msg
-      Browser.msgBox("Exception", e, Browser.Buttons.OK);
+      try {
+        // ie:for "Re-calculate all Formulars" Browser is not accessible
+        Browser.msgBox("Exception", e, Browser.Buttons.OK);
+      } catch (e){}
     }
 
     if (httpResponse) {
-      if(statusCode !== 200){
+      if(!isHttpStatus2xx(statusCode)){
         debug.warn("Code: %s, ResponseHeaders: %s, httpResponse: %s", httpResponse.getResponseCode(), httpResponse.getAllHeaders(), httpResponse);
       } else {
         debug.log("Code: %s, httpResponse: %s", httpResponse.getResponseCode(), httpResponse);
@@ -243,8 +267,6 @@ function Request() {
         if(httpErrorCodes[statusCode]) responseData = httpErrorCodes[statusCode];
         else responseData = 'Unable to make requests to Jira (02)!';
       }
-    } else {
-      responseData = 'Unable to make requests to Jira (01)!';
     }
 
     if( typeof responseData == 'string' ) {
@@ -263,7 +285,7 @@ function Request() {
    * @return {this}  Allow chaining
    */
   this.withSuccessHandler = function(fn) {
-    if(statusCode === 200) {
+    if(isHttpStatus2xx(statusCode)) {
       fn.call(this, responseData, httpResponse, statusCode);
     }
     return this;
@@ -275,7 +297,7 @@ function Request() {
    * @return {this}  Allow chaining
    */
   this.withFailureHandler = function(fn) {
-    if(statusCode !== 200) {
+    if(!isHttpStatus2xx(statusCode)) {
       fn.call(this, responseData, httpResponse, statusCode);
     }
     return this;
@@ -286,7 +308,7 @@ function Request() {
    * @return {Object}    Response object: {respData: {..}, httpResp: {}, statusCode: Integer}
    */
   this.getResponse = function() {
-    return {'respData': responseData, 'httpResp': httpResponse, 'statusCode': statusCode};
+    return {'respData': responseData, 'httpResp': httpResponse, 'statusCode': statusCode, 'method': httpMethod, 'success':isHttpStatus2xx(statusCode)};
   };
 
   // call init

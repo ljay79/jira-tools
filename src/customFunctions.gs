@@ -18,7 +18,7 @@ function recalcCustomFunctions() {
 function JST_EPICLABEL(TicketId) {
   var request   = new Request();
   var response  = {};
-  var epicField = getStorage_().getValue('jst_epic');
+  var epicField = UserStorage.getValue('jst_epic');
 
   if(TicketId == '') {
     throw new Error("{TicketId} can not be empty.");
@@ -43,7 +43,7 @@ function JST_EPICLABEL(TicketId) {
     return value;
   } else {
     debug.error("In JST_EPICLABEL; Response %s", response);
-    throw new Error("Jira Error: " + response.respData.errorMessages.join(",") || response.respData.errorMessages);
+    throw new Error(response.respData.errorMessages.join(",") || response.respData.errorMessages);
   }
 }
 
@@ -94,6 +94,8 @@ function JST_search(JQL, Fields, Limit, StartAt) {
 
   if (undefined == Fields || Fields == '') {
     throw new Error("{Fields} can not be empty.");
+  } else if(typeof Fields !== 'string') {
+    throw new Error("{Fields} must be a string. A comma separated list of JIRA field names.");
   }
 
   Limit = parseInt(Limit) || 1;
@@ -106,7 +108,7 @@ function JST_search(JQL, Fields, Limit, StartAt) {
   debug.log("JST_search([%s]; [%s]; [%s])", JQL, Fields, Limit);
 
   // sanitize string and split to array
-  var aFields = Fields.replace(/;/g, ",").replace(/(^,)|(,$)/g, "").split(',');
+  var aFields = Fields.replace(/;/g, ",").replace(/(^,)|(,$)/g, "").replace(/\s+/g, '').split(',');
   aFields.filter(function(item) { 
     return item != ' ';
   });

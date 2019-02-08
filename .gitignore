@@ -4,5 +4,8 @@
 /.gitconfig
 /node_modules
 /dist
+/script
 /src/.clasp.json
+/coverage
+/temp
 /.vscode
