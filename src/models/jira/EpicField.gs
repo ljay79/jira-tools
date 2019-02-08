@@ -8,7 +8,7 @@ const UserStorage = require("../../UserStorage.gs").UserStorage;
  */
 EpicField = (function () {
 
-  function getDefault() {
+  function _getDefault() {
     return {
       usable: false,  // true|false
       key: 'jst_epic',
@@ -17,65 +17,68 @@ EpicField = (function () {
       label_key: null  // customfield_10005
     };
   }
+  // internal cache for epicfield value
+  function _init() {
+    if (_epicField == null) {
+      _epicField = UserStorage.getValue('jst_epic');
+    }
+    if (_epicField == null) {
+      _epicField = _getDefault();
+    }
+  };
+
+  function _checkUsable() {
+    _epicField.usable = false;
+    if (_epicField.link_key != null && _epicField.label_key != null) {
+      _epicField.usable = true;
+      UserStorage.setValue('jst_epic', _epicField);
+    }
+  };
+
   var _epicField = null;
+
   return {
-    // internal cache for epicfield value
-    _init: function() {
-      if (_epicField == null) {
-        _epicField = UserStorage.getValue('jst_epic');
-      }
-      if (_epicField == null) {
-        _epicField = getDefault();
-      }
-    },
-    _checkUsable: function() {
-      _epicField.usable = false;
-      if (_epicField.link_key != null && _epicField.label_key != null) {
-        _epicField.usable = true;
-        UserStorage.setValue('jst_epic', _epicField);
-      }
-    },
     // get the epicField
     getJson: function () {
-      this._init();
+      _init();
       return copyObject(_epicField);
     },
     setJson: function (newEpicField) {
       _epicField = copyObject(newEpicField);
-      this._checkUsable();
+      _checkUsable();
     },
     resetValue: function() {
-      _epicField = getDefault();
+      _epicField = _getDefault();
       UserStorage.setValue('jst_epic', _epicField);
     },
     isUsable: function() {
-      this._init();
+      _init();
       return _epicField.usable;
     },
     getLabelKey: function() {
-      this._init();
+      _init();
       return _epicField.label_key;
     },
     setLabelKey: function(value) {
-      this._init();
+      _init();
       _epicField.label_key = value;
-      this._checkUsable();
+      _checkUsable();
     },
     getLinkKey: function() {
-      this._init();
+      _init();
       return _epicField.link_key;
     },
     setLinkKey: function(value) {
-      this._init();
+      _init();
       _epicField.link_key =value;
-      this._checkUsable();
+      _checkUsable();
     },
     getKey: function() {
-      this._init();
+      _init();
       return _epicField.key;
     },
     getName: function() {
-      this._init();
+      _init();
       return _epicField.name;
     }, 
     reset: function() {
