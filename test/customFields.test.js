@@ -1,8 +1,9 @@
-/*jiraApiMock = require('./mocks/mockJiraApi.js');
+jiraApiMock = require('./mocks/mockJiraApi.js');
 debug = require("../src/debug.gs").debug;
 PropertiesService = require('./mocks/PropertiesService');
 global.environmentConfiguration = require('../src/environmentConfiguration.gs');
 const UserStorage = require("../src/UserStorage.gs").UserStorage;
+global.EpicField = require("../src/models/jira/EpicField.gs");
 
 beforeEach(() =>  {
     debug.enable(true);
@@ -16,32 +17,36 @@ test("Custom fields should be returned", () => {
   var fetchCustomFields = require('../src/customFields.gs').fetchCustomFields;
   var customFields = fetchCustomFields();
   // fields returned should only have custom fields from the mock data
-  expect(customFields.length).toBe(3);
+  expect(customFields.length).toBe(6);
   // sorted correctly?
-  expect(customFields[0].name).toBe("Custom 0");
-  expect(customFields[1].name).toBe("Custom 1");
-  expect(customFields[2].name).toBe("AA Not Supported");
+  expect(customFields[0].name).toBe("Epic");
+  expect(customFields[1].name).toBe("Custom 0");
+  expect(customFields[2].name).toBe("Custom 1");
+  expect(customFields[3].name).toBe("Epic Label");
+  expect(customFields[4].name).toBe("Epic Link");
+  expect(customFields[5].name).toBe("AA Not Supported");
   // correct fields should be set
-  expect(customFields[0].key).toBe("custom000");
-  expect(customFields[0].supported).toBe(true);
-  expect(customFields[0].type).toBe("string");
-  expect(customFields[1].key).toBe("custom001");
+  expect(customFields[0].key).toBe("jst_epic");
+  expect(customFields[1].key).toBe("custom000");
   expect(customFields[1].supported).toBe(true);
-  expect(customFields[1].type).toBe("number");
-  expect(customFields[2].key).toBe("custom0ZZ");
-  expect(customFields[2].supported).toBe(false);
-  expect(customFields[2].type).toBe("notsupported");
+  expect(customFields[1].type).toBe("string");
+  expect(customFields[2].key).toBe("custom001");
+  expect(customFields[2].supported).toBe(true);
+  expect(customFields[2].type).toBe("number");
+  expect(customFields[5].key).toBe("custom0ZZ");
+  expect(customFields[5].supported).toBe(false);
+  expect(customFields[5].type).toBe("notsupported");
   // epic should be set
-  var epicField = UserStorage.getValue('jst_epic');
+  var epicField = EpicField.getJson();
   expect(epicField.key).toBe("jst_epic");
   expect(epicField.name).toBe('Epic');
-  expect(epicField.usable).toBe(true);
   expect(epicField.link_key).toBe('Epic_link_key');
   expect(epicField.label_key).toBe('Epic_label_key');
+  expect(epicField.usable).toBe(true);
 
   
 
-});*/
+});
 
 
 var mockFieldJiraApiResponse = [
@@ -117,6 +122,38 @@ var mockFieldJiraApiResponse = [
       "description"
     ],
     "schema": {
+      "type": "string",
+      "system": "description"
+    }
+  },
+  {
+    "id": "Epic_link_key",
+    "name": "Epic Link",
+    "custom": true,
+    "orderable": true,
+    "navigable": true,
+    "searchable": true,
+    "clauseNames": [
+      "description"
+    ],
+    "schema": {
+      "custom": ":gh-epic-link",
+      "type": "string",
+      "system": "description"
+    }
+  },
+  {
+    "id": "Epic_label_key",
+    "name": "Epic Label",
+    "custom": true,
+    "orderable": true,
+    "navigable": true,
+    "searchable": true,
+    "clauseNames": [
+      "description"
+    ],
+    "schema": {
+      "custom": ":gh-epic-label",
       "type": "string",
       "system": "description"
     }

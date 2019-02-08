@@ -1,22 +1,13 @@
 // Node required code block
 const Request = require('../src/jiraApi.gs');
 const debug = require("./debug.gs").debug;
+const EpicField = require("./models/jira/EpicField.gs");
 const UserStorage = require("./UserStorage.gs").UserStorage;
 // End of Node required code block
 
 var CUSTOMFIELD_FORMAT_RAW    = 1;
 var CUSTOMFIELD_FORMAT_SEARCH = 2;
 var CUSTOMFIELD_FORMAT_UNIFY  = 3;
-
-// storage of custom Jira field 'EPIC'
-var fieldEpic = {
-  usable:    false,  // true|false
-  key:       'jst_epic',
-  name:      'Epic',
-  link_key:  null, // customfield_10003
-  label_key: null  // customfield_10005
-};
-
 
 /**
  * @desc Convert stored custom fields in different prepared format.
@@ -59,7 +50,7 @@ function fetchCustomFields() {
       debug.log("Response of fetchCustomFields(); respData: %s", respData);
 
       // reset custom epic field
-      UserStorage.setValue('jst_epic', fieldEpic);
+      EpicField.resetValue();
 
       var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
 
@@ -73,10 +64,10 @@ function fetchCustomFields() {
         // EPIC customization
         if (cField.schema && cField.schema.custom) {
           if (cField.schema.custom.indexOf(':gh-epic-link') > -1) {
-            fieldEpic.link_key = cField.key || cField.id;
+            EpicField.setLinkKey(cField.key || cField.id);
           }
           if (cField.schema.custom.indexOf(':gh-epic-label') > -1) {
-            fieldEpic.label_key = cField.key || cField.id;
+            EpicField.setLabelKey(cField.key || cField.id);
           }
         }
 
@@ -116,14 +107,12 @@ function fetchCustomFields() {
       });
 
       // EPIC usable?
-      if (fieldEpic.link_key != null && fieldEpic.label_key != null) {
-        fieldEpic.usable = true;
-        UserStorage.setValue('jst_epic', fieldEpic);
+      if (EpicField.isUsable()) {
 
         // add custom field 'Epic' to beginning of array
         customFields.unshift({
-          key:        fieldEpic.key,
-          name:       fieldEpic.name,
+          key:        EpicField.getKey(),
+          name:       EpicField.getName(),
           type:       'jst_epic',
           supported:  true
         });
@@ -178,5 +167,5 @@ function sidebarJiraFieldMap() {
 }
 
 // Node required code block
-module.exports = { fetchCustomFields: fetchCustomFields, fieldEpic: fieldEpic }
+module.exports = { fetchCustomFields: fetchCustomFields }
 // End of Node required code block

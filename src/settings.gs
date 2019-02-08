@@ -1,6 +1,5 @@
 // Node required code block
 const BUILD = require("./Code.gs").BUILD;
-const fieldEpic = require("./customFields.gs").fieldEpic;
 const Storage_ = require("./Storage.gs").Storage_;
 const UserStorage = require("./UserStorage.gs").UserStorage;
 // End of Node required code block
@@ -89,10 +88,6 @@ function initDefaults() {
   if (isInitialized == 'true' && build == BUILD) return;
 
   UserStorage.setValue('BUILD', BUILD);
-
-  var _tmp = UserStorage.getValue('jst_epic');
-  if (_tmp == null || _tmp.usable === false) 
-    UserStorage.setValue('jst_epic', fieldEpic);
 
   if (null == UserStorage.getValue('workhours'))
     UserStorage.setValue('workhours', 8);
