@@ -123,8 +123,8 @@ Additionally you can configure many different types of custom Jira field, which 
 > Depending on Jira response time i had successfully listed 1000 issues but sometimes only about >850.
 
 
-### Update Jira Issues from Spreadsheet
-“Add-ons" > “Jira Sheet Tools” > "Update Jira Issues from Spreadsheet"
+### Update Jira Issues
+“Add-ons" > “Jira Sheet Tools” > "Update Jira Issues"
 
 Allows you to update values in multiple Jira issues from the values in your spreadsheet.
 This feature allows you to select an area of your spreadsheet with header rows and each row below it corresponding to an issue.

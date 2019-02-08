@@ -1,15 +1,16 @@
 /**
- * @author Jens Rosemeier <github@jens79.de>
+ * @copyright Copyright (c) 2017-2019, Jens Rosemeier. All rights reserved.
+ *            Copyrights licensed under GNU GENERAL PUBLIC LICENSE v3.
+ * 
  * @github  https://github.com/ljay79/jira-tools
- * @copyright Jens Rosemeier, 2017-2019
+ * @author  Jens Rosemeier <github@jens79.de> - https://github.com/ljay79
+ * @author  Paul Lemon - https://github.com/paul-lemon
+ * @author  Daniel Kulbe - https://github.com/DanielKulbe
  * 
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
- *
- * ToDo/Notes:
- * - use google auth with token based Jira RESTful API vs. cleartext password
  */
 
-var BUILD = '1.0.7';
+var BUILD = '1.1.0';
 
 /** 
  * Add a nice menu option for the users.
