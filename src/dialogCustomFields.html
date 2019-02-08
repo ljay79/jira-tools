@@ -84,7 +84,7 @@
           chkboxInput.setAttribute('value', JSON.stringify(field));
           chkboxLabel.setAttribute('for', 'customfield-id-'+field.key);
           chkboxLabel.innerHTML = field.name;
-          if (!field.supported) chkboxLabel.innerHTML += ' <small><em>(Type: ' + JSON.stringify(field.type) + (field.supported?'':' - not supported') + ')</em></small>';
+          if (!field.supported) chkboxLabel.innerHTML += ' <small><em>(Type: ' + JSON.stringify(field.schemaType) + (field.supported?'':' - not supported') + ')</em></small>';
           if (isFavorite(field.key)) chkboxInput.setAttribute('checked', 'checked');
           if (!field.supported) chkboxInput.setAttribute('disabled', 'disabled');
           //if (option.favourite) chkbox.className = 'is-favourite';

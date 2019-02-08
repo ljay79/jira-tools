@@ -674,6 +674,17 @@ return {
         };
  */
 function convertJiraFieldResponseToFieldRecord(jiraFieldResponse) {
+   // EPIC customization
+   if (jiraFieldResponse.schema && jiraFieldResponse.schema.custom) {
+    if (jiraFieldResponse.schema.custom.indexOf(':gh-epic-link') > -1) {
+      EpicField.setLinkKey(jiraFieldResponse.key || jiraFieldResponse.id);
+    }
+    if (jiraFieldResponse.schema.custom.indexOf(':gh-epic-label') > -1) {
+      EpicField.setLabelKey(jiraFieldResponse.key || jiraFieldResponse.id);
+    }
+  }
+  
+  
   var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
   var _type = (jiraFieldResponse.schema ? jiraFieldResponse.schema.type : null) || null;
   if (jiraFieldResponse.schema && jiraFieldResponse.schema.items) {

@@ -3,6 +3,7 @@ const Request = require('../src/jiraApi.gs');
 const debug = require("./debug.gs").debug;
 const EpicField = require("./models/jira/EpicField.gs");
 const UserStorage = require("./UserStorage.gs").UserStorage;
+const convertJiraFieldResponseToFieldRecord = require("./jiraCommon.gs").convertJiraFieldResponseToFieldRecord;
 // End of Node required code block
 
 var CUSTOMFIELD_FORMAT_RAW    = 1;
@@ -52,32 +53,10 @@ function fetchCustomFields() {
       // reset custom epic field
       EpicField.resetValue();
 
-      var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
-
+      
       // add data to export
       _customFieldsRaw.push.apply(_customFieldsRaw, respData.map(function(cField) {
-        var _type = (cField.schema ? cField.schema.type : null) || null;
-        if(cField.schema && cField.schema.items) {
-          _type += '|' + cField.schema.items;
-        }
-
-        // EPIC customization
-        if (cField.schema && cField.schema.custom) {
-          if (cField.schema.custom.indexOf(':gh-epic-link') > -1) {
-            EpicField.setLinkKey(cField.key || cField.id);
-          }
-          if (cField.schema.custom.indexOf(':gh-epic-label') > -1) {
-            EpicField.setLabelKey(cField.key || cField.id);
-          }
-        }
-
-        return {
-          key:        cField.key || cField.id, // Server API returns ".id" only while Cloud returns both with same value
-          name:       cField.name,
-          custom:     cField.custom,
-          schemaType: _type,
-          supported:  (arrSupportedTypes.indexOf(_type) > -1)
-        };
+        return convertJiraFieldResponseToFieldRecord(cField)
       }) )
       // sorting by supported type and name
       && _customFieldsRaw.sort(function(a, b) {
@@ -93,17 +72,8 @@ function fetchCustomFields() {
       ;
 
       // remove non custom fields
-      _customFieldsRaw = _customFieldsRaw.filter(function(el) { 
+      customFields = _customFieldsRaw.filter(function(el) { 
         return el.custom
-      });
-
-      customFields = _customFieldsRaw.map(function(el) { 
-        return {
-          key:        el.key,
-          name:       el.name,
-          type:       el.schemaType,
-          supported:  el.supported
-        };
       });
 
       // EPIC usable?
