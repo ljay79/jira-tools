@@ -353,7 +353,6 @@ test('packing a row', () => {
 });
 
 test("packing a row with Components and Fix Versions in the payload", () => {
-  console.log("packing a row with Components and Fix Versions in the payload");
   const packageRowForUpdate = require('../src/jiraUpdateTicket.gs').packageRowForUpdate;
   var result = packageRowForUpdate(jiraFieldList, { "My custom field": 1, Key: 0,"Components":2 }, ["PBI-1", "column A value","x,y,z"]);
   expect(result).not.toBeNull();

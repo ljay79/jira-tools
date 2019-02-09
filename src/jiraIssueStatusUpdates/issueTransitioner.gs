@@ -60,40 +60,63 @@ function IssueTransitioner() {
    * @param newStatus the status that it is desired to transition to.
    */
   this.transition = function (issueKey, newStatus) {
-    newStatus = newStatus.toLowerCase();
-    var result = getIssue(issueKey);
     var returnData = { success: false, updated: false, errors: [] }
-    if (result.status != 200) {
-      returnData.errors.push(result.errorMessage);
-      return returnData;
-    }
-    var srcStatus = result.data.fields.status.name;
-    srcStatus = srcStatus.toLowerCase();
-    if (srcStatus == newStatus) {
+    
+    var transitionStatus = this.getTransitionStatus(issueKey,newStatus);
+    if (!transitionStatus.transitionNeeded) {
+      // the issue is already in this state we can return
       returnData.success = true;
       return returnData;
     }
-    if (!config.hasTransitionIds(issueKey, srcStatus)) {
-      var transitionsResponse = getPossibleTransitions(issueKey);
-      if (transitionsResponse.status != 200) {
-        returnData.errors.push(transitionsResponse.errorMessage);
-        return returnData;
-      }
-      config.setTransitions(issueKey, srcStatus, transitionsResponse.data.transitions);
+    if (transitionStatus.errors.length>0) {
+      // some error occured 
+      returnData.errors = transitionStatus.errors;
+      return returnData;
     }
-    var transitionId = config.getTransitionId(issueKey, srcStatus, newStatus);
+    var transitionId = transitionStatus.transitionId;
     if (transitionId == null) {
-      returnData.errors.push("Status cannot be changed from '" + srcStatus + "' to '" + newStatus + "', please check your the spelling of the status in your spreadsheet and the JIRA project configuration if the spelling is correct");
+      returnData.errors.push("Status cannot be changed from '" + transitionStatus.srcStatus + "' to '" + newStatus + "', please check your the spelling of the status in your spreadsheet and the JIRA project configuration if the spelling is correct");
       return returnData;
     }
     transitionResult = makeTransition(issueKey, transitionId);
     returnData.success = transitionResult.success;
     if (transitionResult.errorMessage != null & transitionResult.errorMessage != "") {
-      console
       returnData.errors = [transitionResult.errorMessage];
     }
     returnData.updated = returnData.success;
     return returnData;
+  }
+
+  /**
+   * Function to get the correct trantionsition id for this issue
+   * 
+   * @param issueKey - the key of the issue in JIRA
+   * @param newStatus - the text description of the new status
+   * 
+  */
+  this.getTransitionStatus = function(issueKey,newStatus) {
+    newStatus = newStatus.toLowerCase();
+    var result = getIssue(issueKey);
+    var transitionStatus = { transitionNeeded: true, errors: [], transitionID: null, srcStatus: null }
+    if (result.status != 200) {
+      transitionStatus.errors.push(result.errorMessage);
+      return transitionStatus;
+    }
+    transitionStatus.srcStatus = result.data.fields.status.name.toLowerCase();
+    if (transitionStatus.srcStatus == newStatus) {
+      transitionStatus.transitionNeeded = false;
+      return transitionStatus;
+    }
+    if (!config.hasTransitionIds(issueKey, transitionStatus.srcStatus)) {
+      var transitionsResponse = getPossibleTransitions(issueKey);
+      if (transitionsResponse.status != 200) {
+        transitionStatus.errors.push(transitionsResponse.errorMessage);
+        return transitionStatus;
+      }
+      config.setTransitions(issueKey, transitionStatus.srcStatus, transitionsResponse.data.transitions);
+    }
+    transitionStatus.transitionId = config.getTransitionId(issueKey, transitionStatus.srcStatus, newStatus);
+    return transitionStatus;
   }
 
 
