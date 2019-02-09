@@ -4,6 +4,7 @@ const getAllJiraFields = require('./jiraCommon.gs').getAllJiraFields;
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
 const debug = require("./debug.gs").debug;
 const getMatchingJiraField = require("./jiraCommon.gs").getMatchingJiraField;
+const extend = require("./jsLib.gs").extend;
 const IssueTransitioner = require('./jiraIssueStatusUpdates/issueTransitioner.gs');
 // End of Node required code block
 
@@ -208,9 +209,8 @@ function updateIssueinJira(issueData, callback) {
     }
 
   };
-  request.call(method, {
+  var payload = {
     issueIdOrKey: issueData.key,
-    fields: issueData.fields,
     update: {
       comment: [{
         add: {
@@ -218,7 +218,14 @@ function updateIssueinJira(issueData, callback) {
         }
       }]
     }
-  });
+  }
+  if (issueData.fields != null) {
+    payload.fields = issueData.fields;
+  }
+  if (issueData.update != null) {
+    extend(payload.update,issueData.update);
+  }
+  request.call(method, payload);
   request.withSuccessHandler(ok);
   request.withFailureHandler(error);
   return (request.getResponse().success === true);
