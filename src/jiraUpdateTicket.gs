@@ -159,7 +159,7 @@ function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
   return result;
 
   function isIssueScreenField(headerId) {
-    return ["components","fixVersions"].includes(headerId);
+    return headerId == "components" || headerId == "fixVersions";
   }
 
   function prepareUpdateField(headerId,value) {
