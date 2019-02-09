@@ -144,15 +144,17 @@
           statusMessage = result.rowsUpdated+" Jira Issues Updated";
         }
       } else {
-        statusMessage = "See below for errors";
+        statusMessage = "See below for error(s)";
       }
-      showAlert(statusMessage, !hasErrors, 10000);
+      showAlert(statusMessage, !hasErrors && result.status , 10000);
       $('#results').empty();
       if (hasErrors) {
         $('#results').append('<h2 class="error">' + result.errors.length + ' Error(s)</h2>');
         for (var i = 0; i < result.errors.length; i++) {
           $('#results').append("<div class='item'>" + result.errors[i] + "</div>");
         }
+      } else if (!result.status) {
+        $('#results').append('<h2 class="error">' + result.message + '</h2>');
       }
     }
 
