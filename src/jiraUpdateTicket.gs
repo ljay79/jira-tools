@@ -131,7 +131,7 @@ function formatFieldValueForJira(fieldDefinition, value) {
  */
 function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
   var keyFieldName = "issuekey";
-  var result = { key: null, fields: {} };
+  var result = { key: null, fields: {}, update:{} };
   var filteredHeaders = getMatchingJiraFields(allJiraFields, headerRow);
   for (var headerId in filteredHeaders) {
     var index = filteredHeaders[headerId].index;
@@ -140,8 +140,12 @@ function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
     if (value != null) {
       value = formatFieldValueForJira(fieldDefinition, value);
       if (headerId.toLowerCase() != keyFieldName) {
-        result.fields[headerId] = value;
-
+        // is this a field which needs to be put in fields of an update section
+        if (isIssueScreenField(headerId)) {
+          result.update[headerId] = prepareUpdateField(headerId,value);
+        } else {
+          result.fields[headerId] = value;
+        }
       } else {
         if (value.length > 0) {
           result.key = value;
@@ -149,7 +153,23 @@ function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
       }
     }
   }
+  if (Object.keys(result.update).length ==0) {
+    delete(result.update);
+  }
   return result;
+
+  function isIssueScreenField(headerId) {
+    return ["components","fixVersions"].includes(headerId);
+  }
+
+  function prepareUpdateField(headerId,value) {
+    listOfItems = value.split(/\s*,\s*/);
+    updateItems = [];
+    listOfItems.forEach(function (item) {
+      updateItems.push({ "name": item });
+    });
+    return [{ set: updateItems }];
+  }
 }
 
 /**

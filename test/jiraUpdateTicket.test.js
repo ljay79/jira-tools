@@ -63,6 +63,20 @@ const jiraFieldList = [
     schemaType: "array|string",
     custom: false,
     supported: true
+  },
+  {
+    schema: { type: "array|string" },
+    key: "components",
+    name: "Components",
+    custom: false,
+    supported: true
+  },
+  {
+    schema: { type: "array|string" },
+    key: "fixVersions",
+    name: "Fix Versions",
+    custom: false,
+    supported: true
   }
 ]
 
@@ -305,6 +319,7 @@ test('packing a row', () => {
   expect(result.fields.custom1234).toBe("column A value");
   expect(result.fields.custom5678).toBe("column B value");
   expect(Object.keys(result.fields).length).toBe(2);
+  expect(result.update).not.toBeDefined();
 
   var result = packageRowForUpdate(jiraFieldList, { Key: 0, columnA: 1, columnB: 3 }, ["", "column A value", "should be ignored", "column B value"]);
   expect(result).not.toBeNull();
@@ -324,6 +339,7 @@ test('packing a row', () => {
   expect(result.key).toBe("PBI-22");
   expect(result.fields).not.toBeNull();
   expect(result.fields.custom1234).toBe("column A value");
+  expect(result.update).not.toBeDefined();
   expect(Object.keys(result.fields).length).toBe(1);
 
 
@@ -332,6 +348,22 @@ test('packing a row', () => {
   expect(result.key).toBe("PBI-22");
   expect(result.fields).not.toBeNull();
   expect(result.fields.number1).toBe(null);
+  expect(Object.keys(result.fields).length).toBe(1);
+  expect(result.update).not.toBeDefined();
+});
+
+test("packing a row with Components and Fix Versions in the payload", () => {
+  console.log("packing a row with Components and Fix Versions in the payload");
+  const packageRowForUpdate = require('../src/jiraUpdateTicket.gs').packageRowForUpdate;
+  var result = packageRowForUpdate(jiraFieldList, { "My custom field": 1, Key: 0,"Components":2 }, ["PBI-1", "column A value","x,y,z"]);
+  expect(result).not.toBeNull();
+  expect(result.key).toBe("PBI-1");
+  expect(result.fields).not.toBeNull();
+  expect(result.fields.custom1234).toBe("column A value");
+  expect(result.update).not.toBeNull();
+  expect(result.update.components).toBeDefined();
+  expect(result.update.components.length).toBe(1);
+  expect(result.update.components[0]).toEqual({ "set": [{ "name": "x" }, { "name": "y" }, { "name": "z" }] });
   expect(Object.keys(result.fields).length).toBe(1);
 });
 
