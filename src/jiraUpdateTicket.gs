@@ -18,70 +18,77 @@ function updateJiraIssues(headerRow, dataRows) {
   debug.info('updateJiraIssues called Keys:--%s  DATA ROWS %s', Object.keys(headerRow).join(","), dataRows);
   var result = { rowsUpdated: 0, status: false, message: "", finished: false, errors: [] };
 
-  if (headerRow === null || Object.keys(headerRow).length == 0) {
-    result.finished = true;
-    result.message = "No values in header row";
+  if (hasValidationErrors()) {
     return result;
   }
 
-  if (dataRows == null || dataRows.length == 0) {
-    result.status = false;
+  var allJiraFields = getAllJiraFields();
+  if (allJiraFields.length == 0) {
     result.finished = true;
-    result.message = "No issues were selected from your sheet";
+    result.status = false;
+    result.message = "Could not retrieve all field definitions from JIRA";
     return result;
-
   }
 
   var statusTransitioner = new IssueTransitioner();
-  allJiraFields = getAllJiraFields(
-    function (allJiraFields) {
-      for (var i = 0; i < dataRows.length; i++) {
-        var rowData = packageRowForUpdate(allJiraFields, headerRow, dataRows[i]);
-        if (rowData.key != null) {
-          if (rowData.fields["status"] != null) {
-            var statusTransition = statusTransitioner.transition(rowData.key, rowData.fields["status"]);
-            delete (rowData.fields["status"]);
-            if (!statusTransition.success) {
-              statusTransition.errors.forEach(function (message) {
-                result.errors.push("[" + rowData.key + "] " + message);
-              });
-            }
-          }
-          var updateResult = updateIssueinJira(rowData,
-            function (key, success, message) {
-              if (!success) {
-                // replace mention of specific field ids in error messages, try use field name
-                message = message.replace(/{Field:(.*?)}/g, function (match, fieldName) {
-                  var errorField = getMatchingJiraField(allJiraFields, fieldName);
-                  if (errorField != null) {
-                    return errorField.name;
-                  }
-                  return "";
-                });
-                result.errors.push("[" + key + "] " + message);
-              }
-            });
-          if (updateResult) {
-            result.rowsUpdated++;
-          }
-        } else {
-          result.errors.push("No Key value found in row " + i);
+  var rowNum = 0;
+  dataRows.forEach(function(dataRow) {
+    var packagedRow = packageRowForUpdate(allJiraFields, headerRow, dataRow);
+    rowNum++;
+    if (packagedRow.key == null) {
+      result.errors.push("No Key value found in row " + i);
+    } else {
+      if (packagedRow.fields["status"] != null) {
+        var statusTransition = statusTransitioner.transition(packagedRow.key, packagedRow.fields["status"]);
+        delete (packagedRow.fields["status"]);
+        if (!statusTransition.success) {
+          statusTransition.errors.forEach(function (message) {
+            result.errors.push("[" + packagedRow.key + "] " + message);
+          });
         }
       }
-      result.message = result.rowsUpdated + " jira issues(s) updated, " + result.errors.length + " errors.";
-      result.status = (result.rowsUpdated > 0);
-      result.finished = true;
-    },
-    function (errorMessage) {
-      result.finished = true;
-      result.status = false;
-      result.message = "Could not retrieve all field definitions from JIRA " + errorMessage;
-    }
-  )
-
-
+      var updateResult = updateIssueinJira(packagedRow,
+        function (key, success, message) {
+          if (!success) {
+            // replace mention of specific field ids in error messages, try use field name
+            message = message.replace(/{Field:(.*?)}/g, function (match, fieldName) {
+              var errorField = getMatchingJiraField(allJiraFields, fieldName);
+              if (errorField != null) {
+                return errorField.name;
+              }
+              return "";
+            });
+            result.errors.push("[" + key + "] " + message);
+          }
+        });
+      if (updateResult) {
+        result.rowsUpdated++;
+      }
+    } 
+  });
+  for (var i = 0; i < dataRows.length; i++) {
+    
+  }
+  result.message = result.rowsUpdated + " jira issues(s) updated, " + result.errors.length + " errors.";
+  result.status = (result.rowsUpdated > 0);
+  result.finished = true;
 
   return result;
+
+  function hasValidationErrors() {
+    if (headerRow === null || Object.keys(headerRow).length == 0) {
+      result.finished = true;
+      result.message = "No values in header row";
+      return true;
+    }
+    if (dataRows == null || dataRows.length == 0) {
+      result.status = false;
+      result.finished = true;
+      result.message = "No issues were selected from your sheet";
+      return true;
+    }
+    return false;
+  }
 
 }
 

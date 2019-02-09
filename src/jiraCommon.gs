@@ -733,6 +733,8 @@ function getAllJiraFields(successCallBack, errorCallBack) {
     .withSuccessHandler(ok)
     .withFailureHandler(error)
     ;
+
+  return fieldMap;
 }
 
 /**

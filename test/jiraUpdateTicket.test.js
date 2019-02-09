@@ -303,6 +303,18 @@ test('processing list of Jira Issues', () => {
 });
 
 
+test('processing list of Jira Issues fails when fields cant be returned', () => {
+  const updateJiraIssues = require('../src/jiraUpdateTicket.gs').updateJiraIssues;
+  jiraApiMock.setNextJiraResponse(500, "field", []);
+  var result = updateJiraIssues({ "XYZ field": 1, Key: 0, columnB: 2 }, [["PBI-1", "column A value", ""], ["PBI-2", "column A value 2", ""]]);
+  expect(result.message).not.toBeNull();
+  expect(result.rowsUpdated).toBe(0);
+  expect(result.status).toBe(false);
+  expect(result.finished).toBe(true);
+  expect(result.errors.length).toBe(0);
+});
+
+
 test('packing a row', () => {
   const packageRowForUpdate = require('../src/jiraUpdateTicket.gs').packageRowForUpdate;
   var result = packageRowForUpdate(jiraFieldList, { "My custom field": 1, Key: 0 }, ["PBI-1", "column A value"]);
