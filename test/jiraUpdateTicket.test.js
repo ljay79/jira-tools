@@ -376,6 +376,18 @@ test("packing a row with Components and Fix Versions in the payload", () => {
   expect(result.update.components.length).toBe(1);
   expect(result.update.components[0]).toEqual({ "set": [{ "name": "x" }, { "name": "y" }, { "name": "z" }] });
   expect(Object.keys(result.fields).length).toBe(1);
+
+
+  var result = packageRowForUpdate(jiraFieldList, { "My custom field": 1, Key: 0,"Components":2 }, ["PBI-1", "column A value",""]);
+  expect(result).not.toBeNull();
+  expect(result.key).toBe("PBI-1");
+  expect(result.fields).not.toBeNull();
+  expect(result.fields.custom1234).toBe("column A value");
+  expect(result.update).not.toBeNull();
+  expect(result.update.components).toBeDefined();
+  expect(result.update.components.length).toBe(1);
+  expect(result.update.components[0]).toEqual({ "set": [] });
+  expect(Object.keys(result.fields).length).toBe(1);
 });
 
 test("Posting Individual Issues to Jira - Not Found Error", () => {

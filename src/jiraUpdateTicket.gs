@@ -173,7 +173,9 @@ function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
     listOfItems = value.split(/\s*,\s*/);
     updateItems = [];
     listOfItems.forEach(function (item) {
-      updateItems.push({ "name": item });
+      if (item.trim().length>0) {
+        updateItems.push({ "name": item.trim() });
+      }
     });
     return [{ set: updateItems }];
   }
