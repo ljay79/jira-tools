@@ -89,10 +89,17 @@ function IssueTransitioner() {
 
   /**
    * Function to get the correct trantionsition id for this issue
+   * and to work out if the transition is needed
    * 
    * @param issueKey - the key of the issue in JIRA
    * @param newStatus - the text description of the new status
-   * 
+   * @return {object} - 
+   *   { 
+   *      transitionNeeded: true/false, <- true if the transition is possible and the issue is not already in the new state
+   *      errors: [],  <- an array of errors that may have occured when finding the correct transition id
+   *      transitionID: null, <- null of the string id of the jira transition
+   *      srcStatus: null <- the current status of the issue
+   * }
   */
   this.getTransitionStatus = function(issueKey,newStatus) {
     newStatus = newStatus.toLowerCase();
