@@ -1,10 +1,10 @@
-# Jira Sheet Tools
+# Project Aid for Jira (previously:Project Aid for Jira)
 
 [Jira](https://www.atlassian.com/software/jira) is a powerful and well established project management tool among small to enterprise businesses. Still we often end up using Google Sheets for some overview roadmaps, project dashboards and other purposes.
 
-With this Google Sheet Add-on the, called "[Jira Sheet Tools](https://chrome.google.com/webstore/detail/jira-sheet-tools/ncijnapilmmnebhbdanhkbbofofcniao)" available in the Google Add-On store from within Google Sheet, you can now take your sheet based reports with Jira information to the next level.
+With this Google Sheet Add-on the, called "[Project Aid for Jira](https://chrome.google.com/webstore/detail/jira-sheet-tools/ncijnapilmmnebhbdanhkbbofofcniao)" available in the Google Add-On store from within Google Sheet, you can now take your sheet based reports with Jira information to the next level.
 
-[Jira Sheet Tools](https://chrome.google.com/webstore/detail/jira-sheet-tools/ncijnapilmmnebhbdanhkbbofofcniao) allows you to visualize the status of any Jira ticket you mention in a sheet.
+[Project Aid for Jira](https://chrome.google.com/webstore/detail/jira-sheet-tools/ncijnapilmmnebhbdanhkbbofofcniao) allows you to visualize the status of any Jira ticket you mention in a sheet.
 You can directly import entire issue lists with your Jira filters just from within Google sheet.
 Or create time reports for any of your users based on the Jira worklogs.
 
@@ -29,7 +29,7 @@ No manual status update copy&paste anymore.
 # Install / Get started
 * Open up your chrome browser
 * Open or create a Google Sheet
-* Find & Install the Add-on "[Jira Sheet Tools](https://chrome.google.com/webstore/detail/jira-sheet-tools/ncijnapilmmnebhbdanhkbbofofcniao)"
+* Find & Install the Add-on "[Project Aid for Jira](https://chrome.google.com/webstore/detail/jira-sheet-tools/ncijnapilmmnebhbdanhkbbofofcniao)"
 * Authorize the Add-On when asked for
 
 ### Authorizations
@@ -57,7 +57,7 @@ NO data is shared with any third-party other then your google sheet and the used
 Once installed:
 Simply provide your individual Jira server settings before you use any feature.
 
-In any Google sheet, go in the menu to “Add-ons" > "Jira Sheet Tools" > "Settings”.
+In any Google sheet, go in the menu to “Add-ons" > "Project Aid for Jira" > "Settings”.
 Enter your "Jira Domain" and your log on credentials.
 
 #### (A) Email / Username and Password
@@ -80,8 +80,8 @@ Best described here -> [How to obtain API Token](https://confluence.atlassian.co
 You're all set and ready to go.
 
 # Features
-### Update Ticket Key Status
-“Add-ons" > “Jira Sheet Tools” > "Update Ticket Key Status "KEY-123 [Done]""
+### Update issue key status
+“Add-ons" > “Project Aid for Jira” > "Update issue key status "KEY-123 [Done]""
 
 Any Jira ticket Id in the form of "KEY-123" will be updated on the current active google sheet and extended with the current status of matching Jira ticket.
 
@@ -96,27 +96,27 @@ Even when used within text it will search for keys and add the status.
 If a Jira issue key is found in a single cell, the value will be linked automatically to the Jira issue page.
 
 
-### Re-Calculate all formulas in active sheet
-“Add-ons" > “Jira Sheet Tools” > "Re-Calculate all formulas in active sheet"
+### Update formulas in active sheet
+“Add-ons" > “Project Aid for Jira” > "Update formulas in active sheet"
 
 When anu custom function or other formula is used, this simple 'click' will refresh / re-calculate all the formulas and custom functions used in the current active google sheet.
 If a sheet is re-opened this will re-calculate all custom functions by default anyway, but usually not while editing or watching the current sheet.
 
 
-### Show Jira Field Map
-“Add-ons" > “Jira Sheet Tools” > "Show Jira Field Map"
+### Jira field map
+“Add-ons" > “Project Aid for Jira” > "Jira field map"
 
 Fetch and show all your Jira fields name and id in a sidebar. Very useful for our custom functions where you can make use of JQL queries.
 
 
-### List Issues From Filter
-“Add-ons" > “Jira Sheet Tools” > "List Issues from Filter"
+### List issues from filter
+“Add-ons" > “Project Aid for Jira” > "List issues from filter"
 
 Allows you to add a table/list of all found Jira issues based on your favorite Jira Filter.
 The dialog will let you choose from all your Jira filters and then insert all results into the active Google sheet.
 You can even decide which information to be shown in the resulting table.
 Most common Jira fields / columns are available to select from.
-Additionally you can configure many different types of custom Jira field, which then will be available for you in this dialog. (“Add-ons" > “Jira Sheet Tools” > "Configure Custom Fields")
+Additionally you can configure many different types of custom Jira field, which then will be available for you in this dialog. (“Add-ons" > “Project Aid for Jira” > "Configure custom fields")
 
 > Note: This feature is currently limited to list a maximum of 1000 jira issues.
 > It may even break earlier when the requests takes longer then Google's maximum execution timeout.
@@ -124,19 +124,19 @@ Additionally you can configure many different types of custom Jira field, which 
 
 
 ### Update Jira Issues
-“Add-ons" > “Jira Sheet Tools” > "Update Jira Issues"
+“Add-ons" > “Project Aid for Jira” > "Update Jira Issues"
 
 Allows you to update values in multiple Jira issues from the values in your spreadsheet.
 This feature allows you to select an area of your spreadsheet with header rows and each row below it corresponding to an issue.
 The dialog will let you configure the columns from your spreadsheet and map them to Jira issue fields.
-It will let you select from most common fields and the custom fields you have configured (“Add-ons" > “Jira Sheet Tools” > "Configure Custom Fields")
+It will let you select from most common fields and the custom fields you have configured (“Add-ons" > “Project Aid for Jira” > "Configure custom fields")
 Not all fields will update in Jira as there may not be enough data in the spreadsheet for the Add on to set the value. Error messages are shown from Jira when this was the case.
 
 > Each row requires at least one call to Jira REST API to update it.
 > Setting the status of a Jira Issue can required 3 calls per row, do not include this field if you do not need to.
 
 ### Time Report
-“Add-ons" > “Jira Sheet Tools” > "Create Time Report"
+“Add-ons" > “Project Aid for Jira” > "Create time report"
 
 Lets you pick a user from Jira and a date period to filter for and generates a nice Time sheet report based on all worklogs for the filtered user and date period.
 Supports two different time report formats; "1d 7h 59m" for better readibility or "7.5" (work hours as decimal number) for better calculations in the sheet.
@@ -144,15 +144,15 @@ Under “Settings” you can configure which time format you prefer to use.
 
 > Careful when selecting to big date periods, can be slow and become a wide table. Start with 1 week and scale up.
 
-### Configure Custom Fields
-“Add-ons" > “Jira Sheet Tools” > "Configure Custom Fields"
+### Configure custom fields
+“Add-ons" > “Project Aid for Jira” > "Configure custom fields"
 
-If you wish to list issues in your sheet with the function "List Issues From Filter" you can specify which columns to insert.
+If you wish to list issues in your sheet with the function "List issues from filter" you can specify which columns to insert.
 By default only most common Jira default Fields (Columns) are available to choose from.
 In case you use custom Jira fields you can now go to the settings section and select some of these customs fields as your favorites.
 > Note: Not all custom field formats are supported, these are indicated in the list of fields.
 
-Once you configured your custom fields, these fields are available to create column of in the "List Issues From Filter" dialog.
+Once you configured your custom fields, these fields are available to create column of in the "List issues from filter" dialog.
 
 > Supported custom fields are of type: **string**, **number**, **date**, **datetime**
 **option**, **array of options**, **array of strings**, **user**, **array of users**, **group**, **array of groups**, **version** and **array of versions**
@@ -202,7 +202,7 @@ Little but quite powerful function to search for Jira issues and fill your sheet
 Using JQL ([Jira Query Language](https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries)) queries as you would inside Jira.
 Can return just a single cell value or entire list of issues spanning over multiple columns.
 Expecting a valid JQL query as 1st parameter and a comma-separated list of Jira field IDs as the 2nd.
-If your dont know the exact names and syntax of Jira fields, then look at the Field Map (“Add-ons" > “Jira Sheet Tools” > "Show Jira Field Map").
+If your dont know the exact names and syntax of Jira fields, then look at the Field Map (“Add-ons" > “Project Aid for Jira” > "Jira field map").
 
 **Limitation**: This custom function can return a maximum of **100** results/issues. Search and processing is limited to **30 seconds** per call (Google Limitation), if the Jira Server responds slow, it might not be able to provide full result to you.
 
@@ -249,7 +249,7 @@ It is described here on [Atlassian.com](https://confluence.atlassian.com/jirakb/
 Therefore i do use already pagination where ever possible to fetch as many data as possible.
 
 Current existing limitations by this Add-On:
-* "List Issues from Filter" is limited to a total amount of **10.000** issues to be listed per request
+* "List issues from filter" is limited to a total amount of **10.000** issues to be listed per request
   * To comply with Atlassians policy, it does internally fetch only *50* records per page which can result in quite some delay when dealing with too many issues.
 * Listing of Jira users and groups (within dialogs) is limited to **100** user/group records
 * "Time Report" is limited to report max **1.000** worklogs per Jira issue (max **1.000** issues) per Time sheet
@@ -437,7 +437,7 @@ Default credentials saved to: ~/.clasprc.json (/.clasprc.json).
 #### 1. Create and deploy to a new Google project
 ```sh
 cd ./src
-clasp create --type sheets --title "Jira Sheet Tools - Devel"
+clasp create --type sheets --title "Project Aid for Jira - Devel"
 cd ..
 gulp deploy
 ```
