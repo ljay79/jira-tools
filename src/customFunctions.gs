@@ -26,7 +26,7 @@ function JST_EPICLABEL(TicketId) {
 
   if(undefined == epicField || epicField.usable !== true || epicField.label_key == null) {
     debug.error("epicField seems not be configured: %s", epicField);
-    throw new Error("Please configure your Jira Epic field first. Go to 'Jira Sheet Tools' -> 'Configure Custom Fields'");
+    throw new Error("Please configure your Jira Epic field first. Go to 'Project Aid for Jira' -> 'Configure custom fields'");
   }
 
   response = request.call('issueStatus', {
