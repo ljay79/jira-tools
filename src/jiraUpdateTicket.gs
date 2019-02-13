@@ -214,7 +214,7 @@ function updateIssueinJira(issueData, callback) {
     update: {
       comment: [{
         add: {
-          body: "Updated by Jira Sheet Tools https://github.com/ljay79/jira-tool"
+          body: "Updated by Jira Sheet Tools https://github.com/ljay79/jira-tools"
         }
       }]
     }
