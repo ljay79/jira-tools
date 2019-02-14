@@ -157,7 +157,7 @@ function dialogTimesheet() {
 
   debug.log('Processed: %s', dialog);
 
-  SpreadsheetApp.getUi().showModalDialog(dialog, 'Create Time Report');
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'Create time report');
 }
 
 /* Dialog: Worklog - END */
