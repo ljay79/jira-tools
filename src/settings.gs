@@ -57,7 +57,7 @@ function hasSettings(alert) {
   if(available === undefined || !username || !password || !url) {
     if(alert) Browser.msgBox("Jira Error", 
                    "Please configure the Jira Settings first!\\n\\n" +
-                   '"Add-ons -> Jira Sheet Tools -> Settings"', Browser.Buttons.OK);
+                   '"Add-ons -> Project Aid for Jira -> Settings"', Browser.Buttons.OK);
     return false;
   }
 

@@ -41,17 +41,15 @@ function onInstall(e) {
 function addMenu() {
 
   var menu = SpreadsheetApp.getUi().createAddonMenu()
-    .addItem('Re-Calculate all formulas in active sheet', 'recalcCustomFunctions')
-    .addItem('Update Ticket Key Status "KEY-123 [Done]"', 'dialogRefreshTicketsIds')
-    .addItem('Show Jira Field Map', 'sidebarJiraFieldMap')
-    
+    .addItem('List issues from filter', 'dialogIssueFromFilter')
+    .addItem('Create time report', 'dialogTimesheet')
     .addSeparator()
-    .addItem('List Issues from Filter', 'dialogIssueFromFilter')
-    .addItem('Create Time Report', 'dialogTimesheet')
-  
+    .addItem('Update formulas in active sheet', 'recalcCustomFunctions')
+    .addItem('Update issue key status "KEY-123 [Done]"', 'dialogRefreshTicketsIds')
+    .addItem('Jira field map', 'sidebarJiraFieldMap')
     .addSeparator()
     .addItem('Settings', 'dialogSettings')
-    .addItem('Configure Custom Fields', 'dialogCustomFields')
+    .addItem('Configure custom fields', 'dialogCustomFields')
     .addItem('About', 'dialogAbout');
 
     if (environmentConfiguration.features.updateJira.enabled) {
