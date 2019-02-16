@@ -130,7 +130,7 @@ test('processing list of Jira Issues with status transition', () => {
     }
   });
 
-  const updateJiraIssues = require('../src/jiraUpdateTicket.gs').updateJiraIssues;
+  const updateJiraIssues = require('../src/jiraUpdateIssue.gs').updateJiraIssues;
 
   var result = updateJiraIssues({ columnA: 1, Key: 0 }, [["PBI-1", "column A value"]]);
   expect(mockTransitionFunction.mock.calls.length).toBe(0);
@@ -200,7 +200,7 @@ test('processing list of Jira Issues with status transition', () => {
 
 test('processing list of Jira Issues', () => {
 
-  const updateJiraIssues = require('../src/jiraUpdateTicket.gs').updateJiraIssues;
+  const updateJiraIssues = require('../src/jiraUpdateIssue.gs').updateJiraIssues;
   var result = updateJiraIssues({}, []);
   expect(result.rowsUpdated).toBe(0);
   expect(result.status).toBe(false);
@@ -305,7 +305,7 @@ test('processing list of Jira Issues', () => {
 
 
 test('processing list of Jira Issues fails when fields cant be returned', () => {
-  const updateJiraIssues = require('../src/jiraUpdateTicket.gs').updateJiraIssues;
+  const updateJiraIssues = require('../src/jiraUpdateIssue.gs').updateJiraIssues;
   jiraApiMock.setNextJiraResponse(500, "field", []);
   var result = updateJiraIssues({ "XYZ field": 1, Key: 0, columnB: 2 }, [["PBI-1", "column A value", ""], ["PBI-2", "column A value 2", ""]]);
   expect(result.message).not.toBeNull();
@@ -317,7 +317,7 @@ test('processing list of Jira Issues fails when fields cant be returned', () => 
 
 
 test('packing a row', () => {
-  const packageRowForUpdate = require('../src/jiraUpdateTicket.gs').packageRowForUpdate;
+  const packageRowForUpdate = require('../src/jiraUpdateIssue.gs').packageRowForUpdate;
   var result = packageRowForUpdate(jiraFieldList, { "My custom field": 1, Key: 0 }, ["PBI-1", "column A value"]);
   expect(result).not.toBeNull();
   expect(result.key).toBe("PBI-1");
@@ -366,7 +366,7 @@ test('packing a row', () => {
 });
 
 test("packing a row with Components and Fix Versions in the payload", () => {
-  const packageRowForUpdate = require('../src/jiraUpdateTicket.gs').packageRowForUpdate;
+  const packageRowForUpdate = require('../src/jiraUpdateIssue.gs').packageRowForUpdate;
   var result = packageRowForUpdate(jiraFieldList, { "My custom field": 1, Key: 0,"Components":2 }, ["PBI-1", "column A value","x,y,z"]);
   expect(result).not.toBeNull();
   expect(result.key).toBe("PBI-1");
@@ -411,7 +411,7 @@ test("Posting Individual Issues to Jira - Not Found Error", () => {
       return { statusCode: 404, success: false };
     }
   );
-  const updateIssueinJira = require('../src/jiraUpdateTicket.gs').updateIssueinJira;
+  const updateIssueinJira = require('../src/jiraUpdateIssue.gs').updateIssueinJira;
 
   const mockCallback = jest.fn((key, status, message) => { key });
   var result = updateIssueinJira({ key: "PBI-1", fields: { a: "b" } }, mockCallback);
@@ -435,7 +435,7 @@ test("Posting Individual Issues to Jira - Error with data passed to field", () =
     errors: { a: "A had an issue with its payload" }
   });
 
-  const updateIssueinJira = require('../src/jiraUpdateTicket.gs').updateIssueinJira;
+  const updateIssueinJira = require('../src/jiraUpdateIssue.gs').updateIssueinJira;
 
   const mockCallback = jest.fn((key, status, message) => { key });
   var result = updateIssueinJira({ key: "PBI-1", fields: { a: "b" } }, mockCallback);
@@ -453,7 +453,7 @@ test("Posting Individual Issues to Jira - Error with data passed to field", () =
 });
 
 test("Posting Individual Issues to Jira - Success", () => {
-  const updateIssueinJira = require('../src/jiraUpdateTicket.gs').updateIssueinJira;
+  const updateIssueinJira = require('../src/jiraUpdateIssue.gs').updateIssueinJira;
   const mockCallback = jest.fn((key, status, message) => { key });
   jiraApiMock.setAllResponsesSuccesfull(204);
   var result = updateIssueinJira({ key: "PBI-2", fields: { a: "b" } }, mockCallback);
@@ -469,7 +469,7 @@ test("Posting Individual Issues to Jira - Success", () => {
 });
 
 test("field validation", () => {
-  const getMatchingJiraFields = require("../src/jiraUpdateTicket.gs").getMatchingJiraFields;
+  const getMatchingJiraFields = require("../src/jiraUpdateIssue.gs").getMatchingJiraFields;
 
   var getFilteredList = getMatchingJiraFields(
     jiraFieldList, { "custom1234": 1, "Not a Match": 2, "My custom field 2": 3 }
@@ -486,7 +486,7 @@ test("field validation", () => {
 
 
 test("Format string fields for JIRA", () => {
-  const formatFieldValueForJira = require('../src/jiraUpdateTicket.gs').formatFieldValueForJira;
+  const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
   var jiraFieldToUse = jiraFieldList[0];
   expect(jiraFieldToUse.schemaType).toBe("string"); // just in case the test data gets re-ordered
   expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string 
@@ -495,7 +495,7 @@ test("Format string fields for JIRA", () => {
 })
 
 test("Format empty number fields for JIRA", () => {
-  const formatFieldValueForJira = require('../src/jiraUpdateTicket.gs').formatFieldValueForJira;
+  const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
   var jiraFieldToUse = jiraFieldList[4];
   expect(jiraFieldToUse.key).toBe("number1"); // just in case the test data gets re-ordered
   expect(jiraFieldToUse.schemaType).toBe("number"); // just in case the test data gets re-ordered
@@ -505,7 +505,7 @@ test("Format empty number fields for JIRA", () => {
 })
 
 test("Format empty sprint fields for JIRA", () => {
-  const formatFieldValueForJira = require('../src/jiraUpdateTicket.gs').formatFieldValueForJira;
+  const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
   var jiraFieldToUse = jiraFieldList[5];
   expect(jiraFieldToUse.key).toBe("custom_sprint"); // just in case the test data gets re-ordered
   expect(jiraFieldToUse.schemaType).toBe("array|string"); // just in case the test data gets re-ordered
@@ -515,7 +515,7 @@ test("Format empty sprint fields for JIRA", () => {
 })
 
 test("Sending labels to JIRA", () => {
-  const formatFieldValueForJira = require('../src/jiraUpdateTicket.gs').formatFieldValueForJira;
+  const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
   var jiraFieldToUse = jiraFieldList[6];
   expect(jiraFieldToUse.key).toBe("labels"); // just in case the test data gets re-ordered
   expect(jiraFieldToUse.schemaType).toBe("array|string"); // just in case the test data gets re-ordered
@@ -526,7 +526,7 @@ test("Sending labels to JIRA", () => {
 });
 
 test("Including fields and/or items in the update ", () => {
-  const updateIssueinJira = require('../src/jiraUpdateTicket.gs').updateIssueinJira;
+  const updateIssueinJira = require('../src/jiraUpdateIssue.gs').updateIssueinJira;
   const mockCallback = jest.fn((key, status, message) => { key });
   jiraApiMock.setAllResponsesSuccesfull(204);
   var componentsData = [{ "set": [{ "name": "Engine" }, { "name": "Trans/A" }] }];

@@ -49,6 +49,6 @@ test('Update Jira menu option appears based on feature switch', () => {
   var menuItemsCreatedWithFeature = addItemMock.calls.length;
   expect(menuItemsCreatedWithFeature).toBe(menuItemsCreatedWithoutFeature+1)
   expect(addItemMock.calls[menuItemsCreatedWithFeature-1][0]).toBe('Update Jira Issues (BETA)');
-  expect(addItemMock.calls[menuItemsCreatedWithFeature-1][1]).toBe('dialogIssuesFromSheet');
+  expect(addItemMock.calls[menuItemsCreatedWithFeature-1][1]).toBe('menuUpdateJiraIssues');
   
 });

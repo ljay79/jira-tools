@@ -12,7 +12,7 @@ const IssueTransitioner = require('./jiraIssueStatusUpdates/issueTransitioner.gs
 * @desc Takes a 2 x 2 array of values and uses them to update JIRA 
 * @param headerRow {object} A dictionary where each key is the name of a Jira field and the value is the column index of that field in the data
 * @param dataRows {array} A 2x2 array where each row is assumed to be data to be updated in an issue
-* @return {object}
+* @return {object} result object { rowsUpdated: X, status: true/false, message: "", finished: true/false, errors: [] }
 */
 function updateJiraIssues(headerRow, dataRows) {
   debug.info('updateJiraIssues called Keys:--%s  DATA ROWS %s', Object.keys(headerRow).join(","), dataRows);
@@ -243,7 +243,7 @@ function updateIssueinJira(issueData, callback) {
     update: {
       comment: [{
         add: {
-          body: "Updated by [Project Aid for Jira|https://github.com/ljay79/jira-tool]"
+          body: "Updated by [Project Aid for Jira|https://github.com/ljay79/jira-tools"
         }
       }]
     }

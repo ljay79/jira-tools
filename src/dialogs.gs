@@ -162,68 +162,6 @@ function dialogTimesheet() {
 
 /* Dialog: Worklog - END */
 
-/* Dialog: Update Fields in Jira Issues from Spreadsheet */
-/*
-* @desc Gets the selected cells in the spreadsheet and separates to headers and datarows
-* @return {object}
-*/
-function getDataForJiraUpdateFromSheet() {
-  var cellValues = getTicketSheet().getActiveRange().getValues();
-  var headerFields = {};
-  var dataRows = [];
-  if (cellValues.length > 0) {
-    var firstRow = cellValues[0];
-    for (var i = 0; i < firstRow.length; i++) {
-      if (firstRow[i] != null && firstRow[i] != "") {
-        headerFields[firstRow[i]] = i;
-      }
-    }
-    cellValues.splice(0, 1);
-    dataRows = cellValues;
-  }
-  var result = {
-    headerFields: headerFields,
-    dataRows: dataRows
-  };
-  return result;
-}
-
-function getValidFieldsToEditJira() {
-  var validFields = {};
-  var userSelectedcustomFields = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
-  var systemFields = ISSUE_COLUMNS;
-  validFields = extend(validFields, userSelectedcustomFields);
-  validFields = extend(validFields, systemFields);
-  return validFields;
-}
-
-function dialogIssuesFromSheet() {
-  if (!hasSettings(true)) return;
-  var selectedData = getDataForJiraUpdateFromSheet();
-  var fieldsToUse = { "": "select a jira field...", issueKey: "Key" };
-  fieldsToUse = extend(fieldsToUse, getValidFieldsToEditJira());
-  selectedData.allJiraFields = fieldsToUse;
-
-  var readOnlyFields = { "Updated": true, "Issue Type": true, "Created": true };
-  selectedData.readOnlyFields = readOnlyFields;
-  var dialog = getDialog('dialogIssuesFromSheet', selectedData);
-  dialog
-    .setWidth(420)
-    .setHeight(360)
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-
-  SpreadsheetApp.getUi().showModalDialog(dialog, 'Update Jira Issues (BETA)');
-}
-
-function dialogProcessIssuesFromSheet(headerFieldsToUse) {
-  if (!hasSettings(true)) return;
-  var selectedData = getDataForJiraUpdateFromSheet();
-  var data = selectedData.dataRows;
-  return updateJiraIssues(headerFieldsToUse, data);
-}
-
-
-/* Dialog: Update Fields in Jira Issues from Spreadsheet - END */
 
 /* Dialog: Custom Fields */
 
