@@ -23,6 +23,9 @@ var PropertiesService = {
       pair[0].mockImplementation(() => pair[1]);
     });
   },
+  resetMockUserData: function() {
+    _userPropData = {};
+  },
   mockUserProps: UserProps
 }
 PropertiesService.resetMocks();

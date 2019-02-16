@@ -1,6 +1,7 @@
 // Node required code block
 const Request = require('./jiraApi.gs');
 const debug = require('./debug.gs').debug;
+const EpicField = require("./models/jira/EpicField.gs");
 // End of Node required code block
 
 // const not available, but better solution needed
@@ -674,6 +675,17 @@ return {
         };
  */
 function convertJiraFieldResponseToFieldRecord(jiraFieldResponse) {
+   // EPIC customization
+   if (jiraFieldResponse.schema && jiraFieldResponse.schema.custom) {
+    if (jiraFieldResponse.schema.custom.indexOf(':gh-epic-link') > -1) {
+      EpicField.setLinkKey(jiraFieldResponse.key || jiraFieldResponse.id);
+    }
+    if (jiraFieldResponse.schema.custom.indexOf(':gh-epic-label') > -1) {
+      EpicField.setLabelKey(jiraFieldResponse.key || jiraFieldResponse.id);
+    }
+  }
+  
+  
   var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
   var _type = (jiraFieldResponse.schema ? jiraFieldResponse.schema.type : null) || null;
   if (jiraFieldResponse.schema && jiraFieldResponse.schema.items) {
@@ -698,9 +710,13 @@ function getAllJiraFields(successCallBack, errorCallBack) {
   var fieldMap = [];
 
   var ok = function (respData, httpResp, status) {
+
     if (!respData) {
       error(respData, httpResp, status);
     }
+    // reset custom epic field
+    EpicField.resetValue();
+
     fieldMap.push.apply(fieldMap, respData.map(convertJiraFieldResponseToFieldRecord))
       // sorting by supported type and name
       && fieldMap.sort(function (a, b) {
