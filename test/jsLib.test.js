@@ -43,3 +43,17 @@ test('jsLib - getDateFromIso()', () => {
   expect(timeSecOnly(jsLib.getDateFromIso(''))).toEqual(timeSecOnly(new Date()));
 });
 
+test('copyObject', () => {
+  var src = {
+    prop1: "value1",
+    prop2: "value2"
+  };
+  var newObject = jsLib.copyObject(src);
+  expect(Object.keys(newObject).length).toBe(2);
+  expect(newObject.prop1).toBe("value1");
+  expect(newObject.prop2).toBe("value2");
+
+  src.prop1 = "New value";
+  expect(newObject.prop1).toBe("value1");
+});
+
