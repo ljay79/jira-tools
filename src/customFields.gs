@@ -2,7 +2,7 @@
 const debug = require("./debug.gs").debug;
 const EpicField = require("./models/jira/EpicField.gs");
 const UserStorage = require("./UserStorage.gs").UserStorage;
-const getAllJiraFields = require("./jiraCommon.gs").getAllJiraFields;
+const getAllJiraFields = require("src/models/jira/IssueFields.gs").getAllJiraFields;
 // End of Node required code block
 
 var CUSTOMFIELD_FORMAT_RAW    = 1;

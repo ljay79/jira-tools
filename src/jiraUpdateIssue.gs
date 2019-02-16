@@ -1,9 +1,9 @@
 // Node required code block
 const Request = require('../src/jiraApi.gs');
-const getAllJiraFields = require('./jiraCommon.gs').getAllJiraFields;
+const getAllJiraFields = require('src/models/jira/IssueFields.gs').getAllJiraFields;
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
 const debug = require("./debug.gs").debug;
-const getMatchingJiraField = require("./jiraCommon.gs").getMatchingJiraField;
+const getMatchingJiraField = require("src/models/jira/IssueFields.gs").getMatchingJiraField;
 const extend = require("./jsLib.gs").extend;
 const IssueTransitioner = require('./jiraIssueStatusUpdates/issueTransitioner.gs');
 // End of Node required code block
