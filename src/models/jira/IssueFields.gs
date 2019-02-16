@@ -121,6 +121,40 @@ function getMatchingJiraField(listOfValidJiraFields, fieldName) {
  }
 }
 
+
+var CUSTOMFIELD_FORMAT_RAW    = 1;
+var CUSTOMFIELD_FORMAT_SEARCH = 2;
+var CUSTOMFIELD_FORMAT_UNIFY  = 3;
+
+/**
+ * @desc Convert stored custom fields in different prepared format.
+ * @param format {Integer}
+ * @return {Object}
+ */
+function getCustomFields( format ) {
+  format = format || CUSTOMFIELD_FORMAT_RAW;
+  var customFields = UserStorage.getValue('favoriteCustomFields') || [];
+  var fieldsFormatted = {};
+
+  if ( format === CUSTOMFIELD_FORMAT_RAW ) {
+    return customFields;
+  }
+
+  if ( format === CUSTOMFIELD_FORMAT_SEARCH ) {
+    customFields.forEach(function(el) {
+      fieldsFormatted[el.key] = el.name;
+    });
+  }
+
+  if ( format === CUSTOMFIELD_FORMAT_UNIFY ) {
+    customFields.forEach(function(el) {
+      fieldsFormatted[el.key] = el.type;
+    });
+  }
+
+  return fieldsFormatted;
+}
+
 // Node required code block
 module.exports = {
   getMatchingJiraField:getMatchingJiraField, 

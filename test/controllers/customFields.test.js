@@ -1,21 +1,21 @@
-jiraApiMock = require('./mocks/mockJiraApi.js');
-debug = require("../src/debug.gs").debug;
-PropertiesService = require('./mocks/PropertiesService');
-global.environmentConfiguration = require('../src/environmentConfiguration.gs');
-const UserStorage = require("../src/UserStorage.gs").UserStorage;
-global.EpicField = require("../src/models/jira/EpicField.gs");
+jiraApiMock = require('test/mocks/mockJiraApi.js');
+debug = require("src/debug.gs").debug;
+PropertiesService = require('test/mocks/PropertiesService');
+global.environmentConfiguration = require('src/environmentConfiguration.gs');
+const UserStorage = require("src/UserStorage.gs").UserStorage;
+global.EpicField = require("src/models/jira/EpicField.gs");
 
 beforeEach(() =>  {
     debug.enable(true);
     jest.resetModules();
-    jiraApiMock = require('./mocks/mockJiraApi.js');
+    jiraApiMock = require('test/mocks/mockJiraApi.js');
     jiraApiMock.resetMocks();
 });
 
 test("Custom fields should be returned", () => {
   jiraApiMock.setNextJiraResponse(200,"field",mockFieldJiraApiResponse);
-  var fetchCustomFields = require('../src/customFields.gs').fetchCustomFields;
-  var customFields = fetchCustomFields();
+  var callbackFetchCustomFields = require('src/controllers/customFields.gs').callbackFetchCustomFields;
+  var customFields = callbackFetchCustomFields();
   // fields returned should only have custom fields from the mock data
   expect(customFields.length).toBe(6);
   // sorted correctly?

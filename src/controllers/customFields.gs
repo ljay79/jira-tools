@@ -1,48 +1,42 @@
-// Node required code block
-const debug = require("./debug.gs").debug;
-const EpicField = require("./models/jira/EpicField.gs");
-const UserStorage = require("./UserStorage.gs").UserStorage;
+/** 
+ * Controller file for setting and reading the users selects custom fields 
+ */
+
+ // Node required code block
+const debug = require("src/debug.gs").debug;
+const EpicField = require("src/models/jira/EpicField.gs");
+const UserStorage = require("src/UserStorage.gs").UserStorage;
 const getAllJiraFields = require("src/models/jira/IssueFields.gs").getAllJiraFields;
 // End of Node required code block
 
-var CUSTOMFIELD_FORMAT_RAW    = 1;
-var CUSTOMFIELD_FORMAT_SEARCH = 2;
-var CUSTOMFIELD_FORMAT_UNIFY  = 3;
+
+/* Dialog: Custom Fields */
 
 /**
- * @desc Convert stored custom fields in different prepared format.
- * @param format {Integer}
- * @return {Object}
+ * @desc Dialog to configure Jira custom fields
  */
-function getCustomFields( format ) {
-  format = format || CUSTOMFIELD_FORMAT_RAW;
-  var customFields = UserStorage.getValue('favoriteCustomFields') || [];
-  var fieldsFormatted = {};
+function menuCustomFields() {
+  if (!hasSettings(true)) return;
 
-  if ( format === CUSTOMFIELD_FORMAT_RAW ) {
-    return customFields;
-  }
+  var dialog = getDialog('views/dialogs/customFields', {favoriteCustomFields: (UserStorage.getValue('favoriteCustomFields') || [])});
 
-  if ( format === CUSTOMFIELD_FORMAT_SEARCH ) {
-    customFields.forEach(function(el) {
-      fieldsFormatted[el.key] = el.name;
-    });
-  }
+  dialog
+    .setWidth(480)
+    .setHeight(460)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
-  if ( format === CUSTOMFIELD_FORMAT_UNIFY ) {
-    customFields.forEach(function(el) {
-      fieldsFormatted[el.key] = el.type;
-    });
-  }
+  debug.log('Processed: %s', dialog);
 
-  return fieldsFormatted;
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'Configure Custom Fields');
 }
+
+/* Dialog: Custom Fields - END */
 
 /**
  * @desc Dialog Helper to retrieve list of all available Jira Custom Fields from api.
  * @return {Array}    Array of custom Jira Fields
  */
-function fetchCustomFields() {
+function callbackFetchCustomFields() {
   var customFields = [];
 
   var ok = function(_customFieldsRaw) {
@@ -90,29 +84,14 @@ function fetchCustomFields() {
  * @param jsonFormData {object}  JSON Form object of all form values
  * @return {object} Object({status: [boolean], response: [string]})
  */
-function saveCustomFields(jsonFormData) {
+function callbackSaveCustomFields(jsonFormData) {
   UserStorage.setValue('favoriteCustomFields', jsonFormData.favoriteCustomFields);
   debug.log("Saved favoriteCustomFields: %s", jsonFormData.favoriteCustomFields);
   return {status: true, message: 'Ok'};
 }
 
-/**
- * @desc Fetch list of all Jira fields (name and id) and show them in a sidebar.
- */
-function sidebarJiraFieldMap() {
-
-  var ok = function(fieldMap) {
-    sidebarFieldMap(fieldMap);
-  };
-
-  var error = function(msg) {
-    Browser.msgBox(msg, Browser.Buttons.OK);
-    debug.error(msg + " httpResp: %s", httpResp);
-  };
-
-  getAllJiraFields(ok,error);
-}
 
 // Node required code block
-module.exports = { fetchCustomFields: fetchCustomFields }
+module.exports = { callbackFetchCustomFields: callbackFetchCustomFields }
 // End of Node required code block
+

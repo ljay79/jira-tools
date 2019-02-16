@@ -162,52 +162,6 @@ function dialogTimesheet() {
 
 /* Dialog: Worklog - END */
 
-
-/* Dialog: Custom Fields */
-
-/**
- * @desc Dialog to configure Jira custom fields
- */
-function dialogCustomFields() {
-  if (!hasSettings(true)) return;
-
-  var dialog = getDialog('dialogCustomFields', {favoriteCustomFields: (UserStorage.getValue('favoriteCustomFields') || [])});
-
-  dialog
-    .setWidth(480)
-    .setHeight(460)
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-
-  debug.log('Processed: %s', dialog);
-
-  SpreadsheetApp.getUi().showModalDialog(dialog, 'Configure Custom Fields');
-}
-
-/* Dialog: Custom Fields - END */
-
-
-/* Sidebar: Field Map */
-
-/**
- * @desc Show sidebar with Jira field map listing
- * @param fieldMap {object}
- */
-function sidebarFieldMap(fieldMap) {
-  var dialog = getDialog('sidebarFieldMap', { fieldMap: fieldMap });
-
-  debug.log('Processed: %s', dialog);
-
-  var html = HtmlService.createHtmlOutput(dialog.getContent())
-    .setTitle('Jira Field Map')
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-    ;
-
-  SpreadsheetApp.getUi().showSidebar(html);
-}
-
-/* Sidebar: Field Map - END */
-
-
 /* Sidebar: Quick Menu */
 
 /**

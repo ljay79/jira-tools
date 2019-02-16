@@ -149,7 +149,7 @@
         google.script.run
           .withSuccessHandler(onResponse)
           .withFailureHandler(onResponse)
-          .saveCustomFields(formData);
+          .callbackSaveCustomFields(formData);
       }
       function onResponse(response) {
         var done = response.status === true;
@@ -168,7 +168,7 @@
 
       google.script.run
         .withSuccessHandler(onInitCustomFields)
-        .fetchCustomFields();
+        .callbackFetchCustomFields();
 
       form.addEventListener('submit', formSubmitHandler);
 

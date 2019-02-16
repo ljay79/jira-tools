@@ -46,10 +46,10 @@ function addMenu() {
     .addSeparator()
     .addItem('Update formulas in active sheet', 'recalcCustomFunctions')
     .addItem('Update issue key status "KEY-123 [Done]"', 'dialogRefreshTicketsIds')
-    .addItem('Jira field map', 'sidebarJiraFieldMap')
+    .addItem('Jira field map', 'menuJiraFieldMap')
     .addSeparator()
     .addItem('Settings', 'dialogSettings')
-    .addItem('Configure custom fields', 'dialogCustomFields')
+    .addItem('Configure custom fields', 'menuCustomFields')
     .addItem('About', 'dialogAbout');
 
     if (environmentConfiguration.features.updateJira.enabled) {
