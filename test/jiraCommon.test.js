@@ -1,3 +1,4 @@
+global.PropertiesService = require('./mocks/PropertiesService');
 jiraApiMock = require('./mocks/mockJiraApi.js');
 
 test("field validation", () => {

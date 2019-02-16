@@ -1,16 +1,13 @@
+// Node required code block
+const debug = require("./debug.gs").debug;
+const EpicField = require("./models/jira/EpicField.gs");
+const UserStorage = require("./UserStorage.gs").UserStorage;
+const getAllJiraFields = require("./jiraCommon.gs").getAllJiraFields;
+// End of Node required code block
+
 var CUSTOMFIELD_FORMAT_RAW    = 1;
 var CUSTOMFIELD_FORMAT_SEARCH = 2;
 var CUSTOMFIELD_FORMAT_UNIFY  = 3;
-
-// storage of custom Jira field 'EPIC'
-var fieldEpic = {
-  usable:    false,  // true|false
-  key:       'jst_epic',
-  name:      'Epic',
-  link_key:  null, // customfield_10003
-  label_key: null  // customfield_10005
-};
-
 
 /**
  * @desc Convert stored custom fields in different prepared format.
@@ -46,44 +43,11 @@ function getCustomFields( format ) {
  * @return {Array}    Array of custom Jira Fields
  */
 function fetchCustomFields() {
-  var method = "field", _customFieldsRaw = [], customFields = [];
+  var customFields = [];
 
-  var ok = function(respData, httpResp, status) {
-    if(respData) {
-      debug.log("Response of fetchCustomFields(); respData: %s", respData);
-
-      // reset custom epic field
-      UserStorage.setValue('jst_epic', fieldEpic);
-
-      var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
-
-      // add data to export
-      _customFieldsRaw.push.apply(_customFieldsRaw, respData.map(function(cField) {
-        var _type = (cField.schema ? cField.schema.type : null) || null;
-        if(cField.schema && cField.schema.items) {
-          _type += '|' + cField.schema.items;
-        }
-
-        // EPIC customization
-        if (cField.schema && cField.schema.custom) {
-          if (cField.schema.custom.indexOf(':gh-epic-link') > -1) {
-            fieldEpic.link_key = cField.key || cField.id;
-          }
-          if (cField.schema.custom.indexOf(':gh-epic-label') > -1) {
-            fieldEpic.label_key = cField.key || cField.id;
-          }
-        }
-
-        return {
-          key:        cField.key || cField.id, // Server API returns ".id" only while Cloud returns both with same value
-          name:       cField.name,
-          custom:     cField.custom,
-          schemaType: _type,
-          supported:  (arrSupportedTypes.indexOf(_type) > -1)
-        };
-      }) )
+  var ok = function(_customFieldsRaw) {
       // sorting by supported type and name
-      && _customFieldsRaw.sort(function(a, b) {
+      _customFieldsRaw.sort(function(a, b) {
         var keyA = (a.supported ? '0' : '1') + a.name.toLowerCase();
         var keyB = (b.supported ? '0' : '1') + b.name.toLowerCase();
 
@@ -96,49 +60,27 @@ function fetchCustomFields() {
       ;
 
       // remove non custom fields
-      _customFieldsRaw = _customFieldsRaw.filter(function(el) { 
+      customFields = _customFieldsRaw.filter(function(el) { 
         return el.custom
       });
 
-      customFields = _customFieldsRaw.map(function(el) { 
-        return {
-          key:        el.key,
-          name:       el.name,
-          type:       el.schemaType,
-          supported:  el.supported
-        };
-      });
-
       // EPIC usable?
-      if (fieldEpic.link_key != null && fieldEpic.label_key != null) {
-        fieldEpic.usable = true;
-        UserStorage.setValue('jst_epic', fieldEpic);
+      if (EpicField.isUsable()) {
 
         // add custom field 'Epic' to beginning of array
         customFields.unshift({
-          key:        fieldEpic.key,
-          name:       fieldEpic.name,
+          key:        EpicField.getKey(),
+          name:       EpicField.getName(),
           type:       'jst_epic',
           supported:  true
         });
       }
-
-    } else {
-      // Something funky is up with the JSON response.
-      debug.warn("Failed to retrieve Jira Custom Fields with status [" + status + "]; httpResp: %s", httpResp);
-    }
   };
 
-  var error = function(respData, httpResp, status) {
-    debug.error("Failed to retrieve Jira Custom Fields with status [" + status + "]!\\n" + respData.errorMessages.join("\\n") + " httpResp: %s", httpResp);
+  var error = function(message) {
+    debug.error(message);
   };
-
-  var request = new Request();
-
-  request.call(method)
-    .withSuccessHandler(ok)
-    .withFailureHandler(error);
-
+  getAllJiraFields(ok, error);
   return customFields;
 }
 
@@ -170,3 +112,7 @@ function sidebarJiraFieldMap() {
 
   getAllJiraFields(ok,error);
 }
+
+// Node required code block
+module.exports = { fetchCustomFields: fetchCustomFields }
+// End of Node required code block
