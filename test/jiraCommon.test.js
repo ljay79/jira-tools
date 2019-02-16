@@ -130,7 +130,7 @@ test("Get all fields from Jira", () => {
     
     const successCallBack =jest.fn();
     const errorCallBack =jest.fn();
-    getAllJiraFields(successCallBack,errorCallBack);
+    var result = getAllJiraFields(successCallBack,errorCallBack);
     expect(successCallBack.mock.calls.length).toBe(1);
     expect(errorCallBack.mock.calls.length).toBe(0);
     var fieldListReturned = successCallBack.mock.calls[0][0];
@@ -138,6 +138,7 @@ test("Get all fields from Jira", () => {
     expect(fieldListReturned[0].key).toBe("abc");
     expect(fieldListReturned[1].key).toBe("def");
     expect(fieldListReturned[2].key).toBe("xyz");
+    expect(result).toBe(fieldListReturned);
 
     successCallBack.mockClear();
     errorCallBack.mockClear();
@@ -146,9 +147,10 @@ test("Get all fields from Jira", () => {
         callback({errorMessages:["mocked error"]},404,false); 
         return jiraApiMock});
 
-    getAllJiraFields(successCallBack,errorCallBack);
+    var result = getAllJiraFields(successCallBack,errorCallBack);
     expect(successCallBack.mock.calls.length).toBe(0);
     expect(errorCallBack.mock.calls.length).toBe(1);
+    expect(result.length).toBe(0);
 });
 
 test("Call to retrieve an issues status", function() {
