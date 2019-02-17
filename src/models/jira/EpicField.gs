@@ -1,6 +1,6 @@
 // Node required code block
 const copyObject = require('../../jsLib.gs').copyObject;
-const UserStorage = require("../../UserStorage.gs").UserStorage;
+const UserStorage = require("src/models/gas/UserStorage.gs");
 // End of Node required code block
 
 /**
@@ -8,11 +8,12 @@ const UserStorage = require("../../UserStorage.gs").UserStorage;
  */
 EpicField = (function () {
 
+  var EPIC_KEY = 'jst_epic';
   // default fields for epic storage
   function _getDefault() {
     return {
       usable: false,  // true|false
-      key: 'jst_epic',
+      key: EPIC_KEY,
       name: 'Epic',
       link_key: null, // customfield_10003
       label_key: null  // customfield_10005
@@ -34,7 +35,7 @@ EpicField = (function () {
     _epicField.usable = false;
     if (_epicField.link_key != null && _epicField.label_key != null) {
       _epicField.usable = true;
-      UserStorage.setValue('jst_epic', _epicField);
+      UserStorage.setValue(EPIC_KEY, _epicField);
     }
   };
 
@@ -48,7 +49,7 @@ EpicField = (function () {
     },
     resetValue: function() {
       _epicField = _getDefault();
-      UserStorage.setValue('jst_epic', _epicField);
+      UserStorage.setValue(EPIC_KEY, _epicField);
     },
     isUsable: function() {
       _init();
@@ -81,9 +82,10 @@ EpicField = (function () {
       return _epicField.name;
     }, 
     reset: function() {
-      UserStorage.removeValue('jst_epic');
+      UserStorage.removeValue(EPIC_KEY);
       _epicField = null
-    }
+    },
+    EPIC_KEY: EPIC_KEY
   }
 })();
 

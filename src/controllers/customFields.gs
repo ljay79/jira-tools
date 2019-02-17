@@ -5,8 +5,8 @@
  // Node required code block
 const debug = require("src/debug.gs").debug;
 const EpicField = require("src/models/jira/EpicField.gs");
-const UserStorage = require("src/UserStorage.gs").UserStorage;
-const getAllJiraFields = require("src/models/jira/IssueFields.gs").getAllJiraFields;
+const UserStorage = require("src/models/gas/UserStorage.gs");
+const getAllCustomJiraFields = require("src/models/jira/IssueFields.gs").getAllCustomJiraFields;
 // End of Node required code block
 
 
@@ -38,45 +38,45 @@ function menuCustomFields() {
  */
 function callbackFetchCustomFields() {
   var customFields = [];
-
-  var ok = function(_customFieldsRaw) {
+  var ok = function(customFieldsUnsorted) {
+    customFields = customFieldsUnsorted;
       // sorting by supported type and name
-      _customFieldsRaw.sort(function(a, b) {
-        var keyA = (a.supported ? '0' : '1') + a.name.toLowerCase();
-        var keyB = (b.supported ? '0' : '1') + b.name.toLowerCase();
-
-        if (keyA < keyB)
-          return -1;
-        if (keyA > keyB)
-          return 1;
-        return 0;
-      })
-      ;
-
-      // remove non custom fields
-      customFields = _customFieldsRaw.filter(function(el) { 
-        return el.custom
-      });
-
-      // EPIC usable?
-      if (EpicField.isUsable()) {
-
-        // add custom field 'Epic' to beginning of array
-        customFields.unshift({
-          key:        EpicField.getKey(),
-          name:       EpicField.getName(),
-          type:       'jst_epic',
-          supported:  true
-        });
-      }
+    customFields.sort(sortCustomFields_);
   };
 
   var error = function(message) {
     debug.error(message);
   };
-  getAllJiraFields(ok, error);
+  getAllCustomJiraFields(ok, error);
+
   return customFields;
 }
+
+/**
+ * Sorts the fields into the presentation order
+ * Epic field first
+ * Supported fields in alphabetical order
+ * Non- supported fields in alphabetical order
+ * @param a field to compare
+ * @param b field to compare
+ */
+function sortCustomFields_(a, b) {
+    // epic field at the top
+    if (a.key ==  EpicField.EPIC_KEY) {
+      return -1;
+    }
+    if (b.key ==  EpicField.EPIC_KEY) {
+      return 1;
+    }
+    // supported fields first then use alphabetical order.
+    var keyA = (a.supported ? '0' : '1') + a.name.toLowerCase();
+    var keyB = (b.supported ? '0' : '1') + b.name.toLowerCase();
+    if (keyA < keyB)
+      return -1;
+    if (keyA > keyB)
+      return 1;
+    return 0;
+  }
 
 /**
  * @desc Form handler for dialogCustomFields.

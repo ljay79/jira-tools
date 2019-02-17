@@ -67,16 +67,4 @@ function getDataForJiraUpdateFromSheet_() {
   return result;
 }
 
-/**
- * Finds the list of valid JIRA fields which can be edited
- * @returns {array} an array of built in and user selected custom fields
- */
-function getValidFieldsToEditJira_() {
-  var validFields = {};
-  var userSelectedcustomFields = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
-  var systemFields = ISSUE_COLUMNS;
-  validFields = extend(validFields, userSelectedcustomFields);
-  validFields = extend(validFields, systemFields);
-  return validFields;
-}
 /* Dialog: Update Fields in Jira Issues from Spreadsheet - END */

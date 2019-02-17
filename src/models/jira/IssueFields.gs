@@ -1,10 +1,12 @@
 /**
  * Model class for interactions with JIRA fields
+ * @todo Currently this just contains all of the functions used across the code base - needs to be factored into a class
  */
 
 // Node required code block
 const Request = require('src/jiraApi.gs');
 const EpicField = require("src/models/jira/EpicField.gs");
+const UserStorage = require("src/models/gas/UserStorage.gs");
 // End of Node required code block
 
 
@@ -61,7 +63,7 @@ function getAllJiraFields(successCallBack, errorCallBack) {
    if (!respData) {
      error(respData, httpResp, status);
    }
-   // reset custom epic field
+   // reset custom epic field 
    EpicField.resetValue();
 
    fieldMap.push.apply(fieldMap, respData.map(convertJiraFieldResponseToFieldRecord))
@@ -99,6 +101,50 @@ function getAllJiraFields(successCallBack, errorCallBack) {
 
  return fieldMap;
 }
+
+ /**
+  * Returns all custom fields from the Jira Instance including the EpicField
+  * @param successCallBack  - call back function if the list is retrieved succesfully
+  * @param errorCallBack - call back if there is an error
+  */
+function getAllCustomJiraFields(successCallBack, errorCallBack) {
+  console.log("getAllCustomJiraFields");
+
+  var customFields = [];
+
+  var error = function(message) {
+    console.log("error function getAllJiraFields");
+    if (errorCallBack != null) {
+      errorCallBack(message);
+    }
+  };
+
+  var ok = function(allFields) {
+    console.log("ok function getAllJiraFields");
+
+    // remove non custom fields
+    customFields = allFields.filter(function (el) {
+      return el.custom;
+    });
+    // EPIC usable?
+    if (EpicField.isUsable()) {
+      // add custom field 'Epic' to beginning of array
+      customFields.unshift({
+        key: EpicField.getKey(),
+        name: EpicField.getName(),
+        type: EpicField.EPIC_KEY,
+        supported: true
+      });
+    }
+    if (successCallBack != null) {
+      successCallBack(customFields);
+    }
+  }
+  console.log("calling getAllJiraFields");
+  getAllJiraFields(ok, error);
+  return customFields;
+};
+
 
 /**
 * Looks through an array of valid JIRA fields and finds the best matching one
@@ -155,10 +201,99 @@ function getCustomFields( format ) {
   return fieldsFormatted;
 }
 
+
+
+/**
+ * @desc Return table header title for issue property
+ * @param header {string}  Property key name to get header title for
+ * @return {string}
+ */
+function headerNames(header) {
+  var label, labels = ISSUE_COLUMNS;
+  extend(labels, {
+    key: 'Key',
+    issuetype: 'Type',
+    duedate: 'Due',
+    priority: 'P',
+  });
+
+  // append favorite custom fields
+  extend(labels, getCustomFields(CUSTOMFIELD_FORMAT_SEARCH));
+
+  // custom epic
+  var epicField = UserStorage.getValue('jst_epic');
+  if (epicField.usable === true) {
+    labels[epicField.link_key] = 'Epic';
+  }
+  
+  if( !labels.hasOwnProperty(header) ) {
+    label = camelize(header);
+  } else {
+    label = labels[header];
+  }
+
+  return label;
+}
+
+
+/**
+ * Finds the list of valid JIRA fields which can be edited
+ * @returns {array} an array of built in and user selected custom fields
+ */
+function getValidFieldsToEditJira_() {
+  var validFields = {};
+  var userSelectedcustomFields = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
+  var systemFields = ISSUE_COLUMNS;
+  validFields = extend(validFields, userSelectedcustomFields);
+  validFields = extend(validFields, systemFields);
+  return validFields;
+}
+
+// Jira issue fields/columns
+// Sorting of definition below is applied as sorting for IssueTable
+var ISSUE_COLUMNS = {
+  summary: 'Summary',
+  project: 'Project',
+  issuetype: 'Issue Type',
+  priority: 'Priority',
+  status: 'Status',
+  labels: 'Labels',
+  components: 'Components',
+  description: 'Description',
+  assignee: 'Assignee',
+  creator: 'Creator',
+  reporter: 'Reporter',
+  environment: 'Environment',
+  fixVersions: 'Fix Version',
+  duedate: 'Due',
+  resolutiondate: 'Resolved',
+  created: 'Created',
+  updated: 'Updated',
+  resolution: 'Resolution',
+  timespent: 'Time spent',
+  timeestimate: 'Estimate', // remaining
+  timeoriginalestimate: 'Original estimate',
+  aggregatetimespent: 'Aggregate Time Spent',
+  aggregatetimeestimate: 'Aggregate Time Estimate',
+  aggregateprogress: 'Aggregate Progress',
+  progress: 'Progress',
+  lastViewed: 'Last Viewed',
+  votes: 'Votes',
+  watches: 'Watchers',
+  workratio: 'Work Ratio'
+  //subtasks:[{"id":"33351","key":"FF24-229","self":"...atlassian.net/rest/api/2/issue/33351","fields":{"summary":"QA - Feedback","status":{"self":"....atlassian.net/rest/api/2/status/6","description":"The issue is considered finished, the resolution is correct. Issues which are closed can be reopened.","iconUrl":"https://dyhltd.atlassian.net/images/icons/statuses/closed.png","name":"Closed","id":"6","statusCategory":{"self":"https://dyhltd.atlassian.net/rest/api/2/statuscategory/3","id":3,"key":"done","colorName":"green","name":"Done"}},"priority":{"self":"https://dyhltd.atlassian.net/rest/api/2/priority/1","iconUrl":"https://dyhltd.atlassian.net/images/icons/priorities/highest.svg","name":"Highest","id":"1"},"issuetype":{"self":"https://dyhltd.atlassian.net/rest/api/2/issuetype/10003","id":"10003","description":"The sub-task of the issue","iconUrl":"https://dyhltd.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype","name":"Sub-task","subtask":true,"avatarId":10316}}}]
+  //versions: [{"self": "https://dyhltd.atlassian.net/rest/api/2/version/14021","id": "14021","description": "","name": "Loan - Release v2.0.17","archived": false,"released": true,"releaseDate": "2018-03-21"}]
+  //aggregatetimeoriginalestimate: 288000
+};
+
+
 // Node required code block
 module.exports = {
   getMatchingJiraField:getMatchingJiraField, 
   getAllJiraFields:getAllJiraFields, 
+  getAllCustomJiraFields:getAllCustomJiraFields,
   convertJiraFieldResponseToFieldRecord:convertJiraFieldResponseToFieldRecord
 };
 // End of Node required code block
+
+

@@ -1,5 +1,7 @@
 global.PropertiesService = require('test/mocks/PropertiesService');
 jiraApiMock = require('test/mocks/mockJiraApi.js');
+const UserStorage = require("src/models/gas/UserStorage.gs");
+global.EpicField = require("src/models/jira/EpicField.gs");
 
 test("field validation", () => {
     var fieldList = [
@@ -151,4 +153,67 @@ test("Get all fields from Jira", () => {
     expect(successCallBack.mock.calls.length).toBe(0);
     expect(errorCallBack.mock.calls.length).toBe(1);
     expect(result.length).toBe(0);
+});
+
+
+test("Get all custom fields from Jira", () => {
+  var fieldList = [
+      {
+          schema:{type:"string"},
+          key: "xyz",
+          name: "XYZ field",
+          custom: false
+      },
+      {
+          schema:{type:"a custom field not recognised"},
+          key: "abc",
+          name: "ABC field",
+          custom: true
+      },
+      {
+          schema:{type:"string"},
+          id: "def",
+          name: "DEF field",
+          custom: true
+      },
+      {
+        "id": "Epic_link_key",
+        "name": "Epic Link",
+        "custom": true,
+        "schema": {
+          "custom": ":gh-epic-link",
+          "type": "string",
+          "system": "description"
+        }
+      },
+      {
+        "id": "Epic_label_key",
+        "name": "Epic Label",
+        "custom": true,
+        "schema": {
+          "custom": ":gh-epic-label",
+          "type": "string",
+          "system": "description"
+        }
+      }
+  ];
+  //set up
+  jiraApiMock.setNextJiraResponse(200,"field",fieldList);
+  const getAllCustomJiraFields = require("src/models/jira/IssueFields.gs").getAllCustomJiraFields;
+  const successCallBack =jest.fn();
+  const errorCallBack =jest.fn();
+
+  // execute
+  var result = getAllCustomJiraFields(successCallBack,errorCallBack);
+  // verify call backs
+  expect(successCallBack.mock.calls.length).toBe(1);
+  expect(errorCallBack.mock.calls.length).toBe(0);
+  // verify results
+  var fieldListReturned = successCallBack.mock.calls[0][0];
+  expect(fieldListReturned.length).toBe(5);
+  expect(fieldListReturned[0].key).toBe("jst_epic");
+  expect(fieldListReturned[1].key).toBe("abc");
+  expect(fieldListReturned[2].key).toBe("def");
+  expect(result).toBe(fieldListReturned);
+
 });

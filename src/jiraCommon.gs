@@ -9,42 +9,6 @@ var CELLTYPE_EMPTY = -1;
 var CELLTYPE_JIRAID = 10; // entire cell includes Jira ticket id only ("JIRA-123" or "JIRA-123 [Status]")
 var CELLTYPE_TEXT = 20;  // Jira ticket id is within text ("lorem ipsum JIRA-123 [Status] dolores")
 
-// Jira issue fields/columns
-// Sorting of definition below is applied as sorting for IssueTable
-var ISSUE_COLUMNS = {
-  summary: 'Summary',
-  project: 'Project',
-  issuetype: 'Issue Type',
-  priority: 'Priority',
-  status: 'Status',
-  labels: 'Labels',
-  components: 'Components',
-  description: 'Description',
-  assignee: 'Assignee',
-  creator: 'Creator',
-  reporter: 'Reporter',
-  environment: 'Environment',
-  fixVersions: 'Fix Version',
-  duedate: 'Due',
-  resolutiondate: 'Resolved',
-  created: 'Created',
-  updated: 'Updated',
-  resolution: 'Resolution',
-  timespent: 'Time spent',
-  timeestimate: 'Estimate', // remaining
-  timeoriginalestimate: 'Original estimate',
-  aggregatetimespent: 'Aggregate Time Spent',
-  aggregatetimeestimate: 'Aggregate Time Estimate',
-  aggregateprogress: 'Aggregate Progress',
-  progress: 'Progress',
-  lastViewed: 'Last Viewed',
-  votes: 'Votes',
-  watches: 'Watchers',
-  workratio: 'Work Ratio'
-  //subtasks:[{"id":"33351","key":"FF24-229","self":"...atlassian.net/rest/api/2/issue/33351","fields":{"summary":"QA - Feedback","status":{"self":"....atlassian.net/rest/api/2/status/6","description":"The issue is considered finished, the resolution is correct. Issues which are closed can be reopened.","iconUrl":"https://dyhltd.atlassian.net/images/icons/statuses/closed.png","name":"Closed","id":"6","statusCategory":{"self":"https://dyhltd.atlassian.net/rest/api/2/statuscategory/3","id":3,"key":"done","colorName":"green","name":"Done"}},"priority":{"self":"https://dyhltd.atlassian.net/rest/api/2/priority/1","iconUrl":"https://dyhltd.atlassian.net/images/icons/priorities/highest.svg","name":"Highest","id":"1"},"issuetype":{"self":"https://dyhltd.atlassian.net/rest/api/2/issuetype/10003","id":"10003","description":"The sub-task of the issue","iconUrl":"https://dyhltd.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype","name":"Sub-task","subtask":true,"avatarId":10316}}}]
-  //versions: [{"self": "https://dyhltd.atlassian.net/rest/api/2/version/14021","id": "14021","description": "","name": "Loan - Release v2.0.17","archived": false,"released": true,"releaseDate": "2018-03-21"}]
-  //aggregatetimeoriginalestimate: 288000
-};
 //@see storage.gs for jiraColumnDefault
 
 
@@ -580,38 +544,6 @@ function unifyIssueAttrib(attrib, data) {
   } catch (e) {}
   
   return resp;
-}
-
-/**
- * @desc Return table header title for issue property
- * @param header {string}  Property key name to get header title for
- * @return {string}
- */
-function headerNames(header) {
-  var label, labels = ISSUE_COLUMNS;
-  extend(labels, {
-    key: 'Key',
-    issuetype: 'Type',
-    duedate: 'Due',
-    priority: 'P',
-  });
-
-  // append favorite custom fields
-  extend(labels, getCustomFields(CUSTOMFIELD_FORMAT_SEARCH));
-
-  // custom epic
-  var epicField = UserStorage.getValue('jst_epic');
-  if (epicField.usable === true) {
-    labels[epicField.link_key] = 'Epic';
-  }
-  
-  if( !labels.hasOwnProperty(header) ) {
-    label = camelize(header);
-  } else {
-    label = labels[header];
-  }
-
-  return label;
 }
 
 /**

@@ -2,7 +2,7 @@ jiraApiMock = require('test/mocks/mockJiraApi.js');
 debug = require("src/debug.gs").debug;
 PropertiesService = require('test/mocks/PropertiesService');
 global.environmentConfiguration = require('src/environmentConfiguration.gs');
-const UserStorage = require("src/UserStorage.gs").UserStorage;
+const UserStorage = require("src/models/gas/UserStorage.gs");
 global.EpicField = require("src/models/jira/EpicField.gs");
 
 beforeEach(() =>  {

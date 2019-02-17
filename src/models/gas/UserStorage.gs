@@ -1,5 +1,5 @@
 // Node required code block
-const Storage_ = require('./Storage.gs').Storage_;
+const Storage_ = require('src/Storage.gs').Storage_;
 // End of Node required code block
 
 /**
@@ -49,7 +49,5 @@ var UserStorage = {
 
 
 // Node required code block
-module.exports = {
-  UserStorage: UserStorage
-};
+module.exports = UserStorage
 // End of Node required code block
