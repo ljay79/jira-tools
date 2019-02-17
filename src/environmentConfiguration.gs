@@ -5,7 +5,7 @@
 var environmentConfiguration = {
   "name": "Local",
   "description": "Local development environment",
-  "debugEnabled": false,
+  "debugEnabled": true,
   "features": {
     "updateJira": {
       "enabled": true
