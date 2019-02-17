@@ -113,7 +113,17 @@
 
       function inputValidatyHandler() {
         var validaty = true;
-        input.forEach(function(el) { return validaty && (validaty = el.nodeName !== 'INPUT' || el.value.length > 0); });
+        input.forEach(function(el) {
+          switch(el.name) {
+            case 'jira_url':
+              validaty = validaty && (el.value.indexOf('https://') !== -1);
+            break;
+            default:
+              validaty = validaty && (validaty = el.nodeName !== 'INPUT' || el.value.length > 0);
+            break;
+          }
+          return validaty;
+        });
         valid = validaty;
         action.disabled = valid ? false : 'disabled';
       }
@@ -132,7 +142,7 @@
       // deprecation notice
       document.getElementById('jira-url').addEventListener('focusout', function(e){
         if(this.value.indexOf('https://') == -1) {
-          showAlert('Security Warning' + "\n" + 'Using JIRA without SSL is deprecated. Make sure to use a URL starting with "https://".', false, 5000);
+          showAlert('Please use HTTPS for secure connection to your JIRA instance. URL must start with "https://".', false, 8000);
         }
       });
     </script>
