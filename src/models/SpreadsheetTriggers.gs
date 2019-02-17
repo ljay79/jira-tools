@@ -97,8 +97,8 @@ var SpreadsheetTriggers_ = {
 };
 
 
-//Node required code block
+// Node required code block
 module.exports = {
   SpreadsheetTriggers_: SpreadsheetTriggers_
 };
-//End of Node required code block
+// End of Node required code block
