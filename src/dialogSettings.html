@@ -117,10 +117,10 @@
           switch(el.name) {
             case 'jira_url':
               validaty = validaty && (el.value.indexOf('https://') !== -1);
-            break;
+              break;
             default:
               validaty = validaty && (validaty = el.nodeName !== 'INPUT' || el.value.length > 0);
-            break;
+              break;
           }
           return validaty;
         });
