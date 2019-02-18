@@ -68,7 +68,7 @@ test('camelize', () => {
 
   expect(jsLib.camelize("My Name")).toBe("myName");
   expect(jsLib.camelize("my name")).toBe("myName");
-  expect(jsLib.camelize("mY nAME")).toBe("mYNAME"); // Dubious results - is this expected?
+  expect(jsLib.camelize("My API handler")).toBe("myAPIHandler");
   expect(jsLib.camelize("My    name   is  ")).toBe("myNameIs"); 
   
 });
