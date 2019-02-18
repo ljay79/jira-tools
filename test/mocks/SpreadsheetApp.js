@@ -6,6 +6,7 @@ var ADDONMENU = {
 }
 var UI = {
   createAddonMenu : jest.fn().mockImplementation(()=> ADDONMENU),
+  showSidebar: jest.fn(),
   showModalDialog : jest.fn()
 }
 

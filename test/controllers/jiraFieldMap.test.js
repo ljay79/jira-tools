@@ -1,4 +1,6 @@
 jiraApiMock = require('test/mocks/mockJiraApi.js');
+HtmlService = require('test/mocks/HtmlService');
+SpreadsheetApp = require('test/mocks/SpreadsheetApp');
 debug = require("src/debug.gs").debug;
 PropertiesService = require('test/mocks/PropertiesService');
 global.environmentConfiguration = require('src/environmentConfiguration.gs');
@@ -6,43 +8,36 @@ const UserStorage = require("src/models/gas/UserStorage.gs");
 global.EpicField = require("src/models/jira/EpicField.gs");
 
 beforeEach(() =>  {
-    debug.enable(true);
     jest.resetModules();
     jiraApiMock = require('test/mocks/mockJiraApi.js');
     jiraApiMock.resetMocks();
 });
 
-test("Custom fields should be returned", () => {
+test("menuJiraFieldMap", () => {
+  const dialogCode = require("src/dialogs.gs");
+  dialogCode.getDialog = jest.fn().mockImplementation(()=> HtmlService.dialogMock);
   jiraApiMock.setNextJiraResponse(200,"field",mockFieldJiraApiResponse);
-  var callbackFetchCustomFields = require('src/controllers/customFields.gs').callbackFetchCustomFields;
-  var customFields = callbackFetchCustomFields();
-  // fields returned should only have custom fields from the mock data
-  expect(customFields.length).toBe(6);
-  // sorted correctly?
-  expect(customFields[0].name).toBe("Epic");
-  expect(customFields[1].name).toBe("Custom 0");
-  expect(customFields[2].name).toBe("Custom 1");
-  expect(customFields[3].name).toBe("Epic Label");
-  expect(customFields[4].name).toBe("Epic Link");
-  expect(customFields[5].name).toBe("AA Not Supported");
-  // correct fields should be set
-  expect(customFields[0].key).toBe("jst_epic");
-  expect(customFields[1].key).toBe("custom000");
-  expect(customFields[1].supported).toBe(true);
-  expect(customFields[1].schemaType).toBe("string");
-  expect(customFields[2].key).toBe("custom001");
-  expect(customFields[2].supported).toBe(true);
-  expect(customFields[2].schemaType).toBe("number");
-  expect(customFields[5].key).toBe("custom0ZZ");
-  expect(customFields[5].supported).toBe(false);
-  expect(customFields[5].schemaType).toBe("notsupported");
-  // epic should be set
-  var epicField = EpicField.getJson();
-  expect(epicField.key).toBe("jst_epic");
-  expect(epicField.name).toBe('Epic');
-  expect(epicField.link_key).toBe('Epic_link_key');
-  expect(epicField.label_key).toBe('Epic_label_key');
-  expect(epicField.usable).toBe(true);
+  var menuJiraFieldMap = require('src/controllers/jiraFieldMap.gs').menuJiraFieldMap;
+  menuJiraFieldMap();
+  expect(dialogCode.getDialog).toBeCalled();
+  expect(dialogCode.getDialog.mock.calls[0][0]).toBe('views/sidebar/fieldMap');
+  var params = dialogCode.getDialog.mock.calls[0][1];
+  expect(params.fieldMap).toBeDefined();
+  var fieldMap = params.fieldMap;
+  expect(fieldMap.length).toBe(mockFieldJiraApiResponse.length);
+  expect(fieldMap[0].key).toBe("custom0ZZ");
+  expect(fieldMap[1].key).toBe("custom000");
+  expect(fieldMap[2].key).toBe("custom001");
+  expect(fieldMap[3].key).toBe("description");
+  expect(fieldMap[4].key).toBe("Epic_label_key");
+  
+  expect(HtmlService.dialogMock.getContent).toBeCalled();
+  expect(HtmlService.createHtmlOutput).toBeCalled();
+  expect(HtmlService.htmlOutputMock.setTitle).toBeCalled();
+  expect(HtmlService.htmlOutputMock.setTitle.mock.calls[0][0]).toBe('Jira Field Map');
+  expect(HtmlService.htmlOutputMock.setSandboxMode).toBeCalled();
+  expect(HtmlService.htmlOutputMock.setSandboxMode.mock.calls[0][0]).toBe(HtmlService.SandboxMode.IFRAME);
+
 });
 
 

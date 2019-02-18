@@ -5,15 +5,8 @@ const hasSettings = require("../src/settings.gs").hasSettings;
 const debug = require("../src/debug.gs").debug;
 const Request = require('../src/jiraApi.gs');
 PropertiesService = require('./mocks/PropertiesService');
+Browser = require('./mocks/Browser');
 
-Browser = {
-  Buttons: {
-    OK: "OK"
-  },
-  msgBox: function (type, exception, button) {
-    debug.error("Browser.msgBox " + exception);
-  }
-};
 
 UrlFetchApp = {
   fetch: function () { }

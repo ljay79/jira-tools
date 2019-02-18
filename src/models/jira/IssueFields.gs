@@ -108,20 +108,15 @@ function getAllJiraFields(successCallBack, errorCallBack) {
   * @param errorCallBack - call back if there is an error
   */
 function getAllCustomJiraFields(successCallBack, errorCallBack) {
-  console.log("getAllCustomJiraFields");
-
   var customFields = [];
 
   var error = function(message) {
-    console.log("error function getAllJiraFields");
     if (errorCallBack != null) {
       errorCallBack(message);
     }
   };
 
   var ok = function(allFields) {
-    console.log("ok function getAllJiraFields");
-
     // remove non custom fields
     customFields = allFields.filter(function (el) {
       return el.custom;

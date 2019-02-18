@@ -24,6 +24,7 @@ var HtmlService = {
   // properties to access the mock objects
   templateMock: template,
   dialogMock: dialog,
+  htmlOutputMock: htmlOutput,
   // resets all the mocks ready for a new test
   resetMocks: function () {
     this.templateMock = {

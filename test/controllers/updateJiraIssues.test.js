@@ -4,6 +4,7 @@ PropertiesService = require('test/mocks/PropertiesService');
 global.environmentConfiguration = require('src/environmentConfiguration.gs');
 const UserStorage = require("src/models/gas/UserStorage.gs");
 global.EpicField = require("src/models/jira/EpicField.gs");
+global.Browser = require('test/mocks/Browser');
 
 beforeEach(() =>  {
     debug.enable(true);
@@ -12,38 +13,18 @@ beforeEach(() =>  {
     jiraApiMock.resetMocks();
 });
 
-test("Custom fields should be returned", () => {
+test("menuUpdateJiraIssues", () => {
   jiraApiMock.setNextJiraResponse(200,"field",mockFieldJiraApiResponse);
-  var callbackFetchCustomFields = require('src/controllers/customFields.gs').callbackFetchCustomFields;
-  var customFields = callbackFetchCustomFields();
-  // fields returned should only have custom fields from the mock data
-  expect(customFields.length).toBe(6);
-  // sorted correctly?
-  expect(customFields[0].name).toBe("Epic");
-  expect(customFields[1].name).toBe("Custom 0");
-  expect(customFields[2].name).toBe("Custom 1");
-  expect(customFields[3].name).toBe("Epic Label");
-  expect(customFields[4].name).toBe("Epic Link");
-  expect(customFields[5].name).toBe("AA Not Supported");
-  // correct fields should be set
-  expect(customFields[0].key).toBe("jst_epic");
-  expect(customFields[1].key).toBe("custom000");
-  expect(customFields[1].supported).toBe(true);
-  expect(customFields[1].schemaType).toBe("string");
-  expect(customFields[2].key).toBe("custom001");
-  expect(customFields[2].supported).toBe(true);
-  expect(customFields[2].schemaType).toBe("number");
-  expect(customFields[5].key).toBe("custom0ZZ");
-  expect(customFields[5].supported).toBe(false);
-  expect(customFields[5].schemaType).toBe("notsupported");
-  // epic should be set
-  var epicField = EpicField.getJson();
-  expect(epicField.key).toBe("jst_epic");
-  expect(epicField.name).toBe('Epic');
-  expect(epicField.link_key).toBe('Epic_link_key');
-  expect(epicField.label_key).toBe('Epic_label_key');
-  expect(epicField.usable).toBe(true);
+  var menuUpdateJiraIssues = require('src/controllers/updateJiraIssues.gs').menuUpdateJiraIssues;
+  menuUpdateJiraIssues();
 });
+
+test("menuUpdateJiraIssues", () => {
+  jiraApiMock.setNextJiraResponse(200,"field",mockFieldJiraApiResponse);
+  var callbackProcessIssuesFromSheet = require('src/controllers/updateJiraIssues.gs').callbackProcessIssuesFromSheet;
+  callbackProcessIssuesFromSheet();
+});
+
 
 
 var mockFieldJiraApiResponse = [

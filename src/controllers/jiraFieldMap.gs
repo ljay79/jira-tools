@@ -3,6 +3,13 @@
  * Controller for showing all jira fields in a sidenar
  */
 
+
+ // Node required code block
+
+const getAllJiraFields = require("src/models/jira/IssueFields.gs").getAllJiraFields;
+const getDialog = require("src/dialogs.gs").getDialog;
+// End of Node required code block
+
 /**
  * @desc Fetch list of all Jira fields (name and id) and show them in a sidebar.
  */
@@ -37,3 +44,9 @@ function sidebarFieldMap_(fieldMap) {
 
   SpreadsheetApp.getUi().showSidebar(html);
 }
+
+// Node required code block
+module.exports = {
+  menuJiraFieldMap :menuJiraFieldMap
+}
+// End of Node required code block

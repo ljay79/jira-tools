@@ -1,16 +1,21 @@
 
 /* Dialog: Update Fields in Jira Issues from Spreadsheet */
-/*
-* @desc Gets the selected cells in the spreadsheet and separates to headers and datarows
-* @return {object}
-*/
+
+
+ // Node required code block
+
+ //const getAllJiraFields = require("src/models/jira/IssueFields.gs").getAllJiraFields;
+ const hasSettings = require("src/settings.gs").hasSettings;
+ const getDialog = require("src/dialogs.gs").getDialog;
+ const extend = require("src/jsLib.gs").extend;
+ // End of Node required code block
 
 /**
  * Menu action to show the dialog for updating jira issues
  */
 function menuUpdateJiraIssues() {
   if (!hasSettings(true)) return;
-  var selectedData = getDataForJiraUpdateFromSheet_();
+  var selectedData = getDataForJiraUpdateFromSheet_();``
   var fieldsToUse = { "": "select a jira field...", issueKey: "Key" };
   fieldsToUse = extend(fieldsToUse, getValidFieldsToEditJira_());
   selectedData.allJiraFields = fieldsToUse;
@@ -68,3 +73,12 @@ function getDataForJiraUpdateFromSheet_() {
 }
 
 /* Dialog: Update Fields in Jira Issues from Spreadsheet - END */
+
+
+
+// Node required code block
+module.exports = {
+  callbackProcessIssuesFromSheet :callbackProcessIssuesFromSheet,
+  menuUpdateJiraIssues: menuUpdateJiraIssues
+}
+// End of Node required code block
