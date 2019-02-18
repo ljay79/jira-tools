@@ -36,6 +36,11 @@
       "<rootDir>/test"
     ],
     "modulePaths":
-    ["<rootDir>"]
+    ["<rootDir>"],
+    "moduleFileExtensions": 
+    ["gs","js"],
+    "collectCoverageFrom": [
+      "src/**/*.gs"
+    ]
   }
 }
