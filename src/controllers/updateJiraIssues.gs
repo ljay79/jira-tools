@@ -8,6 +8,8 @@
  const hasSettings = require("src/settings.gs").hasSettings;
  const getDialog = require("src/dialogs.gs").getDialog;
  const extend = require("src/jsLib.gs").extend;
+ const getTicketSheet = require("src/jiraCommon.gs").getTicketSheet;
+ const getValidFieldsToEditJira = require('src/models/jira/IssueFields').getValidFieldsToEditJira
  // End of Node required code block
 
 /**
@@ -17,9 +19,8 @@ function menuUpdateJiraIssues() {
   if (!hasSettings(true)) return;
   var selectedData = getDataForJiraUpdateFromSheet_();``
   var fieldsToUse = { "": "select a jira field...", issueKey: "Key" };
-  fieldsToUse = extend(fieldsToUse, getValidFieldsToEditJira_());
+  fieldsToUse = extend(fieldsToUse, getValidFieldsToEditJira());
   selectedData.allJiraFields = fieldsToUse;
-
   var readOnlyFields = { "Updated": true, "Issue Type": true, "Created": true };
   selectedData.readOnlyFields = readOnlyFields;
   var dialog = getDialog('views/dialogs/updateJiraIssues', selectedData);

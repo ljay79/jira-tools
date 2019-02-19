@@ -597,7 +597,8 @@ function getIssue(issueKey, fields) {
 // Node required code block
 module.exports = {
   getIssue: getIssue, 
-  unifyIssueAttrib: unifyIssueAttrib
+  unifyIssueAttrib: unifyIssueAttrib,
+  getTicketSheet: getTicketSheet
 };
 
 // End of Node required code block

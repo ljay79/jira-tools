@@ -7,6 +7,7 @@
 const Request = require('src/jiraApi.gs');
 const EpicField = require("src/models/jira/EpicField.gs");
 const UserStorage = require("src/models/gas/UserStorage.gs");
+const extend = require("src/jsLib.gs").extend;
 // End of Node required code block
 
 
@@ -135,7 +136,6 @@ function getAllCustomJiraFields(successCallBack, errorCallBack) {
       successCallBack(customFields);
     }
   }
-  console.log("calling getAllJiraFields");
   getAllJiraFields(ok, error);
   return customFields;
 };
@@ -235,7 +235,7 @@ function headerNames(header) {
  * Finds the list of valid JIRA fields which can be edited
  * @returns {array} an array of built in and user selected custom fields
  */
-function getValidFieldsToEditJira_() {
+function getValidFieldsToEditJira() {
   var validFields = {};
   var userSelectedcustomFields = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
   var systemFields = ISSUE_COLUMNS;
@@ -287,7 +287,8 @@ module.exports = {
   getMatchingJiraField:getMatchingJiraField, 
   getAllJiraFields:getAllJiraFields, 
   getAllCustomJiraFields:getAllCustomJiraFields,
-  convertJiraFieldResponseToFieldRecord:convertJiraFieldResponseToFieldRecord
+  convertJiraFieldResponseToFieldRecord:convertJiraFieldResponseToFieldRecord,
+  getValidFieldsToEditJira: getValidFieldsToEditJira
 };
 // End of Node required code block
 
