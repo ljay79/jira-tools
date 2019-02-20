@@ -3,6 +3,7 @@
 var debug = require("src/debug.gs").debug;
 global.environmentConfiguration = require('src/environmentConfiguration.gs');
 const Request = require('src/jiraApi.gs');
+const EpicField = require("src/models/jira/EpicField.gs");
 // End of Node required code block
 
 /**
@@ -36,9 +37,10 @@ function IssueSearch(searchQuery) {
     if(aFields.constructor == Array) {
       fields = aFields;
       // has custom Epic field 'jst_epic'?
-      if (fields.indexOf('jst_epic') > -1) {
-        var epicField = UserStorage.getValue('jst_epic');
-        if(epicField.link_key) fields.push(epicField.link_key);
+      if (fields.indexOf(EpicField.EPIC_KEY) > -1) {
+        if(EpicField.isUsable()) {
+          fields.push(EpicField.getLinkKey());
+        }
       }
     } else {
       throw '{aFields} is not an Array.';
