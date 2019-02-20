@@ -8,6 +8,7 @@ const Request = require('src/jiraApi.gs');
 const EpicField = require("src/models/jira/EpicField.gs");
 const UserStorage = require("src/models/gas/UserStorage.gs");
 const extend = require("src/jsLib.gs").extend;
+const camelize = require('src/jsLib.gs').camelize;
 // End of Node required code block
 
 
@@ -176,7 +177,8 @@ function getCustomFields( format ) {
   format = format || CUSTOMFIELD_FORMAT_RAW;
   var customFields = UserStorage.getValue('favoriteCustomFields') || [];
   var fieldsFormatted = {};
-
+  // TODO: this code branch appears unnessaruy
+  // getCustomFields is not called without a parameter or with CUSTOMFIELD_FORMAT_RAW
   if ( format === CUSTOMFIELD_FORMAT_RAW ) {
     return customFields;
   }
@@ -284,11 +286,13 @@ var ISSUE_COLUMNS = {
 
 // Node required code block
 module.exports = {
+  getCustomFields: getCustomFields,
   getMatchingJiraField:getMatchingJiraField, 
   getAllJiraFields:getAllJiraFields, 
   getAllCustomJiraFields:getAllCustomJiraFields,
   convertJiraFieldResponseToFieldRecord:convertJiraFieldResponseToFieldRecord,
-  getValidFieldsToEditJira: getValidFieldsToEditJira
+  getValidFieldsToEditJira: getValidFieldsToEditJira,
+  headerNames: headerNames
 };
 // End of Node required code block
 

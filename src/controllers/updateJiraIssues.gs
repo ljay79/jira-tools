@@ -9,7 +9,7 @@
  const getDialog = require("src/dialogs.gs").getDialog;
  const extend = require("src/jsLib.gs").extend;
  const getTicketSheet = require("src/jiraCommon.gs").getTicketSheet;
- const getValidFieldsToEditJira = require('src/models/jira/IssueFields').getValidFieldsToEditJira
+ const getValidFieldsToEditJira = require('src/models/jira/IssueFields.gs').getValidFieldsToEditJira
  // End of Node required code block
 
 /**

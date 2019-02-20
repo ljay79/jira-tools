@@ -217,3 +217,41 @@ test("Get all custom fields from Jira", () => {
   expect(result).toBe(fieldListReturned);
 
 });
+
+test("headerNames",() => {
+  const headerNames = require("src/models/jira/IssueFields.gs").headerNames;
+  PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
+    return JSON.stringify([
+      {key:"custom1",name:"Custom 1"},
+      {key:"custom2",name:"Custom 2"}
+    ] 
+    );
+  });
+  expect(headerNames("hello world")).toBe("helloWorld");
+  expect(headerNames("key")).toBe("Key");
+  expect(headerNames("summary")).toBe("Summary");
+  expect(headerNames("custom1")).toBe("Custom 1");
+  expect(headerNames("custom2")).toBe("Custom 2");
+})
+
+
+test("getCustomFields",() => {
+  PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
+    return JSON.stringify([
+      {key:"custom1",name:"Custom 1",type: "Type 1"},
+      {key:"custom2",name:"Custom 2",type: "Type 2"}
+    ] 
+    );
+  });
+  const getCustomFields = require("src/models/jira/IssueFields.gs").getCustomFields;
+  var result = getCustomFields();
+  expect(result.length).toBe(2);
+  expect(result[0]).toEqual({key:"custom1",name:"Custom 1",type: "Type 1"});
+  result = getCustomFields(0);
+  expect(result.length).toBe(2);
+  expect(getCustomFields(1)).toEqual([
+    {key:"custom1",name:"Custom 1",type: "Type 1"},
+    {key:"custom2",name:"Custom 2",type: "Type 2"}
+  ] 
+  );
+});

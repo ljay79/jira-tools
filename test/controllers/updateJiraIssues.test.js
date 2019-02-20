@@ -18,12 +18,13 @@ beforeEach(() =>  {
     jiraApiMock.resetMocks();
     jest.mock('src/settings.gs');
     settingsMock = require('src/settings.gs');
+    getValues.mockClear();
 });
 
 test("menuUpdateJiraIssues", () => {
   const dialogCode = require("src/dialogs.gs");
   dialogCode.getDialog = jest.fn().mockImplementation(()=> HtmlService.dialogMock);
-  jiraApiMock.setNextJiraResponse(200,"field",mockFieldJiraApiResponse);
+  //jiraApiMock.setNextJiraResponse(200,"field",mockFieldJiraApiResponse);
   var menuUpdateJiraIssues = require('src/controllers/updateJiraIssues.gs').menuUpdateJiraIssues;
   
   // no settings...
@@ -33,11 +34,21 @@ test("menuUpdateJiraIssues", () => {
   menuUpdateJiraIssues();
   // should have called hasSettings and done nothing else
   expect(settingsMock.hasSettings).toBeCalled();
-  settingsMock.hasSettings.mockImplementationOnce(() => {
+  expect(getValues).not.toBeCalled();
+  
+  settingsMock.hasSettings.mockImplementation(() => {
     return true;
   });
   // no values selected
-  getValues.mockImplementationOnce(() => [])
+  getValues.mockImplementationOnce(() => []);
+  PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
+    return JSON.stringify([
+      {key:"custom1",name:"Custom 1"},
+      {key:"custom2",name:"Custom 2"}
+    ]
+      
+    );
+  });
   menuUpdateJiraIssues();
   expect(settingsMock.hasSettings).toBeCalled();
   expect(dialogCode.getDialog).toBeCalled();
@@ -45,16 +56,73 @@ test("menuUpdateJiraIssues", () => {
   var params = dialogCode.getDialog.mock.calls[0][1];
   expect(params.headerFields).toBeDefined();
   expect(params.headerFields).toEqual({});
+  expect(params.dataRows).toBeDefined();
   expect(params.dataRows).toEqual([]);
-  /*setCfg('jira_url', "1");
-  setCfg('jira_username', "1");
-  setCfg('jira_password', "1");*/
+  expect(params.readOnlyFields).toBeDefined();
+  expect(params.readOnlyFields["Updated"]).toBeTruthy();
+  expect(params.readOnlyFields["Created"]).toBeTruthy();
+  expect(params.allJiraFields).toBeDefined();
+  expect(params.allJiraFields.summary).toBe("Summary");
+  expect(params.allJiraFields.custom1).toBe("Custom 1");
+  expect(params.allJiraFields.custom2).toBe("Custom 2");
+  expect(params.allJiraFields[""]).toBe("select a jira field...");
+  expect(params.allJiraFields.issueKey).toBe("Key");
+  expect(Object.keys(params.allJiraFields).length).toBeGreaterThan(5);
+
+  getValues.mockClear();
+  dialogCode.getDialog.mockClear();
+  getValues.mockImplementationOnce(() => [["a","b"]]);
+  menuUpdateJiraIssues();
+  expect(getValues).toBeCalled()
+  expect(dialogCode.getDialog).toBeCalled();;
+  var params = dialogCode.getDialog.mock.calls[0][1];
+  expect(params.headerFields).toBeDefined();
+  expect(params.headerFields).toEqual({"a":0,"b":1});
+  expect(params.dataRows).toBeDefined();
+  expect(params.dataRows).toEqual([]);
+  expect(params.readOnlyFields).toBeDefined();
+  expect(params.allJiraFields).toBeDefined();
+
+
+  getValues.mockClear();
+  getValues.mockImplementationOnce(() => [["a","","b"]]);
+  dialogCode.getDialog.mockClear();
+  menuUpdateJiraIssues();
+  expect(dialogCode.getDialog).toBeCalled();
+  var params = dialogCode.getDialog.mock.calls[0][1];
+  expect(params.headerFields).toBeDefined();
+  expect(params.headerFields).toEqual({"a":0,"b":2});
+  expect(params.dataRows).toBeDefined();
+  expect(params.dataRows).toEqual([]);
+  expect(params.readOnlyFields).toBeDefined();
+  expect(params.allJiraFields).toBeDefined();
+
+  getValues.mockClear();
+  getValues.mockImplementationOnce(() => [["a","","b"],["c","d","e"],["f","g","h"]]);
+  dialogCode.getDialog.mockClear();
+  menuUpdateJiraIssues();
+  expect(dialogCode.getDialog).toBeCalled();
+  var params = dialogCode.getDialog.mock.calls[0][1];
+  expect(params.headerFields).toBeDefined();
+  expect(params.headerFields).toEqual({"a":0,"b":2});
+  expect(params.dataRows).toBeDefined();
+  expect(params.dataRows.length).toBe(2);
+  expect(params.dataRows[0]).toEqual(["c","d","e"]);
+  expect(params.dataRows[1]).toEqual(["f","g","h"]);
+  expect(params.readOnlyFields).toBeDefined();
+  expect(params.allJiraFields).toBeDefined();
+
 });
 
 test("menuUpdateJiraIssues", () => {
-  jiraApiMock.setNextJiraResponse(200,"field",mockFieldJiraApiResponse);
+  //jiraApiMock.setNextJiraResponse(200,"field",mockFieldJiraApiResponse);
   var callbackProcessIssuesFromSheet = require('src/controllers/updateJiraIssues.gs').callbackProcessIssuesFromSheet;
   callbackProcessIssuesFromSheet();
+  settingsMock.hasSettings.mockImplementationOnce(() => {
+    return false;
+  });
+  expect(settingsMock.hasSettings).toBeCalled();
+  expect(getValues).not.toBeCalled();
 });
 
 
