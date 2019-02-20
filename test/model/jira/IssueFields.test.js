@@ -226,15 +226,19 @@ test("headerNames",() => {
   PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
     return JSON.stringify([
       {key:"custom1",name:"Custom 1"},
-      {key:"custom2",name:"Custom 2"}
+      {key:"custom2",name:"Custom 2"},
+      {key:"custom_epiclink",name:"Epic Link"}
     ] 
     );
   });
+  EpicField.setLinkKey("custom_epiclink");
+  EpicField.setLabelKey("not used");
   expect(headerNames("hello world")).toBe("helloWorld");
   expect(headerNames("key")).toBe("Key");
   expect(headerNames("summary")).toBe("Summary");
   expect(headerNames("custom1")).toBe("Custom 1");
   expect(headerNames("custom2")).toBe("Custom 2");
+  expect(headerNames("custom_epiclink")).toBe("Epic");
 })
 
 

@@ -218,9 +218,8 @@ function headerNames(header) {
   extend(labels, getCustomFields(CUSTOMFIELD_FORMAT_SEARCH));
 
   // custom epic
-  var epicField = UserStorage.getValue('jst_epic');
-  if (epicField.usable === true) {
-    labels[epicField.link_key] = 'Epic';
+  if (EpicField.isUsable()) {
+    labels[EpicField.getLinkKey()] = EpicField.getName();
   }
   
   if( !labels.hasOwnProperty(header) ) {

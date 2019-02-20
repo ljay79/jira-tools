@@ -1,7 +1,7 @@
 // Node required code block
 const Request = require('./jiraApi.gs');
 const debug = require('./debug.gs').debug;
-const EpicField = require("./models/jira/EpicField.gs");
+const EpicField = require("src/models/jira/EpicField.gs");
 const getCustomFields = require("src/models/jira/IssueFields.gs").getCustomFields;
 const CUSTOMFIELD_FORMAT_RAW = require("src/models/jira/IssueFields.gs").CUSTOMFIELD_FORMAT_RAW;
 const CUSTOMFIELD_FORMAT_SEARCH = require("src/models/jira/IssueFields.gs").CUSTOMFIELD_FORMAT_SEARCH;
@@ -269,15 +269,14 @@ function unifyIssueAttrib(attrib, data) {
   if ( attrib.substring(0, 12) == 'customfield_' ) {
     var customFields = getCustomFields(CUSTOMFIELD_FORMAT_UNIFY);
     // custom epic
-    var epicField = UserStorage.getValue('jst_epic');
-    if (epicField.usable === true) {
-      customFields[epicField.link_key] = 'jst_epic';
+    if (EpicField.isUsable()) {
+      customFields[EpicField.getLinkKey()] = EpicField.EPIC_KEY;
     }
 
     if (customFields.hasOwnProperty(attrib)) {
       var format = customFields[attrib];
       switch(format) {
-        case 'jst_epic':
+        case EpicField.EPIC_KEY:
           resp = {
             epic  : true,
             value : data.fields[attrib] || 'n/a',
