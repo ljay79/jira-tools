@@ -17,7 +17,7 @@
  */
 function menuUpdateJiraIssues() {
   if (!hasSettings(true)) return;
-  var selectedData = getDataForJiraUpdateFromSheet_();``
+  var selectedData = getDataForJiraUpdateFromSheet_();
   var fieldsToUse = { "": "select a jira field...", issueKey: "Key" };
   fieldsToUse = extend(fieldsToUse, getValidFieldsToEditJira());
   selectedData.allJiraFields = fieldsToUse;
