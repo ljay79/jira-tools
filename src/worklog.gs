@@ -135,7 +135,7 @@ function createWorklog(jsonFormData) {
 
   // Search API returns max 20 worklogs per issue - we have to get worklog 
   // indiv. per issue later in iterated requests - see onSuccess handler
-  var search = new Search(wlQuery);
+  var search = new IssueSearch(wlQuery);
   search.setOrderBy('created', 'DESC')
         .setFields(['id','key','issuetype','priority','status','summary']);
 

@@ -1,42 +1,9 @@
-/*function testSearch() {
-  var s = new Search('');
-  s.setOrderBy('updated', 'DESC')
-   .setFields(['summary', 'issuetype', 'priority', 
-		'status', 'updated', 'assignee', 
-		'duedate', 'project', 'customfield_11102'])
-    .setMaxResults(50)
-    .setMaxPerPage(10);
-
-  //var s = new Search('worklogDate>="2017-07-02" and worklogDate<="2017-07-11" and worklogAuthor="jrosemeier"');
-  //s.setOrderBy('updated', 'DESC')
-  // .setFields(['id','key','issuetype','project','status','summary']);
-  //
-  onSuccess = function(a,b,c) {
-    debug.log('%s', '----------ON SUCCESS-----------');
-    debug.log('%s %s %s', JSON.stringify(a), b, c);
-    debug.log('%s', '---------------------1');
-    
-    debug.log('AMOUNT: %s !', a.length);
-  };
-  onFailure = function(a,b,c) {
-    debug.log('%s', '----------ON FAILURE-----------');
-    debug.log('a:%s b:%s c:%s', a, b, c);
-    debug.log('%s', '---------------------1');
-  };
-  
-  s.search()
-    .withSuccessHandler(onSuccess)
-    .withFailureHandler(onFailure)
-  ;
-}*/
-
-
 /**
- * @desc Class 'Search' API abstraction with pagination handling.
+ * @desc Class 'IssueSearch' API abstraction with pagination handling.
  *       Performs a JQL POST search request to JIRA Rest API.
  * @param searchQuery {String}    JQL Query statement
  */
-function Search(searchQuery) {
+function IssueSearch(searchQuery) {
   var fields = ['key'],
       startAt = 0, maxResults = 1000, maxPerPage = 50,
       queryStr = searchQuery, orderBy = '', orderDir = 'ASC';
@@ -208,7 +175,7 @@ function Search(searchQuery) {
       var _maxPage  = Math.ceil((_total<maxResults?_total:maxResults) / maxPerPage);
       SpreadsheetApp.getActiveSpreadsheet().toast(".. fetching result page "+_currPage+" / " + _maxPage, "Progress", 5);
       
-      var subSearch = new Search( queryStr );
+      var subSearch = new IssueSearch( queryStr );
       subSearch.setOrderBy( orderBy, orderDir )
                .setFields( fields )
                .setMaxPerPage( maxPerPage )
@@ -269,3 +236,8 @@ function Search(searchQuery) {
   
   this.init();
 }
+
+
+// Node required code block
+module.exports = IssueSearch;
+// End of Node required code block

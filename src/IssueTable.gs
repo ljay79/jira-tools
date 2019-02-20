@@ -52,7 +52,7 @@ function insertIssuesFromFilter(jsonFormData) {
   var columns = jsonFormData['columns'] || jiraColumnDefault;
   UserStorage.setValue('userColumns', columns); //store for re-use by user
 
-  var search = new Search(jql);
+  var search = new IssueSearch(jql);
   search.setOrderBy()
         .setFields(columns)
         .setMaxResults(maxResults)
