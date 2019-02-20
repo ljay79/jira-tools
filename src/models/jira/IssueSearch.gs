@@ -1,3 +1,10 @@
+
+// Node required code block
+var debug = require("src/debug.gs").debug;
+global.environmentConfiguration = require('src/environmentConfiguration.gs');
+const Request = require('src/jiraApi.gs');
+// End of Node required code block
+
 /**
  * @desc Class 'IssueSearch' API abstraction with pagination handling.
  *       Performs a JQL POST search request to JIRA Rest API.
@@ -225,7 +232,6 @@ function IssueSearch(searchQuery) {
       startAt    : startAt,
       maxResults : (maxResults < maxPerPage) ? maxResults : maxPerPage
     };
-
     var request = new Request();
     request.call('search', data, {'method' : 'post'})
       .withSuccessHandler(onSuccess)
