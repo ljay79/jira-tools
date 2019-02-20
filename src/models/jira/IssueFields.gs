@@ -292,7 +292,10 @@ module.exports = {
   getAllCustomJiraFields:getAllCustomJiraFields,
   convertJiraFieldResponseToFieldRecord:convertJiraFieldResponseToFieldRecord,
   getValidFieldsToEditJira: getValidFieldsToEditJira,
-  headerNames: headerNames
+  headerNames: headerNames,
+  CUSTOMFIELD_FORMAT_RAW:CUSTOMFIELD_FORMAT_RAW,
+  CUSTOMFIELD_FORMAT_SEARCH:CUSTOMFIELD_FORMAT_SEARCH,
+  CUSTOMFIELD_FORMAT_UNIFY:CUSTOMFIELD_FORMAT_UNIFY,
 };
 // End of Node required code block
 

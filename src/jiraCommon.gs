@@ -2,6 +2,12 @@
 const Request = require('./jiraApi.gs');
 const debug = require('./debug.gs').debug;
 const EpicField = require("./models/jira/EpicField.gs");
+const getCustomFields = require("src/models/jira/IssueFields.gs").getCustomFields;
+const CUSTOMFIELD_FORMAT_RAW = require("src/models/jira/IssueFields.gs").CUSTOMFIELD_FORMAT_RAW;
+const CUSTOMFIELD_FORMAT_SEARCH = require("src/models/jira/IssueFields.gs").CUSTOMFIELD_FORMAT_SEARCH;
+const CUSTOMFIELD_FORMAT_UNIFY = require("src/models/jira/IssueFields.gs").CUSTOMFIELD_FORMAT_UNIFY;
+const UserStorage = require("src/models/gas/UserStorage.gs");
+const getCfg = require("./settings.gs").getCfg;
 // End of Node required code block
 
 // const not available, but better solution needed
@@ -256,7 +262,7 @@ function fetchUsersAndGroups(minimal) {
  */
 function unifyIssueAttrib(attrib, data) {
   var resp = {value: ''};
-
+  
   try { // no error handling, always return a valid object
 
   // custom fields first
@@ -270,7 +276,6 @@ function unifyIssueAttrib(attrib, data) {
 
     if (customFields.hasOwnProperty(attrib)) {
       var format = customFields[attrib];
-
       switch(format) {
         case 'jst_epic':
           resp = {
@@ -541,7 +546,9 @@ function unifyIssueAttrib(attrib, data) {
       resp.value = data[attrib] || data.fields[attrib];
       break;
   }
-  } catch (e) {}
+  } catch (e) {
+    debug.log("Error in unifyIssueAttrib "+e);
+  }
   
   return resp;
 }

@@ -2,6 +2,9 @@ global.PropertiesService = require('test/mocks/PropertiesService');
 jiraApiMock = require('test/mocks/mockJiraApi.js');
 const UserStorage = require("src/models/gas/UserStorage.gs");
 global.EpicField = require("src/models/jira/EpicField.gs");
+const CUSTOMFIELD_FORMAT_RAW = require("src/models/jira/IssueFields.gs").CUSTOMFIELD_FORMAT_RAW;
+const CUSTOMFIELD_FORMAT_SEARCH = require("src/models/jira/IssueFields.gs").CUSTOMFIELD_FORMAT_SEARCH;
+const CUSTOMFIELD_FORMAT_UNIFY = require("src/models/jira/IssueFields.gs").CUSTOMFIELD_FORMAT_UNIFY;
 
 test("field validation", () => {
     var fieldList = [
@@ -236,22 +239,33 @@ test("headerNames",() => {
 
 
 test("getCustomFields",() => {
-  PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
-    return JSON.stringify([
-      {key:"custom1",name:"Custom 1",type: "Type 1"},
-      {key:"custom2",name:"Custom 2",type: "Type 2"}
-    ] 
-    );
-  });
+  PropertiesService.resetMocks();
+  PropertiesService.resetMockUserData();
+  UserStorage.setValue(
+    "favoriteCustomFields",
+    [
+      {key:"customx",name:"Custom X",type: "Type 1"},
+      {key:"customy",name:"Custom Y",type: "Type 2"}
+    ]
+  );
   const getCustomFields = require("src/models/jira/IssueFields.gs").getCustomFields;
   var result = getCustomFields();
   expect(result.length).toBe(2);
-  expect(result[0]).toEqual({key:"custom1",name:"Custom 1",type: "Type 1"});
-  result = getCustomFields(0);
+  expect(result[0]).toEqual({key:"customx",name:"Custom X",type: "Type 1"});
+  result = getCustomFields(CUSTOMFIELD_FORMAT_RAW);
   expect(result.length).toBe(2);
-  expect(getCustomFields(1)).toEqual([
-    {key:"custom1",name:"Custom 1",type: "Type 1"},
-    {key:"custom2",name:"Custom 2",type: "Type 2"}
+  expect(result).toEqual([
+    {key:"customx",name:"Custom X",type: "Type 1"},
+    {key:"customy",name:"Custom Y",type: "Type 2"}
   ] 
   );
+  result = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
+  expect(Object.keys(result).length).toBe(2);
+  expect(result.customx).toBe("Custom X");
+  expect(result.customy).toBe("Custom Y");
+
+  result = getCustomFields(CUSTOMFIELD_FORMAT_UNIFY);
+  expect(Object.keys(result).length).toBe(2);
+  expect(result.customx).toBe("Type 1");
+  expect(result.customy).toBe("Type 2");
 });
