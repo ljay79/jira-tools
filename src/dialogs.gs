@@ -15,16 +15,20 @@ function getDialog(file, values) {
   var template = HtmlService.createTemplateFromFile(file);
 
   // privacy (remove clear text password and username from possible debug logging
-  var debugValue = {};
-  extend(debugValue, values);
-  if (debugValue.password) delete debugValue.password;
-  if (debugValue.username) delete debugValue.username;
-  debug.log('Processing: %s.html with %s', file, JSON.stringify(debugValue));
+  _logTemplate(values,file);
+  
   for (var name in values) {
     template[name] = values[name];
   }
-
   return template.evaluate();
+
+  function _logTemplate(values,file) {
+    var debugValue = {};
+    extend(debugValue, values);
+    if (debugValue.password) delete debugValue.password;
+    if (debugValue.username) delete debugValue.username;
+    debug.log('Processing: %s.html with %s', file, JSON.stringify(debugValue));
+  }
 }
 
 /* Dialog: Settings */

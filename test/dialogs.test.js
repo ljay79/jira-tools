@@ -44,7 +44,7 @@ test("Test getdialog Function", () => {
 
   var getDialog = require('src/dialogs.gs').getDialog;
   var returnedDialogue = getDialog("path/to/html", {
-    username: "username", // commented 
+    username: "username", 
     password: "password",
     var1: "value1",
     var2: "value2",
@@ -53,15 +53,13 @@ test("Test getdialog Function", () => {
   // Correct HTML file loaded
   expect(HtmlService.createTemplateFromFile).toBeCalled();
   expect(HtmlService.createTemplateFromFile.mock.calls[0][0]).toBe("path/to/html");
-  // password and username not passed to the template
-  // @TODO: Check if the commented out tests should work/..
-  //expect(HtmlService.templateMock["username"]).not.toBeDefined(); // test fails - bug I think
-  //expect(HtmlService.templateMock["password"]).not.toBeDefined(); // test fails - bug I think
-  // all other variables are passed to the template
+  // all variables are passed to the template
   expect(Object.keys(HtmlService.templateMock).length).toBe(mockTemplateKeyCoumt + 5);
   expect(HtmlService.templateMock["var1"]).toBe("value1");
   expect(HtmlService.templateMock["var2"]).toBe("value2");
   expect(HtmlService.templateMock["var3"]).toBe("value3");
+  expect(HtmlService.templateMock["username"]).toBe("username");
+  expect(HtmlService.templateMock["password"]).toBe("password");
   // evaluated template is passed back
   expect(returnedDialogue).toBe(HtmlService.dialogMock);
 
