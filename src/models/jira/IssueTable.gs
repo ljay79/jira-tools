@@ -1,8 +1,33 @@
 // Node required code block
-const Storage_ = require('./Storage.gs').Storage_;
+const IssueTableStorage_ = require('../IssueTableStorage.gs').IssueTableStorage_;
 // End of Node required code block
 
-/* ----- DEV ------------------- */
+/* ######## DEV- WIP - Testing #################### */
+
+
+function saveTest() {
+  var table1 = new IssueTable_();
+  table1.data.tableId = 'aaa';
+  
+  var table2 = new IssueTable_();
+  table2.data.tableId = 'bbb';
+  
+  var tblIndex = new IssueTableIndex_();
+  tblIndex.addTable(table1).addTable(table2);
+}
+
+function loadTest() {
+  console.log('current sheet id: %s', sheetIdPropertySave());
+  var tblIndex = new IssueTableIndex_();
+  var tableOld = tblIndex.getTable('bbb');
+  console.log('tableOld B: %s', tableOld.toJson());
+  
+  var tblIndex = new IssueTableIndex_();
+  var tableOld = tblIndex.getTable('aaa');
+  console.log('tableOld A: %s', tableOld.toJson());
+}
+
+
 
 var TestTable = {
   sheetId: '6.02713257E8',
@@ -37,6 +62,7 @@ function testTable1() {
   SpreadsheetTriggers_.register('onEdit', 'onEditTableMeta', true);
   SpreadsheetTriggers_.register('onChange', 'onEditTableMeta', true);
 }
+
 
 function onEditTableMeta(e) {
   console.log('onEditTableMeta(): %s', e);
@@ -113,31 +139,69 @@ function onEditTableMeta(e) {
 
 }
 
-/* ---------------------------------- */
+/* ######## ################## #################### */
 
-var TableMeta = {
-  _appStorage: false,
 
-  getValue: function(key) {
-    return this._getAppStorage().getValue(key);
-  },
+/**
+ * @file Contains class used reflect a Jira IssueTable's meta data for google sheet tables.
+ */
 
-  setValue: function(key, value) {
-    return this._getAppStorage().setValue(key, value);
-  },
+/**
+ * Creates new IssueTable_ instance to reflect the meta data of a IssueTable in google sheets.
+ * 
+ * @param {object} data    Optional JSON representation of previously stored IssueTable data object.
+ * @Constructor
+ */
 
-  _getAppStorage: function() {
-    if (!this._appStorage) {
-      // https://developers.google.com/apps-script/guides/services/quotas
-      this._appStorage = new Storage_('jst_tbl', PropertiesService.getUserProperties()||{});
-    }
-    return this._appStorage;
-  }
+//@TODO: Work in Progress
+function IssueTable_(data) {
+  this.data = data || {
+    sheetId         : sheetIdPropertySave(),
+    tableId         :  '',
+    
+    /*
+    Range names:
+    - Can contain only letters, numbers, and underscores.
+    - Can't start with a number, or the words "true" or "false."
+    - Can't contain any spaces or punctuation.
+    - Must be 1–250 characters.
+    - Can't be in either A1 or R1C1 syntax. For example, you might get an error if you give your range a name like "A1:B2" or "R1C1:R2C2."
+    */
+    rangeName       :  'table1_6_02713257E8',
+    rangeA1         : 'B3:D6',
+    headerRowOffset : 1,
+    headerValues    : ['colA', 'colB', 'colC'],
+    
+    JQL             : null,
+    time_lastupdated: null
+  };
+}
+
+IssueTable_.prototype.setData = function(object) {
+  console.log('IssueTable_.setData() <= %s', object);
+};
+
+/**
+ * Converts tables data to JSON object string representation
+ * @return {string}
+ */
+IssueTable_.prototype.toJson = function() {
+    return JSON.stringify(this.data);
+};
+
+/**
+ * Takes stringified JSON to parse into JSON object and use for initialize a IssueTable object.
+ * @param {string} json    The JSON string to parse and load into a new IssueTable instance
+ * @return {IssueTable_}    A new instance of IssueTable_ with all data from [json] load into.
+ */
+IssueTable_.prototype.fromJson = function(json) {
+    var data = JSON.parse(json); // Parsing the json string.
+    return new IssueTable_(data);
 };
 
 
 // Node required code block
 module.exports = {
-  TableMeta: TableMeta
+    IssueTable_ : IssueTable_
 };
 // End of Node required code block
