@@ -70,20 +70,30 @@ function getAllJiraFields(successCallBack, errorCallBack) {
 
    fieldMap.push.apply(fieldMap, respData.map(convertJiraFieldResponseToFieldRecord))
      // sorting by supported type and name
-     && fieldMap.sort(function (a, b) {
-       var keyA = a.name.toLowerCase();
-       var keyB = b.name.toLowerCase();
-
-       if (keyA < keyB)
-         return -1;
-       if (keyA > keyB)
-         return 1;
-       return 0;
-     });
+   fieldMap.sort(defaultFieldSort_);
    if (successCallBack != null) {
      successCallBack(fieldMap);
    }
  };
+
+ /**
+  * Default field sort
+  * @param fieldA {IssueField} field to sort
+  * @param fieldB {IssueField} field to sort
+  * @returns -1,0,1 as per requirments of javascript sort function
+  */
+ function defaultFieldSort_(fieldA, fieldB) {
+  var nameA = fieldA.name.toLowerCase();
+  var nameB = fieldB.name.toLowerCase();
+
+  if (nameA < nameB) {
+    return -1;
+  }
+  if (nameA > nameB) {
+    return 1;
+  }
+  return 0;
+ }
 
  var error = function (respData, httpResp, status) {
    var jiraErrorMessage = "";
