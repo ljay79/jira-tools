@@ -311,9 +311,9 @@ function removeFromArray(array, element) {
  * which can be used as a objects property key.
  * 
  * @param {object|int|string} sheetId    The original google sheetId
- * @return {tring}
+ * @return {string}
  */
-function sheetIdPropertySave(sheetId) {
+function sheetIdPropertySafe(sheetId) {
   // in contrast to google's doc, getSheetId() does not return an integer neither an string, 
   // instead it returns a value of type '6.123456789E3' which gets 
   // wrongly interpreted as object in some circumstances.
@@ -330,6 +330,6 @@ module.exports = {
   getDateFromIso: getDateFromIso,
   extend: extend,
   copyObject: copyObject,
-  sheetIdPropertySave: sheetIdPropertySave
+  sheetIdPropertySafe: sheetIdPropertySafe
 };
 // End of Node required code block
