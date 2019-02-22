@@ -46,6 +46,9 @@
     ],
     "collectCoverageFrom": [
       "src/**/*.gs"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/initTestEnvironment.js"
     ]
   }
 }

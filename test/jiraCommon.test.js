@@ -1,9 +1,7 @@
 jiraApiMock = require('./mocks/mockJiraApi.js');
-PropertiesService = require('./mocks/PropertiesService');
-const UserStorage = require("src/models/gas/UserStorage.gs");
-global.environmentConfiguration = require('../src/environmentConfiguration.gs');
 const getCfg = require("../src/settings.gs").getCfg;
 const setCfg = require("../src/settings.gs").setCfg;
+const UserStorage = require("src/models/gas/UserStorage.gs");
 
 test("Call to retrieve an issues status", function() {
     jiraApiMock.resetMocks();

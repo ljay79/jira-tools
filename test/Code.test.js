@@ -4,11 +4,6 @@
 
  */
 
-ScriptApp = require('./mocks/ScriptApp');
-PropertiesService = require('./mocks/PropertiesService');
-SpreadsheetApp = require('./mocks/SpreadsheetApp');
-environmentConfiguration = require('../src/environmentConfiguration.gs');
-debug = require('../src/debug.gs').debug;
 
 beforeEach(() => {
   SpreadsheetApp.resetMocks();

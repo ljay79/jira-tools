@@ -1,4 +1,3 @@
-global.PropertiesService = require('test/mocks/PropertiesService');
 jiraApiMock = require('test/mocks/mockJiraApi.js');
 const UserStorage = require("src/models/gas/UserStorage.gs");
 global.EpicField = require("src/models/jira/EpicField.gs");

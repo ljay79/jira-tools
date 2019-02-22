@@ -1,20 +1,8 @@
 
 
-global.environmentConfiguration = require('../src/environmentConfiguration.gs');
 const hasSettings = require("../src/settings.gs").hasSettings;
-const debug = require("../src/debug.gs").debug;
 const Request = require('../src/jiraApi.gs');
-PropertiesService = require('./mocks/PropertiesService');
-Browser = require('./mocks/Browser');
 
-
-UrlFetchApp = {
-  fetch: function () { }
-}
-
-Utilities = {
-  base64Encode: function () { }
-}
 
 beforeEach(() => {
   Browser.msgBox = jest.fn();

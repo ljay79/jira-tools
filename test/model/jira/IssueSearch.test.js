@@ -1,5 +1,4 @@
 
-global.PropertiesService = require('test/mocks/PropertiesService');
 jiraApiMock = require('test/mocks/mockJiraApi.js');
 IssueSearch = require("src/models/jira/IssueSearch.gs");
 var debug = require("src/debug.gs").debug;

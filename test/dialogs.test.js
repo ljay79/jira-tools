@@ -1,11 +1,5 @@
 
-global.environmentConfiguration = require('../src/environmentConfiguration.gs');
-PropertiesService = require('./mocks/PropertiesService');
-HtmlService = require('./mocks/HtmlService');
-Session = require('./mocks/Session');
-SpreadsheetApp = require('./mocks/SpreadsheetApp');
 BUILD = "";
-const debug = require("../src/debug.gs").debug;
 
 beforeEach(() => {
   jest.resetModules();
