@@ -56,4 +56,3 @@ test('copyObject', () => {
   src.prop1 = "New value";
   expect(newObject.prop1).toBe("value1");
 });
-

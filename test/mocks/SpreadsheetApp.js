@@ -1,3 +1,4 @@
+Spreadsheet = require('./Spreadsheet');
 
 var ADDONMENU = {
   addItem : jest.fn().mockImplementation(()=> ADDONMENU),
@@ -10,10 +11,14 @@ var UI = {
 }
 
 var SpreadsheetApp = {
-  getUi: jest.fn().mockImplementation(() => UI ),
+  getUi: jest.fn().mockImplementation(() => UI),
+
+  getActiveSpreadsheet: jest.fn().mockImplementation(() => Spreadsheet),
+
   resetMocks: function() {
     mocks = [
       [SpreadsheetApp.getUi,UI],
+      [SpreadsheetApp.getActiveSpreadsheet, Spreadsheet],
       [UI.createAddonMenu,ADDONMENU],
       [ADDONMENU.addItem,ADDONMENU],
       [ADDONMENU.addSeparator,ADDONMENU],
@@ -25,7 +30,5 @@ var SpreadsheetApp = {
     })
   }  
 }
-
-
 
 module.exports = SpreadsheetApp;

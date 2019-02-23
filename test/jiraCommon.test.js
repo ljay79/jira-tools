@@ -1,5 +1,8 @@
 global.PropertiesService = require('./mocks/PropertiesService');
 jiraApiMock = require('./mocks/mockJiraApi.js');
+SpreadsheetApp = require('./mocks/SpreadsheetApp');
+jiraCommon = require('../src/jiraCommon.gs');
+
 
 test("field validation", () => {
     var fieldList = [
@@ -161,4 +164,30 @@ test("Call to retrieve an issues status", function() {
     expect(jiraApiMock.call.mock.calls[0][0]).toBe("issueStatus");
     expect(jiraApiMock.call.mock.calls[0][1].issueIdOrKey).toBe("PBI-222");
     expect(Object.keys(jiraApiMock.call.mock.calls[0][1]).length).toBe(1);
+});
+
+test("Receiving proper sheet id's from mock", () => {
+  SpreadsheetApp.resetMocks();
+
+  var sheetIdA = jiraCommon.getTicketSheet().getSheetId();
+  var sheetIdB = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getSheetId();
+  expect(sheetIdA).toBe(sheetIdB);
+
+  SpreadsheetApp.resetMocks();
+});
+
+test('sheetIdPropertySafe() generates property safe string from an sheet id', () => {
+  SpreadsheetApp.resetMocks();
+
+  var result = '';
+  var sheetId = jiraCommon.getTicketSheet().getSheetId();
+  var expectedId = ('sid_' + sheetId).replace(/[^a-zA-Z0-9_]/g, '_');
+  
+  result = jiraCommon.sheetIdPropertySafe(sheetId);
+  expect(result).toBe(expectedId);
+
+  result = jiraCommon.sheetIdPropertySafe();
+  expect(result).toBe(expectedId);
+
+  SpreadsheetApp.resetMocks();
 });
