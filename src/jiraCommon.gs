@@ -1,3 +1,5 @@
+//@TODO: rename this filename, its not appropiate as it has not only jira related utilities - JRo
+
 // Node required code block
 const Request = require('./jiraApi.gs');
 const debug = require('./debug.gs').debug;
@@ -54,6 +56,23 @@ var ISSUE_COLUMNS = {
  */
 function getTicketSheet() {
   return SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+}
+
+/**
+ * Takes a google spreadsheet sheet id and converts it into a save string 
+ * which can be used as a objects property key.
+ * 
+ * @param {object|int|string} sheetId    Optional; The original google sheetId
+ * @return {string}
+ */
+function sheetIdPropertySafe(sheetId) {
+  // in contrast to google's doc, getSheetId() does not return an integer neither an string, 
+  // instead it returns a value of type '6.123456789E3' which gets 
+  // wrongly interpreted as object in some circumstances.
+  sheetId = sheetId || getTicketSheet().getSheetId();
+  sheetId = ('sid_' + sheetId).replace(/[^a-zA-Z0-9_]/g, '_');
+
+  return sheetId;
 }
 
 /**
@@ -781,7 +800,9 @@ module.exports = {
   unifyIssueAttrib: unifyIssueAttrib, 
   getMatchingJiraField:getMatchingJiraField, 
   getAllJiraFields:getAllJiraFields, 
-  convertJiraFieldResponseToFieldRecord:convertJiraFieldResponseToFieldRecord
+  convertJiraFieldResponseToFieldRecord:convertJiraFieldResponseToFieldRecord,
+  getTicketSheet: getTicketSheet,
+  sheetIdPropertySafe: sheetIdPropertySafe
 };
 
 // End of Node required code block

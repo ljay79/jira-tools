@@ -306,30 +306,12 @@ function removeFromArray(array, element) {
   }
 }
 
-/**
- * Takes a google spreadsheet sheet id and converts it into a save string 
- * which can be used as a objects property key.
- * 
- * @param {object|int|string} sheetId    The original google sheetId
- * @return {string}
- */
-function sheetIdPropertySafe(sheetId) {
-  // in contrast to google's doc, getSheetId() does not return an integer neither an string, 
-  // instead it returns a value of type '6.123456789E3' which gets 
-  // wrongly interpreted as object in some circumstances.
-  sheetId = sheetId || getTicketSheet().getSheetId();
-  sheetId = ('sid_' + sheetId).replace(/[^a-zA-Z0-9_]/g, '_');
-
-  return sheetId;
-};
-
 
 // Node required code block
 module.exports = {
   buildUrl: buildUrl,
   getDateFromIso: getDateFromIso,
   extend: extend,
-  copyObject: copyObject,
-  sheetIdPropertySafe: sheetIdPropertySafe
+  copyObject: copyObject
 };
 // End of Node required code block
