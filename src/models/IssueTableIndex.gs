@@ -143,7 +143,5 @@ function IssueTableIndex_() {
 }
 
 // Node required code block
-module.exports = {
-  IssueTableIndex_ : IssueTableIndex_
-};
+module.exports = IssueTableIndex_;
 // End of Node required code block
