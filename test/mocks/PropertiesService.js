@@ -4,6 +4,7 @@
  */
 var _userPropData = {};
 var _scriptPropData = {};
+var _documentPropData = {};
 
 /*
  * @see https://developers.google.com/apps-script/reference/properties/properties-service#getuserproperties
@@ -31,6 +32,18 @@ var ScriptProps = {
   deleteAllProperties: jest.fn().mockImplementation(function() { _scriptPropData = {}; }),
 };
 
+/*
+ * @see https://developers.google.com/apps-script/reference/properties/properties-service#getdocumentproperties
+ */
+var DocumentProps = {
+  getProperty: jest.fn().mockImplementation((key)=>  _documentPropData[key]),
+  setProperty: jest.fn().mockImplementation(function(key) { _documentPropData[key] = data; }),
+  deleteProperty: jest.fn().mockImplementation(function(key) { 
+    _documentPropData[key] = null; 
+    delete _documentPropData[key];
+  }),
+  deleteAllProperties: jest.fn().mockImplementation(function() { _documentPropData = {}; }),
+};
 
 /**
  * @see https://developers.google.com/apps-script/reference/properties/properties-service
@@ -38,6 +51,7 @@ var ScriptProps = {
 var PropertiesService = {
   getUserProperties: jest.fn(),
   getScriptProperties: jest.fn(),
+  getDocumentProperties: jest.fn(),
   resetMocks: function () {
     var mocks = [
       [UserProps.getProperty, ""],
@@ -50,7 +64,13 @@ var PropertiesService = {
       [ScriptProps.setProperty, null],
       [ScriptProps.deleteProperty, null],
       [ScriptProps.deleteAllProperties, null],
-      [PropertiesService.getScriptProperties, ScriptProps]
+      [PropertiesService.getScriptProperties, ScriptProps],
+      
+      [DocumentProps.getProperty, ""],
+      [DocumentProps.setProperty, null],
+      [DocumentProps.deleteProperty, null],
+      [DocumentProps.deleteAllProperties, null],
+      [PropertiesService.getDocumentProperties, DocumentProps]
     ];
     mocks.forEach((pair) => {
       pair[0].mockReset();
@@ -60,9 +80,11 @@ var PropertiesService = {
   resetMockUserData: function() {
     _userPropData = {};
     _scriptPropData = {};
+    _documentPropData = {};
   },
   mockUserProps: UserProps,
-  mockScriptProps: ScriptProps
+  mockScriptProps: ScriptProps,
+  mockDocumentProps: DocumentProps
 }
 PropertiesService.resetMocks();
 module.exports = PropertiesService;
