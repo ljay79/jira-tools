@@ -1,6 +1,6 @@
 // Node required code block
 const extend = require('../../jsLib.gs').extend;
-const sheetIdPropertySafe = require('../../jsLib.gs').sheetIdPropertySafe;
+const sheetIdPropertySafe = require('../../jiraCommon.gs').sheetIdPropertySafe;
 const IssueTableIndex_ = require('../IssueTableIndex.gs').IssueTableIndex_;
 const SpreadsheetTriggers_ = require('../SpreadsheetTriggers.gs').SpreadsheetTriggers_;
 // End of Node required code block
@@ -287,7 +287,5 @@ function IssueTable_(initData) {
 }
 
 // Node required code block
-module.exports = {
-  IssueTable_ : IssueTable_
-};
+module.exports = IssueTable_;
 // End of Node required code block
