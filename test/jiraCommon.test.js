@@ -188,6 +188,13 @@ test('sheetIdPropertySafe() generates property safe string from an sheet id', ()
 
   result = jiraCommon.sheetIdPropertySafe();
   expect(result).toBe(expectedId);
+  
+  // shall be same on multiple calls within runtime
+  var id1 = jiraCommon.sheetIdPropertySafe();
+  var id2 = jiraCommon.sheetIdPropertySafe();
+  var id3 = jiraCommon.sheetIdPropertySafe();
+  expect(id1).toBe(id2);
+  expect(id2).toBe(id3);
 
   SpreadsheetApp.resetMocks();
 });
