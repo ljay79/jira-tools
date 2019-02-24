@@ -1,7 +1,7 @@
 // Node required code block
 const sheetIdPropertySafe = require('../jiraCommon.gs').sheetIdPropertySafe;
-const Storage_ = require('../Storage.gs').Storage_;
-const IssueTable_ = require('./jira/IssueTable.gs').IssueTable_;
+var Storage_ = require('../Storage.gs').Storage_;
+var IssueTable_ = require('./jira/IssueTable.gs');
 // End of Node required code block
 
 /**

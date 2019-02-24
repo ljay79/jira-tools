@@ -1,7 +1,7 @@
-global.SpreadsheetApp = require("../../mocks/SpreadsheetApp");
-utils = require('../../utils');
-jiraCommon = require('../../../src/jiraCommon.gs');
-var IssueTable_ = require("../../../src/models/jira/IssueTable.gs");
+global.SpreadsheetApp = require('../../mocks/SpreadsheetApp');
+const utils = require('../../utils');
+const jiraCommon = require('../../../src/jiraCommon.gs');
+var IssueTable_ = require('../../../src/models/jira/IssueTable.gs');
 
 beforeEach(() => {
   jest.resetModules();

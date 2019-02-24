@@ -1,8 +1,7 @@
 // Node required code block
 const extend = require('../../jsLib.gs').extend;
 const sheetIdPropertySafe = require('../../jiraCommon.gs').sheetIdPropertySafe;
-const IssueTableIndex_ = require('../IssueTableIndex.gs').IssueTableIndex_;
-const SpreadsheetTriggers_ = require('../SpreadsheetTriggers.gs').SpreadsheetTriggers_;
+var SpreadsheetTriggers_ = require('../SpreadsheetTriggers.gs').SpreadsheetTriggers_;
 // End of Node required code block
 
 /*

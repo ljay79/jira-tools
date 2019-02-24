@@ -1,4 +1,4 @@
-Spreadsheet = require('./Spreadsheet');
+const Spreadsheet = require('./Spreadsheet');
 
 var ADDONMENU = {
   addItem : jest.fn().mockImplementation(()=> ADDONMENU),

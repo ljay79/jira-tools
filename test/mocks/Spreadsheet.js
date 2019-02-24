@@ -1,4 +1,4 @@
-utils = require('../utils');
+const utils = require('../utils');
 
 /*
  * Mocking GAS Sheet Class

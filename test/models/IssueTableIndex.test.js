@@ -1,9 +1,9 @@
 global.environmentConfiguration = require('../../src/environmentConfiguration.gs');
 global.PropertiesService = require('../mocks/PropertiesService');
-global.SpreadsheetApp = require("../mocks/SpreadsheetApp");
+global.SpreadsheetApp = require('../mocks/SpreadsheetApp');
 const jiraCommon = require('../../src/jiraCommon.gs');
-const IssueTable_ = require("../../src/models/jira/IssueTable.gs");
-const IssueTableIndex_ = require("../../src/models/IssueTableIndex.gs");
+var IssueTable_ = require('../../src/models/jira/IssueTable.gs');
+var IssueTableIndex_ = require('../../src/models/IssueTableIndex.gs');
 
 beforeEach(() => {
   PropertiesService.resetMocks();
@@ -46,4 +46,31 @@ test("IssueTableIndex_ can store IssueTable's",()=> {
   expect(PropertiesService.mockDocumentProps.setProperty).toBeCalled();
   expect(PropertiesService.mockDocumentProps.setProperty.mock.calls[0][0]).toBe("jst_tables.index");
   expect(PropertiesService.mockDocumentProps.setProperty.mock.calls[0][1]).toBe(JSON.stringify(indexData));
+});
+
+test("IssueTableIndex_ duplicated index prevention",()=> {
+  var TableIndex = new IssueTableIndex_();
+  var IssueTable1 = new IssueTable_();
+  var IssueTable2 = new IssueTable_();
+  IssueTable1.setData('tableId', 'table1_A');
+  IssueTable2.setData('tableId', 'table2_B');
+
+  // add same tables multiple times
+  TableIndex.addTable(IssueTable1)
+    .addTable(IssueTable2)
+    .addTable(IssueTable1);
+
+  // expected index data
+  var indexData = {};
+  indexData[IssueTable1.getSheetId()] = [
+    IssueTable1.getTableId(), 
+    IssueTable2.getTableId()
+  ];
+
+  expect(PropertiesService.getDocumentProperties).toBeCalled();
+  expect(PropertiesService.mockDocumentProps.setProperty).toBeCalled();
+
+  // values in IssueTable match passed values?
+  expect(TableIndex.getTable('table1_A').getTableId()).toBe('table1_A');
+  expect(TableIndex.getTable('table2_B').getTableId()).toBe('table2_B');
 });
