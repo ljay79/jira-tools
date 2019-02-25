@@ -66,11 +66,8 @@ function getTicketSheet() {
  * @return {string}
  */
 function sheetIdPropertySafe(sheetId) {
-  // in contrast to google's doc, getSheetId() does not return an integer neither an string, 
-  // instead it returns a value of type '6.123456789E3' which gets 
-  // wrongly interpreted as object in some circumstances.
   sheetId = sheetId || getTicketSheet().getSheetId();
-  sheetId = ('sid_' + sheetId).replace(/[^a-zA-Z0-9_]/g, '_');
+  sheetId = ('sid_' + JSON.stringify(sheetId)).replace(/[^a-zA-Z0-9_]/g, '_');
 
   return sheetId;
 }
