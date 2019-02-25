@@ -11,143 +11,189 @@ const extend = require("src/jsLib.gs").extend;
 const camelize = require('src/jsLib.gs').camelize;
 // End of Node required code block
 
+IssueFields = (function () {
+
+  var SupportedTypes = [EpicField.EPIC_KEY,'string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
+
+  function field(key,name,isCustom,schemaType) {
+    return {
+      key: key, 
+      name: name,
+      custom: isCustom,
+      schemaType: schemaType,
+      supported: (SupportedTypes.indexOf(schemaType) > -1)
+    };
+  }
+  /**
+   * Takes the native JSON response from JIRA for a field definition and returns an object
+   * with the fields used in the Application 
+   * @param jiraFieldResponse - the response from JIRA
+   * @return array Array of objects for each field 
+  return {
+            key:        cField.key || cField.id, // Server API returns ".id" only while Cloud returns both with same value
+            name:       cField.name,
+            custom:     cField.custom,
+            schemaType: _type,
+            supported:  (arrSupportedTypes.indexOf(_type) > -1)
+          };
+   */
+  function convertJiraResponse(jiraFieldResponse) {
+    // EPIC customization
+    if (jiraFieldResponse.schema && jiraFieldResponse.schema.custom) {
+      if (jiraFieldResponse.schema.custom.indexOf(':gh-epic-link') > -1) {
+        EpicField.setLinkKey(jiraFieldResponse.key || jiraFieldResponse.id);
+      }
+      if (jiraFieldResponse.schema.custom.indexOf(':gh-epic-label') > -1) {
+        EpicField.setLabelKey(jiraFieldResponse.key || jiraFieldResponse.id);
+      }
+    }
+    var _type = (jiraFieldResponse.schema ? jiraFieldResponse.schema.type : null) || null;
+    if (jiraFieldResponse.schema && jiraFieldResponse.schema.items) {
+      _type += '|' + jiraFieldResponse.schema.items;
+    }
+    return field(
+      jiraFieldResponse.key || jiraFieldResponse.id, // Server API returns ".id" only while Cloud returns both with same value
+      jiraFieldResponse.name,
+      jiraFieldResponse.custom,
+       _type
+    );
+  }
+
+  /**
+   * Default field sort
+   * @param fieldA {IssueField} field to sort
+   * @param fieldB {IssueField} field to sort
+   * @returns -1,0,1 as per requirments of javascript sort function
+   */
+  function defaultFieldSort_(fieldA, fieldB) {
+    var nameA = fieldA.name.toLowerCase();
+    var nameB = fieldB.name.toLowerCase();
+
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+    return 0;
+  }
+
+
+  /**
+   * Cached in memory copy of all fields in Jira
+   */
+  var allJiraFields_ = null;
+  /**
+  * Returns all of the fields in the configured JIRA rest server
+  * @param successCallBack - function to call back if this call to the JIRA rest server is succesful
+  * @param errorCallBack - funcion callback if there is an issue with the server call or response
+  */
+  function getAllFields(successCallBack, errorCallBack) {
+    if (allJiraFields_ != null) {
+      successCallBack(allJiraFields_);
+      return allJiraFields_;
+    } else {
+      var request = new Request();
+      allJiraFields_ = [];
+
+      var ok = function (respData, httpResp, status) {
+
+        if (!respData) {
+          error(respData, httpResp, status);
+        } else {
+          // reset custom epic field 
+          EpicField.resetValue();
+
+          allJiraFields_.push.apply(allJiraFields_, respData.map(IssueFields.convertJiraResponse))
+          // sorting by supported type and name
+          allJiraFields_.sort(defaultFieldSort_);
+          // EPIC usable?
+          if (EpicField.isUsable()) {
+            // add custom field 'Epic' to beginning of array
+            allJiraFields_.unshift(
+              field(
+                EpicField.getKey(),
+                EpicField.getName(),
+                EpicField.EPIC_KEY,
+                true
+            ));
+          }
+          if (successCallBack != null) {
+            successCallBack(allJiraFields_);
+          }
+        }
+      };
+
+
+      var error = function (respData, httpResp, status) {
+        allJiraFields_ = null;
+        var jiraErrorMessage = "";
+        if (respData != null && respData.errorMessages != null) {
+          jiraErrorMessage = respData.errorMessages.join(",") || respData.errorMessages;
+        }
+        var msg = "Failed to retrieve Jira Fields info with status [" + status + "]!\\n"
+          + jiraErrorMessage;
+        if (errorCallBack != null) {
+          errorCallBack(msg);
+        }
+      };
+      request.call("field")
+        .withSuccessHandler(ok)
+        .withFailureHandler(error)
+        ;
+      if (allJiraFields_ == null) {
+        return [];
+      } else {
+        return allJiraFields_;
+      }
+    }
+  }
+
+  /**
+   * Clears the in memory cached Jira fields
+   */
+  function clearCache() {
+    allJiraFields_ = null;
+  }
+
+
+  return {
+    convertJiraResponse: convertJiraResponse,
+    SupportedTypes: SupportedTypes,
+    getAllFields: getAllFields,
+    clearCache: clearCache
+  }
+})();
+
+
+
+
+
 
 /**
- * Takes the native JSON response from JIRA for a field definition and returns an object
- * with the fields used in the Application 
- * @param jiraFieldResponse - the response from JIRA
- * @return array Array of objects for each field 
-return {
-          key:        cField.key || cField.id, // Server API returns ".id" only while Cloud returns both with same value
-          name:       cField.name,
-          custom:     cField.custom,
-          schemaType: _type,
-          supported:  (arrSupportedTypes.indexOf(_type) > -1)
-        };
+ * Returns all custom fields from the Jira Instance including the EpicField
+ * @param successCallBack  - call back function if the list is retrieved succesfully
+ * @param errorCallBack - call back if there is an error
  */
-function convertJiraFieldResponseToFieldRecord(jiraFieldResponse) {
-  // EPIC customization
-  if (jiraFieldResponse.schema && jiraFieldResponse.schema.custom) {
-   if (jiraFieldResponse.schema.custom.indexOf(':gh-epic-link') > -1) {
-     EpicField.setLinkKey(jiraFieldResponse.key || jiraFieldResponse.id);
-   }
-   if (jiraFieldResponse.schema.custom.indexOf(':gh-epic-label') > -1) {
-     EpicField.setLabelKey(jiraFieldResponse.key || jiraFieldResponse.id);
-   }
- }
- 
- 
- var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
- var _type = (jiraFieldResponse.schema ? jiraFieldResponse.schema.type : null) || null;
- if (jiraFieldResponse.schema && jiraFieldResponse.schema.items) {
-   _type += '|' + jiraFieldResponse.schema.items;
- }
- return {
-   key: jiraFieldResponse.key || jiraFieldResponse.id, // Server API returns ".id" only while Cloud returns both with same value
-   name: jiraFieldResponse.name,
-   custom: jiraFieldResponse.custom,
-   schemaType: _type,
-   supported: (arrSupportedTypes.indexOf(_type) > -1)
- };
-}
-
-/**
-* Returns all of the fields in the configured JIRA rest server
-* @param successCallBack - function to call back if this call to the JIRA rest server is succesful
-* @param errorCallBack - funcion callback if there is an issue with the server call or response
-*/
-function getAllJiraFields(successCallBack, errorCallBack) {
- var request = new Request();
- var fieldMap = [];
-
- var ok = function (respData, httpResp, status) {
-
-   if (!respData) {
-     error(respData, httpResp, status);
-   }
-   // reset custom epic field 
-   EpicField.resetValue();
-
-   fieldMap.push.apply(fieldMap, respData.map(convertJiraFieldResponseToFieldRecord))
-     // sorting by supported type and name
-   fieldMap.sort(defaultFieldSort_);
-   if (successCallBack != null) {
-     successCallBack(fieldMap);
-   }
- };
-
- /**
-  * Default field sort
-  * @param fieldA {IssueField} field to sort
-  * @param fieldB {IssueField} field to sort
-  * @returns -1,0,1 as per requirments of javascript sort function
-  */
- function defaultFieldSort_(fieldA, fieldB) {
-  var nameA = fieldA.name.toLowerCase();
-  var nameB = fieldB.name.toLowerCase();
-
-  if (nameA < nameB) {
-    return -1;
-  }
-  if (nameA > nameB) {
-    return 1;
-  }
-  return 0;
- }
-
- var error = function (respData, httpResp, status) {
-   var jiraErrorMessage = "";
-   if (respData != null && respData.errorMessages != null) {
-     jiraErrorMessage = respData.errorMessages.join(",") || respData.errorMessages;
-   }
-   var msg = "Failed to retrieve Jira Fields info with status [" + status + "]!\\n"
-     + jiraErrorMessage;
-   if (errorCallBack != null) {
-     errorCallBack(msg);
-   }
- };
- request.call("field")
-   .withSuccessHandler(ok)
-   .withFailureHandler(error)
-   ;
-
- return fieldMap;
-}
-
- /**
-  * Returns all custom fields from the Jira Instance including the EpicField
-  * @param successCallBack  - call back function if the list is retrieved succesfully
-  * @param errorCallBack - call back if there is an error
-  */
 function getAllCustomJiraFields(successCallBack, errorCallBack) {
   var customFields = [];
 
-  var error = function(message) {
+  var error = function (message) {
     if (errorCallBack != null) {
       errorCallBack(message);
     }
   };
 
-  var ok = function(allFields) {
+  var ok = function (allFields) {
     // remove non custom fields
     customFields = allFields.filter(function (el) {
       return el.custom;
     });
-    // EPIC usable?
-    if (EpicField.isUsable()) {
-      // add custom field 'Epic' to beginning of array
-      customFields.unshift({
-        key: EpicField.getKey(),
-        name: EpicField.getName(),
-        type: EpicField.EPIC_KEY,
-        supported: true
-      });
-    }
     if (successCallBack != null) {
       successCallBack(customFields);
     }
   }
-  getAllJiraFields(ok, error);
+  IssueFields.getAllFields(ok, error);
   return customFields;
 };
 
@@ -160,48 +206,48 @@ function getAllCustomJiraFields(successCallBack, errorCallBack) {
 * @param fieldName - the name used for matching
 */
 function getMatchingJiraField(listOfValidJiraFields, fieldName) {
- var matchingFunction = function (stringA, stringB) {
-   return stringA.toLowerCase().trim() == stringB.toLowerCase().trim();
- }
- var results = listOfValidJiraFields.filter(function (fieldSpec) {
-   return matchingFunction(fieldSpec.name, fieldName) || matchingFunction(fieldSpec.key, fieldName)
- });
- if (results.length > 0) {
-   return results[0];
- } else {
-   return null;
- }
+  var matchingFunction = function (stringA, stringB) {
+    return stringA.toLowerCase().trim() == stringB.toLowerCase().trim();
+  }
+  var results = listOfValidJiraFields.filter(function (fieldSpec) {
+    return matchingFunction(fieldSpec.name, fieldName) || matchingFunction(fieldSpec.key, fieldName)
+  });
+  if (results.length > 0) {
+    return results[0];
+  } else {
+    return null;
+  }
 }
 
 
-var CUSTOMFIELD_FORMAT_RAW    = 1;
+var CUSTOMFIELD_FORMAT_RAW = 1;
 var CUSTOMFIELD_FORMAT_SEARCH = 2;
-var CUSTOMFIELD_FORMAT_UNIFY  = 3;
+var CUSTOMFIELD_FORMAT_UNIFY = 3;
 
 /**
  * @desc Convert stored custom fields in different prepared format.
  * @param format {Integer}
  * @return {Object}
  */
-function getCustomFields( format ) {
+function getCustomFields(format) {
   format = format || CUSTOMFIELD_FORMAT_RAW;
   var customFields = UserStorage.getValue('favoriteCustomFields') || [];
   var fieldsFormatted = {};
   // TODO: this code branch appears unnessaruy
   // getCustomFields is not called without a parameter or with CUSTOMFIELD_FORMAT_RAW
-  if ( format === CUSTOMFIELD_FORMAT_RAW ) {
+  if (format === CUSTOMFIELD_FORMAT_RAW) {
     return customFields;
   }
 
-  if ( format === CUSTOMFIELD_FORMAT_SEARCH ) {
-    customFields.forEach(function(el) {
+  if (format === CUSTOMFIELD_FORMAT_SEARCH) {
+    customFields.forEach(function (el) {
       fieldsFormatted[el.key] = el.name;
     });
   }
 
-  if ( format === CUSTOMFIELD_FORMAT_UNIFY ) {
-    customFields.forEach(function(el) {
-      fieldsFormatted[el.key] = el.type;
+  if (format === CUSTOMFIELD_FORMAT_UNIFY) {
+    customFields.forEach(function (el) {
+      fieldsFormatted[el.key] = el.schemaType;
     });
   }
 
@@ -231,8 +277,8 @@ function headerNames(header) {
   if (EpicField.isUsable()) {
     labels[EpicField.getLinkKey()] = EpicField.getName();
   }
-  
-  if( !labels.hasOwnProperty(header) ) {
+
+  if (!labels.hasOwnProperty(header)) {
     label = camelize(header);
   } else {
     label = labels[header];
@@ -295,16 +341,15 @@ var ISSUE_COLUMNS = {
 
 // Node required code block
 module.exports = {
+  IssueFields: IssueFields,
   getCustomFields: getCustomFields,
-  getMatchingJiraField:getMatchingJiraField, 
-  getAllJiraFields:getAllJiraFields, 
-  getAllCustomJiraFields:getAllCustomJiraFields,
-  convertJiraFieldResponseToFieldRecord:convertJiraFieldResponseToFieldRecord,
+  getMatchingJiraField: getMatchingJiraField,
+  getAllCustomJiraFields: getAllCustomJiraFields,
   getValidFieldsToEditJira: getValidFieldsToEditJira,
   headerNames: headerNames,
-  CUSTOMFIELD_FORMAT_RAW:CUSTOMFIELD_FORMAT_RAW,
-  CUSTOMFIELD_FORMAT_SEARCH:CUSTOMFIELD_FORMAT_SEARCH,
-  CUSTOMFIELD_FORMAT_UNIFY:CUSTOMFIELD_FORMAT_UNIFY,
+  CUSTOMFIELD_FORMAT_RAW: CUSTOMFIELD_FORMAT_RAW,
+  CUSTOMFIELD_FORMAT_SEARCH: CUSTOMFIELD_FORMAT_SEARCH,
+  CUSTOMFIELD_FORMAT_UNIFY: CUSTOMFIELD_FORMAT_UNIFY,
 };
 // End of Node required code block
 

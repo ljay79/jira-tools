@@ -4,7 +4,11 @@ global.EpicField = require("src/models/jira/EpicField.gs");
 const CUSTOMFIELD_FORMAT_RAW = require("src/models/jira/IssueFields.gs").CUSTOMFIELD_FORMAT_RAW;
 const CUSTOMFIELD_FORMAT_SEARCH = require("src/models/jira/IssueFields.gs").CUSTOMFIELD_FORMAT_SEARCH;
 const CUSTOMFIELD_FORMAT_UNIFY = require("src/models/jira/IssueFields.gs").CUSTOMFIELD_FORMAT_UNIFY;
+const IssueFields = require("src/models/jira/IssueFields.gs").IssueFields;
 
+beforeEach(()=> {
+  IssueFields.clearCache();
+});
 test("field validation", () => {
     var fieldList = [
         {
@@ -66,9 +70,8 @@ test("field validation", () => {
 });
 
 test("Convert Jira Field Responses to internal field data", () => {
-    const convertJiraFieldResponseToFieldRecord = require("src/models/jira/IssueFields.gs").convertJiraFieldResponseToFieldRecord;
     
-    var result = convertJiraFieldResponseToFieldRecord({
+    var result = IssueFields.convertJiraResponse({
         schema:{type:"string"},
         key: "xyz",
         name: "XYZ field",
@@ -80,7 +83,7 @@ test("Convert Jira Field Responses to internal field data", () => {
     expect(result.supported).toBe(true);
     expect(result.schemaType).toBe("string");
 
-    result = convertJiraFieldResponseToFieldRecord({
+    result = IssueFields.convertJiraResponse({
         schema:{type:"a custom field not recognised"},
         key: "abc",
         name: "ABC field",
@@ -94,7 +97,7 @@ test("Convert Jira Field Responses to internal field data", () => {
 
 
 
-    result = convertJiraFieldResponseToFieldRecord({
+    result = IssueFields.convertJiraResponse({
         schema:{type:"string"},
         id: "def",
         name: "DEF field",
@@ -130,11 +133,11 @@ test("Get all fields from Jira", () => {
     ];
     jiraApiMock.setNextJiraResponse(200,"field",fieldList);
 
-    const getAllJiraFields = require("src/models/jira/IssueFields.gs").getAllJiraFields;
+    const IssueFields = require("src/models/jira/IssueFields.gs").IssueFields;
     
     const successCallBack =jest.fn();
     const errorCallBack =jest.fn();
-    var result = getAllJiraFields(successCallBack,errorCallBack);
+    var result = IssueFields.getAllFields(successCallBack,errorCallBack);
     expect(successCallBack.mock.calls.length).toBe(1);
     expect(errorCallBack.mock.calls.length).toBe(0);
     var fieldListReturned = successCallBack.mock.calls[0][0];
@@ -146,12 +149,12 @@ test("Get all fields from Jira", () => {
 
     successCallBack.mockClear();
     errorCallBack.mockClear();
+    IssueFields.clearCache();
     jiraApiMock.withSuccessHandler.mockClear();
     jiraApiMock.withFailureHandler.mockImplementationOnce((callback) => { 
         callback({errorMessages:["mocked error"]},404,false); 
         return jiraApiMock});
-
-    var result = getAllJiraFields(successCallBack,errorCallBack);
+    var result = IssueFields.getAllFields(successCallBack,errorCallBack);
     expect(successCallBack.mock.calls.length).toBe(0);
     expect(errorCallBack.mock.calls.length).toBe(1);
     expect(result.length).toBe(0);
@@ -247,19 +250,19 @@ test("getCustomFields",() => {
   UserStorage.setValue(
     "favoriteCustomFields",
     [
-      {key:"customx",name:"Custom X",type: "Type 1"},
-      {key:"customy",name:"Custom Y",type: "Type 2"}
+      {key:"customx",name:"Custom X",schemaType: "Type 1"},
+      {key:"customy",name:"Custom Y",schemaType: "Type 2"}
     ]
   );
   const getCustomFields = require("src/models/jira/IssueFields.gs").getCustomFields;
   var result = getCustomFields();
   expect(result.length).toBe(2);
-  expect(result[0]).toEqual({key:"customx",name:"Custom X",type: "Type 1"});
+  expect(result[0]).toEqual({key:"customx",name:"Custom X",schemaType: "Type 1"});
   result = getCustomFields(CUSTOMFIELD_FORMAT_RAW);
   expect(result.length).toBe(2);
   expect(result).toEqual([
-    {key:"customx",name:"Custom X",type: "Type 1"},
-    {key:"customy",name:"Custom Y",type: "Type 2"}
+    {key:"customx",name:"Custom X",schemaType: "Type 1"},
+    {key:"customy",name:"Custom Y",schemaType: "Type 2"}
   ] 
   );
   result = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);

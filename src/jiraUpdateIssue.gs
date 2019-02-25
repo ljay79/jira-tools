@@ -1,6 +1,6 @@
 // Node required code block
 const Request = require('../src/jiraApi.gs');
-const getAllJiraFields = require('src/models/jira/IssueFields.gs').getAllJiraFields;
+const IssueFields = require('src/models/jira/IssueFields.gs').IssueFields;
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
 const debug = require("./debug.gs").debug;
 const getMatchingJiraField = require("src/models/jira/IssueFields.gs").getMatchingJiraField;
@@ -22,7 +22,7 @@ function updateJiraIssues(headerRow, dataRows) {
     return result;
   }
 
-  var allJiraFields = getAllJiraFields();
+  var allJiraFields = IssueFields.getAllFields();
   if (allJiraFields.length == 0) {
     result.finished = true;
     result.status = false;

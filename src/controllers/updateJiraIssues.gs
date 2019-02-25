@@ -4,7 +4,6 @@
 
  // Node required code block
 
- //const getAllJiraFields = require("src/models/jira/IssueFields.gs").getAllJiraFields;
  const hasSettings = require("src/settings.gs").hasSettings;
  const getDialog = require("src/dialogs.gs").getDialog;
  const extend = require("src/jsLib.gs").extend;

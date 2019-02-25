@@ -6,7 +6,7 @@
 
  // Node required code block
 
-const getAllJiraFields = require("src/models/jira/IssueFields.gs").getAllJiraFields;
+const IssueFields = require("src/models/jira/IssueFields.gs").IssueFields;
 const getDialog = require("src/dialogs.gs").getDialog;
 // End of Node required code block
 
@@ -24,7 +24,7 @@ function menuJiraFieldMap() {
     debug.error(msg + " httpResp: %s", httpResp);
   };
 
-  getAllJiraFields(ok,error);
+  IssueFields.getAllFields(ok,error);
 }
 
 
