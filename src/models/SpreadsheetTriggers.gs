@@ -1,15 +1,22 @@
 /**
  * Centralized handler to register/install spreadsheet triggers while ensuring no duplicated triggers are registered.
  */
-var SpreadsheetTriggers_ = {
+function SpreadsheetTriggers_() {
 
+  /**
+   * Initialize anything necessary for the class object
+   * 
+   * @return void
+   */
+  this.init = function (init) {};
+  
   /**
    * Get a installed Spreadsheet trigger if exists.
    * 
    * @param {string} handlerFunction The Trigger handler function name
    * @return {Trigger|object|FALSE} Returns the found trigger or false if not found
    */
-  get : function (handlerFunction) {
+  this.get = function (handlerFunction) {
     var triggers = ScriptApp.getProjectTriggers();
     for (var i = 0; i < triggers.length; i++) {
       if (triggers[i].getHandlerFunction() === handlerFunction) {
@@ -18,7 +25,7 @@ var SpreadsheetTriggers_ = {
     }
 
     return false;
-  },
+  };
 
   /**
    * Register/Install new Spreadsheet trigger to current active spreadsheet. If already installed, it will be ignore unless param
@@ -31,7 +38,7 @@ var SpreadsheetTriggers_ = {
    * @return {Trigger|object} Returns the trigger object
    * @throws Error
    */
-  register : function (event, handlerFunction, reinstall) {
+  this.register = function (event, handlerFunction, reinstall) {
     reinstall = reinstall || false;
     var _events = ['onChange', 'onEdit', 'onFormSubmit', 'onOpen'];
 
@@ -73,7 +80,7 @@ var SpreadsheetTriggers_ = {
     _trigger = _newTrigger.create();
 
     return _trigger;
-  },
+  };
 
   /**
    * Deletes a trigger based on Function Name.
@@ -81,7 +88,7 @@ var SpreadsheetTriggers_ = {
    * @param {string} handlerFunction The Trigger handler function name
    * @return SpreadsheetTriggers_
    */
-  deleteTrigger : function (handlerFunction) {
+  this.deleteTrigger = function (handlerFunction) {
     // Loop over all triggers.
     var triggers = ScriptApp.getProjectTriggers();
     for (var i = 0; i < triggers.length; i++) {
@@ -93,12 +100,12 @@ var SpreadsheetTriggers_ = {
     }
 
     return this;
-  }
+  };
 
+  // Initialize this object/class
+  this.init(initData);
 };
 
 // Node required code block
-module.exports = {
-  SpreadsheetTriggers_ : SpreadsheetTriggers_
-};
+module.exports = SpreadsheetTriggers_;
 // End of Node required code block
