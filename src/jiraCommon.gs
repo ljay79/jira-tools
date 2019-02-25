@@ -245,7 +245,20 @@ function getMyFilters(includeFavourites) {
  */
 function getFilter(filterId) {
   var method = "filter",
-      filter = {},
+      filter = {
+        // obj template
+        id : null,
+        name : null,
+        description : null,
+        owner: {
+          name : null,
+          displayName : null,
+          active : null
+        },
+        jql : null,
+        searchUrl : null,
+        favourite : null
+      },
       request = new Request();
 
   var ok = function(responseData, httpResponse, statusCode){
