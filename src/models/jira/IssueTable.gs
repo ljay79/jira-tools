@@ -140,23 +140,6 @@ function onEditTableMeta(e) {
 
 /* ######## ################## #################### */
 
-function tblAccessTest() {
-  var table1 = new IssueTable_();
-  table1.setData('tableId', 'aaaTid');
-  table1.setData('sheetId', 'aaaSid');
-  table1.setData('foo', 'bar');
-
-  console.log('tId: %s', table1.getTableId());
-  console.log('sId: %s', table1.getSheetId());
-  console.log('default 1: %s', table1.getData('unknown'));
-  console.log('default 2: %s', table1.getData('unknown', 'defValue2'));
-  console.log('dataAll: %s', table1.getData());
-
-  table1.setData('foo', 'bar2');
-  console.log('dataAll: %s', table1.getData());
-  table1.setData('foo', 'bar2');
-  console.log('dataAll: %s', table1.getData());
-}
 
 /**
  * @file Contains class used reflect a Jira IssueTable's meta data for google sheet tables.
@@ -195,11 +178,11 @@ function IssueTable_(initData) {
    */
   this.init = function (initData) {
     // initialize with existing data
-    data = initData || extend(data, {
+    data = extend(extend(data, {
       sheetId          : sheetIdPropertySafe(),
       headerRowOffset  : 1,
       time_lastupdated : (new Date()).getTime()
-    });
+    }), initData);
   };
 
   /**
