@@ -71,7 +71,6 @@ function insertIssuesFromFilter(jsonFormData) {
  * @param initRange {object}  SpreadsheetApp range
  * @param data {object}  (https://docs.atlassian.com/jira/REST/server/#api/2/search-searchUsingSearchRequest)
  * @return {IssueTable}
- * @deprecated  To be replaced by new IssueTable_ models
  */
 function IssueTable(sheet, initRange, data) {
   var headers = [], rowIndex = 0, numColumns = 0;
