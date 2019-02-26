@@ -138,7 +138,55 @@ function onEditTableMeta(e) {
 
 }
 
+
+function tblAccessTest() {
+  var table1 = new IssueTable_();
+  table1.setData('tableId', 'aaaTid');
+  table1.setData('sheetId', 'aaaSid');
+  table1.setData('foo', 'bar');
+
+  console.log('tId: %s', table1.getTableId());
+  console.log('sId: %s', table1.getSheetId());
+  console.log('default 1: %s', table1.getData('unknown'));
+  console.log('default 2: %s', table1.getData('unknown', 'defValue2'));
+  console.log('dataAll: %s', table1.getData());
+
+  table1.setData('foo', 'bar2');
+  console.log('dataAll: %s', table1.getData());
+  table1.setData('foo', 'bar2');
+  console.log('dataAll: %s', table1.getData());
+}
+
+
+
+
 /* ######## ################## #################### */
+
+function newTable() {
+  var jsonIssues = '[{"expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields","id": "33184","self": "https://dyhltd.atlassian.net/rest/api/2/issue/33184","key": "TP-15","fields": {"summary": "Test Story 1 - appended2","status": {"self": "https://dyhltd.atlassian.net/rest/api/2/status/10004","description": "The issue is open and awaiting review and further refining to process into Sprints Backlog.","iconUrl": "https://dyhltd.atlassian.net/images/icons/status_generic.gif","name": "To Do","id": "10004","statusCategory": {"self": "https://dyhltd.atlassian.net/rest/api/2/statuscategory/2","id": 2,"key": "new","colorName": "blue-gray","name": "To Do"}}}}, {"expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields","id": "33178","self": "https://dyhltd.atlassian.net/rest/api/2/issue/33178","key": "TP-9","fields": {"summary": "CLONE - Test task of Epic 4 - appended","status": {"self": "https://dyhltd.atlassian.net/rest/api/2/status/3","description": "This issue is being actively worked on at the moment by the assignee.","iconUrl": "https://dyhltd.atlassian.net/images/icons/statuses/inprogress.png","name": "In Progress","id": "3","statusCategory": {"self": "https://dyhltd.atlassian.net/rest/api/2/statuscategory/4","id": 4,"key": "indeterminate","colorName": "yellow","name": "In Progress"}}}}]';
+  jsonIssues = JSON.parse(jsonIssues);
+
+  var attributes = {
+    filter   : getFilter(14406),
+    issues   : jsonIssues,
+    sheet    : getTicketSheet(),
+    renderer : new IssueTableRendererDefault_()
+  };
+
+  console.log('passing attribs: %s', attributes);
+  var table = new IssueTable_(attributes);
+  table.render();
+}
+
+function IssueTableRendererDefault_() {
+  console.log('IssueTableRendererDefault_()');
+
+  this.render = function () {
+    console.log('IssueTableRendererDefault_.render()');
+    console.log('getSheetId: %s; rangeA1: %s', this.getSheetId(), this.getMeta('rangeA1'));
+  };
+}
+
 
 
 /**
@@ -151,24 +199,25 @@ function onEditTableMeta(e) {
  * @param {object} data Optional JSON representation of previously stored IssueTable data object.
  * @Constructor
  */
-function IssueTable_(initData) {
-  // use private property "data" instead of public?
-  var data = {
-    sheetId : null,         // sample: '6.02713257E8'
-    tableId : null,         // sample: 'table1_1550871398921'
-    name : null,            // sample: 'My pending Issues'
-    /*
-     * Range names: - Can contain only letters, numbers, and underscores. - Can't start with a number, or the words "true" or "false." -
-     * Can't contain any spaces or punctuation. - Must be 1–250 characters. - Can't be in either A1 or R1C1 syntax. For example, you might
-     * get an error if you give your range a name like "A1:B2" or "R1C1:R2C2."
-     */
-    rangeName : null,       // sample: 'table1_6_02713257E8'
-    rangeA1 : null,         // sample: 'A1:F4'
-    headerRowOffset : null, // sample: 1
-    headerValues : [],      // sample: [Summary,Key,Status,Epic]
-    JQL : null,             // sample: 'status = Done and project in ("JST")'
-    time_lastupdated : null // sample: 1550871398921
-  };
+function IssueTable_(attributes) {
+  var issues = {},
+      metaData = {
+        sheetId : sheetIdPropertySafe(), // sample: '6.02713257E8'
+        tableId : null,                  // sample: 'table1_1550871398921'
+        name : null,                     // sample: 'My pending Issues'
+        /*
+         * Range names: - Can contain only letters, numbers, and underscores. - Can't start with a number, or the words "true" or "false." -
+         * Can't contain any spaces or punctuation. - Must be 1–250 characters. - Can't be in either A1 or R1C1 syntax. For example, you might
+         * get an error if you give your range a name like "A1:B2" or "R1C1:R2C2."
+         */
+        rangeName : null,                // sample: 'table1_6_02713257E8'
+        rangeA1 : null,                  // sample: 'A1:F4'
+        headerRowOffset : 1,             // sample: 1
+        headerValues : [],               // sample: [Summary,Key,Status,Epic]
+        filter: {id: 0, jql: null},      // sample: {id: 1234, jql: 'status = Done and project in ("JST")'}
+        renderer: null,                  // sample: IssueTableRendererDefault_
+        time_lastupdated : (new Date()).getTime() // sample: 1550871398921
+      };
 
   /**
    * Initialize anything necessary for the class object
@@ -176,13 +225,64 @@ function IssueTable_(initData) {
    * @param {object} initData    Optional JSON representation of an IssueTable_ data set to load into instance
    * @return void
    */
-  this.init = function (initData) {
-    // initialize with existing data
-    data = extend(extend(data, {
-      sheetId          : sheetIdPropertySafe(),
-      headerRowOffset  : 1,
-      time_lastupdated : (new Date()).getTime()
-    }), initData);
+  this.init = function (attributes) {
+    // metaData passed (ie: this.fromJson()
+    if (attributes.hasOwnProperty('metaData')) {
+      // initialize with existing data
+      metaData = extend(metaData, attributes.metaData);
+    } else {
+      // new init to generate new table; validate required options
+      if (!attributes.hasOwnProperty('filter') 
+          || typeof attributes.filter !== 'object'
+          || !attributes.filter.hasOwnProperty('id')
+          || !attributes.filter.hasOwnProperty('jql') ) {
+            throw new Error("{attributes.filter} must be an object of type 'Filter'. {id:{int}, jql: {strong}, ..}");
+      }
+
+      if (!attributes.hasOwnProperty('issues') || typeof attributes.issues !== 'object' ) {
+        throw new Error("{attributes.issues} must be an object. Jira api response object of type issues.");
+      }
+
+      if (!attributes.hasOwnProperty('sheet') || typeof attributes.sheet !== 'object' ) {
+        throw new Error("{attributes.sheet} must be an object of type 'Sheet'.");
+      }
+
+      if (!attributes.hasOwnProperty('renderer') || typeof attributes.renderer !== 'object' ) {
+        throw new Error("{attributes.renderer} must be an object. Ie: of type 'IssueTableRendererDefault_'.");
+      }
+
+      this.setMeta('filter', attributes.filter)
+        .setIssues(attributes.issues)
+        .setRenderer(attributes.renderer)
+      ;
+      this.setMeta('sheetId', sheetIdPropertySafe(attributes.sheet.getSheetId()))
+        .setMeta('rangeA1', attributes.sheet.getActiveCell().getA1Notation())
+      ;
+    }
+  };
+
+  /**
+   * Setting the table renderer
+   *
+   * @param {IssueTableRenderer_} IssueTableRenderer    Renderer class to be used
+   * @return {IssueTable_}
+   */
+  this.setRenderer = function (IssueTableRenderer) {
+    metaData.renderer = IssueTableRenderer;
+
+    return this;
+  };
+
+  /**
+   * Set the Jira api response object "issues"
+   * 
+   * @param {object} issuesJson
+   * @return {IssueTable_}
+   */
+  this.setIssues = function (issuesJson) {
+    issues = issuesJson || {};
+
+    return this;
   };
 
   /**
@@ -191,17 +291,17 @@ function IssueTable_(initData) {
    * @param {mixed} value    The value for key
    * @return {IssueTable_}
    */
-  this.setData = function (key, value) {
-    console.log('IssueTable_.setData(%s) <= %s', key, value);
+  this.setMeta = function (key, value) {
+    console.log('IssueTable_.setMeta(%s) <= %s', key, value);
 
-    if (data.hasOwnProperty(key) && data[key] === value) {
-      console.log('new data unchanged; %s = new(%s) vs old(%s)', key, value, data[key]);
+    if (metaData.hasOwnProperty(key) && metaData[key] === value) {
+      console.log('new metaData unchanged; %s = new(%s) vs old(%s)', key, value, metaData[key]);
       // old and new value are same, just skip and return
       return this;
     }
 
-    data[key] = value;
-    data.time_lastupdated = (new Date()).getTime();
+    metaData[key] = value;
+    metaData.time_lastupdated = (new Date()).getTime();
 
     return this;
   };
@@ -213,16 +313,16 @@ function IssueTable_(initData) {
    * @param {mixed} defaultValue    Optional default value to return in case data could not be found
    * @return {mixed}
    */
-  this.getData = function (key, defaultValue) {
+  this.getMeta = function (key, defaultValue) {
     var value = defaultValue || null;
 
     // no key specified, return entire data object
     if (key === undefined) {
-      return data;
+      return metaData;
     }
 
-    if (data.hasOwnProperty(key)) {
-      value = data[key];
+    if (metaData.hasOwnProperty(key)) {
+      value = metaData[key];
     }
 
     return value;
@@ -233,7 +333,7 @@ function IssueTable_(initData) {
    * @return {string}
    */
   this.getSheetId = function () {
-    return data.sheetId;
+    return metaData.sheetId;
   };
 
   /**
@@ -241,7 +341,7 @@ function IssueTable_(initData) {
    * @return {string}
    */
   this.getTableId = function () {
-    return data.tableId;
+    return metaData.tableId;
   };
 
   /**
@@ -250,7 +350,7 @@ function IssueTable_(initData) {
    * @return {string}    Entire data object stringified with JSON.stringify
    */
   this.toJson = function () {
-    return JSON.stringify(data);
+    return JSON.stringify(metaData);
   };
 
   /**
@@ -260,12 +360,26 @@ function IssueTable_(initData) {
    * @return {IssueTable_} A new instance of IssueTable_ with all data from [json] load into.
    */
   this.fromJson = function (json) {
-    var data = JSON.parse(json); // Parsing the json string.
-    return new IssueTable_(data);
+    var metaData = JSON.parse(json); // Parsing the json string.
+    return new IssueTable_({metaData: metaData});
+  };
+
+  /**
+   * @return {IssueTableRenderer_}
+   */
+  this.render = function () {
+    console.log('->render()');
+    if (typeof metaData.renderer !== 'object' || !metaData.renderer.hasOwnProperty('render')) {
+      throw new Error("{renderer} must be an object. Ie: of type 'IssueTableRendererDefault_'.");
+    }
+    
+    console.log('  -> rendering ..');
+
+    return metaData.renderer.render.call(this);
   };
 
   // Initialize this object/class
-  this.init(initData);
+  this.init(attributes);
 }
 
 // Node required code block
