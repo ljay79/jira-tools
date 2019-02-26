@@ -41,7 +41,6 @@ var ISSUE_COLUMNS = {
   watches: 'Watchers',
   workratio: 'Work Ratio'
   //subtasks:[{"id":"33351","key":"FF24-229","self":"...atlassian.net/rest/api/2/issue/33351","fields":{"summary":"QA - Feedback","status":{"self":"....atlassian.net/rest/api/2/status/6","description":"The issue is considered finished, the resolution is correct. Issues which are closed can be reopened.","iconUrl":"https://dyhltd.atlassian.net/images/icons/statuses/closed.png","name":"Closed","id":"6","statusCategory":{"self":"https://dyhltd.atlassian.net/rest/api/2/statuscategory/3","id":3,"key":"done","colorName":"green","name":"Done"}},"priority":{"self":"https://dyhltd.atlassian.net/rest/api/2/priority/1","iconUrl":"https://dyhltd.atlassian.net/images/icons/priorities/highest.svg","name":"Highest","id":"1"},"issuetype":{"self":"https://dyhltd.atlassian.net/rest/api/2/issuetype/10003","id":"10003","description":"The sub-task of the issue","iconUrl":"https://dyhltd.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype","name":"Sub-task","subtask":true,"avatarId":10316}}}]
-  //versions: [{"self": "https://dyhltd.atlassian.net/rest/api/2/version/14021","id": "14021","description": "","name": "Loan - Release v2.0.17","archived": false,"released": true,"releaseDate": "2018-03-21"}]
   //aggregatetimeoriginalestimate: 288000
 };
 //@see storage.gs for jiraColumnDefault
@@ -388,12 +387,12 @@ function unifyIssueAttrib(attrib, data) {
           resp.value = data.fields[attrib].name || '';
           break;
         case 'array|group':
-        case 'array|version':
+        case 'array|versions':
           resp.value = data.fields[attrib].map(function(el){
             return (el.name || 'n/a');
           }).join(', ');
           break;
-        case 'version':
+        case 'versions':
           resp = {
             value: data.fields[attrib].name,
             format: (data.fields[attrib].released == true) ? '@[green]' : ''
@@ -503,6 +502,7 @@ function unifyIssueAttrib(attrib, data) {
       break;
     case 'components':
     case 'fixVersions':
+    case 'versions':
       // array of objects with element name in property 'name'
       resp = {
         value: data.fields[attrib].map(function(value) {
@@ -674,7 +674,7 @@ return {
         };
  */
 function convertJiraFieldResponseToFieldRecord(jiraFieldResponse) {
-  var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
+  var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'versions', 'array|versions'];
   var _type = (jiraFieldResponse.schema ? jiraFieldResponse.schema.type : null) || null;
   if (jiraFieldResponse.schema && jiraFieldResponse.schema.items) {
     _type += '|' + jiraFieldResponse.schema.items;
