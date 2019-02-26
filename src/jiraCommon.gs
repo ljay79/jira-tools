@@ -422,7 +422,7 @@ function unifyIssueAttrib(attrib, data) {
             return (el.name || 'n/a');
           }).join(', ');
           break;
-        case 'version': // obsolete? see regular fields
+        case 'versions': // obsolete? see regular fields
           resp = {
             value: data.fields[attrib].name,
             format: (data.fields[attrib].released == true) ? '@[green]' : ''
@@ -715,7 +715,7 @@ function convertJiraFieldResponseToFieldRecord(jiraFieldResponse) {
   }
   
   
-  var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
+  var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'versions', 'array|versions'];
   var _type = (jiraFieldResponse.schema ? jiraFieldResponse.schema.type : null) || null;
   if (jiraFieldResponse.schema && jiraFieldResponse.schema.items) {
     _type += '|' + jiraFieldResponse.schema.items;
