@@ -36,11 +36,11 @@ test("unifyIssueAttrib ", () => {
     "favoriteCustomFields",
     [
       {key:"customfield_custom1",name:"Custom 1",type: "number"},
-      {key:"customfield_custom2",name:"Custom 2",type: "string"},
-      {key:"customfield_custom3",name:"Custom 3",type: "option"},
-      {key:"customfield_stringArray",name:"String Array",type: "array|string"},
-      {key:"customfield_stringArray2",name:"String Array",type: "array|string"},
-      {key:"customfield_stringArray3",name:"String Array",type: "array|string"},
+      {key:"customfield_custom2",name:"Custom 2",schemaType: "string"},
+      {key:"customfield_custom3",name:"Custom 3",schemaType: "option"},
+      {key:"customfield_stringArray",name:"String Array",schemaType: "array|string"},
+      {key:"customfield_stringArray2",name:"String Array",schemaType: "array|string"},
+      {key:"customfield_stringArray3",name:"String Array",schemaType: "array|string"},
       
     ]
   );

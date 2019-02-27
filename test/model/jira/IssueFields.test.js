@@ -138,6 +138,7 @@ test("Get all fields from Jira", () => {
     const successCallBack =jest.fn();
     const errorCallBack =jest.fn();
     var result = IssueFields.getAllFields(successCallBack,errorCallBack);
+    expect(jiraApiMock.call.mock.calls.length).toBe(1);
     expect(successCallBack.mock.calls.length).toBe(1);
     expect(errorCallBack.mock.calls.length).toBe(0);
     var fieldListReturned = successCallBack.mock.calls[0][0];
@@ -146,6 +147,14 @@ test("Get all fields from Jira", () => {
     expect(fieldListReturned[1].key).toBe("def");
     expect(fieldListReturned[2].key).toBe("xyz");
     expect(result).toBe(fieldListReturned);
+
+    // now check the cache
+    var result = IssueFields.getAllFields(successCallBack,errorCallBack);
+    expect(successCallBack.mock.calls.length).toBe(2);
+    expect(errorCallBack.mock.calls.length).toBe(0);
+    // no additional calls to JIRA API
+    expect(jiraApiMock.call.mock.calls.length).toBe(1);
+
 
     successCallBack.mockClear();
     errorCallBack.mockClear();
@@ -204,12 +213,12 @@ test("Get all custom fields from Jira", () => {
   ];
   //set up
   jiraApiMock.setNextJiraResponse(200,"field",fieldList);
-  const getAllCustomJiraFields = require("src/models/jira/IssueFields.gs").getAllCustomJiraFields;
+  const IssueFields = require("src/models/jira/IssueFields.gs").IssueFields;
   const successCallBack =jest.fn();
   const errorCallBack =jest.fn();
 
   // execute
-  var result = getAllCustomJiraFields(successCallBack,errorCallBack);
+  var result = IssueFields.getAllCustomFields(successCallBack,errorCallBack);
   // verify call backs
   expect(successCallBack.mock.calls.length).toBe(1);
   expect(errorCallBack.mock.calls.length).toBe(0);

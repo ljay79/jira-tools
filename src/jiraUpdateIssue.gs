@@ -21,7 +21,6 @@ function updateJiraIssues(headerRow, dataRows) {
   if (hasValidationErrors()) {
     return result;
   }
-
   var allJiraFields = IssueFields.getAllFields();
   if (allJiraFields.length == 0) {
     result.finished = true;
@@ -213,7 +212,6 @@ function updateIssueinJira(issueData, callback) {
   var request = new Request();
   var ok = function (responseData, httpResponse, statusCode) {
     // it worked
-    var status = unifyIssueAttrib('status', responseData);
     callback(issueData.key, true, "");
   };
 

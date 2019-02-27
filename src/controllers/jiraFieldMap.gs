@@ -33,6 +33,10 @@ function menuJiraFieldMap() {
  * @param fieldMap {object}
  */
 function sidebarFieldMap_(fieldMap) {
+  // only show actual jira fields to the user
+  fieldMap = fieldMap.filter(function(field){
+    return !field.isVirtualField;
+  });
   var dialog = getDialog('views/sidebar/fieldMap', { fieldMap: fieldMap });
 
   debug.log('Processed: %s', dialog);

@@ -262,7 +262,7 @@ function fetchUsersAndGroups(minimal) {
  */
 function unifyIssueAttrib(attrib, data) {
   var resp = {value: ''};
-  
+  // TODO: We should remove this try catch - needs alot of testing though to get to that.
   try { // no error handling, always return a valid object
 
   // custom fields first
@@ -328,15 +328,17 @@ function unifyIssueAttrib(attrib, data) {
           resp.value = '';
           var _values = data.fields[attrib];
 
-          // field "Sprint" is type string with custom value
-          if (data.fields[attrib][0].indexOf('service.sprint.Sprint') > -1) {
-            _values = [];
-            var _regEx = /name=([^,]+),/gi;
-            for (var i = 0; i < data.fields[attrib].length; i++) {
-              var _sprintNameArr = null;
-              _sprintNameArr = _regEx.exec(data.fields[attrib][i]);
-              _regEx.lastIndex = 0; // Reset
-              if(_sprintNameArr.length==2) _values.push(_sprintNameArr[1]);
+          if (_values.length>0) {
+            // field "Sprint" is type string with custom value
+            if (data.fields[attrib][0].indexOf('service.sprint.Sprint') > -1) {
+              _values = [];
+              var _regEx = /name=([^,]+),/gi;
+              for (var i = 0; i < data.fields[attrib].length; i++) {
+                var _sprintNameArr = null;
+                _sprintNameArr = _regEx.exec(data.fields[attrib][i]);
+                _regEx.lastIndex = 0; // Reset
+                if(_sprintNameArr.length==2) _values.push(_sprintNameArr[1]);
+              }
             }
           }
 

@@ -6,7 +6,7 @@
 const debug = require("src/debug.gs").debug;
 const EpicField = require("src/models/jira/EpicField.gs");
 const UserStorage = require("src/models/gas/UserStorage.gs");
-const getAllCustomJiraFields = require("src/models/jira/IssueFields.gs").getAllCustomJiraFields;
+const IssueFields = require("src/models/jira/IssueFields.gs").IssueFields;
 // End of Node required code block
 
 
@@ -47,7 +47,7 @@ function callbackFetchCustomFields() {
   var error = function(message) {
     debug.error(message);
   };
-  getAllCustomJiraFields(ok, error);
+  IssueFields.getAllCustomFields(ok, error);
 
   return customFields;
 }
