@@ -25,7 +25,7 @@ IssueFields = (function () {
    * 
    * @returns {object}
    */
-  function field(key, name, isCustom, schemaType, isVirtual) {
+  function createField(key, name, isCustom, schemaType, isVirtual) {
     // isVirtual defaults to false
     return {
       key: key,
@@ -64,7 +64,7 @@ IssueFields = (function () {
     if (jiraFieldResponse.schema && jiraFieldResponse.schema.items) {
       _type += '|' + jiraFieldResponse.schema.items;
     }
-    return field(
+    return createField(
       jiraFieldResponse.key || jiraFieldResponse.id, // Server API returns ".id" only while Cloud returns both with same value
       jiraFieldResponse.name,
       jiraFieldResponse.custom,
@@ -126,7 +126,7 @@ IssueFields = (function () {
           if (EpicField.isUsable()) {
             // add custom field 'Epic' to beginning of array
             allJiraFields_.unshift(
-              field(
+              createField(
                 EpicField.getKey(),
                 EpicField.getName(),
                 EpicField.EPIC_KEY,
