@@ -244,11 +244,12 @@ function getCustomFields(format) {
   format = format || CUSTOMFIELD_FORMAT_RAW;
   var customFields = UserStorage.getValue('favoriteCustomFields') || [];
 
-  // using schemaType conistently across the code base
-  // however a user may have an object stored with type in their preferences
+  // using attribute schemaType conistently across the code base
+  // however a user may have an object stored with attribute "type" in their preferences
   customFields.forEach(function(field) {
     if (field.type != null) {
       field.schemaType = field.type;
+      delete(field.type);
     }
   });
    

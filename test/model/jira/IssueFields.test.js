@@ -260,27 +260,31 @@ test("getCustomFields",() => {
     "favoriteCustomFields",
     [
       {key:"customx",name:"Custom X",schemaType: "Type 1"},
-      {key:"customy",name:"Custom Y",schemaType: "Type 2"}
+      {key:"customy",name:"Custom Y",schemaType: "Type 2"},
+      {key:"customz",name:"Custom Z",type: "Type 3"}
     ]
   );
   const getCustomFields = require("src/models/jira/IssueFields.gs").getCustomFields;
   var result = getCustomFields();
-  expect(result.length).toBe(2);
+  expect(result.length).toBe(3);
   expect(result[0]).toEqual({key:"customx",name:"Custom X",schemaType: "Type 1"});
   result = getCustomFields(CUSTOMFIELD_FORMAT_RAW);
-  expect(result.length).toBe(2);
+  expect(result.length).toBe(3);
   expect(result).toEqual([
     {key:"customx",name:"Custom X",schemaType: "Type 1"},
-    {key:"customy",name:"Custom Y",schemaType: "Type 2"}
+    {key:"customy",name:"Custom Y",schemaType: "Type 2"},
+    {key:"customz",name:"Custom Z",schemaType: "Type 3"}
   ] 
   );
   result = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
-  expect(Object.keys(result).length).toBe(2);
+  expect(Object.keys(result).length).toBe(3);
   expect(result.customx).toBe("Custom X");
   expect(result.customy).toBe("Custom Y");
+  expect(result.customz).toBe("Custom Z");
 
   result = getCustomFields(CUSTOMFIELD_FORMAT_UNIFY);
-  expect(Object.keys(result).length).toBe(2);
+  expect(Object.keys(result).length).toBe(3);
   expect(result.customx).toBe("Type 1");
   expect(result.customy).toBe("Type 2");
+  expect(result.customz).toBe("Type 3");
 });
