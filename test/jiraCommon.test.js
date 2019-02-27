@@ -76,9 +76,9 @@ test("unifyIssueAttrib ", () => {
   expect(unifyIssueAttrib("customfield_version_unreleased",testIssue).value).toBe("unreleased version");
   expect(unifyIssueAttrib("customfield_version_unreleased",testIssue).format).toBe("");
   
-  expect(unifyIssueAttrib("components",testIssue).format).toBe("");
-  expect(unifyIssueAttrib("fixVersions",testIssue).format).toBe("");
-  expect(unifyIssueAttrib("versions",testIssue).format).toBe("");
+  expect(unifyIssueAttrib("components",testIssue).value).toBe("component 1, component 2");
+  expect(unifyIssueAttrib("fixVersions",testIssue).value).toBe("fix Version 1");
+  expect(unifyIssueAttrib("versions",testIssue).value).toBe("");
 });
 
 

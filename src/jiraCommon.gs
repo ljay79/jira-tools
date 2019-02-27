@@ -479,7 +479,7 @@ function unifyIssueAttrib(attrib, data) {
       resp = {
         value: data.fields[attrib].map(function(value) {
           return value.name;
-        }).join(',')
+        }).join(', ')
       };
       break;
     case 'aggregateprogress':
