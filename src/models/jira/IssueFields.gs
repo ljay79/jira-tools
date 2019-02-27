@@ -46,7 +46,7 @@ IssueFields = (function () {
             name:       cField.name,
             custom:     cField.custom,
             schemaType: _type,
-            supported:  (arrSupportedTypes.indexOf(_type) > -1),
+            supported:  (SupportedTypes.indexOf(_type) > -1),
             isVirtualField: true/false
           };
    */
