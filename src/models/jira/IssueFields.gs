@@ -21,11 +21,11 @@ IssueFields = (function () {
    * @param name the name for the field
    * @param isCustom is the field a custom field
    * @param schemaType the string representation of the type
-   * @param isVirtualField the field is a virtual field used by the application only
+   * @param isVirtual the field is a virtual field used by the application only
    * 
    * @returns {object}
    */
-  function field(key, name, isCustom, schemaType, isVirtualField) {
+  function field(key, name, isCustom, schemaType, isVirtual) {
     // isVirtualField defaults to false
     return {
       key: key,
@@ -33,7 +33,7 @@ IssueFields = (function () {
       custom: isCustom,
       schemaType: schemaType,
       supported: (SupportedTypes.indexOf(schemaType) > -1),
-      isVirtualField: (isVirtualField==null)?false:isVirtualField
+      isVirtual: (isVirtual==null)?false:isVirtual
     };
   }
   /**
@@ -47,7 +47,7 @@ IssueFields = (function () {
             custom:     cField.custom,
             schemaType: _type,
             supported:  (SupportedTypes.indexOf(_type) > -1),
-            isVirtualField: true/false
+            isVirtual: true/false
           };
    */
   function convertJiraResponse(jiraFieldResponse) {
