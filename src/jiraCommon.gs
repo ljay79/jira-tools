@@ -359,12 +359,12 @@ function unifyIssueAttrib(attrib, data) {
           resp.value = data.fields[attrib].name || '';
           break;
         case 'array|group':
-        case 'array|version':
+        case 'array|versions':
           resp.value = data.fields[attrib].map(function(el){
             return (el.name || 'n/a');
           }).join(', ');
           break;
-        case 'version':
+        case 'versions':
           resp = {
             value: data.fields[attrib].name,
             format: (data.fields[attrib].released == true) ? '@[green]' : ''
@@ -474,6 +474,7 @@ function unifyIssueAttrib(attrib, data) {
       break;
     case 'components':
     case 'fixVersions':
+    case 'versions':
       // array of objects with element name in property 'name'
       resp = {
         value: data.fields[attrib].map(function(value) {

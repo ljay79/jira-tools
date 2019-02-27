@@ -26,7 +26,11 @@ test("unifyIssueAttrib ", () => {
       customfield_custom3: { value:"option_value"},
       customfield_stringArray: ["one","two","three"],
       customfield_stringArray2: [],
-      customfield_stringArray3: ["one"]
+      customfield_stringArray3: ["one"],
+      customfield_versions: [{name:"version1"},{name:"version2"}],
+      customfield_emptyversions: [],
+      customfield_version_unreleased: {name:"unreleased version",released: false},
+      customfield_version_released: {name:"released version",released: true}
     }
   }
   initJiraDummyConfig();
@@ -41,6 +45,11 @@ test("unifyIssueAttrib ", () => {
       {key:"customfield_stringArray",name:"String Array",schemaType: "array|string"},
       {key:"customfield_stringArray2",name:"String Array",schemaType: "array|string"},
       {key:"customfield_stringArray3",name:"String Array",schemaType: "array|string"},
+      {key:"customfield_versions",name:"Version Array",schemaType: "array|versions"},
+      {key:"customfield_emptyversions",name:"Empty Version Array",schemaType: "array|versions"},
+      {key:"customfield_version_released",name:"Version",schemaType: "versions"},
+      {key:"customfield_version_unreleased",name:"Version",schemaType: "versions"},
+      
       
     ]
   );
@@ -57,7 +66,13 @@ test("unifyIssueAttrib ", () => {
   expect(unifyIssueAttrib("customfield_stringArray",testIssue).value).toBe("one,two,three");
   expect(unifyIssueAttrib("customfield_stringArray2",testIssue).value).toBe("");
   expect(unifyIssueAttrib("customfield_stringArray3",testIssue).value).toBe("one");
-
+  expect(unifyIssueAttrib("customfield_versions",testIssue).value).toBe("version1, version2");
+  expect(unifyIssueAttrib("customfield_emptyversions",testIssue).value).toBe("");
+  expect(unifyIssueAttrib("customfield_version_released",testIssue).value).toBe("released version");
+  expect(unifyIssueAttrib("customfield_version_released",testIssue).format).toBe("@[green]");
+  expect(unifyIssueAttrib("customfield_version_unreleased",testIssue).value).toBe("unreleased version");
+  expect(unifyIssueAttrib("customfield_version_unreleased",testIssue).format).toBe("");
+  
 });
 
 
