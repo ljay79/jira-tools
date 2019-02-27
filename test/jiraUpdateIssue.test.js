@@ -4,15 +4,7 @@ IssueFields = require('src/models/jira/IssueFields.gs').IssueFields;
 
 beforeAll(() => {
   //set the cached field list
- // jiraApiMock.setNextJiraResponse(200, "field", jiraFieldList);
-  //IssueFields.clearCache();
-  IssueFields.getAllFields = jest.fn().mockImplementation( (ok, error) => {
-    console.log("IssueFields.getAllFields mock");
-    if (ok != null) {
-      ok(jiraFieldList);
-    }
-    return jiraFieldList;
-  })
+  IssueFields.setAllFields(jiraFieldList);
 });
 
 beforeEach(() => {
@@ -304,14 +296,15 @@ describe('processing list of Jira Issues', () => {
 
 test('packing a row', () => {
   const packageRowForUpdate = require('../src/jiraUpdateIssue.gs').packageRowForUpdate;
-  var result = packageRowForUpdate(jiraFieldList, { "My custom field": 1, Key: 0 }, ["PBI-1", "column A value"]);
+
+  var result = packageRowForUpdate({ "My custom field": 1, Key: 0 }, ["PBI-1", "column A value"]);
   expect(result).not.toBeNull();
   expect(result.key).toBe("PBI-1");
   expect(result.fields).not.toBeNull();
   expect(result.fields.custom1234).toBe("column A value");
   expect(Object.keys(result.fields).length).toBe(1);
 
-  var result = packageRowForUpdate(jiraFieldList, { Key: 0, "My custom field": 1, "My custom field 2": 3 }, ["PBI-1", "column A value", "should be ignored", "column B value"]);
+  var result = packageRowForUpdate({ Key: 0, "My custom field": 1, "My custom field 2": 3 }, ["PBI-1", "column A value", "should be ignored", "column B value"]);
   expect(result).not.toBeNull();
   expect(result.key).toBe("PBI-1");
   expect(result.fields).not.toBeNull();
@@ -320,20 +313,20 @@ test('packing a row', () => {
   expect(Object.keys(result.fields).length).toBe(2);
   expect(result.update).not.toBeDefined();
 
-  var result = packageRowForUpdate(jiraFieldList, { Key: 0, columnA: 1, columnB: 3 }, ["", "column A value", "should be ignored", "column B value"]);
+  var result = packageRowForUpdate({ Key: 0, columnA: 1, columnB: 3 }, ["", "column A value", "should be ignored", "column B value"]);
   expect(result).not.toBeNull();
   expect(result.key).toBeNull();
 
-  var result = packageRowForUpdate(jiraFieldList, { Key: 0, columnA: 1, columnB: 3 }, [null, "column A value", "should be ignored", "column B value"]);
+  var result = packageRowForUpdate({ Key: 0, columnA: 1, columnB: 3 }, [null, "column A value", "should be ignored", "column B value"]);
   expect(result).not.toBeNull();
   expect(result.key).toBeNull();
 
 
-  var result = packageRowForUpdate(jiraFieldList, { columnA: 1, columnB: 3 }, [null, "column A value", "should be ignored", "column B value"]);
+  var result = packageRowForUpdate({ columnA: 1, columnB: 3 }, [null, "column A value", "should be ignored", "column B value"]);
   expect(result).not.toBeNull();
   expect(result.key).toBeNull();
 
-  var result = packageRowForUpdate(jiraFieldList, { "My custom field": 1, Key: 0 }, ["PBI-22", "column A value"]);
+  var result = packageRowForUpdate( { "My custom field": 1, Key: 0 }, ["PBI-22", "column A value"]);
   expect(result).not.toBeNull();
   expect(result.key).toBe("PBI-22");
   expect(result.fields).not.toBeNull();
@@ -342,7 +335,7 @@ test('packing a row', () => {
   expect(Object.keys(result.fields).length).toBe(1);
 
 
-  var result = packageRowForUpdate(jiraFieldList, { number1: 1, issuekey: 0 }, ["PBI-22", ""]);
+  var result = packageRowForUpdate({ number1: 1, issuekey: 0 }, ["PBI-22", ""]);
   expect(result).not.toBeNull();
   expect(result.key).toBe("PBI-22");
   expect(result.fields).not.toBeNull();
@@ -353,7 +346,7 @@ test('packing a row', () => {
 
 test("packing a row with Components and Fix Versions in the payload", () => {
   const packageRowForUpdate = require('../src/jiraUpdateIssue.gs').packageRowForUpdate;
-  var result = packageRowForUpdate(jiraFieldList, { "My custom field": 1, Key: 0, "Components": 2 }, ["PBI-1", "column A value", "x,y,z"]);
+  var result = packageRowForUpdate({ "My custom field": 1, Key: 0, "Components": 2 }, ["PBI-1", "column A value", "x,y,z"]);
   expect(result).not.toBeNull();
   expect(result.key).toBe("PBI-1");
   expect(result.fields).not.toBeNull();
@@ -365,7 +358,7 @@ test("packing a row with Components and Fix Versions in the payload", () => {
   expect(Object.keys(result.fields).length).toBe(1);
 
 
-  var result = packageRowForUpdate(jiraFieldList, { "My custom field": 1, Key: 0, "Components": 2 }, ["PBI-1", "column A value", ""]);
+  var result = packageRowForUpdate({ "My custom field": 1, Key: 0, "Components": 2 }, ["PBI-1", "column A value", ""]);
   expect(result).not.toBeNull();
   expect(result.key).toBe("PBI-1");
   expect(result.fields).not.toBeNull();
@@ -458,7 +451,7 @@ test("field validation", () => {
   const getMatchingJiraFields = require("../src/jiraUpdateIssue.gs").getMatchingJiraFields;
 
   var getFilteredList = getMatchingJiraFields(
-    jiraFieldList, { "custom1234": 1, "Not a Match": 2, "My custom field 2": 3 }
+    { "custom1234": 1, "Not a Match": 2, "My custom field 2": 3 }
   );
   expect(getFilteredList).not.toBeNull();
   expect(Object.keys(getFilteredList).length).toBe(2);

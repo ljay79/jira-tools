@@ -92,10 +92,20 @@ IssueFields = (function () {
   }
 
 
+
   /**
    * Cached in memory copy of all fields in Jira
    */
   var allJiraFields_ = null;
+
+  /**
+   * Sets the JIRA fields in the cache.
+   * Useful for tests
+   * @param newJiraFields 
+   */
+  function setAllFields(newJiraFields) {
+    allJiraFields_ = newJiraFields;
+  }
   /**
   * Returns all of the fields in the configured JIRA rest server
   * @param successCallBack - function to call back if this call to the JIRA rest server is succesful
@@ -200,35 +210,39 @@ IssueFields = (function () {
     return customFields;
   };
 
+  /**
+  * Looks through an array of valid JIRA fields and finds the best matching one
+  * Will compare on both the name of the field (the text displayed in the jira GUI)
+  * amd on the key of the the field (the id used in JSON interactions with the REST API)
+  * @param listOfValidJiraFields - an array of fields, each item is a object with name and key defined 
+  * @param fieldName - the name used for matching
+  */
+  function getMatchingField(fieldName) {
+    listOfValidJiraFields = getAllFields();
+    var matchingFunction = function (stringA, stringB) {
+      return stringA.toLowerCase().trim() == stringB.toLowerCase().trim();
+    }
+    var results = listOfValidJiraFields.filter(function (fieldSpec) {
+      return matchingFunction(fieldSpec.name, fieldName) || matchingFunction(fieldSpec.key, fieldName)
+    });
+    if (results.length > 0) {
+      return results[0];
+    } else {
+      return null;
+    }
+  }
+
   return {
     convertJiraResponse: convertJiraResponse,
     SupportedTypes: SupportedTypes,
     getAllFields: getAllFields,
+    setAllFields: setAllFields,
     getAllCustomFields: getAllCustomFields,
-    clearCache: clearCache
+    clearCache: clearCache,
+    getMatchingField: getMatchingField
   }
 })();
 
-/**
-* Looks through an array of valid JIRA fields and finds the best matching one
-* Will compare on both the name of the field (the text displayed in the jira GUI)
-* amd on the key of the the field (the id used in JSON interactions with the REST API)
-* @param listOfValidJiraFields - an array of fields, each item is a object with name and key defined 
-* @param fieldName - the name used for matching
-*/
-function getMatchingJiraField(listOfValidJiraFields, fieldName) {
-  var matchingFunction = function (stringA, stringB) {
-    return stringA.toLowerCase().trim() == stringB.toLowerCase().trim();
-  }
-  var results = listOfValidJiraFields.filter(function (fieldSpec) {
-    return matchingFunction(fieldSpec.name, fieldName) || matchingFunction(fieldSpec.key, fieldName)
-  });
-  if (results.length > 0) {
-    return results[0];
-  } else {
-    return null;
-  }
-}
 
 
 var CUSTOMFIELD_FORMAT_RAW = 1;
@@ -364,7 +378,6 @@ var ISSUE_COLUMNS = {
 module.exports = {
   IssueFields: IssueFields,
   getCustomFields: getCustomFields,
-  getMatchingJiraField: getMatchingJiraField,
   getValidFieldsToEditJira: getValidFieldsToEditJira,
   headerNames: headerNames,
   CUSTOMFIELD_FORMAT_RAW: CUSTOMFIELD_FORMAT_RAW,

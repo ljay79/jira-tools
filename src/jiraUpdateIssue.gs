@@ -3,7 +3,6 @@ const Request = require('../src/jiraApi.gs');
 const IssueFields = require('src/models/jira/IssueFields.gs').IssueFields;
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
 const debug = require("./debug.gs").debug;
-const getMatchingJiraField = require("src/models/jira/IssueFields.gs").getMatchingJiraField;
 const extend = require("./jsLib.gs").extend;
 const IssueTransitioner = require('./jiraIssueStatusUpdates/issueTransitioner.gs');
 // End of Node required code block
@@ -21,18 +20,11 @@ function updateJiraIssues(headerRow, dataRows) {
   if (hasValidationErrors()) {
     return result;
   }
-  var allJiraFields = IssueFields.getAllFields();
-  if (allJiraFields.length == 0) {
-    result.finished = true;
-    result.status = false;
-    result.message = "Could not retrieve all field definitions from JIRA";
-    return result;
-  }
-
+  
   var statusTransitioner = new IssueTransitioner();
   var rowNum = 0;
   dataRows.forEach(function(dataRow) {
-    var packagedRow = packageRowForUpdate(allJiraFields, headerRow, dataRow);
+    var packagedRow = packageRowForUpdate(headerRow, dataRow);
     rowNum++;
     if (packagedRow.key == null) {
       result.errors.push("No Key value found in row " + i);
@@ -51,7 +43,7 @@ function updateJiraIssues(headerRow, dataRows) {
           if (!success) {
             // replace mention of specific field ids in error messages, try use field name
             message = message.replace(/{Field:(.*?)}/g, function (match, fieldName) {
-              var errorField = getMatchingJiraField(allJiraFields, fieldName);
+              var errorField = IssueFields.getMatchingField(fieldName);
               if (errorField != null) {
                 return errorField.name;
               }
@@ -131,14 +123,13 @@ function formatFieldValueForJira(fieldDefinition, value) {
 /**
  * Takes a row of data from the spreadsheet and converts it into a JSON object to be posted
  * to the JIRA rest API
- * @param allJiraFields  - the definition of all JIRA fields retrieved from the RESt API
  * @param headerRow - the header row from the spreadsheet
  * @param dataRow - the row of data from the spreadsheet
  */
-function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
+function packageRowForUpdate(headerRow, dataRow) {
   var keyFieldName = "issuekey";
   var result = { key: null, fields: {}, update:{} };
-  var filteredHeaders = getMatchingJiraFields(allJiraFields, headerRow);
+  var filteredHeaders = getMatchingJiraFields(headerRow);
   for (var headerId in filteredHeaders) {
     var index = filteredHeaders[headerId].index;
     var fieldDefinition = filteredHeaders[headerId].definition;
@@ -183,13 +174,12 @@ function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
 /**
  * Filters through the values in the header row from the spreadshet to find
  * the best matching fields defined in the JIRA instance
- * @param allJiraFields 
  * @param headerRow 
  */
-function getMatchingJiraFields(allJiraFields, headerRow) {
+function getMatchingJiraFields(headerRow) {
   var filteredHeadings = {};
   Object.keys(headerRow).forEach(function (fieldTitle) {
-    var matchField = getMatchingJiraField(allJiraFields, fieldTitle);
+    var matchField = IssueFields.getMatchingField(fieldTitle);
     if (matchField != null) {
       filteredHeadings[matchField.key] = {
         index: headerRow[fieldTitle],

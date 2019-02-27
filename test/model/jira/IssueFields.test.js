@@ -35,34 +35,33 @@ test("field validation", () => {
 
         }
     ]
-
-    const getMatchingJiraField = require("src/models/jira/IssueFields.gs").getMatchingJiraField;
+    IssueFields.setAllFields(fieldList);
     
-    var matchedField = getMatchingJiraField(fieldList,"Summary");
+    var matchedField = IssueFields.getMatchingField("Summary");
     expect(matchedField).not.toBeNull();
     expect(matchedField.key).toBe("summary");
 
-    var matchedField = getMatchingJiraField(fieldList,"My custom field");
+    var matchedField = IssueFields.getMatchingField("My custom field");
     expect(matchedField).not.toBeNull();
     expect(matchedField.key).toBe("custom1234");
 
-    var matchedField = getMatchingJiraField(fieldList,"An unrecognised field");
+    var matchedField = IssueFields.getMatchingField("An unrecognised field");
     expect(matchedField).toBeNull();
 
 
-    var matchedField = getMatchingJiraField(fieldList,"custom1234");
+    var matchedField = IssueFields.getMatchingField("custom1234");
     expect(matchedField).not.toBeNull();
     expect(matchedField.key).toBe("custom1234");
 
-    var matchedField = getMatchingJiraField(fieldList,"my CUStom field");
+    var matchedField = IssueFields.getMatchingField("my CUStom field");
     expect(matchedField).not.toBeNull();
     expect(matchedField.key).toBe("custom1234");
 
-    var matchedField = getMatchingJiraField(fieldList,"my CUStom field ");
+    var matchedField = IssueFields.getMatchingField("my CUStom field ");
     expect(matchedField).not.toBeNull();
     expect(matchedField.key).toBe("custom1234");
 
-    var matchedField = getMatchingJiraField(fieldList," my CUStom field ");
+    var matchedField = IssueFields.getMatchingField(" my CUStom field ");
     expect(matchedField).not.toBeNull();
     expect(matchedField.key).toBe("custom1234");
 
@@ -110,6 +109,11 @@ test("Convert Jira Field Responses to internal field data", () => {
     expect(result.schemaType).toBe("string");
 });
 
+test("Set all JIRA fields",() => {
+  IssueFields.setAllFields({a:"b"});
+  expect(IssueFields.getAllFields()).toEqual({a:"b"});
+});
+
 test("Get all fields from Jira", () => {
     var fieldList = [
         {
@@ -131,9 +135,9 @@ test("Get all fields from Jira", () => {
             custom: true
         }
     ];
+    jiraApiMock.resetMocks();
     jiraApiMock.setNextJiraResponse(200,"field",fieldList);
 
-    const IssueFields = require("src/models/jira/IssueFields.gs").IssueFields;
     
     const successCallBack =jest.fn();
     const errorCallBack =jest.fn();
