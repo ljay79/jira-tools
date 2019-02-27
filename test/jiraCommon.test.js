@@ -30,7 +30,10 @@ test("unifyIssueAttrib ", () => {
       customfield_versions: [{name:"version1"},{name:"version2"}],
       customfield_emptyversions: [],
       customfield_version_unreleased: {name:"unreleased version",released: false},
-      customfield_version_released: {name:"released version",released: true}
+      customfield_version_released: {name:"released version",released: true},
+      components: [{name:"component 1"},{name:"component 2"}],
+      fixVersions: [{name:"fix Version 1"}],
+      versions: []
     }
   }
   initJiraDummyConfig();
@@ -73,6 +76,9 @@ test("unifyIssueAttrib ", () => {
   expect(unifyIssueAttrib("customfield_version_unreleased",testIssue).value).toBe("unreleased version");
   expect(unifyIssueAttrib("customfield_version_unreleased",testIssue).format).toBe("");
   
+  expect(unifyIssueAttrib("components",testIssue).format).toBe("");
+  expect(unifyIssueAttrib("fixVersions",testIssue).format).toBe("");
+  expect(unifyIssueAttrib("versions",testIssue).format).toBe("");
 });
 
 
