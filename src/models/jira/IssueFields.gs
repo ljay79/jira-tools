@@ -26,7 +26,7 @@ IssueFields = (function () {
    * @returns {object}
    */
   function field(key, name, isCustom, schemaType, isVirtual) {
-    // isVirtualField defaults to false
+    // isVirtual defaults to false
     return {
       key: key,
       name: name,
