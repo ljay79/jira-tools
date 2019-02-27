@@ -21,7 +21,8 @@ var SpreadsheetTriggers_ = require('../SpreadsheetTriggers.gs').SpreadsheetTrigg
  * @Constructor
  */
 function IssueTable_(attributes) {
-  var issues = {},
+  var that = this,
+      issues = {},
       metaData = {
         sheetId : sheetIdPropertySafe(), // sample: '6.02713257E8'
         tableId : null,                  // sample: 'table1_1550871398921'
@@ -46,8 +47,8 @@ function IssueTable_(attributes) {
    * @param {object} initData    Optional JSON representation of an IssueTable_ data set to load into instance
    * @return void
    */
-  this.init = function (attributes) {
-    // metaData passed (ie: this.fromJson()
+  init = function (attributes) {
+    // metaData passed (ie: that.fromJson()
     if (attributes.hasOwnProperty('metaData')) {
       // initialize with existing data
       metaData = extend(metaData, attributes.metaData);
@@ -68,15 +69,15 @@ function IssueTable_(attributes) {
         throw new Error("{attributes.sheet} must be an object of type 'Sheet'.");
       }
 
-      if (!attributes.hasOwnProperty('renderer') || typeof attributes.renderer !== 'object' ) {
-        throw new Error("{attributes.renderer} must be an object. Ie: of type 'IssueTableRendererDefault_'.");
+      if (!attributes.hasOwnProperty('renderer')) {
+        throw new Error("{attributes.renderer} must be defined. Ie: of type 'IssueTableRendererDefault_' or string of class name.");
       }
 
-      this.setMeta('filter', attributes.filter)
+      that.setMeta('filter', attributes.filter)
         .setIssues(attributes.issues)
         .setRenderer(attributes.renderer)
       ;
-      this.setMeta('sheetId', sheetIdPropertySafe(attributes.sheet.getSheetId()))
+      that.setMeta('sheetId', sheetIdPropertySafe(attributes.sheet.getSheetId()))
         .setMeta('rangeA1', attributes.sheet.getActiveCell().getA1Notation())
       ;
     }
@@ -85,13 +86,17 @@ function IssueTable_(attributes) {
   /**
    * Setting the table renderer
    *
-   * @param {IssueTableRenderer_} IssueTableRenderer    Renderer class to be used
+   * @param {string|function} Classname or class of IssueTableRenderer
    * @return {IssueTable_}
    */
-  this.setRenderer = function (IssueTableRenderer) {
-    metaData.renderer = IssueTableRenderer;
+  that.setRenderer = function (rendererClass) {
+    if (typeof rendererClass === 'string') {
+      metaData.renderer = rendererClass;
+    } else {
+      metaData.renderer = rendererClass.name;
+    }
 
-    return this;
+    return that;
   };
 
   /**
@@ -100,10 +105,10 @@ function IssueTable_(attributes) {
    * @param {object} issuesJson
    * @return {IssueTable_}
    */
-  this.setIssues = function (issuesJson) {
+  that.setIssues = function (issuesJson) {
     issues = issuesJson || {};
 
-    return this;
+    return that;
   };
 
   /**
@@ -112,19 +117,16 @@ function IssueTable_(attributes) {
    * @param {mixed} value    The value for key
    * @return {IssueTable_}
    */
-  this.setMeta = function (key, value) {
-    console.log('IssueTable_.setMeta(%s) <= %s', key, value);
-
+  that.setMeta = function (key, value) {
     if (metaData.hasOwnProperty(key) && metaData[key] === value) {
-      console.log(' -> new metaData unchanged; %s = new(%s) vs old(%s)', key, value, metaData[key]);
       // old and new value are same, just skip and return
-      return this;
+      return that;
     }
 
     metaData[key] = value;
     metaData.time_lastupdated = (new Date()).getTime();
 
-    return this;
+    return that;
   };
 
   /**
@@ -134,7 +136,7 @@ function IssueTable_(attributes) {
    * @param {mixed} defaultValue    Optional default value to return in case data could not be found
    * @return {mixed}
    */
-  this.getMeta = function (key, defaultValue) {
+  that.getMeta = function (key, defaultValue) {
     var value = defaultValue || null;
 
     // no key specified, return entire data object
@@ -153,7 +155,7 @@ function IssueTable_(attributes) {
    * Wrapper/Helper to get tables sheet id
    * @return {string}
    */
-  this.getSheetId = function () {
+  that.getSheetId = function () {
     return metaData.sheetId;
   };
 
@@ -161,7 +163,7 @@ function IssueTable_(attributes) {
    * Wrapper/Helper to get tables table id
    * @return {string}
    */
-  this.getTableId = function () {
+  that.getTableId = function () {
     return metaData.tableId;
   };
 
@@ -170,7 +172,7 @@ function IssueTable_(attributes) {
    * 
    * @return {string}    Entire data object stringified with JSON.stringify
    */
-  this.toJson = function () {
+  that.toJson = function () {
     return JSON.stringify(metaData);
   };
 
@@ -180,7 +182,7 @@ function IssueTable_(attributes) {
    * @param {string} json The JSON string to parse and load into a new IssueTable instance
    * @return {IssueTable_} A new instance of IssueTable_ with all data from [json] load into.
    */
-  this.fromJson = function (json) {
+  that.fromJson = function (json) {
     var metaData = JSON.parse(json); // Parsing the json string.
     return new IssueTable_({metaData: metaData});
   };
@@ -188,19 +190,17 @@ function IssueTable_(attributes) {
   /**
    * @return {IssueTableRenderer_}
    */
-  this.render = function () {
-    console.log('->render()');
-    if (typeof metaData.renderer !== 'object' || !metaData.renderer.hasOwnProperty('render')) {
-      throw new Error("{renderer} must be an object. Ie: of type 'IssueTableRendererDefault_'.");
+  that.render = function () {
+    var renderer = RendererFactory_.call(that, metaData.renderer);
+    if (typeof renderer !== 'object' || !renderer.hasOwnProperty('render')) {
+      throw new Error("{renderer} must be an object/class but is '" + typeof renderer + "'. Ie: of type 'IssueTableRendererDefault_'.");
     }
     
-    console.log('  -> rendering ..');
-
-    return metaData.renderer.render.call(this);
+    return renderer.render();
   };
 
   // Initialize this object/class
-  this.init(attributes);
+  init(attributes);
 }
 
 // Node required code block
