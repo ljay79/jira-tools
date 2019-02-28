@@ -112,6 +112,15 @@ function IssueTable_(attributes) {
   };
 
   /**
+   * Get the Jira issues object
+   * 
+   * @return {array} issues
+   */
+  that.getIssues = function () {
+    return issues;
+  };
+
+  /**
    * Setting a key/value pair to internal data object
    * @param {string} key    Name/Key of value to store
    * @param {mixed} value    The value for key

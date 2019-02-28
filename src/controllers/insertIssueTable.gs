@@ -19,7 +19,39 @@ function newControllerAction() {
 
   console.log('passing attribs: %s', attributes);
   var table = new IssueTable_(attributes);
-  table.render();
+  if( table.render() ) {
+    // toast with status message
+      SpreadsheetApp.getActiveSpreadsheet().toast("Finished inserting YYY Jira issues out of XXX total found records.", "Status", 10);
+  }
+}
+
+function newControllerActionLive() {
+  var jsonIssues = '[{"expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields","id": "33184","self": "https://dyhltd.atlassian.net/rest/api/2/issue/33184","key": "TP-15","fields": {"summary": "Test Story 1 - appended2","status": {"self": "https://dyhltd.atlassian.net/rest/api/2/status/10004","description": "The issue is open and awaiting review and further refining to process into Sprints Backlog.","iconUrl": "https://dyhltd.atlassian.net/images/icons/status_generic.gif","name": "To Do","id": "10004","statusCategory": {"self": "https://dyhltd.atlassian.net/rest/api/2/statuscategory/2","id": 2,"key": "new","colorName": "blue-gray","name": "To Do"}}}}, {"expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields","id": "33178","self": "https://dyhltd.atlassian.net/rest/api/2/issue/33178","key": "TP-9","fields": {"summary": "CLONE - Test task of Epic 4 - appended","status": {"self": "https://dyhltd.atlassian.net/rest/api/2/status/3","description": "This issue is being actively worked on at the moment by the assignee.","iconUrl": "https://dyhltd.atlassian.net/images/icons/statuses/inprogress.png","name": "In Progress","id": "3","statusCategory": {"self": "https://dyhltd.atlassian.net/rest/api/2/statuscategory/4","id": 4,"key": "indeterminate","colorName": "yellow","name": "In Progress"}}}}]';
+  jsonIssues = JSON.parse(jsonIssues);
+
+  var ok = function(resp, status, errorMessage) {
+    var attributes = {
+      filter   : getFilter(14406),
+      issues   : resp.data,
+      sheet    : getTicketSheet(),
+      renderer : IssueTableRendererDefault_
+    };
+    
+    console.log('passing attribs: %s', attributes);
+    var table = new IssueTable_(attributes);
+    if( table.render() ) {
+      // toast with status message
+      SpreadsheetApp.getActiveSpreadsheet().toast("Finished inserting YYY Jira issues out of XXX total found records.", "Status", 10);
+    }
+  };
+
+  var search = new Search("status = Done");
+  search.setOrderBy()
+        .setFields(['key', 'summary', 'status'])
+        .setMaxResults(3000)
+        .setStartAt(0)
+        .search()      
+        .withSuccessHandler(ok);
 }
 
 
