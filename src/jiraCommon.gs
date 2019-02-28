@@ -62,11 +62,17 @@ function getTicketSheet() {
  * which can be used as a objects property key.
  * 
  * @param {object|int|string} sheetId    Optional; The original google sheetId
+ * @param {boolean} revert    If TRUE, an previous generated sheetId is converted back
  * @return {string}
  */
-function sheetIdPropertySafe(sheetId) {
-  sheetId = sheetId || getTicketSheet().getSheetId();
-  sheetId = ('sid_' + JSON.stringify(sheetId)).replace(/[^a-zA-Z0-9_]/g, '_');
+function sheetIdPropertySafe(sheetId, revert) {
+  if (true === revert) {
+    sheetId = sheetId.replace(/sid\_/g, '');
+  } else {
+    sheetId = sheetId || getTicketSheet().getSheetId();
+    //sheetId = ('sid_' + JSON.stringify(sheetId)).replace(/[^a-zA-Z0-9_]/g, '_');
+    sheetId = 'sid_' + JSON.stringify(sheetId);
+  }
 
   return sheetId;
 }
