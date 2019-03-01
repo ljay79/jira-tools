@@ -7,7 +7,7 @@ const CUSTOMFIELD_FORMAT_UNIFY = require("src/models/jira/IssueFields.gs").CUSTO
 const IssueFields = require("src/models/jira/IssueFields.gs").IssueFields;
 
 beforeEach(()=> {
-  IssueFields.clearCache();
+  IssueFields.clearCache_();
 });
 test("field validation", () => {
     var fieldList = [
@@ -35,7 +35,7 @@ test("field validation", () => {
 
         }
     ]
-    IssueFields.setAllFields(fieldList);
+    IssueFields.setAllFields_(fieldList);
     
     var matchedField = IssueFields.getMatchingField("Summary");
     expect(matchedField).not.toBeNull();
@@ -110,7 +110,7 @@ test("Convert Jira Field Responses to internal field data", () => {
 });
 
 test("Set all JIRA fields",() => {
-  IssueFields.setAllFields({a:"b"});
+  IssueFields.setAllFields_({a:"b"});
   expect(IssueFields.getAllFields()).toEqual({a:"b"});
 });
 
@@ -162,7 +162,7 @@ test("Get all fields from Jira", () => {
 
     successCallBack.mockClear();
     errorCallBack.mockClear();
-    IssueFields.clearCache();
+    IssueFields.clearCache_();
     jiraApiMock.withSuccessHandler.mockClear();
     jiraApiMock.withFailureHandler.mockImplementationOnce((callback) => { 
         callback({errorMessages:["mocked error"]},404,false); 
@@ -268,11 +268,10 @@ test("getCustomFields",() => {
       {key:"customz",name:"Custom Z",type: "Type 3"}
     ]
   );
-  const getCustomFields = require("src/models/jira/IssueFields.gs").getCustomFields;
-  var result = getCustomFields();
+  var result = IssueFields.getAvailableCustomFields();
   expect(result.length).toBe(3);
   expect(result[0]).toEqual({key:"customx",name:"Custom X",schemaType: "Type 1"});
-  result = getCustomFields(CUSTOMFIELD_FORMAT_RAW);
+  result = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_RAW);
   expect(result.length).toBe(3);
   expect(result).toEqual([
     {key:"customx",name:"Custom X",schemaType: "Type 1"},
@@ -280,15 +279,31 @@ test("getCustomFields",() => {
     {key:"customz",name:"Custom Z",schemaType: "Type 3"}
   ] 
   );
-  result = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
+  result = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_SEARCH);
   expect(Object.keys(result).length).toBe(3);
   expect(result.customx).toBe("Custom X");
   expect(result.customy).toBe("Custom Y");
   expect(result.customz).toBe("Custom Z");
 
-  result = getCustomFields(CUSTOMFIELD_FORMAT_UNIFY);
+  result = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_UNIFY);
   expect(Object.keys(result).length).toBe(3);
   expect(result.customx).toBe("Type 1");
   expect(result.customy).toBe("Type 2");
   expect(result.customz).toBe("Type 3");
+});
+
+test("Creating Fields", ()=> {
+
+  var epicField = IssueFields.createField_(
+    EpicField.getKey(),
+    EpicField.getName(),
+    true,
+    EpicField.EPIC_KEY,
+    true
+  );
+  expect(epicField.supported).toBe(true);
+  expect(epicField.name).toBe(EpicField.getName());
+  expect(epicField.key).toBe(EpicField.getKey());
+  expect(epicField.custom).toBe(true);
+  expect(epicField.isVirtual).toBe(true);
 });

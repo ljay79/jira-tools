@@ -94,9 +94,9 @@ function IssueTable(sheet, initRange, data) {
       headers.push(k);
     }
     
-    // sort fields based on defined order in ISSUE_COLUMNS
+    // sort fields based on defined order in IssueFields.getBuiltInJiraFields()
     // improves consistent column listing/sorting and defined fields first before alpha sorting rest
-    headers = _sortKeysByRef(headers, ISSUE_COLUMNS);
+    headers = _sortKeysByRef(headers, IssueFields.getBuiltInJiraFields());
     headers.unshift('key');
 
     numColumns = headers.length;

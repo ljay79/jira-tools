@@ -57,15 +57,12 @@ function updateJiraIssues(headerRow, dataRows) {
       }
     } 
   });
-  for (var i = 0; i < dataRows.length; i++) {
-    
-  }
   result.message = result.rowsUpdated + " jira issues(s) updated, " + result.errors.length + " errors.";
   result.status = (result.rowsUpdated > 0);
   result.finished = true;
 
   return result;
-
+  
   function hasValidationErrors() {
     if (headerRow === null || Object.keys(headerRow).length == 0) {
       result.finished = true;

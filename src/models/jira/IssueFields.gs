@@ -25,7 +25,7 @@ IssueFields = (function () {
    * 
    * @returns {object}
    */
-  function createField(key, name, isCustom, schemaType, isVirtual) {
+  function createField_(key, name, isCustom, schemaType, isVirtual) {
     // isVirtual defaults to false
     return {
       key: key,
@@ -33,7 +33,7 @@ IssueFields = (function () {
       custom: isCustom,
       schemaType: schemaType,
       supported: (SupportedTypes.indexOf(schemaType) > -1),
-      isVirtual: (isVirtual==null)?false:isVirtual
+      isVirtual: (isVirtual == null) ? false : isVirtual
     };
   }
   /**
@@ -64,7 +64,7 @@ IssueFields = (function () {
     if (jiraFieldResponse.schema && jiraFieldResponse.schema.items) {
       _type += '|' + jiraFieldResponse.schema.items;
     }
-    return createField(
+    return createField_(
       jiraFieldResponse.key || jiraFieldResponse.id, // Server API returns ".id" only while Cloud returns both with same value
       jiraFieldResponse.name,
       jiraFieldResponse.custom,
@@ -103,7 +103,7 @@ IssueFields = (function () {
    * Useful for tests
    * @param newJiraFields 
    */
-  function setAllFields(newJiraFields) {
+  function setAllFields_(newJiraFields) {
     allJiraFields_ = newJiraFields;
   }
   /**
@@ -136,11 +136,11 @@ IssueFields = (function () {
           if (EpicField.isUsable()) {
             // add custom field 'Epic' to beginning of array
             allJiraFields_.unshift(
-              createField(
+              createField_(
                 EpicField.getKey(),
                 EpicField.getName(),
-                EpicField.EPIC_KEY,
                 true,
+                EpicField.EPIC_KEY,
                 true
               ));
           }
@@ -178,7 +178,7 @@ IssueFields = (function () {
   /**
    * Clears the in memory cached Jira fields
    */
-  function clearCache() {
+  function clearCache_() {
     allJiraFields_ = null;
   }
 
@@ -232,64 +232,119 @@ IssueFields = (function () {
     }
   }
 
+  /**
+ * Returns the an object with all the built in JIRA Fields and user selected custom fields
+ * @returns {object} an array of built in and user selected custom fields. Key -> Name
+ */
+  function getAvailableFields() {
+    var validFields = {};
+    var userSelectedcustomFields = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_SEARCH);
+    var systemFields = IssueFields.getBuiltInJiraFields();
+    validFields = extend(validFields, userSelectedcustomFields);
+    validFields = extend(validFields, systemFields);
+    return validFields;
+  }
+
+
+  var CUSTOMFIELD_FORMAT_RAW = 1;
+  var CUSTOMFIELD_FORMAT_SEARCH = 2;
+  var CUSTOMFIELD_FORMAT_UNIFY = 3;
+
+  /**
+   * @desc Returns the custom fields the user has selected to use in a variable format
+   * @param format {Integer}
+   * @return {Object}
+   */
+  function getAvailableCustomFields(format) {
+    format = format || CUSTOMFIELD_FORMAT_RAW;
+    var customFields = UserStorage.getValue('favoriteCustomFields') || [];
+
+    // using attribute schemaType conistently across the code base
+    // however a user may have an object stored with attribute "type" in their preferences
+    customFields.forEach(function (field) {
+      if (field.type != null) {
+        field.schemaType = field.type;
+        delete (field.type);
+      }
+    });
+
+    var fieldsFormatted = {};
+    // TODO: this code branch appears unnessaruy
+    // getCustomFields is not called without a parameter or with CUSTOMFIELD_FORMAT_RAW
+    if (format === CUSTOMFIELD_FORMAT_RAW) {
+      return customFields;
+    }
+
+    if (format === CUSTOMFIELD_FORMAT_SEARCH) {
+      customFields.forEach(function (el) {
+        fieldsFormatted[el.key] = el.name;
+      });
+    }
+
+    if (format === CUSTOMFIELD_FORMAT_UNIFY) {
+      customFields.forEach(function (el) {
+        fieldsFormatted[el.key] = el.schemaType;
+      });
+    }
+
+    return fieldsFormatted;
+  }
+
+  // Jira issue fields/columns
+  // Sorting of definition below is applied as sorting for IssueTable
+  function getBuiltInJiraFields() {
+    return {
+      summary: 'Summary',
+      project: 'Project',
+      issuetype: 'Issue Type',
+      priority: 'Priority',
+      status: 'Status',
+      labels: 'Labels',
+      components: 'Components',
+      description: 'Description',
+      assignee: 'Assignee',
+      creator: 'Creator',
+      reporter: 'Reporter',
+      environment: 'Environment',
+      fixVersions: 'Fix Version',
+      duedate: 'Due',
+      resolutiondate: 'Resolved',
+      created: 'Created',
+      updated: 'Updated',
+      resolution: 'Resolution',
+      timespent: 'Time spent',
+      timeestimate: 'Estimate', // remaining
+      timeoriginalestimate: 'Original estimate',
+      aggregatetimespent: 'Aggregate Time Spent',
+      aggregatetimeestimate: 'Aggregate Time Estimate',
+      aggregateprogress: 'Aggregate Progress',
+      progress: 'Progress',
+      lastViewed: 'Last Viewed',
+      votes: 'Votes',
+      watches: 'Watchers',
+      workratio: 'Work Ratio'
+      //subtasks:[{"id":"33351","key":"FF24-229","self":"...atlassian.net/rest/api/2/issue/33351","fields":{"summary":"QA - Feedback","status":{"self":"....atlassian.net/rest/api/2/status/6","description":"The issue is considered finished, the resolution is correct. Issues which are closed can be reopened.","iconUrl":"https://dyhltd.atlassian.net/images/icons/statuses/closed.png","name":"Closed","id":"6","statusCategory":{"self":"https://dyhltd.atlassian.net/rest/api/2/statuscategory/3","id":3,"key":"done","colorName":"green","name":"Done"}},"priority":{"self":"https://dyhltd.atlassian.net/rest/api/2/priority/1","iconUrl":"https://dyhltd.atlassian.net/images/icons/priorities/highest.svg","name":"Highest","id":"1"},"issuetype":{"self":"https://dyhltd.atlassian.net/rest/api/2/issuetype/10003","id":"10003","description":"The sub-task of the issue","iconUrl":"https://dyhltd.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype","name":"Sub-task","subtask":true,"avatarId":10316}}}]
+      //versions: [{"self": "https://dyhltd.atlassian.net/rest/api/2/version/14021","id": "14021","description": "","name": "Loan - Release v2.0.17","archived": false,"released": true,"releaseDate": "2018-03-21"}]
+      //aggregatetimeoriginalestimate: 288000
+    }
+  }
   return {
     convertJiraResponse: convertJiraResponse,
     SupportedTypes: SupportedTypes,
     getAllFields: getAllFields,
-    setAllFields: setAllFields,
     getAllCustomFields: getAllCustomFields,
-    clearCache: clearCache,
-    getMatchingField: getMatchingField
+    getAvailableFields: getAvailableFields,
+    getMatchingField: getMatchingField,
+    getAvailableCustomFields: getAvailableCustomFields,
+    getBuiltInJiraFields: getBuiltInJiraFields,
+    CUSTOMFIELD_FORMAT_RAW: CUSTOMFIELD_FORMAT_RAW,
+    CUSTOMFIELD_FORMAT_SEARCH: CUSTOMFIELD_FORMAT_SEARCH,
+    CUSTOMFIELD_FORMAT_UNIFY: CUSTOMFIELD_FORMAT_UNIFY,
+    setAllFields_: setAllFields_, // exposed for unit testing
+    clearCache_: clearCache_, // exposed for unit testing
+    createField_: createField_ // exposed for unit testing
   }
 })();
-
-
-
-var CUSTOMFIELD_FORMAT_RAW = 1;
-var CUSTOMFIELD_FORMAT_SEARCH = 2;
-var CUSTOMFIELD_FORMAT_UNIFY = 3;
-
-/**
- * @desc Convert stored custom fields in different prepared format.
- * @param format {Integer}
- * @return {Object}
- */
-function getCustomFields(format) {
-  format = format || CUSTOMFIELD_FORMAT_RAW;
-  var customFields = UserStorage.getValue('favoriteCustomFields') || [];
-
-  // using attribute schemaType conistently across the code base
-  // however a user may have an object stored with attribute "type" in their preferences
-  customFields.forEach(function(field) {
-    if (field.type != null) {
-      field.schemaType = field.type;
-      delete(field.type);
-    }
-  });
-   
-  var fieldsFormatted = {};
-  // TODO: this code branch appears unnessaruy
-  // getCustomFields is not called without a parameter or with CUSTOMFIELD_FORMAT_RAW
-  if (format === CUSTOMFIELD_FORMAT_RAW) {
-    return customFields;
-  }
-
-  if (format === CUSTOMFIELD_FORMAT_SEARCH) {
-    customFields.forEach(function (el) {
-      fieldsFormatted[el.key] = el.name;
-    });
-  }
-
-  if (format === CUSTOMFIELD_FORMAT_UNIFY) {
-    customFields.forEach(function (el) {
-        fieldsFormatted[el.key] = el.schemaType;
-    });
-  }
-
-  return fieldsFormatted;
-}
-
-
 
 /**
  * @desc Return table header title for issue property
@@ -297,7 +352,7 @@ function getCustomFields(format) {
  * @return {string}
  */
 function headerNames(header) {
-  var label, labels = ISSUE_COLUMNS;
+  var label, labels = IssueFields.getBuiltInJiraFields();
   extend(labels, {
     key: 'Key',
     issuetype: 'Type',
@@ -306,7 +361,7 @@ function headerNames(header) {
   });
 
   // append favorite custom fields
-  extend(labels, getCustomFields(CUSTOMFIELD_FORMAT_SEARCH));
+  extend(labels, IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_SEARCH));
 
   // custom epic
   if (EpicField.isUsable()) {
@@ -323,66 +378,14 @@ function headerNames(header) {
 }
 
 
-/**
- * Finds the list of valid JIRA fields which can be edited
- * @returns {array} an array of built in and user selected custom fields
- */
-function getValidFieldsToEditJira() {
-  var validFields = {};
-  var userSelectedcustomFields = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
-  var systemFields = ISSUE_COLUMNS;
-  validFields = extend(validFields, userSelectedcustomFields);
-  validFields = extend(validFields, systemFields);
-  return validFields;
-}
 
-// Jira issue fields/columns
-// Sorting of definition below is applied as sorting for IssueTable
-var ISSUE_COLUMNS = {
-  summary: 'Summary',
-  project: 'Project',
-  issuetype: 'Issue Type',
-  priority: 'Priority',
-  status: 'Status',
-  labels: 'Labels',
-  components: 'Components',
-  description: 'Description',
-  assignee: 'Assignee',
-  creator: 'Creator',
-  reporter: 'Reporter',
-  environment: 'Environment',
-  fixVersions: 'Fix Version',
-  duedate: 'Due',
-  resolutiondate: 'Resolved',
-  created: 'Created',
-  updated: 'Updated',
-  resolution: 'Resolution',
-  timespent: 'Time spent',
-  timeestimate: 'Estimate', // remaining
-  timeoriginalestimate: 'Original estimate',
-  aggregatetimespent: 'Aggregate Time Spent',
-  aggregatetimeestimate: 'Aggregate Time Estimate',
-  aggregateprogress: 'Aggregate Progress',
-  progress: 'Progress',
-  lastViewed: 'Last Viewed',
-  votes: 'Votes',
-  watches: 'Watchers',
-  workratio: 'Work Ratio'
-  //subtasks:[{"id":"33351","key":"FF24-229","self":"...atlassian.net/rest/api/2/issue/33351","fields":{"summary":"QA - Feedback","status":{"self":"....atlassian.net/rest/api/2/status/6","description":"The issue is considered finished, the resolution is correct. Issues which are closed can be reopened.","iconUrl":"https://dyhltd.atlassian.net/images/icons/statuses/closed.png","name":"Closed","id":"6","statusCategory":{"self":"https://dyhltd.atlassian.net/rest/api/2/statuscategory/3","id":3,"key":"done","colorName":"green","name":"Done"}},"priority":{"self":"https://dyhltd.atlassian.net/rest/api/2/priority/1","iconUrl":"https://dyhltd.atlassian.net/images/icons/priorities/highest.svg","name":"Highest","id":"1"},"issuetype":{"self":"https://dyhltd.atlassian.net/rest/api/2/issuetype/10003","id":"10003","description":"The sub-task of the issue","iconUrl":"https://dyhltd.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype","name":"Sub-task","subtask":true,"avatarId":10316}}}]
-  //versions: [{"self": "https://dyhltd.atlassian.net/rest/api/2/version/14021","id": "14021","description": "","name": "Loan - Release v2.0.17","archived": false,"released": true,"releaseDate": "2018-03-21"}]
-  //aggregatetimeoriginalestimate: 288000
-};
+
 
 
 // Node required code block
 module.exports = {
   IssueFields: IssueFields,
-  getCustomFields: getCustomFields,
-  getValidFieldsToEditJira: getValidFieldsToEditJira,
-  headerNames: headerNames,
-  CUSTOMFIELD_FORMAT_RAW: CUSTOMFIELD_FORMAT_RAW,
-  CUSTOMFIELD_FORMAT_SEARCH: CUSTOMFIELD_FORMAT_SEARCH,
-  CUSTOMFIELD_FORMAT_UNIFY: CUSTOMFIELD_FORMAT_UNIFY,
+  headerNames: headerNames
 };
 // End of Node required code block
 

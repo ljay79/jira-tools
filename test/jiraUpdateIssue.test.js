@@ -4,12 +4,10 @@ IssueFields = require('src/models/jira/IssueFields.gs').IssueFields;
 
 beforeAll(() => {
   //set the cached field list
-  IssueFields.setAllFields(jiraFieldList);
+  IssueFields.setAllFields_(jiraFieldList);
 });
 
 beforeEach(() => {
-  debug.enable(true);
-  //jest.resetModules();
   jiraApiMock = require('./mocks/mockJiraApi.js');
   jiraApiMock.resetMocks();
 });
