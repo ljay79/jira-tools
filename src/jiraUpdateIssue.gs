@@ -231,7 +231,7 @@ function updateIssueinJira(issueData, callback) {
     update: {
       comment: [{
         add: {
-          body: "Updated by [Project Aid for Jira|https://github.com/ljay79/jira-tools"
+          body: "Updated by [Project Aid for Jira|https://github.com/ljay79/jira-tools]"
         }
       }]
     }
