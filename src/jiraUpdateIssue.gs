@@ -1,6 +1,6 @@
 // Node required code block
 const Request = require('../src/jiraApi.gs');
-const IssueFields = require('src/models/jira/IssueFields.gs').IssueFields;
+const IssueFields = require('src/models/jira/IssueFields.gs');
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
 const debug = require("./debug.gs").debug;
 const extend = require("./jsLib.gs").extend;
@@ -27,7 +27,7 @@ function updateJiraIssues(headerRow, dataRows) {
     var packagedRow = packageRowForUpdate(headerRow, dataRow);
     rowNum++;
     if (packagedRow.key == null) {
-      result.errors.push("No Key value found in row " + i);
+      result.errors.push("No Key value found in row " + rowNum);
     } else {
       if (packagedRow.fields["status"] != null) {
         var statusTransition = statusTransitioner.transition(packagedRow.key, packagedRow.fields["status"]);

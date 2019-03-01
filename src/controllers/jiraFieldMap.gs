@@ -6,7 +6,7 @@
 
  // Node required code block
 
-const IssueFields = require("src/models/jira/IssueFields.gs").IssueFields;
+const IssueFields = require("src/models/jira/IssueFields.gs");
 const getDialog = require("src/dialogs.gs").getDialog;
 // End of Node required code block
 

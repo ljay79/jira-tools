@@ -6,7 +6,7 @@
 const debug = require("src/debug.gs").debug;
 const EpicField = require("src/models/jira/EpicField.gs");
 const UserStorage = require("src/models/gas/UserStorage.gs");
-const IssueFields = require("src/models/jira/IssueFields.gs").IssueFields;
+const IssueFields = require("src/models/jira/IssueFields.gs");
 // End of Node required code block
 
 

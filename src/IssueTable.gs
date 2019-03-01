@@ -178,7 +178,7 @@ function IssueTable(sheet, initRange, data) {
   this.addHeader = function() {
     var values = [], formats = [];
     for(var i=0; i<headers.length; i++) {
-      values.push( headerNames(headers[i]) );
+      values.push(  IssueFields.getHeaderName(headers[i]) );
       formats.push('bold');
     }
 

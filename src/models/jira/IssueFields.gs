@@ -328,30 +328,14 @@ IssueFields = (function () {
       //aggregatetimeoriginalestimate: 288000
     }
   }
-  return {
-    convertJiraResponse: convertJiraResponse,
-    SupportedTypes: SupportedTypes,
-    getAllFields: getAllFields,
-    getAllCustomFields: getAllCustomFields,
-    getAvailableFields: getAvailableFields,
-    getMatchingField: getMatchingField,
-    getAvailableCustomFields: getAvailableCustomFields,
-    getBuiltInJiraFields: getBuiltInJiraFields,
-    CUSTOMFIELD_FORMAT_RAW: CUSTOMFIELD_FORMAT_RAW,
-    CUSTOMFIELD_FORMAT_SEARCH: CUSTOMFIELD_FORMAT_SEARCH,
-    CUSTOMFIELD_FORMAT_UNIFY: CUSTOMFIELD_FORMAT_UNIFY,
-    setAllFields_: setAllFields_, // exposed for unit testing
-    clearCache_: clearCache_, // exposed for unit testing
-    createField_: createField_ // exposed for unit testing
-  }
-})();
+
 
 /**
  * @desc Return table header title for issue property
- * @param header {string}  Property key name to get header title for
+ * @param key {string}  Property key name to get header title for
  * @return {string}
  */
-function headerNames(header) {
+function getHeaderName(key) {
   var label, labels = IssueFields.getBuiltInJiraFields();
   extend(labels, {
     key: 'Key',
@@ -368,25 +352,42 @@ function headerNames(header) {
     labels[EpicField.getLinkKey()] = EpicField.getName();
   }
 
-  if (!labels.hasOwnProperty(header)) {
-    label = camelize(header);
+  if (!labels.hasOwnProperty(key)) {
+    label = camelize(key);
   } else {
-    label = labels[header];
+    label = labels[key];
   }
 
   return label;
 }
 
 
+  return {
+    convertJiraResponse: convertJiraResponse,
+    SupportedTypes: SupportedTypes,
+    getAllFields: getAllFields,
+    getAllCustomFields: getAllCustomFields,
+    getAvailableFields: getAvailableFields,
+    getMatchingField: getMatchingField,
+    getAvailableCustomFields: getAvailableCustomFields,
+    getBuiltInJiraFields: getBuiltInJiraFields,
+    getHeaderName: getHeaderName,
+    // TODO we should remove these format flags and create separate methods 
+    CUSTOMFIELD_FORMAT_RAW: CUSTOMFIELD_FORMAT_RAW,
+    CUSTOMFIELD_FORMAT_SEARCH: CUSTOMFIELD_FORMAT_SEARCH,
+    CUSTOMFIELD_FORMAT_UNIFY: CUSTOMFIELD_FORMAT_UNIFY,
+    setAllFields_: setAllFields_, // exposed for unit testing
+    clearCache_: clearCache_, // exposed for unit testing
+    createField_: createField_ // exposed for unit testing
+  }
+})();
+
 
 
 
 
 // Node required code block
-module.exports = {
-  IssueFields: IssueFields,
-  headerNames: headerNames
-};
+module.exports = IssueFields;
 // End of Node required code block
 
 

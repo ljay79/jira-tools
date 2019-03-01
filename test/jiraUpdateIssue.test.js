@@ -1,6 +1,6 @@
 
 jiraApiMock = require('./mocks/mockJiraApi.js');
-IssueFields = require('src/models/jira/IssueFields.gs').IssueFields;
+IssueFields = require('src/models/jira/IssueFields.gs');
 
 beforeAll(() => {
   //set the cached field list
