@@ -4,7 +4,7 @@
 This is a work in progress - if you contribute to the code base please work towards these standards and [leave the code base tidier than when you found it](https://deviq.com/boy-scout-rule/). 
 - Use camel case for all files
 - Test your code using unit tests and make sure all tests run before pushing code.
-- Classes should use an initial uppercase letter e.g. `MyClass`
+ - Classes should use an initial uppercase letter e.g. `MyClass`
 - Controllers and function libraries `myController`
 - For private functions use an underscore suffix as per Googles GAS standards e.g. `myPrivateFunction_`
 - Use JSDocs for all functions
