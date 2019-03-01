@@ -95,11 +95,16 @@ function menuNewCoolFeature() {
 
 function menuAnotherThingForNewCoolFeature() {
   // do stuff when the menu item is clicked
- // Add reference in Code.gs 
-  //  e.g. .addItem('New cool feature 2', 'menuAnotherThingForNewCoolFeature')
+  // Add reference in Code.gs 
+  //  e.g. .addItem('New cool feature 2' 'menuAnotherThingForNewCoolFeature')
 }
 
-function callbackForNewCoolFeature() {
-  // do stuff from a callback from google.script.run
+function callbackForNewCoolFeature(parameters) {
+  // do stuff from a callback from google.script.run in the view displayed for this feature
+  // e.g.
+  /*
+  google.script.run
+          .callbackForNewCoolFeature(parameters);
+  */
 }
 ```
