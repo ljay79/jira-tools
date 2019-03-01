@@ -73,3 +73,33 @@ All unit tests should use the extension `.js`
 
 e.g unit tests for `/controllers/updateIssues.gs` should be placed in 
 `/controllers/updateIssues.test.js`
+
+### Controllers
+
+Any action or menu item call functions in a controller file. This file should be placed in the `/controllers` folder and be named after the feature it supports.
+
+For example the entry points for "New Cool Feature" from the menu or call backs from the javascript in the HTML template displayed to the user should be added to a file called `controllers/newCoolFeature.gs`
+
+Inside that file you would add functions based on this template
+```
+/*
+* Functions for New Cool Feature.
+*/
+
+function menuNewCoolFeature() {
+  // do stuff when the menu item is clicked
+  // Add reference in Code.gs 
+  //  e.g. .addItem('New cool feature', 'menuNewCoolFeature')
+  
+}
+
+function menuAnotherThingForNewCoolFeature() {
+  // do stuff when the menu item is clicked
+ // Add reference in Code.gs 
+  //  e.g. .addItem('New cool feature 2', 'menuAnotherThingForNewCoolFeature')
+}
+
+function callbackForNewCoolFeature() {
+  // do stuff from a callback from google.script.run
+}
+```
