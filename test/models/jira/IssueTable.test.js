@@ -9,17 +9,17 @@ beforeEach(() => {
 
 test("IssueTable_ accessibility test",()=> {
   var table = new IssueTable_();
-  var implementations = ['init', 'setData', 'getData', 'getSheetId', 'getTableId', 'toJson', 'fromJson'];
+  var implementations = ['setRenderer', 'setIssues', 'getIssues', 'setMeta', 'getMeta', 'getSheetId', 'getTableId', 'toJson', 'fromJson', 'render'];
 
   // all required methods implemented?
   implementations.forEach(function(method) {
     expect(table).toHaveProperty(method);
   });
 
-  // data property should be private
-  expect(table).not.toHaveProperty('data');
+  // metaData property should be private
+  expect(table).not.toHaveProperty('metaData');
 
-  var tableData = table.getData();
+  var tableData = table.getMeta();
   var currentTime = (new Date()).getTime();
 
   // init values of IssueTable are set?
@@ -31,22 +31,22 @@ test("IssueTable_ accessibility test",()=> {
   expect(tableData).toHaveProperty('time_lastupdated');
 
   // initial lastupdated timestamp is correctly set?
-  expect(table.getData('time_lastupdated')).toBeLessThan(currentTime);
-  expect(table.getData('time_lastupdated')).toBeGreaterThanOrEqual(currentTime-1000);
+  expect(table.getMeta('time_lastupdated')).toBeLessThan(currentTime);
+  expect(table.getMeta('time_lastupdated')).toBeGreaterThanOrEqual(currentTime-1000);
 
-  expect(table.getData('sheetId')).toBe(table.getSheetId());
+  expect(table.getMeta('sheetId')).toBe(table.getSheetId());
 
   /*
    * Setting/Getting data
    */
   var tableId = utils._randomId();
-  table.setData('tableId', tableId);
-  table.setData('random_data_key', 'random Data Value');
+  table.setMeta('tableId', tableId);
+  table.setMeta('random_data_key', 'random Data Value');
 
   // lasupdated should now be greater than earlier
-  expect(table.getData('time_lastupdated')).toBeGreaterThan(currentTime);
+  expect(table.getMeta('time_lastupdated')).toBeGreaterThan(currentTime);
 
-  tableData = table.getData();
+  tableData = table.getMeta();
   expect(tableData).toMatchObject({
     'sheetId': jiraCommon.sheetIdPropertySafe(),
     'tableId': tableId,
@@ -82,15 +82,15 @@ test("IssueTable_ data consistency", ()=> {
 
   // set values
   for( var p in testData1 ) {
-    table1.setData(p, testData1[p]);
+    table1.setMeta(p, testData1[p]);
   }
   for( var p in testData2 ) {
-    table2.setData(p, testData2[p]);
+    table2.setMeta(p, testData2[p]);
   }
 
   // values in IssueTable match passed values?
-  expect(table1.getData()).toMatchObject(testData1);
-  expect(table2.getData()).toMatchObject(testData2);
+  expect(table1.getMeta()).toMatchObject(testData1);
+  expect(table2.getMeta()).toMatchObject(testData2);
   
   // sheet id is correct?
   expect(table1.getSheetId()).toBe(sheetId);
@@ -117,6 +117,6 @@ test("IssueTable_ from/to JSON conversion works", ()=> {
   table = table.fromJson(JSON.stringify(testData));
 
   // values in IssueTable match passed values?
-  expect(table.getData()).toMatchObject(testData);
+  expect(table.getMeta()).toMatchObject(testData);
   //expect(table.toJson()).toBe(JSON.stringify(testData)); //doesnt work as soon object keys are not in same order
 });

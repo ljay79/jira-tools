@@ -5,6 +5,13 @@ const utils = require('../utils');
  * https://developers.google.com/apps-script/reference/spreadsheet/sheet
  */
 var randNum = utils._randomNum(10, 100);
+
+var Range = {
+    getValues: jest.fn().mockImplementation(() => {
+      return [];
+    }),
+};
+
 var Sheet = {
   // Returns the ID of the sheet represented by this object
   getSheetId: jest.fn().mockImplementation(() => {
@@ -20,7 +27,7 @@ var Sheet = {
     return 'SheetName 0' + utils._randomNum(1, 10);
   }),
 
-  getValues: jest.fn()
+  getActiveRange: jest.fn().mockImplementation(() => Range)
 }
 
 /*
