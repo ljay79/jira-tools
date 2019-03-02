@@ -37,7 +37,7 @@ function JST_EPICLABEL(TicketId) {
   }).getResponse();
 
   if(response.statusCode === 200 && response.respData && response.respData.fields) {
-    var value = response.respData.fields[epicField.label_key];
+    var value = response.respData.fields[EpicField.getLabelKey()];
     if ( value === undefined || value == '') value = TicketId;
     return value;
   } else {
