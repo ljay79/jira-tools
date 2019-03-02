@@ -34,7 +34,7 @@ test("IssueTableIndex_ accessibility test",()=> {
 test("IssueTableIndex_ can store IssueTable's",()=> {
   var TableIndex = new IssueTableIndex_();
   var IssueTable1 = new IssueTable_();
-  IssueTable1.setData('tableId', 'table1_Id');
+  IssueTable1.setMeta('tableId', 'table1_Id');
 
   // add table to index which stores it into PropertiesService
   TableIndex.addTable(IssueTable1);
@@ -52,8 +52,8 @@ test("IssueTableIndex_ duplicated index prevention",()=> {
   var TableIndex = new IssueTableIndex_();
   var IssueTable1 = new IssueTable_();
   var IssueTable2 = new IssueTable_();
-  IssueTable1.setData('tableId', 'table1_A');
-  IssueTable2.setData('tableId', 'table2_B');
+  IssueTable1.setMeta('tableId', 'table1_A');
+  IssueTable2.setMeta('tableId', 'table2_B');
 
   // add same tables multiple times
   TableIndex.addTable(IssueTable1)

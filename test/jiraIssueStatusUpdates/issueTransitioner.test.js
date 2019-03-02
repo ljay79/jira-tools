@@ -1,7 +1,5 @@
 var testData = require('./mockIssueTransitionData.js');
 var jiraApiMock = require('../mocks/mockJiraApi.js');
-const debug = require("../../src/debug.gs").debug;
-global.environmentConfiguration = require('../../src/environmentConfiguration.gs');
 
 var testTransitionResponses = require('./mockIssueTransitionData.js');
 

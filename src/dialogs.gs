@@ -15,16 +15,20 @@ function getDialog(file, values) {
   var template = HtmlService.createTemplateFromFile(file);
 
   // privacy (remove clear text password and username from possible debug logging
-  var debugValue = {};
-  extend(debugValue, values);
-  if (debugValue.password) delete debugValue.password;
-  if (debugValue.username) delete debugValue.username;
-  debug.log('Processing: %s.html with %s', file, JSON.stringify(debugValue));
+  _logTemplate(values,file);
+  
   for (var name in values) {
     template[name] = values[name];
   }
-
   return template.evaluate();
+
+  function _logTemplate(values,file) {
+    var debugValue = {};
+    extend(debugValue, values);
+    if (debugValue.password) delete debugValue.password;
+    if (debugValue.username) delete debugValue.username;
+    debug.log('Processing: %s.html with %s', file, JSON.stringify(debugValue));
+  }
 }
 
 /* Dialog: Settings */
@@ -85,10 +89,10 @@ function dialogRefreshTicketsIds() {
 function dialogIssueFromFilter() {
   if (!hasSettings(true)) return;
 
-  var customFields = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
+  var customFields = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_SEARCH);
   var userColumns = UserStorage.getValue('userColumns') || [];
   var dialog = getDialog('dialogIssuesFromFilter', {
-    columns: ISSUE_COLUMNS,
+    columns: IssueFields.getBuiltInJiraFields(),
     customFields: customFields,
     userColumns: userColumns.length > 0 ? userColumns : jiraColumnDefault
   });
@@ -96,7 +100,7 @@ function dialogIssueFromFilter() {
   // try to adjust height depending on amount of jira fields to show
   var rowH = 32;
   var height = 424;
-  height += (Math.ceil(Object.keys(ISSUE_COLUMNS).length % 4) * rowH);
+  height += (Math.ceil(Object.keys(IssueFields.getBuiltInJiraFields()).length % 4) * rowH);
   height += (Math.ceil(Object.keys(customFields).length % 4) * rowH);
 
   dialog
@@ -161,52 +165,6 @@ function dialogTimesheet() {
 }
 
 /* Dialog: Worklog - END */
-
-
-/* Dialog: Custom Fields */
-
-/**
- * @desc Dialog to configure Jira custom fields
- */
-function dialogCustomFields() {
-  if (!hasSettings(true)) return;
-
-  var dialog = getDialog('dialogCustomFields', {favoriteCustomFields: (UserStorage.getValue('favoriteCustomFields') || [])});
-
-  dialog
-    .setWidth(480)
-    .setHeight(460)
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-
-  debug.log('Processed: %s', dialog);
-
-  SpreadsheetApp.getUi().showModalDialog(dialog, 'Configure Custom Fields');
-}
-
-/* Dialog: Custom Fields - END */
-
-
-/* Sidebar: Field Map */
-
-/**
- * @desc Show sidebar with Jira field map listing
- * @param fieldMap {object}
- */
-function sidebarFieldMap(fieldMap) {
-  var dialog = getDialog('sidebarFieldMap', { fieldMap: fieldMap });
-
-  debug.log('Processed: %s', dialog);
-
-  var html = HtmlService.createHtmlOutput(dialog.getContent())
-    .setTitle('Jira Field Map')
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-    ;
-
-  SpreadsheetApp.getUi().showSidebar(html);
-}
-
-/* Sidebar: Field Map - END */
-
 
 /* Sidebar: Quick Menu */
 

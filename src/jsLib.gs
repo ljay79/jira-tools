@@ -312,6 +312,8 @@ module.exports = {
   buildUrl: buildUrl,
   getDateFromIso: getDateFromIso,
   extend: extend,
-  copyObject: copyObject
+  copyObject: copyObject,
+  reverse: reverse,
+  camelize: camelize
 };
 // End of Node required code block

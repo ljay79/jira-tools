@@ -23,9 +23,9 @@ function IssueTableIndex_() {
    * @return void
    */
   this.init = function () {
-    //storage_ = new Storage_('jst_tables', PropertiesService.getDocumentProperties() || {});
+    storage_ = new Storage_('jst_tables', PropertiesService.getDocumentProperties() || {});
     //@TODO: remove before production - only for better debugging
-    storage_ = new Storage_('jst_tables', PropertiesService.getScriptProperties() || {});
+    //storage_ = new Storage_('jst_tables', PropertiesService.getScriptProperties() || {});
   };
 
   /**

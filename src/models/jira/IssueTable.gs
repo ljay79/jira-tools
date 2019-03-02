@@ -48,9 +48,10 @@ function IssueTable_(attributes) {
    * @return void
    */
   init = function (attributes) {
-    // metaData passed (ie: that.fromJson()
+    attributes = attributes || {metaData: {}};
+
     if (attributes.hasOwnProperty('metaData')) {
-      // initialize with existing data
+      // initialize with existing data (ie: that.fromJson()
       metaData = extend(metaData, attributes.metaData);
     } else {
       // new init to generate new table; validate required options

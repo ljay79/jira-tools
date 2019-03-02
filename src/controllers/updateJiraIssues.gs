@@ -1,9 +1,15 @@
 
 /* Dialog: Update Fields in Jira Issues from Spreadsheet */
-/*
-* @desc Gets the selected cells in the spreadsheet and separates to headers and datarows
-* @return {object}
-*/
+
+
+ // Node required code block
+
+ const hasSettings = require("src/settings.gs").hasSettings;
+ const getDialog = require("src/dialogs.gs").getDialog;
+ const extend = require("src/jsLib.gs").extend;
+ const getTicketSheet = require("src/jiraCommon.gs").getTicketSheet;
+ const IssueFields = require('src/models/jira/IssueFields.gs')
+ // End of Node required code block
 
 /**
  * Menu action to show the dialog for updating jira issues
@@ -11,10 +17,10 @@
 function menuUpdateJiraIssues() {
   if (!hasSettings(true)) return;
   var selectedData = getDataForJiraUpdateFromSheet_();
-  var fieldsToUse = { "": "select a jira field...", issueKey: "Key" };
-  fieldsToUse = extend(fieldsToUse, getValidFieldsToEditJira_());
-  selectedData.allJiraFields = fieldsToUse;
-
+  selectedData.allJiraFields = extend(
+    { "": "select a jira field...", issueKey: "Key" }, 
+    IssueFields.getAvailableFields());
+    
   var readOnlyFields = { "Updated": true, "Issue Type": true, "Created": true };
   selectedData.readOnlyFields = readOnlyFields;
   var dialog = getDialog('views/dialogs/updateJiraIssues', selectedData);
@@ -67,16 +73,13 @@ function getDataForJiraUpdateFromSheet_() {
   return result;
 }
 
-/**
- * Finds the list of valid JIRA fields which can be edited
- * @returns {array} an array of built in and user selected custom fields
- */
-function getValidFieldsToEditJira_() {
-  var validFields = {};
-  var userSelectedcustomFields = getCustomFields(CUSTOMFIELD_FORMAT_SEARCH);
-  var systemFields = ISSUE_COLUMNS;
-  validFields = extend(validFields, userSelectedcustomFields);
-  validFields = extend(validFields, systemFields);
-  return validFields;
-}
 /* Dialog: Update Fields in Jira Issues from Spreadsheet - END */
+
+
+
+// Node required code block
+module.exports = {
+  callbackProcessIssuesFromSheet :callbackProcessIssuesFromSheet,
+  menuUpdateJiraIssues: menuUpdateJiraIssues
+}
+// End of Node required code block

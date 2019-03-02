@@ -1,9 +1,8 @@
 // Node required code block
 const Request = require('../src/jiraApi.gs');
-const getAllJiraFields = require('./jiraCommon.gs').getAllJiraFields;
+const IssueFields = require('src/models/jira/IssueFields.gs');
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
 const debug = require("./debug.gs").debug;
-const getMatchingJiraField = require("./jiraCommon.gs").getMatchingJiraField;
 const extend = require("./jsLib.gs").extend;
 const IssueTransitioner = require('./jiraIssueStatusUpdates/issueTransitioner.gs');
 // End of Node required code block
@@ -21,22 +20,14 @@ function updateJiraIssues(headerRow, dataRows) {
   if (hasValidationErrors()) {
     return result;
   }
-
-  var allJiraFields = getAllJiraFields();
-  if (allJiraFields.length == 0) {
-    result.finished = true;
-    result.status = false;
-    result.message = "Could not retrieve all field definitions from JIRA";
-    return result;
-  }
-
+  
   var statusTransitioner = new IssueTransitioner();
   var rowNum = 0;
   dataRows.forEach(function(dataRow) {
-    var packagedRow = packageRowForUpdate(allJiraFields, headerRow, dataRow);
+    var packagedRow = packageRowForUpdate(headerRow, dataRow);
     rowNum++;
     if (packagedRow.key == null) {
-      result.errors.push("No Key value found in row " + i);
+      result.errors.push("No Key value found in row " + rowNum);
     } else {
       if (packagedRow.fields["status"] != null) {
         var statusTransition = statusTransitioner.transition(packagedRow.key, packagedRow.fields["status"]);
@@ -52,7 +43,7 @@ function updateJiraIssues(headerRow, dataRows) {
           if (!success) {
             // replace mention of specific field ids in error messages, try use field name
             message = message.replace(/{Field:(.*?)}/g, function (match, fieldName) {
-              var errorField = getMatchingJiraField(allJiraFields, fieldName);
+              var errorField = IssueFields.getMatchingField(fieldName);
               if (errorField != null) {
                 return errorField.name;
               }
@@ -66,15 +57,12 @@ function updateJiraIssues(headerRow, dataRows) {
       }
     } 
   });
-  for (var i = 0; i < dataRows.length; i++) {
-    
-  }
   result.message = result.rowsUpdated + " jira issues(s) updated, " + result.errors.length + " errors.";
   result.status = (result.rowsUpdated > 0);
   result.finished = true;
 
   return result;
-
+  
   function hasValidationErrors() {
     if (headerRow === null || Object.keys(headerRow).length == 0) {
       result.finished = true;
@@ -132,14 +120,13 @@ function formatFieldValueForJira(fieldDefinition, value) {
 /**
  * Takes a row of data from the spreadsheet and converts it into a JSON object to be posted
  * to the JIRA rest API
- * @param allJiraFields  - the definition of all JIRA fields retrieved from the RESt API
  * @param headerRow - the header row from the spreadsheet
  * @param dataRow - the row of data from the spreadsheet
  */
-function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
+function packageRowForUpdate(headerRow, dataRow) {
   var keyFieldName = "issuekey";
   var result = { key: null, fields: {}, update:{} };
-  var filteredHeaders = getMatchingJiraFields(allJiraFields, headerRow);
+  var filteredHeaders = getMatchingJiraFields(headerRow);
   for (var headerId in filteredHeaders) {
     var index = filteredHeaders[headerId].index;
     var fieldDefinition = filteredHeaders[headerId].definition;
@@ -184,13 +171,12 @@ function packageRowForUpdate(allJiraFields, headerRow, dataRow) {
 /**
  * Filters through the values in the header row from the spreadshet to find
  * the best matching fields defined in the JIRA instance
- * @param allJiraFields 
  * @param headerRow 
  */
-function getMatchingJiraFields(allJiraFields, headerRow) {
+function getMatchingJiraFields(headerRow) {
   var filteredHeadings = {};
   Object.keys(headerRow).forEach(function (fieldTitle) {
-    var matchField = getMatchingJiraField(allJiraFields, fieldTitle);
+    var matchField = IssueFields.getMatchingField(fieldTitle);
     if (matchField != null) {
       filteredHeadings[matchField.key] = {
         index: headerRow[fieldTitle],
@@ -213,7 +199,6 @@ function updateIssueinJira(issueData, callback) {
   var request = new Request();
   var ok = function (responseData, httpResponse, statusCode) {
     // it worked
-    var status = unifyIssueAttrib('status', responseData);
     callback(issueData.key, true, "");
   };
 
@@ -243,7 +228,7 @@ function updateIssueinJira(issueData, callback) {
     update: {
       comment: [{
         add: {
-          body: "Updated by [Project Aid for Jira|https://github.com/ljay79/jira-tools"
+          body: "Updated by [Project Aid for Jira|https://github.com/ljay79/jira-tools]"
         }
       }]
     }

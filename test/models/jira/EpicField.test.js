@@ -1,11 +1,14 @@
-global.PropertiesService = require('../../mocks/PropertiesService');
-global.UserStorage = require('../../../src/UserStorage.gs').UserStorage;
-var EpicField = require("../../../src/models/jira/EpicField.gs");
+global.UserStorage = require('src/models/gas/UserStorage.gs');
+var EpicField = require("src/models/jira/EpicField.gs");
 
 beforeEach(() => {
   PropertiesService.resetMocks();
   EpicField.reset();
   jest.resetModules();
+});
+
+test("Check id is correct", () => {
+  expect(EpicField.EPIC_KEY).toBe("jst_epic");
 });
 
 test("Initialises the object from the Properties Service and saves to Properties Service",()=> {

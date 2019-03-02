@@ -18,7 +18,9 @@ var Sheet = {
   // Returns the name of the sheet
   getName: jest.fn().mockImplementation(() => {
     return 'SheetName 0' + utils._randomNum(1, 10);
-  })
+  }),
+
+  getValues: jest.fn()
 }
 
 /*
@@ -27,7 +29,7 @@ var Sheet = {
  */
 var Spreadsheet = {
   getActiveSheet: jest.fn().mockImplementation(() => Sheet),
-  
+
   // Gets a unique identifier for this spreadsheet.
   getId: jest.fn().mockImplementation(() => {
     return utils._randomId(20, 25);

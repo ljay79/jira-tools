@@ -56,3 +56,20 @@ test('copyObject', () => {
   src.prop1 = "New value";
   expect(newObject.prop1).toBe("value1");
 });
+
+
+test('reverse', () => {
+
+    expect(jsLib.reverse("abc")).toBe("cba");
+    expect(jsLib.reverse(123)).toBeNull();
+});
+
+test('camelize', () => {
+
+  expect(jsLib.camelize("My Name")).toBe("myName");
+  expect(jsLib.camelize("my name")).toBe("myName");
+  expect(jsLib.camelize("My API handler")).toBe("myAPIHandler");
+  expect(jsLib.camelize("My    name   is  ")).toBe("myNameIs"); 
+  
+});
+

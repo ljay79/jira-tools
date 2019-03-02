@@ -52,7 +52,7 @@ function insertIssuesFromFilter(jsonFormData) {
   var columns = jsonFormData['columns'] || jiraColumnDefault;
   UserStorage.setValue('userColumns', columns); //store for re-use by user
 
-  var search = new Search(jql);
+  var search = new IssueSearch(jql);
   search.setOrderBy()
         .setFields(columns)
         .setMaxResults(maxResults)
@@ -74,7 +74,6 @@ function insertIssuesFromFilter(jsonFormData) {
  */
 function IssueTable(sheet, initRange, data) {
   var headers = [], rowIndex = 0, numColumns = 0;
-  var epicField = UserStorage.getValue('jst_epic');
 
   /**
    * @desc Initialization, validation
@@ -95,9 +94,9 @@ function IssueTable(sheet, initRange, data) {
       headers.push(k);
     }
     
-    // sort fields based on defined order in ISSUE_COLUMNS
+    // sort fields based on defined order in IssueFields.getBuiltInJiraFields()
     // improves consistent column listing/sorting and defined fields first before alpha sorting rest
-    headers = _sortKeysByRef(headers, ISSUE_COLUMNS);
+    headers = _sortKeysByRef(headers, IssueFields.getBuiltInJiraFields());
     headers.unshift('key');
 
     numColumns = headers.length;
@@ -128,10 +127,10 @@ function IssueTable(sheet, initRange, data) {
             break;
           case (key.hasOwnProperty('epic') && key.epic === true):
             if (key.value != 'n/a') {
-              if(undefined == epicField || epicField.usable === false || epicField.label_key == null) {
-                key.value = '=HYPERLINK("' + key.link + '"; "' + key.value + '")';
-              } else {
+              if (EpicField.isUsable()) {
                 key.value = '=HYPERLINK("' + key.link + '"; JST_EPICLABEL("' + key.value + '"))';
+              } else {
+                key.value = '=HYPERLINK("' + key.link + '"; "' + key.value + '")';
               }
             }
             break;
@@ -179,7 +178,7 @@ function IssueTable(sheet, initRange, data) {
   this.addHeader = function() {
     var values = [], formats = [];
     for(var i=0; i<headers.length; i++) {
-      values.push( headerNames(headers[i]) );
+      values.push(  IssueFields.getHeaderName(headers[i]) );
       formats.push('bold');
     }
 

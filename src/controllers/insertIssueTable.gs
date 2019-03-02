@@ -57,8 +57,8 @@ function newControllerActionLive() {
     debug.timeEnd('insertIssueTable()');
   };
 
-  var search = new Search("status = Done");
-  search.setOrderBy()
+  var Search = new IssueSearch("status = Done");
+  Search.setOrderBy()
         .setFields(['key', 'summary', 'status'])
         .setMaxResults(75)
         .setStartAt(0)
