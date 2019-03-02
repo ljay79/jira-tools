@@ -599,7 +599,6 @@ function getIssue(issueKey, fields) {
   return response;
 }
 
-
 // Node required code block
 module.exports = {
   getIssue: getIssue, 
