@@ -25,7 +25,7 @@ var jiraColumnDefault = [
  * @return {this}  Allow chaining
  */
 
-function setCfg(key, value) {
+function setCfg_(key, value) {
   var keyname = 'serverConfig.' + key;
   UserStorage.setValue(keyname, value);
   return this;
@@ -36,7 +36,7 @@ function setCfg(key, value) {
  * @param key {string}
  * @return {string}||NULL
  */
-function getCfg(key) {
+function getCfg_(key) {
   var keyname = 'serverConfig.' + key;
   return UserStorage.getValue(keyname);
 }
@@ -49,10 +49,10 @@ function getCfg(key) {
 function hasSettings(alert) {
   initDefaults();
 
-  var available = getCfg('available');
-  var url = getCfg('jira_url');
-  var username = getCfg('jira_username');
-  var password = getCfg('jira_password');
+  var available = getCfg_('available');
+  var url = getCfg_('jira_url');
+  var username = getCfg_('jira_username');
+  var password = getCfg_('jira_password');
 
   if(available === undefined || !username || !password || !url) {
     if(alert) Browser.msgBox("Jira Error", 
@@ -92,9 +92,9 @@ function initDefaults() {
     UserStorage.setValue('dspdurationas', "w");
 
   // Jira onDemand or Server
-  var server_type = getCfg('server_type');
+  var server_type = getCfg_('server_type');
   if (server_type == null) server_type = 'onDemand';
-  setCfg('server_type', server_type);
+  setCfg_('server_type', server_type);
 
   // set done
   UserStorage.setValue('defaults_initialized', 'true');
@@ -108,17 +108,17 @@ function initDefaults() {
  */
 function saveSettings(jsonFormData) {
   var url = trimChar(jsonFormData.jira_url, "/");
-  setCfg('available', false);
-  setCfg('jira_url', url);
-  setCfg('jira_username', jsonFormData.jira_username);
-  setCfg('jira_password', jsonFormData.jira_password);
+  setCfg_('available', false);
+  setCfg_('jira_url', url);
+  setCfg_('jira_username', jsonFormData.jira_username);
+  setCfg_('jira_password', jsonFormData.jira_password);
   UserStorage.setValue('workhours', jsonFormData.ts_workhours);
   UserStorage.setValue('dspuseras_name', parseInt(jsonFormData.ts_dspuseras_name));
   UserStorage.setValue('dspdurationas', jsonFormData.ts_dspdurationas);
 
   var test = testConnection();
 
-  setCfg('server_type', (url.indexOf('atlassian.net') == -1) ? 'server' : 'onDemand');
+  setCfg_('server_type', (url.indexOf('atlassian.net') == -1) ? 'server' : 'onDemand');
 
   return {status: test.status, message: test.response};
 }
@@ -136,8 +136,8 @@ function deleteAllProperties_()
 
 // Node required code block
 module.exports = {
-  getCfg: getCfg,
-  setCfg: setCfg,
+  getCfg_: getCfg_,
+  setCfg_: setCfg_,
   hasSettings: hasSettings
 }
 // End of Node required code block

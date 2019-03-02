@@ -1,8 +1,8 @@
 
 
 global.environmentConfiguration = require('../src/environmentConfiguration.gs');
-const getCfg = require("../src/settings.gs").getCfg;
-const setCfg = require("../src/settings.gs").setCfg;
+const getCfg_ = require("../src/settings.gs").getCfg_;
+const setCfg_ = require("../src/settings.gs").setCfg_;
 const hasSettings = require("../src/settings.gs").hasSettings;
 const debug = require("../src/debug.gs").debug;
 const Request = require('../src/jiraApi.gs');
@@ -33,9 +33,9 @@ beforeEach(() => {
 });
 
 function initJiraDummyConfig() {
-  setCfg('jira_url', "https://jiraserver");
-  setCfg('jira_username', "username");
-  setCfg('jira_password', "password");
+  setCfg_('jira_url', "https://jiraserver");
+  setCfg_('jira_username', "username");
+  setCfg_('jira_password', "password");
 }
 
 test('no jira config should give an error when making a request', () => {
