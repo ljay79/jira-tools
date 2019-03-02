@@ -227,6 +227,8 @@ function Search(searchQuery) {
         }
       }); // dont bubble up failure - 1st call was successfull so we soft-fail and response with results found so far
     }
+
+    debug.timeEnd('Search.search(' + startAt + ')');
   }
 
   /**
@@ -244,6 +246,8 @@ function Search(searchQuery) {
 
     response.status = status;
     response.errorMessage = msgs.join("\n");
+
+    debug.time('Search.search(' + startAt + ')');
   }
 
   /**
@@ -251,7 +255,9 @@ function Search(searchQuery) {
    * @return {this}    Allow chaining
    */
   this.search = function() {
+    debug.time('Search.search(' + startAt + ')');
     debug.log("search with startAt:%s, maxPerPage:%s, totalMaxResults:%s and field:[%s]", startAt, maxPerPage, maxResults, fields);
+
     var data = {
       jql        : getJql(), 
       fields     : fields, 

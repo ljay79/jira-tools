@@ -25,17 +25,18 @@ function test(){
 function IssueTableRendererDefault_(IssueTable) {
   var that = this,
       sheet, initRange,
+      epicField = UserStorage.getValue('jst_epic'),
       issues = [], headers = [], 
       rowIndex = 0, numColumns = 0,
-      epicField = UserStorage.getValue('jst_epic');
+      info = {
+        totalInserted : 0,
+        finishRendering: false
+      };
 
   /**
    * @desc Initialization, validation
    */
   init = function() {
-    console.warn('IssueTableRendererDefault_.init() - IssueTable %s', IssueTable); // instance of passed IssueTable_
-    console.info('IssueTable.metaData: %s', IssueTable.getMeta()); // instance of passed IssueTable_
-
     // check data to rendering
     if (typeof IssueTable !== 'object') {
       throw new Error("{IssueTable} is not a valid instance of class IssueTable_.");
@@ -63,25 +64,28 @@ function IssueTableRendererDefault_(IssueTable) {
   };
 
   init();
-  
+
   /* -------- */
-  
+
   that.render = function () {
-    console.log('IssueTableRendererDefault_.render()');
-    console.log('getSheetId: %s; rangeA1: %s', IssueTable.getSheetId(), IssueTable.getMeta('rangeA1'));
+    debug.time('IssueTableRendererDefault_.render()');
+
     prepareHeaderValues();
-    console.log('headers: %s', headers);
-    console.log('numColumns: %s', numColumns);
-    
+
     initRange = sheet.setActiveSelection(IssueTable.getMeta('rangeA1'));
 
     if (filterName = IssueTable.getMeta('filter').name) {
       that.addSummary("Filter: " + filterName);
     }
-    
+
     that.addHeader().fillTable();
+
+    debug.timeEnd('IssueTableRendererDefault_.render()');
+    debug.log('IssueTableRendererDefault_.render() <- finished rendering %s issues with %s columns.', info.totalInserted, numColumns);
     
-    return true;
+    info.finishRendering = true;
+
+    return that;
   };
   
   /**
@@ -91,7 +95,7 @@ function IssueTableRendererDefault_(IssueTable) {
    */
   that.addSummary = function(summary) {
     range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
-    //range.mergeAcross().setValue(summary);
+
     range.clearContent()
       .clearNote()
       .clearFormat()
@@ -102,13 +106,14 @@ function IssueTableRendererDefault_(IssueTable) {
 
     return that;
   };
-  
+
   /**
-   * @desc Add headers into 1st row
+   * @desc Add column headers into 1st/2nd row
    * @return this  For chaining
    */
   that.addHeader = function() {
     var values = [], formats = [];
+
     for(var i=0; i<headers.length; i++) {
       values.push( headerNames(headers[i]) );
       formats.push('bold');
@@ -120,7 +125,7 @@ function IssueTableRendererDefault_(IssueTable) {
       .clearFormat()
       .setValues([ values ])
       .setFontWeights([ formats ]);
-    
+
     SpreadsheetApp.flush();
 
     return that;
@@ -131,16 +136,17 @@ function IssueTableRendererDefault_(IssueTable) {
    * @return this  For chaining
    */
   that.fillTable = function() {
+    info.totalInserted = issues.length;
     var range = sheet.getRange(initRange.getRow(), initRange.getColumn(), 1, headers.length); //obsolete?
 
-    // loop over each resulted issue
+    // loop over each resulted issue (row)
     for(var i=0; i<issues.length; i++) {
       var issue = issues[i];
       var values = [];
       var formats = []; //http://www.blackcj.com/blog/2015/05/18/cell-number-formatting-with-google-apps-script/
       range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
 
-      // loop over each header (field/key to output in cell)
+      // loop over each header (column)
       for(var j=0; j<headers.length; j++) {
         var key = unifyIssueAttrib(headers[j], issue);
 
@@ -165,7 +171,7 @@ function IssueTableRendererDefault_(IssueTable) {
 
         values.push( key.value );
         formats.push( key.format || '@' );
-      }
+      } // END: header/columns loop
 
       // just check if values (column) length is as we expect?!
       if( values.length != numColumns ) {
@@ -183,18 +189,32 @@ function IssueTableRendererDefault_(IssueTable) {
         .setNumberFormats([ formats ])
         .activate();
 
-      // flush sheet
+      // flush sheet every 25 rows (to often is bad for performance, to less bad for UX)
       if(i % 25 === 0) {
         SpreadsheetApp.flush();
       }
 
       issue = null;
 
-    }// END: for(data.issues.length)
+    } // END: issue loop
 
     return that;
   };
-  
+
+  /**
+   * Return Info object.
+   *
+   * @return {object}    {totalInserted:<{number}>}
+   */
+  that.getInfo = function() {
+    return info;
+  };
+
+  /**
+   * Sorting the header/columns based on definition/order in global var ISSUE_COLUMNS.
+   * Improves a consistent column listing/sorting and defined fields first before alpha sorting the rest.
+   * @returns {IssueTableRendererDefault_}
+   */
   prepareHeaderValues = function() {
     // prep headers
     for(var k in issues[0].fields) {
@@ -202,7 +222,6 @@ function IssueTableRendererDefault_(IssueTable) {
     }
 
     // sort fields based on defined order in ISSUE_COLUMNS
-    // improves consistent column listing/sorting and defined fields first before alpha sorting rest
     headers = _sortKeysByRef(headers, ISSUE_COLUMNS);
     headers.unshift('key');
 
@@ -212,10 +231,11 @@ function IssueTableRendererDefault_(IssueTable) {
   };
 }
 
-//@TODO: Move to appropiate file (not jiraCommand.gs, jsLib.gs, but where?)
 /**
- * Get a sheet of current active Spreadsheet by ID passed.
- * @param {int|string} id    The sheet id to get a Sheet for
+ * @TODO: Move to appropiate file (not jiraCommand.gs, jsLib.gs, but where?)
+ *
+ * Get a sheet from current active Spreadsheet by ID passed.
+ * @param {int|string} id    The sheet id to get a Sheet for.
  * @return {undefined|Sheet}
  */
 function getSheetById(id) {
