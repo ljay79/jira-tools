@@ -23,7 +23,7 @@ function refreshTickets() {
       // dependent cell value update
       switch(jiraCell.type) {
         case CELLTYPE_JIRAID:
-          var link = '=HYPERLINK("' + getCfg('jira_url') + '/browse/' + jiraCell.ticketId + '";"' + jiraCell.ticketId + ' [' + status.value + ']")';
+          var link = '=HYPERLINK("' + getCfg_('jira_url') + '/browse/' + jiraCell.ticketId + '";"' + jiraCell.ticketId + ' [' + status.value + ']")';
           rows.getCell(rowIdx, colIdx).setValue(link);
           break;
 
@@ -45,7 +45,7 @@ function refreshTickets() {
 
   var error = function(responseData, httpResponse, statusCode) {
     if( statusCode == 404 ) {
-      rows.getCell(rowIdx, colIdx).setNote("This Jira ticket does not exist on " + getCfg('jira_url'));
+      rows.getCell(rowIdx, colIdx).setNote("This Jira ticket does not exist on " + getCfg_('jira_url'));
     } else {
       // Jira returns all errors that occured in an array (if using the application/json mime type)
       rows.getCell(rowIdx, colIdx).setNote("Jira Error: " + responseData.errorMessages.join(",") || responseData.errorMessages);

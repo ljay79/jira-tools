@@ -1,6 +1,6 @@
 jiraApiMock = require('./mocks/mockJiraApi.js');
-const getCfg = require("../src/settings.gs").getCfg;
-const setCfg = require("../src/settings.gs").setCfg;
+const getCfg_ = require("../src/settings.gs").getCfg_;
+const setCfg_ = require("../src/settings.gs").setCfg_;
 const UserStorage = require("src/models/gas/UserStorage.gs");
 
 test("Call to retrieve an issues status", function() {
@@ -38,7 +38,7 @@ test("unifyIssueAttrib ", () => {
   }
   initJiraDummyConfig();
   expect(EpicField.isUsable()).toBeTruthy();
-  expect(getCfg('jira_url')).toBe("https://jiraserver");
+  expect(getCfg_('jira_url')).toBe("https://jiraserver");
   UserStorage.setValue(
     "favoriteCustomFields",
     [
@@ -83,9 +83,9 @@ test("unifyIssueAttrib ", () => {
 
 
 function initJiraDummyConfig() {
-  setCfg('jira_url', "https://jiraserver");
-  setCfg('jira_username', "username");
-  setCfg('jira_password', "password");
+  setCfg_('jira_url', "https://jiraserver");
+  setCfg_('jira_username', "username");
+  setCfg_('jira_password', "password");
   EpicField.setLinkKey("customfield_epic_link");
   EpicField.setLabelKey("customfield_epic_label");
 }

@@ -4,7 +4,7 @@ const debug = require('./debug.gs').debug;
 const EpicField = require("src/models/jira/EpicField.gs");
 const IssueFields = require("src/models/jira/IssueFields.gs");
 const UserStorage = require("src/models/gas/UserStorage.gs");
-const getCfg = require("./settings.gs").getCfg;
+const getCfg_ = require("./settings.gs").getCfg_;
 // End of Node required code block
 
 // const not available, but better solution needed
@@ -234,7 +234,7 @@ function fetchUsersAndGroups(minimal) {
   });
 
   // Jira Server Issue workaround (https://jira.atlassian.com/browse/JRASERVER-29069)
-  if(result.users.length == 0 && getCfg('server_type') == 'server') {
+  if(result.users.length == 0 && getCfg_('server_type') == 'server') {
     // try it again with custom query param apparently working like %
     result.users = findUser('.', minimal).filter(function( user ) {
       return user.active !== false;
@@ -277,7 +277,7 @@ function unifyIssueAttrib(attrib, data) {
           resp = {
             epic  : true,
             value : data.fields[attrib] || 'n/a',
-            link  : getCfg('jira_url') + "/browse/" + data.fields[attrib]
+            link  : getCfg_('jira_url') + "/browse/" + data.fields[attrib]
           };
           break;
         case 'datetime':
@@ -400,7 +400,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'key':
       resp = {
         value: data.key || 'n/a',
-        link: getCfg('jira_url') + "/browse/" + data.key
+        link: getCfg_('jira_url') + "/browse/" + data.key
       };
       break;
     case 'summary':
