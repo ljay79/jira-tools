@@ -330,36 +330,64 @@ IssueFields = (function () {
   }
 
 
-/**
- * @desc Return table header title for issue property
- * @param key {string}  Property key name to get header title for
- * @return {string}
- */
-function getHeaderName(key) {
-  var label, labels = IssueFields.getBuiltInJiraFields();
-  extend(labels, {
-    key: 'Key',
-    issuetype: 'Type',
-    duedate: 'Due',
-    priority: 'P',
-  });
+  /**
+   * @desc Return table header title for issue property
+   * @param key {string}  Property key name to get header title for
+   * @return {string}
+   */
+  function getHeaderName(key) {
+    var label, labels = IssueFields.getBuiltInJiraFields();
+    extend(labels, {
+      key: 'Key',
+      issuetype: 'Type',
+      duedate: 'Due',
+      priority: 'P',
+    });
 
-  // append favorite custom fields
-  extend(labels, IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_SEARCH));
+    // append favorite custom fields
+    extend(labels, IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_SEARCH));
 
-  // custom epic
-  if (EpicField.isUsable()) {
-    labels[EpicField.getLinkKey()] = EpicField.getName();
+    // custom epic
+    if (EpicField.isUsable()) {
+      labels[EpicField.getLinkKey()] = EpicField.getName();
+    }
+
+    if (!labels.hasOwnProperty(key)) {
+      label = camelize(key);
+    } else {
+      label = labels[key];
+    }
+
+    return label;
   }
 
-  if (!labels.hasOwnProperty(key)) {
-    label = camelize(key);
-  } else {
-    label = labels[key];
+  function getReadonlyFields() {
+    return [
+      "updated",
+      "issuetype",
+      "created",
+      "project",
+      "priority",
+      'lastViewed',
+      'assignee',
+      'watches',
+      'creator',
+      'timespent',
+      'timeoriginalestimate',
+      'reporter',
+      'aggregateprogress',
+      'aggregatetimespent',
+      'resolution',
+      'environment',
+      'timeestimate',
+      'aggregatetimeestimate',
+      'resolutiondate',
+      'progress',
+      'workratio',
+      'votes',
+      'jst_epic'
+    ];
   }
-
-  return label;
-}
 
 
   return {
@@ -372,6 +400,7 @@ function getHeaderName(key) {
     getAvailableCustomFields: getAvailableCustomFields,
     getBuiltInJiraFields: getBuiltInJiraFields,
     getHeaderName: getHeaderName,
+    getReadonlyFields: getReadonlyFields,
     // TODO we should remove these format flags and create separate methods 
     CUSTOMFIELD_FORMAT_RAW: CUSTOMFIELD_FORMAT_RAW,
     CUSTOMFIELD_FORMAT_SEARCH: CUSTOMFIELD_FORMAT_SEARCH,

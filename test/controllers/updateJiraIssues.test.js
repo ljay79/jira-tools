@@ -59,8 +59,8 @@ test("menuUpdateJiraIssues", () => {
   expect(params.dataRows).toBeDefined();
   expect(params.dataRows).toEqual([]);
   expect(params.readOnlyFields).toBeDefined();
-  expect(params.readOnlyFields["Updated"]).toBeTruthy();
-  expect(params.readOnlyFields["Created"]).toBeTruthy();
+  expect(params.readOnlyFields["updated"]).toBeTruthy();
+  expect(params.readOnlyFields["created"]).toBeTruthy();
   expect(params.allJiraFields).toBeDefined();
   expect(params.allJiraFields.summary).toBe("Summary");
   expect(params.allJiraFields.custom1).toBe("Custom 1");
@@ -69,6 +69,8 @@ test("menuUpdateJiraIssues", () => {
   expect(params.allJiraFields.issueKey).toBe("Key");
   expect(Object.keys(params.allJiraFields).length).toBeGreaterThan(5);
 
+
+  
   getValues.mockClear();
   dialogCode.getDialog.mockClear();
   getValues.mockImplementationOnce(() => [["a","b"]]);

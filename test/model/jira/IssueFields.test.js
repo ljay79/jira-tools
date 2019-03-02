@@ -307,3 +307,10 @@ test("Creating Fields", () => {
   expect(epicField.custom).toBe(true);
   expect(epicField.isVirtual).toBe(true);
 });
+
+test("Read Only fields", () => {
+  var readonly = IssueFields.getReadonlyFields();
+  expect(readonly).toContain("project");
+  expect(readonly).toContain("created");
+  expect(readonly).toContain("updated");
+})
