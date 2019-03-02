@@ -1,7 +1,7 @@
 // Node required code block
 const BUILD = require("./Code.gs").BUILD;
 const Storage_ = require("./Storage.gs").Storage_;
-const UserStorage = require("./UserStorage.gs").UserStorage;
+const UserStorage = require("src/models/gas/UserStorage.gs");
 // End of Node required code block
 
 

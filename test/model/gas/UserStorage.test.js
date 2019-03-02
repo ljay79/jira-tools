@@ -1,6 +1,5 @@
 
-global.PropertiesService = require('./mocks/PropertiesService');
-const UserStorage = require('../src/UserStorage.gs').UserStorage;
+const UserStorage = require('src/models/gas/UserStorage.gs');
 
 test("It should save items in PropertiesService.", () => {
   UserStorage.setValue("test","value");

@@ -1,42 +1,17 @@
-/*function testSearch() {
-  var s = new Search('');
-  s.setOrderBy('updated', 'DESC')
-   .setFields(['summary', 'issuetype', 'priority', 
-		'status', 'updated', 'assignee', 
-		'duedate', 'project', 'customfield_11102'])
-    .setMaxResults(50)
-    .setMaxPerPage(10);
 
-  //var s = new Search('worklogDate>="2017-07-02" and worklogDate<="2017-07-11" and worklogAuthor="jrosemeier"');
-  //s.setOrderBy('updated', 'DESC')
-  // .setFields(['id','key','issuetype','project','status','summary']);
-  //
-  onSuccess = function(a,b,c) {
-    debug.log('%s', '----------ON SUCCESS-----------');
-    debug.log('%s %s %s', JSON.stringify(a), b, c);
-    debug.log('%s', '---------------------1');
-    
-    debug.log('AMOUNT: %s !', a.length);
-  };
-  onFailure = function(a,b,c) {
-    debug.log('%s', '----------ON FAILURE-----------');
-    debug.log('a:%s b:%s c:%s', a, b, c);
-    debug.log('%s', '---------------------1');
-  };
-  
-  s.search()
-    .withSuccessHandler(onSuccess)
-    .withFailureHandler(onFailure)
-  ;
-}*/
-
+// Node required code block
+var debug = require("src/debug.gs").debug;
+global.environmentConfiguration = require('src/environmentConfiguration.gs');
+const Request = require('src/jiraApi.gs');
+const EpicField = require("src/models/jira/EpicField.gs");
+// End of Node required code block
 
 /**
- * @desc Class 'Search' API abstraction with pagination handling.
+ * @desc Class 'IssueSearch' API abstraction with pagination handling.
  *       Performs a JQL POST search request to JIRA Rest API.
  * @param searchQuery {String}    JQL Query statement
  */
-function Search(searchQuery) {
+function IssueSearch(searchQuery) {
   var fields = ['key'],
       startAt = 0, maxResults = 1000, maxPerPage = 50,
       queryStr = searchQuery, orderBy = '', orderDir = 'ASC';
@@ -62,9 +37,10 @@ function Search(searchQuery) {
     if(aFields.constructor == Array) {
       fields = aFields;
       // has custom Epic field 'jst_epic'?
-      if (fields.indexOf('jst_epic') > -1) {
-        var epicField = UserStorage.getValue('jst_epic');
-        if(epicField.link_key) fields.push(epicField.link_key);
+      if (fields.indexOf(EpicField.EPIC_KEY) > -1) {
+        if(EpicField.isUsable()) {
+          fields.push(EpicField.getLinkKey());
+        }
       }
     } else {
       throw '{aFields} is not an Array.';
@@ -208,7 +184,7 @@ function Search(searchQuery) {
       var _maxPage  = Math.ceil((_total<maxResults?_total:maxResults) / maxPerPage);
       SpreadsheetApp.getActiveSpreadsheet().toast(".. fetching result page "+_currPage+" / " + _maxPage, "Progress", 5);
       
-      var subSearch = new Search( queryStr );
+      var subSearch = new IssueSearch( queryStr );
       subSearch.setOrderBy( orderBy, orderDir )
                .setFields( fields )
                .setMaxPerPage( maxPerPage )
@@ -258,7 +234,6 @@ function Search(searchQuery) {
       startAt    : startAt,
       maxResults : (maxResults < maxPerPage) ? maxResults : maxPerPage
     };
-
     var request = new Request();
     request.call('search', data, {'method' : 'post'})
       .withSuccessHandler(onSuccess)
@@ -269,3 +244,8 @@ function Search(searchQuery) {
   
   this.init();
 }
+
+
+// Node required code block
+module.exports = IssueSearch;
+// End of Node required code block

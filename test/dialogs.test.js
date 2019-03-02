@@ -1,11 +1,10 @@
 
-global.environmentConfiguration = require('../src/environmentConfiguration.gs');
-PropertiesService = require('./mocks/PropertiesService');
-HtmlService = require('./mocks/HtmlService');
-Session = require('./mocks/Session');
-SpreadsheetApp = require('./mocks/SpreadsheetApp');
 BUILD = "";
-const debug = require("../src/debug.gs").debug;
+
+beforeEach(() => {
+  jest.resetModules();
+  HtmlService.resetMocks();
+});
 
 test("About dialog is populated with correct values", () => {
   var dialogAbout = require('../src/dialogs.gs').dialogAbout;
@@ -30,4 +29,40 @@ test("About dialog is populated with correct values", () => {
   expect(SpreadsheetApp.getUi().showModalDialog).toBeCalledTimes(1);
   expect(SpreadsheetApp.getUi().showModalDialog.mock.calls[0][1]).toBe('About');
 
+});
+
+
+test("Test getdialog Function", () => {
+  // store number of keys in Template mock for reference
+  const mockTemplateKeyCoumt = Object.keys(HtmlService.templateMock).length;
+
+  var getDialog = require('src/dialogs.gs').getDialog;
+  var returnedDialogue = getDialog("path/to/html", {
+    username: "username", 
+    password: "password",
+    var1: "value1",
+    var2: "value2",
+    var3: "value3"
+  });
+  // Correct HTML file loaded
+  expect(HtmlService.createTemplateFromFile).toBeCalled();
+  expect(HtmlService.createTemplateFromFile.mock.calls[0][0]).toBe("path/to/html");
+  // all variables are passed to the template
+  expect(Object.keys(HtmlService.templateMock).length).toBe(mockTemplateKeyCoumt + 5);
+  expect(HtmlService.templateMock["var1"]).toBe("value1");
+  expect(HtmlService.templateMock["var2"]).toBe("value2");
+  expect(HtmlService.templateMock["var3"]).toBe("value3");
+  expect(HtmlService.templateMock["username"]).toBe("username");
+  expect(HtmlService.templateMock["password"]).toBe("password");
+  // evaluated template is passed back
+  expect(returnedDialogue).toBe(HtmlService.dialogMock);
+
+
+  // scenario with no variables
+  HtmlService.resetMocks();
+  var returnedDialogue = getDialog("path/to/html2", {});
+  expect(HtmlService.createTemplateFromFile).toBeCalled();
+  expect(HtmlService.createTemplateFromFile.mock.calls[0][0]).toBe("path/to/html2");
+  expect(Object.keys(HtmlService.templateMock).length).toBe(mockTemplateKeyCoumt);
+  // @todo: scenario without username or password
 });

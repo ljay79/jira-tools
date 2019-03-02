@@ -10,7 +10,7 @@
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
-var BUILD = '1.1.0';
+var BUILD = '1.2.0';
 
 /** 
  * Add a nice menu option for the users.
@@ -46,10 +46,10 @@ function addMenu() {
     .addSeparator()
     .addItem('Update formulas in active sheet', 'recalcCustomFunctions')
     .addItem('Update issue key status "KEY-123 [Done]"', 'dialogRefreshTicketsIds')
-    .addItem('Jira field map', 'sidebarJiraFieldMap')
+    .addItem('Jira field map', 'menuJiraFieldMap')
     .addSeparator()
     .addItem('Settings', 'dialogSettings')
-    .addItem('Configure custom fields', 'dialogCustomFields')
+    .addItem('Configure custom fields', 'menuCustomFields')
     .addItem('About', 'dialogAbout');
 
     if (environmentConfiguration.features.updateJira.enabled) {

@@ -1,7 +1,10 @@
 // Node required code block
 const Request = require('./jiraApi.gs');
 const debug = require('./debug.gs').debug;
-const EpicField = require("./models/jira/EpicField.gs");
+const EpicField = require("src/models/jira/EpicField.gs");
+const IssueFields = require("src/models/jira/IssueFields.gs");
+const UserStorage = require("src/models/gas/UserStorage.gs");
+const getCfg = require("./settings.gs").getCfg;
 // End of Node required code block
 
 // const not available, but better solution needed
@@ -9,41 +12,6 @@ var CELLTYPE_EMPTY = -1;
 var CELLTYPE_JIRAID = 10; // entire cell includes Jira ticket id only ("JIRA-123" or "JIRA-123 [Status]")
 var CELLTYPE_TEXT = 20;  // Jira ticket id is within text ("lorem ipsum JIRA-123 [Status] dolores")
 
-// Jira issue fields/columns
-// Sorting of definition below is applied as sorting for IssueTable
-var ISSUE_COLUMNS = {
-  summary: 'Summary',
-  project: 'Project',
-  issuetype: 'Issue Type',
-  priority: 'Priority',
-  status: 'Status',
-  labels: 'Labels',
-  components: 'Components',
-  description: 'Description',
-  assignee: 'Assignee',
-  creator: 'Creator',
-  reporter: 'Reporter',
-  environment: 'Environment',
-  fixVersions: 'Fix Version',
-  duedate: 'Due',
-  resolutiondate: 'Resolved',
-  created: 'Created',
-  updated: 'Updated',
-  resolution: 'Resolution',
-  timespent: 'Time spent',
-  timeestimate: 'Estimate', // remaining
-  timeoriginalestimate: 'Original estimate',
-  aggregatetimespent: 'Aggregate Time Spent',
-  aggregatetimeestimate: 'Aggregate Time Estimate',
-  aggregateprogress: 'Aggregate Progress',
-  progress: 'Progress',
-  lastViewed: 'Last Viewed',
-  votes: 'Votes',
-  watches: 'Watchers',
-  workratio: 'Work Ratio'
-  //subtasks:[{"id":"33351","key":"FF24-229","self":"...atlassian.net/rest/api/2/issue/33351","fields":{"summary":"QA - Feedback","status":{"self":"....atlassian.net/rest/api/2/status/6","description":"The issue is considered finished, the resolution is correct. Issues which are closed can be reopened.","iconUrl":"https://dyhltd.atlassian.net/images/icons/statuses/closed.png","name":"Closed","id":"6","statusCategory":{"self":"https://dyhltd.atlassian.net/rest/api/2/statuscategory/3","id":3,"key":"done","colorName":"green","name":"Done"}},"priority":{"self":"https://dyhltd.atlassian.net/rest/api/2/priority/1","iconUrl":"https://dyhltd.atlassian.net/images/icons/priorities/highest.svg","name":"Highest","id":"1"},"issuetype":{"self":"https://dyhltd.atlassian.net/rest/api/2/issuetype/10003","id":"10003","description":"The sub-task of the issue","iconUrl":"https://dyhltd.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype","name":"Sub-task","subtask":true,"avatarId":10316}}}]
-  //aggregatetimeoriginalestimate: 288000
-};
 //@see storage.gs for jiraColumnDefault
 
 
@@ -291,23 +259,21 @@ function fetchUsersAndGroups(minimal) {
  */
 function unifyIssueAttrib(attrib, data) {
   var resp = {value: ''};
-
+  // TODO: We should remove this try catch - needs alot of testing though to get to that.
   try { // no error handling, always return a valid object
 
   // custom fields first
   if ( attrib.substring(0, 12) == 'customfield_' ) {
-    var customFields = getCustomFields(CUSTOMFIELD_FORMAT_UNIFY);
+    var customFields = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_UNIFY);
     // custom epic
-    var epicField = UserStorage.getValue('jst_epic');
-    if (epicField.usable === true) {
-      customFields[epicField.link_key] = 'jst_epic';
+    if (EpicField.isUsable()) {
+      customFields[EpicField.getLinkKey()] = EpicField.EPIC_KEY;
     }
 
     if (customFields.hasOwnProperty(attrib)) {
       var format = customFields[attrib];
-
       switch(format) {
-        case 'jst_epic':
+        case EpicField.EPIC_KEY:
           resp = {
             epic  : true,
             value : data.fields[attrib] || 'n/a',
@@ -359,15 +325,17 @@ function unifyIssueAttrib(attrib, data) {
           resp.value = '';
           var _values = data.fields[attrib];
 
-          // field "Sprint" is type string with custom value
-          if (data.fields[attrib][0].indexOf('service.sprint.Sprint') > -1) {
-            _values = [];
-            var _regEx = /name=([^,]+),/gi;
-            for (var i = 0; i < data.fields[attrib].length; i++) {
-              var _sprintNameArr = null;
-              _sprintNameArr = _regEx.exec(data.fields[attrib][i]);
-              _regEx.lastIndex = 0; // Reset
-              if(_sprintNameArr.length==2) _values.push(_sprintNameArr[1]);
+          if (_values.length>0) {
+            // field "Sprint" is type string with custom value
+            if (data.fields[attrib][0].indexOf('service.sprint.Sprint') > -1) {
+              _values = [];
+              var _regEx = /name=([^,]+),/gi;
+              for (var i = 0; i < data.fields[attrib].length; i++) {
+                var _sprintNameArr = null;
+                _sprintNameArr = _regEx.exec(data.fields[attrib][i]);
+                _regEx.lastIndex = 0; // Reset
+                if(_sprintNameArr.length==2) _values.push(_sprintNameArr[1]);
+              }
             }
           }
 
@@ -508,7 +476,7 @@ function unifyIssueAttrib(attrib, data) {
       resp = {
         value: data.fields[attrib].map(function(value) {
           return value.name;
-        }).join(',')
+        }).join(', ')
       };
       break;
     case 'aggregateprogress':
@@ -577,41 +545,11 @@ function unifyIssueAttrib(attrib, data) {
       resp.value = data[attrib] || data.fields[attrib];
       break;
   }
-  } catch (e) {}
+  } catch (e) {
+    debug.log("Error in unifyIssueAttrib "+e);
+  }
   
   return resp;
-}
-
-/**
- * @desc Return table header title for issue property
- * @param header {string}  Property key name to get header title for
- * @return {string}
- */
-function headerNames(header) {
-  var label, labels = ISSUE_COLUMNS;
-  extend(labels, {
-    key: 'Key',
-    issuetype: 'Type',
-    duedate: 'Due',
-    priority: 'P',
-  });
-
-  // append favorite custom fields
-  extend(labels, getCustomFields(CUSTOMFIELD_FORMAT_SEARCH));
-
-  // custom epic
-  var epicField = UserStorage.getValue('jst_epic');
-  if (epicField.usable === true) {
-    labels[epicField.link_key] = 'Epic';
-  }
-  
-  if( !labels.hasOwnProperty(header) ) {
-    label = camelize(header);
-  } else {
-    label = labels[header];
-  }
-
-  return label;
 }
 
 /**
@@ -661,125 +599,12 @@ function getIssue(issueKey, fields) {
   return response;
 }
 
-/**
- * Takes the native JSON response from JIRA for a field definition and returns an object
- * with the fields used in the Application 
- * @param jiraFieldResponse - the response from JIRA
- * @return array Array of objects for each field 
-return {
-          key:        cField.key || cField.id, // Server API returns ".id" only while Cloud returns both with same value
-          name:       cField.name,
-          custom:     cField.custom,
-          schemaType: _type,
-          supported:  (arrSupportedTypes.indexOf(_type) > -1)
-        };
- */
-function convertJiraFieldResponseToFieldRecord(jiraFieldResponse) {
-   // EPIC customization
-   if (jiraFieldResponse.schema && jiraFieldResponse.schema.custom) {
-    if (jiraFieldResponse.schema.custom.indexOf(':gh-epic-link') > -1) {
-      EpicField.setLinkKey(jiraFieldResponse.key || jiraFieldResponse.id);
-    }
-    if (jiraFieldResponse.schema.custom.indexOf(':gh-epic-label') > -1) {
-      EpicField.setLabelKey(jiraFieldResponse.key || jiraFieldResponse.id);
-    }
-  }
-  
-  var arrSupportedTypes = ['string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'versions', 'array|versions'];
-  var _type = (jiraFieldResponse.schema ? jiraFieldResponse.schema.type : null) || null;
-  if (jiraFieldResponse.schema && jiraFieldResponse.schema.items) {
-    _type += '|' + jiraFieldResponse.schema.items;
-  }
-  return {
-    key: jiraFieldResponse.key || jiraFieldResponse.id, // Server API returns ".id" only while Cloud returns both with same value
-    name: jiraFieldResponse.name,
-    custom: jiraFieldResponse.custom,
-    schemaType: _type,
-    supported: (arrSupportedTypes.indexOf(_type) > -1)
-  };
-}
-
-/**
- * Returns all of the fields in the configured JIRA rest server
- * @param successCallBack - function to call back if this call to the JIRA rest server is succesful
- * @param errorCallBack - funcion callback if there is an issue with the server call or response
- */
-function getAllJiraFields(successCallBack, errorCallBack) {
-  var request = new Request();
-  var fieldMap = [];
-
-  var ok = function (respData, httpResp, status) {
-    if (!respData) {
-      error(respData, httpResp, status);
-    }
-    // reset custom epic field
-    EpicField.resetValue();
-
-    fieldMap.push.apply(fieldMap, respData.map(convertJiraFieldResponseToFieldRecord))
-      // sorting by supported type and name
-      && fieldMap.sort(function (a, b) {
-        var keyA = a.name.toLowerCase();
-        var keyB = b.name.toLowerCase();
-
-        if (keyA < keyB)
-          return -1;
-        if (keyA > keyB)
-          return 1;
-        return 0;
-      });
-    if (successCallBack != null) {
-      successCallBack(fieldMap);
-    }
-  };
-
-  var error = function (respData, httpResp, status) {
-    var jiraErrorMessage = "";
-    if (respData != null && respData.errorMessages != null) {
-      jiraErrorMessage = respData.errorMessages.join(",") || respData.errorMessages;
-    }
-    var msg = "Failed to retrieve Jira Fields info with status [" + status + "]!\\n"
-      + jiraErrorMessage;
-    if (errorCallBack != null) {
-      errorCallBack(msg);
-    }
-  };
-  request.call("field")
-    .withSuccessHandler(ok)
-    .withFailureHandler(error)
-    ;
-
-  return fieldMap;
-}
-
-/**
- * Looks through an array of valid JIRA fields and finds the best matching one
- * Will compare on both the name of the field (the text displayed in the jira GUI)
- * amd on the key of the the field (the id used in JSON interactions with the REST API)
- * @param listOfValidJiraFields - an array of fields, each item is a object with name and key defined 
- * @param fieldName - the name used for matching
- */
-function getMatchingJiraField(listOfValidJiraFields, fieldName) {
-  var matchingFunction = function (stringA, stringB) {
-    return stringA.toLowerCase().trim() == stringB.toLowerCase().trim();
-  }
-  var results = listOfValidJiraFields.filter(function (fieldSpec) {
-    return matchingFunction(fieldSpec.name, fieldName) || matchingFunction(fieldSpec.key, fieldName)
-  });
-  if (results.length > 0) {
-    return results[0];
-  } else {
-    return null;
-  }
-}
-
 
 // Node required code block
 module.exports = {
   getIssue: getIssue, 
-  unifyIssueAttrib: unifyIssueAttrib, 
-  getMatchingJiraField:getMatchingJiraField, 
-  getAllJiraFields:getAllJiraFields, 
-  convertJiraFieldResponseToFieldRecord:convertJiraFieldResponseToFieldRecord
+  unifyIssueAttrib: unifyIssueAttrib,
+  getTicketSheet: getTicketSheet
 };
 
 // End of Node required code block
