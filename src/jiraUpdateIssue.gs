@@ -156,6 +156,10 @@ function packageRowForUpdate(headerRow, dataRow) {
     result.fields.timetracking.originalEstimate = result.fields.timeoriginalestimate;
     delete (result.fields.timeoriginalestimate);
   }
+  if (result.fields.hasOwnProperty("timeestimate")) {
+    result.fields.timetracking.remainingEstimate = result.fields.timeestimate;
+    delete (result.fields.timeestimate);
+  }
   // delete any unnecessary keys in the response
   if (Object.keys(result.fields.timetracking).length == 0) {
     delete (result.fields.timetracking);

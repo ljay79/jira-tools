@@ -117,7 +117,7 @@ const jiraFieldList = [
     custom: false
   },
   {
-    schemaType: "string",
+    schemaType: "number",
     key: "timeoriginalestimate",
     name: "Original Estimate",
     custom: false
@@ -128,6 +128,12 @@ const jiraFieldList = [
     key: "duedate",
     name: "Due Date",
     custom: false
+   },
+   {
+     schemaType: "number",
+     key: "timeestimate",
+     name: "Remaining Estimate",
+     custom: false
    }
 ]
 
@@ -403,7 +409,32 @@ describe("Packing data from a spreadsheet row ready for Jira API", () => {
     expect(result.fields.timeoriginalestimate).not.toBeDefined();
     expect(result.fields.timetracking).toBeDefined();
     expect(result.fields.timetracking.originalEstimate).toBeDefined();
-    expect(result.fields.timetracking.originalEstimate).toBe("");
+    expect(result.fields.timetracking.originalEstimate).toBeNull();
+
+
+    var result = packageRowForUpdate(
+      { "Remaining Estimate": 1, Key: 0 },
+      ["PBI-1", "1d",]
+    );
+    expect(result.key).toBe("PBI-1");
+    expect(result.fields).toBeDefined();
+    expect(result.fields.timeestimate).not.toBeDefined();
+    expect(result.fields.timetracking).toBeDefined();
+    expect(result.fields.timetracking.remainingEstimate).toBeDefined();
+    expect(result.fields.timetracking.remainingEstimate).toBe("1d");
+    var result = packageRowForUpdate(
+      {"Original Estimate": 2, "Remaining Estimate": 1, Key: 0 },
+      ["PBI-1", "1d","2d"]
+    );
+    expect(result.key).toBe("PBI-1");
+    expect(result.fields).toBeDefined();
+    expect(result.fields.timeoriginalestimate).not.toBeDefined();
+    expect(result.fields.timeestimate).not.toBeDefined();
+    expect(result.fields.timetracking).toBeDefined();
+    expect(result.fields.timetracking.remainingEstimate).toBeDefined();
+    expect(result.fields.timetracking.remainingEstimate).toBe("1d");
+    expect(result.fields.timetracking.originalEstimate).toBeDefined();
+    expect(result.fields.timetracking.originalEstimate).toBe("2d");
   });
 
 
