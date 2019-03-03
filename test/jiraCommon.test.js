@@ -33,6 +33,7 @@ test("unifyIssueAttrib ", () => {
       customfield_version_released: {name:"released version",released: true},
       components: [{name:"component 1"},{name:"component 2"}],
       fixVersions: [{name:"fix Version 1"}],
+      customfield_sprints: ["service.sprint.Sprint","name=Sprint 1","name=Sprint 2"],
       versions: []
     }
   }
@@ -48,11 +49,12 @@ test("unifyIssueAttrib ", () => {
       {key:"customfield_stringArray",name:"String Array",schemaType: "array|string"},
       {key:"customfield_stringArray2",name:"String Array",schemaType: "array|string"},
       {key:"customfield_stringArray3",name:"String Array",schemaType: "array|string"},
+      {key:"customfield_stringArray4",name:"String Array",schemaType: "array|string"},
       {key:"customfield_versions",name:"Version Array",schemaType: "array|versions"},
       {key:"customfield_emptyversions",name:"Empty Version Array",schemaType: "array|versions"},
       {key:"customfield_version_released",name:"Version",schemaType: "versions"},
       {key:"customfield_version_unreleased",name:"Version",schemaType: "versions"},
-      
+     // {key:"customfield_sprints",name:"Sprints",schemaType:"array|string"}
       
     ]
   );
@@ -69,6 +71,7 @@ test("unifyIssueAttrib ", () => {
   expect(unifyIssueAttrib("customfield_stringArray",testIssue).value).toBe("one,two,three");
   expect(unifyIssueAttrib("customfield_stringArray2",testIssue).value).toBe("");
   expect(unifyIssueAttrib("customfield_stringArray3",testIssue).value).toBe("one");
+  expect(unifyIssueAttrib("customfield_stringArray4",testIssue).value).toBe("");
   expect(unifyIssueAttrib("customfield_versions",testIssue).value).toBe("version1, version2");
   expect(unifyIssueAttrib("customfield_emptyversions",testIssue).value).toBe("");
   expect(unifyIssueAttrib("customfield_version_released",testIssue).value).toBe("released version");
@@ -79,6 +82,8 @@ test("unifyIssueAttrib ", () => {
   expect(unifyIssueAttrib("components",testIssue).value).toBe("component 1, component 2");
   expect(unifyIssueAttrib("fixVersions",testIssue).value).toBe("fix Version 1");
   expect(unifyIssueAttrib("versions",testIssue).value).toBe("");
+  //expect(unifyIssueAttrib("customfield_sprints",testIssue).value).toBe("Sprint 1, Sprint 2");
+  
 });
 
 

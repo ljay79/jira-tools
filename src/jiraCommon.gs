@@ -325,21 +325,20 @@ function unifyIssueAttrib(attrib, data) {
           resp.value = '';
           var _values = data.fields[attrib];
 
-          if (_values.length>0) {
+          if (Array.isArray(_values) && _values.length>0) {
             // field "Sprint" is type string with custom value
-            if (data.fields[attrib][0].indexOf('service.sprint.Sprint') > -1) {
+            if (_values[0].indexOf('service.sprint.Sprint') > -1) {
               _values = [];
               var _regEx = /name=([^,]+),/gi;
               for (var i = 0; i < data.fields[attrib].length; i++) {
                 var _sprintNameArr = null;
                 _sprintNameArr = _regEx.exec(data.fields[attrib][i]);
                 _regEx.lastIndex = 0; // Reset
-                if(_sprintNameArr.length==2) _values.push(_sprintNameArr[1]);
+                if(Array.isArray(_sprintNameArr) && _sprintNameArr.length==2) _values.push(_sprintNameArr[1]);
               }
             }
+            resp.value = _values.join(',');
           }
-
-          resp.value = _values.join(',');
           break;
         case 'user':
           resp = {
@@ -455,6 +454,7 @@ function unifyIssueAttrib(attrib, data) {
     case 'timeoriginalestimate':
     case 'aggregatetimespent':
     case 'aggregatetimeestimate':
+    case 'remainingEstimate':
       resp = {
         value: (UserStorage.getValue('dspdurationas') == "w") ? formatTimeDiff(parseInt(data.fields[attrib]) || 0) : parseInt(data.fields[attrib]) || 0
       };
@@ -546,7 +546,9 @@ function unifyIssueAttrib(attrib, data) {
       break;
   }
   } catch (e) {
-    debug.log("Error in unifyIssueAttrib "+e);
+    debug.error("Error in unifyIssueAttrib field"+attrib+" exception "+e);
+    debug.log(JSON.stringify(e));
+    debug.log(JSON.stringify(data));
   }
   
   return resp;
