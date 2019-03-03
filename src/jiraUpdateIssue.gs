@@ -103,6 +103,15 @@ function formatFieldValueForJira(fieldDefinition, value) {
     }
     return value;
   }
+  if (fieldDefinition.schemaType == "user") {
+    if (value == "") {
+      value = null;
+    } else {
+      value = {name:value};
+    }
+    return value;
+  }
+
   if (fieldDefinition.custom && fieldDefinition.schemaType == "array|string") {
     // array|string as a schematpe is used by many fields
     // intended first to fix bug with setting sprint fields to empty

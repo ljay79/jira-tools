@@ -80,6 +80,13 @@ const jiraFieldList = [
     supported: true
   },
   {
+    schemaType:  "user" ,
+    key: "assignee",
+    name: "Assignee",
+    custom: false,
+    supported: true
+  },
+  {
     schemaType:  "string" ,
     key: "columnA",
     name: "XYZ field",
@@ -461,44 +468,53 @@ test("field validation", () => {
   expect(getFilteredList["My custom field 2"]).not.toBeDefined();
 });
 
+describe("Converting data from spreadsheet cells to Jira format - field by field ", () => {
+  test("Format string fields for JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[0];
+    expect(jiraFieldToUse.schemaType).toBe("string"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string 
+    expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe("1223"); // just pass it a string 
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(""); // just pass it a string 
+  })
 
-test("Format string fields for JIRA", () => {
-  const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
-  var jiraFieldToUse = jiraFieldList[0];
-  expect(jiraFieldToUse.schemaType).toBe("string"); // just in case the test data gets re-ordered
-  expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string 
-  expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe("1223"); // just pass it a string 
-  expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(""); // just pass it a string 
-})
+  test("Format empty number fields for JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[4];
+    expect(jiraFieldToUse.key).toBe("number1"); // just in case the test data gets re-ordered
+    expect(jiraFieldToUse.schemaType).toBe("number"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string
+    expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe("1223"); // just pass it a string
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null); // null required to clear a number field
+  })
 
-test("Format empty number fields for JIRA", () => {
-  const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
-  var jiraFieldToUse = jiraFieldList[4];
-  expect(jiraFieldToUse.key).toBe("number1"); // just in case the test data gets re-ordered
-  expect(jiraFieldToUse.schemaType).toBe("number"); // just in case the test data gets re-ordered
-  expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string
-  expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe("1223"); // just pass it a string
-  expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null); // null required to clear a number field
-})
+  test("Format empty sprint fields for JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[5];
+    expect(jiraFieldToUse.key).toBe("custom_sprint"); // just in case the test data gets re-ordered
+    expect(jiraFieldToUse.schemaType).toBe("array|string"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string - let JIRA error
+    expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe(1223); // convert to number
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null); // null required to clear a number field
+  })
 
-test("Format empty sprint fields for JIRA", () => {
-  const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
-  var jiraFieldToUse = jiraFieldList[5];
-  expect(jiraFieldToUse.key).toBe("custom_sprint"); // just in case the test data gets re-ordered
-  expect(jiraFieldToUse.schemaType).toBe("array|string"); // just in case the test data gets re-ordered
-  expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string - let JIRA error
-  expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe(1223); // convert to number
-  expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null); // null required to clear a number field
-})
+  test("Sending labels to JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[6];
+    expect(jiraFieldToUse.key).toBe("labels"); // just in case the test data gets re-ordered
+    expect(jiraFieldToUse.schemaType).toBe("array|string"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null);
+    expect(formatFieldValueForJira(jiraFieldToUse, "GNS-Metapod")).toEqual(["GNS-Metapod"]);
+    expect(formatFieldValueForJira(jiraFieldToUse, "GNS-Metapod,Test")).toEqual(["GNS-Metapod", "Test"]);
+  });
 
-test("Sending labels to JIRA", () => {
-  const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
-  var jiraFieldToUse = jiraFieldList[6];
-  expect(jiraFieldToUse.key).toBe("labels"); // just in case the test data gets re-ordered
-  expect(jiraFieldToUse.schemaType).toBe("array|string"); // just in case the test data gets re-ordered
-  expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null);
-  expect(formatFieldValueForJira(jiraFieldToUse, "GNS-Metapod")).toEqual(["GNS-Metapod"]);
-  expect(formatFieldValueForJira(jiraFieldToUse, "GNS-Metapod,Test")).toEqual(["GNS-Metapod", "Test"]);
+  test("Sending users to JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[9];
+    expect(jiraFieldToUse.schemaType).toBe("user"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null);
+    expect(formatFieldValueForJira(jiraFieldToUse, "plemon")).toEqual({name:"plemon"});
+  });
 });
 
 test("Including fields and/or items in the update ", () => {

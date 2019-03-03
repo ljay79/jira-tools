@@ -278,7 +278,6 @@ IssueFields = (function () {
       "project",
       "priority",
       'lastViewed',
-      //'assignee',
       'watches',
       'creator',
       'timespent',

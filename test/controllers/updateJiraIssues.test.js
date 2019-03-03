@@ -68,8 +68,6 @@ test("menuUpdateJiraIssues", () => {
   expect(params.allJiraFields[""]).toBe("select a jira field...");
   expect(params.allJiraFields.issueKey).toBe("Key");
   expect(Object.keys(params.allJiraFields).length).toBeGreaterThan(5);
-
-
   
   getValues.mockClear();
   dialogCode.getDialog.mockClear();
