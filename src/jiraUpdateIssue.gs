@@ -156,6 +156,17 @@ function packageRowForUpdate(headerRow, dataRow) {
       }
     }
   }
+
+  // move any timetracking fields into a single object in the data
+  result.fields.timetracking = {}
+  if (result.fields.hasOwnProperty("timeoriginalestimate")) {
+    result.fields.timetracking.originalEstimate = result.fields.timeoriginalestimate;
+    delete(result.fields.timeoriginalestimate);
+  }
+  // delete any unnecessary keys in the response
+  if (Object.keys(result.fields.timetracking).length ==0) {
+    delete(result.fields.timetracking);
+  }
   if (Object.keys(result.update).length ==0) {
     delete(result.update);
   }
