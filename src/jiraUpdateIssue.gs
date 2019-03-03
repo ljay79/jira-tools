@@ -30,14 +30,9 @@ function updateJiraIssues(headerRow, dataRows) {
       result.errors.push("No Key value found in row " + rowNum);
     } else {
       if (packagedRow.fields["status"] != null) {
-        var statusTransition = statusTransitioner.transition(packagedRow.key, packagedRow.fields["status"]);
-        delete (packagedRow.fields["status"]);
-        if (!statusTransition.success) {
-          statusTransition.errors.forEach(function (message) {
-            result.errors.push("[" + packagedRow.key + "] " + message);
-          });
-        }
+        updateStatus(packagedRow);
       }
+      checkForFieldsWhichCantBeEmpty(packagedRow);
       var updateResult = updateIssueinJira(packagedRow,
         function (key, success, message) {
           if (!success) {
@@ -62,6 +57,26 @@ function updateJiraIssues(headerRow, dataRows) {
   result.finished = true;
 
   return result;
+
+  function checkForFieldsWhichCantBeEmpty(packagedRow) {
+    if (packagedRow.fields.hasOwnProperty("priority")) {
+      var checkValue = packagedRow.fields["priority"];
+      if (checkValue == null || checkValue =="") {
+        result.errors.push("[" + packagedRow.key + "] you must enter a value for field Priority");
+        delete(packagedRow.fields["priority"]);
+      }
+    }
+  }
+
+  function updateStatus(packagedRow) {
+    var statusTransition = statusTransitioner.transition(packagedRow.key, packagedRow.fields["status"]);
+    delete (packagedRow.fields["status"]);
+    if (!statusTransition.success) {
+      statusTransition.errors.forEach(function (message) {
+        result.errors.push("[" + packagedRow.key + "] " + message);
+      });
+    }
+  }
 
   function hasValidationErrors() {
     if (headerRow === null || Object.keys(headerRow).length == 0) {
@@ -98,15 +113,17 @@ function formatFieldValueForJira(fieldDefinition, value) {
     }
     return value;
   }
-  var nullableSchemaTypes = ["number", "date", "user", "array|string"];
+  var nullableSchemaTypes = ["number", "date", "user", "array|string", "user", "priority"];
   if (nullableSchemaTypes.indexOf(fieldDefinition.schemaType) >= 0) {
     if (value == "") {
       value = null;
     }
   }
-  if (fieldDefinition.schemaType == "user" && value != null) {
+  var fieldsUsingName = ["user", "priority"];
+  if (fieldsUsingName.indexOf(fieldDefinition.schemaType) >= 0 && value != null) {
     value = { name: value };
   }
+
 
   if (fieldDefinition.custom && fieldDefinition.schemaType == "array|string") {
     // array|string as a schematpe is used by many fields

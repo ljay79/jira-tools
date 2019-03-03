@@ -134,6 +134,12 @@ const jiraFieldList = [
      key: "timeestimate",
      name: "Remaining Estimate",
      custom: false
+   },
+   {
+     schemaType: "priority",
+     key: "priority",
+     name: "Priority",
+     custom: false
    }
 ]
 
@@ -241,7 +247,6 @@ describe('processing list of Jira Issues', () => {
     expect(result.finished).toBe(true);
   });
 
-
   test("Update a single issue", () => {
     jiraApiMock.setAllResponsesSuccesfull(204);
 
@@ -253,6 +258,32 @@ describe('processing list of Jira Issues', () => {
     expect(result.finished).toBe(true);
     expect(jiraApiMock.call.mock.calls.length).toBe(result.rowsUpdated);
   });
+
+  test("Checking fields which must have a value", () => {
+    jiraApiMock.setAllResponsesSuccesfull(204);
+
+    var result = updateJiraIssues({ columnA: 2,priority: 1, Key: 0 }, [["PBI-1", "","column A value"]]);
+    expect(result.message).not.toBeNull();
+    expect(result.rowsUpdated).toBe(1);
+    expect(result.errors.length).toBe(1);
+    expect(result.status).toBe(true);
+    expect(result.finished).toBe(true);
+    expect(jiraApiMock.call.mock.calls.length).toBe(1);
+    expect(jiraApiMock.call.mock.calls[0][0]).toBe("issueUpdate");
+    expect(jiraApiMock.call.mock.calls[0][1].fields["priority"]).not.toBeDefined();
+
+
+    var result = updateJiraIssues({ columnA: 2,priority: 1, Key: 0 }, [["PBI-1", "P1","column A value"]]);
+    expect(result.message).not.toBeNull();
+    expect(result.rowsUpdated).toBe(1);
+    expect(result.errors.length).toBe(0);
+    expect(result.status).toBe(true);
+    expect(result.finished).toBe(true);
+    expect(jiraApiMock.call.mock.calls.length).toBe(2);
+    expect(jiraApiMock.call.mock.calls[1][0]).toBe("issueUpdate");
+    expect(jiraApiMock.call.mock.calls[1][1].fields["priority"]).toEqual({name:"P1"});
+  });
+
 
   test("Update two issues", () => {
     jiraApiMock.setAllResponsesSuccesfull(204);
@@ -623,6 +654,15 @@ describe("Converting data from spreadsheet cells to Jira format - field by field
     expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null);
     expect(formatFieldValueForJira(jiraFieldToUse, "plemon")).toEqual({ name: "plemon" });
   });
+
+
+  test("Sending prioirty values to JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[18];
+    expect(jiraFieldToUse.schemaType).toBe("priority"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null);
+    expect(formatFieldValueForJira(jiraFieldToUse, "P1")).toEqual({ name: "P1" });
+  });
 });
 
 
@@ -671,7 +711,4 @@ test("Including fields and/or items in the update ", () => {
   expect(putCall[1]["update"]["components"]).toBe(componentsData);
   // should have a comment
   expect(jiraApiMock.call.mock.calls[0][1]["update"]["comment"][0]["add"]["body"]).toBeDefined();
-
-
-
 });

@@ -276,7 +276,7 @@ IssueFields = (function () {
       "issuetype",
       "created",
       "project",
-      "priority",
+      //"priority",
       'lastViewed',
       'watches',
       'creator',
