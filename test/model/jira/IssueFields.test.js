@@ -313,4 +313,7 @@ test("Read Only fields", () => {
   expect(readonly).toContain("project");
   expect(readonly).toContain("created");
   expect(readonly).toContain("updated");
+  expect(readonly).not.toContain("summary");
+  expect(readonly).not.toContain("description");
+  expect(readonly).not.toContain("assignee");
 })
