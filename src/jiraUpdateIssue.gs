@@ -20,10 +20,10 @@ function updateJiraIssues(headerRow, dataRows) {
   if (hasValidationErrors()) {
     return result;
   }
-  
+
   var statusTransitioner = new IssueTransitioner();
   var rowNum = 0;
-  dataRows.forEach(function(dataRow) {
+  dataRows.forEach(function (dataRow) {
     var packagedRow = packageRowForUpdate(headerRow, dataRow);
     rowNum++;
     if (packagedRow.key == null) {
@@ -55,14 +55,14 @@ function updateJiraIssues(headerRow, dataRows) {
       if (updateResult) {
         result.rowsUpdated++;
       }
-    } 
+    }
   });
   result.message = result.rowsUpdated + " jira issues(s) updated, " + result.errors.length + " errors.";
   result.status = (result.rowsUpdated > 0);
   result.finished = true;
 
   return result;
-  
+
   function hasValidationErrors() {
     if (headerRow === null || Object.keys(headerRow).length == 0) {
       result.finished = true;
@@ -92,36 +92,29 @@ function formatFieldValueForJira(fieldDefinition, value) {
     if (value == "") {
       value = null;
     } else {
-      value = value.split(/,\s?/);
+      if (typeof value === 'string' || value instanceof String) {
+        value = value.split(/,\s?/);
+      }
     }
     return value;
   }
-
-  if (fieldDefinition.schemaType == "number" || fieldDefinition.schemaType == "date") {
+  var nullableSchemaTypes = ["number", "date", "user", "array|string"];
+  if (nullableSchemaTypes.indexOf(fieldDefinition.schemaType) >= 0) {
     if (value == "") {
       value = null;
     }
-    return value;
   }
-  if (fieldDefinition.schemaType == "user") {
-    if (value == "") {
-      value = null;
-    } else {
-      value = {name:value};
-    }
-    return value;
+  if (fieldDefinition.schemaType == "user" && value != null) {
+    value = { name: value };
   }
 
   if (fieldDefinition.custom && fieldDefinition.schemaType == "array|string") {
     // array|string as a schematpe is used by many fields
     // intended first to fix bug with setting sprint fields to empty
     // currently there is no other way to identify the sprint field
-    if (value == "") {
-      value = null;
-    } else if (!isNaN(value)) {
+    if (value != null && !isNaN(value)) {
       value = +value;
     }
-    return value;
   }
   return value;
 }
@@ -134,7 +127,7 @@ function formatFieldValueForJira(fieldDefinition, value) {
  */
 function packageRowForUpdate(headerRow, dataRow) {
   var keyFieldName = "issuekey";
-  var result = { key: null, fields: {}, update:{} };
+  var result = { key: null, fields: {}, update: {} };
   var filteredHeaders = getMatchingJiraFields(headerRow);
   for (var headerId in filteredHeaders) {
     var index = filteredHeaders[headerId].index;
@@ -145,7 +138,7 @@ function packageRowForUpdate(headerRow, dataRow) {
       if (headerId.toLowerCase() != keyFieldName) {
         // is this a field which needs to be put in fields of an update section
         if (isIssueScreenField(headerId)) {
-          result.update[headerId] = prepareUpdateField(headerId,value);
+          result.update[headerId] = prepareUpdateField(headerId, value);
         } else {
           result.fields[headerId] = value;
         }
@@ -161,14 +154,14 @@ function packageRowForUpdate(headerRow, dataRow) {
   result.fields.timetracking = {}
   if (result.fields.hasOwnProperty("timeoriginalestimate")) {
     result.fields.timetracking.originalEstimate = result.fields.timeoriginalestimate;
-    delete(result.fields.timeoriginalestimate);
+    delete (result.fields.timeoriginalestimate);
   }
   // delete any unnecessary keys in the response
-  if (Object.keys(result.fields.timetracking).length ==0) {
-    delete(result.fields.timetracking);
+  if (Object.keys(result.fields.timetracking).length == 0) {
+    delete (result.fields.timetracking);
   }
-  if (Object.keys(result.update).length ==0) {
-    delete(result.update);
+  if (Object.keys(result.update).length == 0) {
+    delete (result.update);
   }
   return result;
 
@@ -176,14 +169,16 @@ function packageRowForUpdate(headerRow, dataRow) {
     return headerId == "components" || headerId == "fixVersions";
   }
 
-  function prepareUpdateField(headerId,value) {
-    listOfItems = value.split(/\s*,\s*/);
+  function prepareUpdateField(headerId, value) {
     updateItems = [];
-    listOfItems.forEach(function (item) {
-      if (item.trim().length>0) {
-        updateItems.push({ "name": item.trim() });
-      }
-    });
+    if (value != null) {
+      listOfItems = value.split(/\s*,\s*/);
+      listOfItems.forEach(function (item) {
+        if (item.trim().length > 0) {
+          updateItems.push({ "name": item.trim() });
+        }
+      });
+    }
     return [{ set: updateItems }];
   }
 }
@@ -257,7 +252,7 @@ function updateIssueinJira(issueData, callback) {
     payload.fields = issueData.fields;
   }
   if (issueData.update != null) {
-    extend(payload.update,issueData.update);
+    extend(payload.update, issueData.update);
   }
   request.call(method, payload);
   request.withSuccessHandler(ok);
