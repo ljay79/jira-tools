@@ -33,7 +33,10 @@ test("unifyIssueAttrib ", () => {
       customfield_version_released: {name:"released version",released: true},
       components: [{name:"component 1"},{name:"component 2"}],
       fixVersions: [{name:"fix Version 1"}],
-      customfield_sprints: ["service.sprint.Sprint","name=Sprint 1","name=Sprint 2"],
+      customfield_sprints: [
+        "com.atlassian.greenhopper.service.sprint.Sprint@a29f07[rapidViewId=<null>,state=CLOSED,name=Sprint 1,startDate=2013-07-29T06:47:00.000+02:00,endDate=2013-08-11T20:47:00.000+02:00,completeDate=2013-08-14T15:31:33.157+02:00,id=107]",
+        "com.atlassian.greenhopper.service.sprint.Sprint@a29f07[rapidViewId=<null>,state=CLOSED,name=Sprint 2,startDate=2013-07-29T06:47:00.000+02:00,endDate=2013-08-11T20:47:00.000+02:00,completeDate=2013-08-14T15:31:33.157+02:00,id=108]"
+      ],
       versions: []
     }
   }
@@ -54,13 +57,17 @@ test("unifyIssueAttrib ", () => {
       {key:"customfield_emptyversions",name:"Empty Version Array",schemaType: "array|versions"},
       {key:"customfield_version_released",name:"Version",schemaType: "versions"},
       {key:"customfield_version_unreleased",name:"Version",schemaType: "versions"},
-     // {key:"customfield_sprints",name:"Sprints",schemaType:"array|string"}
+      {key:"customfield_sprints",name:"Sprints",schemaType:"array|string"}
       
     ]
   );
+  var debug = require("../src/debug.gs").debug;
+  debug.enable(true);
+  var debugErrorSpy = jest.spyOn(debug,'error');
   expect(unifyIssueAttrib("summary",testIssue).value).toBe("A summary");
   expect(unifyIssueAttrib("description",testIssue).value).toBe("This is the description");
   expect(unifyIssueAttrib("environment",testIssue).value).toBe("An environment");
+  expect(unifyIssueAttrib("duedate",testIssue).value).toBe("");
   var epicResult = unifyIssueAttrib("customfield_epic_link",testIssue);
   expect(epicResult.value).toBe("EPC-22");
   expect(epicResult.link).toBe("https://jiraserver/browse/EPC-22");
@@ -68,7 +75,7 @@ test("unifyIssueAttrib ", () => {
   expect(unifyIssueAttrib("customfield_custom1",testIssue).format).toBe("0");
   expect(unifyIssueAttrib("customfield_custom2",testIssue).value).toBe("hello");
   expect(unifyIssueAttrib("customfield_custom3",testIssue).value).toBe("option_value");
-  expect(unifyIssueAttrib("customfield_stringArray",testIssue).value).toBe("one,two,three");
+  expect(unifyIssueAttrib("customfield_stringArray",testIssue).value).toBe("one, two, three");
   expect(unifyIssueAttrib("customfield_stringArray2",testIssue).value).toBe("");
   expect(unifyIssueAttrib("customfield_stringArray3",testIssue).value).toBe("one");
   expect(unifyIssueAttrib("customfield_stringArray4",testIssue).value).toBe("");
@@ -82,8 +89,10 @@ test("unifyIssueAttrib ", () => {
   expect(unifyIssueAttrib("components",testIssue).value).toBe("component 1, component 2");
   expect(unifyIssueAttrib("fixVersions",testIssue).value).toBe("fix Version 1");
   expect(unifyIssueAttrib("versions",testIssue).value).toBe("");
-  //expect(unifyIssueAttrib("customfield_sprints",testIssue).value).toBe("Sprint 1, Sprint 2");
+  expect(unifyIssueAttrib("customfield_sprints",testIssue).value).toBe("Sprint 1, Sprint 2");
   
+  debug.enable(false);
+  expect(debugErrorSpy).toBeCalledTimes(0);
 });
 
 

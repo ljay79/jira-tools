@@ -92,7 +92,7 @@ function formatFieldValueForJira(fieldDefinition, value) {
     if (value == "") {
       value = null;
     } else {
-      value = value.split(",");
+      value = value.split(/,\s?/);
     }
     return value;
   }

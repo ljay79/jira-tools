@@ -31,7 +31,7 @@ function getTicketSheet() {
  */
 function grepJiraTicketId(cellValue) {
   var ticketId = cellValue.match(/[A-Z]+\-\d+/);
-  return (ticketId==null ? null : ticketId[0]);
+  return (ticketId == null ? null : ticketId[0]);
 }
 
 /**
@@ -48,7 +48,7 @@ function grepJiraCell(cellValue) {
     parts: []
   };
 
-  if(cellValue.trim() == '') {
+  if (cellValue.trim() == '') {
     return cellProps;
   }
 
@@ -56,7 +56,7 @@ function grepJiraCell(cellValue) {
 
   // match: "JIRA-123"
   match = cellValue.match(/^([A-Z0-9]+\-\d+)$/);
-  if(match && match.length == 2) {
+  if (match && match.length == 2) {
     cellProps = {
       type: CELLTYPE_JIRAID,
       value: cellValue,
@@ -65,10 +65,10 @@ function grepJiraCell(cellValue) {
     }
     return cellProps;
   }
-  
+
   // match: "JIRA-123 [Status]"
   match = cellValue.match(/^([A-Z0-9]+\-\d+)\s?(\[.+\])$/);
-  if(match && match.length == 3) {
+  if (match && match.length == 3) {
     cellProps = {
       type: CELLTYPE_JIRAID,
       value: cellValue,
@@ -80,7 +80,7 @@ function grepJiraCell(cellValue) {
 
   // match: "lorem ipsum JIRA-123 [Status] dolores"
   match = reverse(cellValue).match(/(.*)((\].+\[)\s?(\d+-[A-Z0-9]+(?!-?[a-zA-Z]{1,10})))(.*)/);
-  if(match && match.length == 6) {
+  if (match && match.length == 6) {
     // remove status part
     cellValue = cellValue.replace(' ' + reverse(match[3]), '').trim();
     cellProps = {
@@ -91,10 +91,10 @@ function grepJiraCell(cellValue) {
     }
     return cellProps;
   }
-  
+
   // match: "lorem ipsum JIRA-123 dolores"
   match = reverse(cellValue).match(/(\d+-[A-Z0-9]+(?!-?[a-zA-Z]{1,10}))(.*)/);
-  if(match && match.length == 3) {
+  if (match && match.length == 3) {
     cellProps = {
       type: CELLTYPE_TEXT,
       value: cellValue,
@@ -103,29 +103,29 @@ function grepJiraCell(cellValue) {
     }
     return cellProps;
   }
-  
+
   return cellProps;
-  
-/* Debug Info
-IN: IT-123
-OUT: {"type":10,"value":"IT-123","ticketId":"IT-123","parts":["IT-123","IT-123"]}
-----------------------------------
-IN: IT-123 [Status]
-OUT: {"type":10,"value":"IT-123 [Status]","ticketId":"IT-123","parts":["IT-123 [Status]","IT-123","[Status]"]}
-----------------------------------
-IN: Lorem ispum IT-123
-OUT: {"type":20,"value":"Lorem ispum IT-123","ticketId":"IT-123","parts":["321-TI mupsi meroL","321-TI"," mupsi meroL"]}
-----------------------------------
-IN: Lorem ispum IT-123 dolores
-OUT: {"type":20,"value":"Lorem ispum IT-123 dolores","ticketId":"IT-123","parts":["321-TI mupsi meroL","321-TI"," mupsi meroL"]}
-----------------------------------
-IN: Lorem ispum IT-123 [Status]
-OUT: {"type":20,"value":"Lorem ispum IT-123","ticketId":"IT-123","parts":["]sutatS[ 321-TI mupsi meroL","","]sutatS[ 321-TI","]sutatS[","321-TI"," mupsi meroL"]}
-----------------------------------
-IN: Lorem ispum IT-123 [Status] dolores
-OUT: {"type":20,"value":"Lorem ispum IT-123 dolores","ticketId":"IT-123","parts":["serolod ]sutatS[ 321-TI mupsi meroL","serolod ","]sutatS[ 321-TI","]sutatS[","321-TI"," mupsi meroL"]}
-----------------------------------
-*/
+
+  /* Debug Info
+  IN: IT-123
+  OUT: {"type":10,"value":"IT-123","ticketId":"IT-123","parts":["IT-123","IT-123"]}
+  ----------------------------------
+  IN: IT-123 [Status]
+  OUT: {"type":10,"value":"IT-123 [Status]","ticketId":"IT-123","parts":["IT-123 [Status]","IT-123","[Status]"]}
+  ----------------------------------
+  IN: Lorem ispum IT-123
+  OUT: {"type":20,"value":"Lorem ispum IT-123","ticketId":"IT-123","parts":["321-TI mupsi meroL","321-TI"," mupsi meroL"]}
+  ----------------------------------
+  IN: Lorem ispum IT-123 dolores
+  OUT: {"type":20,"value":"Lorem ispum IT-123 dolores","ticketId":"IT-123","parts":["321-TI mupsi meroL","321-TI"," mupsi meroL"]}
+  ----------------------------------
+  IN: Lorem ispum IT-123 [Status]
+  OUT: {"type":20,"value":"Lorem ispum IT-123","ticketId":"IT-123","parts":["]sutatS[ 321-TI mupsi meroL","","]sutatS[ 321-TI","]sutatS[","321-TI"," mupsi meroL"]}
+  ----------------------------------
+  IN: Lorem ispum IT-123 [Status] dolores
+  OUT: {"type":20,"value":"Lorem ispum IT-123 dolores","ticketId":"IT-123","parts":["serolod ]sutatS[ 321-TI mupsi meroL","serolod ","]sutatS[ 321-TI","]sutatS[","321-TI"," mupsi meroL"]}
+  ----------------------------------
+  */
 }
 
 
@@ -135,15 +135,16 @@ OUT: {"type":20,"value":"Lorem ispum IT-123 dolores","ticketId":"IT-123","parts"
  * @return {object} Object({[id]:{name:{string}, self:{string}, favourite:{boolean}, owner:{string}, viewUrl:{string}}})
  */
 function getMyFilters(includeFavourites) {
-  var filters = {list:[], error:''};
+  var filters = { list: [], error: '' };
 
-  var ok = function(responseData, httpResponse, statusCode) {
+  var ok = function (responseData, httpResponse, statusCode) {
     // Check the data is valid and the Jira fields exist
     debug.log("getMyFilters()->ok(): %s", responseData);
 
-    if(responseData) {
+    if (responseData) {
       // add data to export
-      filters.list.push.apply(filters.list, responseData.map(function(filter){ return {
+      filters.list.push.apply(filters.list, responseData.map(function (filter) {
+        return {
           id: parseInt(filter.id),
           name: filter.name,
           self: filter.self,
@@ -151,9 +152,10 @@ function getMyFilters(includeFavourites) {
           owner: filter.owner.displayName,
           viewUrl: filter.viewUrl,
           jql: filter.jql
-        }; }) )
-      // sorting the list of filters by favourite, name
-      && filters.list.sort(function(a, b){
+        };
+      }))
+        // sorting the list of filters by favourite, name
+        && filters.list.sort(function (a, b) {
           var keyA = (a.favourite ? '0' : '1') + a.name;
           var keyB = (b.favourite ? '0' : '1') + b.name;
 
@@ -163,7 +165,7 @@ function getMyFilters(includeFavourites) {
             return 1;
           return 0;
         })
-      ;
+        ;
       debug.log("getMyFilters()->return(): %s", filters);
     } else {
       // Something funky is up with the JSON response.
@@ -172,14 +174,14 @@ function getMyFilters(includeFavourites) {
     }
   };
 
-  var error = function(responseData, httpResponse, statusCode) {
+  var error = function (responseData, httpResponse, statusCode) {
     filters.error = "Failed to retrieve jira filters with status [" + statusCode + "]!\\n" + responseData.errorMessages.join("\\n");
     debug.error(filters.error);
   };
 
   var request = new Request();
 
-  request.call("myFilters", {includeFavourites:(includeFavourites?'true':'false')})
+  request.call("myFilters", { includeFavourites: (includeFavourites ? 'true' : 'false') })
     .withSuccessHandler(ok)
     .withFailureHandler(error);
 
@@ -193,12 +195,12 @@ function getMyFilters(includeFavourites) {
  */
 function getFilter(filterId) {
   var method = "filter",
-      filter = {},
-      request = new Request();
+    filter = {},
+    request = new Request();
 
-  var ok = function(responseData, httpResponse, statusCode){
+  var ok = function (responseData, httpResponse, statusCode) {
     // Check the data is valid and the Jira fields exist
-    if(responseData) {
+    if (responseData) {
       filter = responseData;
     } else {
       // Something funky is up with the JSON response.
@@ -206,11 +208,11 @@ function getFilter(filterId) {
     }
   };
 
-  var error = function(responseData, httpResponse, statusCode) {
+  var error = function (responseData, httpResponse, statusCode) {
     debug.error("Failed to retrieve jira filter with status [" + statusCode + "]!\\n" + responseData.errorMessages.join("\\n"));
   };
 
-  request.call(method, {filterId:filterId})
+  request.call(method, { filterId: filterId })
     .withSuccessHandler(ok)
     .withFailureHandler(error);
 
@@ -223,27 +225,27 @@ function getFilter(filterId) {
  * @return {object} Object({"users":[{<arrayOfObjects}], "groups":[{arrayOfObjects}]})
  */
 function fetchUsersAndGroups(minimal) {
-  var minimal = minimal || true, 
-      result = {
-        "users" : [],
-        "groups": findGroup('%', minimal)
-      };
+  var minimal = minimal || true,
+    result = {
+      "users": [],
+      "groups": findGroup('%', minimal)
+    };
 
-  result.users = findUser('%', minimal).filter(function( user ) {
+  result.users = findUser('%', minimal).filter(function (user) {
     return user.active !== false;
   });
 
   // Jira Server Issue workaround (https://jira.atlassian.com/browse/JRASERVER-29069)
-  if(result.users.length == 0 && getCfg_('server_type') == 'server') {
+  if (result.users.length == 0 && getCfg_('server_type') == 'server') {
     // try it again with custom query param apparently working like %
-    result.users = findUser('.', minimal).filter(function( user ) {
+    result.users = findUser('.', minimal).filter(function (user) {
       return user.active !== false;
     });
   }
 
-  result.users.sort(function(a,b) {return (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0);} ); 
+  result.users.sort(function (a, b) { return (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0); });
 
-  if(result.users.length == 0) {
+  if (result.users.length == 0) {
     SpreadsheetApp.getActiveSpreadsheet().toast("No users were found. Check your JIRA permission.", "Error", 10);
   }
 
@@ -258,299 +260,305 @@ function fetchUsersAndGroups(minimal) {
  * @return {object}
  */
 function unifyIssueAttrib(attrib, data) {
-  var resp = {value: ''};
+  var resp = { value: '' };
   // TODO: We should remove this try catch - needs alot of testing though to get to that.
   try { // no error handling, always return a valid object
 
-  // custom fields first
-  if ( attrib.substring(0, 12) == 'customfield_' ) {
-    var customFields = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_UNIFY);
-    // custom epic
-    if (EpicField.isUsable()) {
-      customFields[EpicField.getLinkKey()] = EpicField.EPIC_KEY;
+    // custom fields first
+    if (attrib.substring(0, 12) == 'customfield_') {
+      var customFields = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_UNIFY);
+      // custom epic
+      if (EpicField.isUsable()) {
+        customFields[EpicField.getLinkKey()] = EpicField.EPIC_KEY;
+      }
+
+      if (customFields.hasOwnProperty(attrib)) {
+        var format = customFields[attrib];
+        switch (format) {
+          case EpicField.EPIC_KEY:
+            resp = {
+              epic: true,
+              value: data.fields[attrib] || 'n/a',
+              link: getCfg_('jira_url') + "/browse/" + data.fields[attrib]
+            };
+            break;
+          case 'datetime':
+            var _date = data.fields[attrib] || null;
+            resp = {
+              value: _date,
+              date: getDateFromIso(_date),
+              format: "dd.mm.yyyy hh:mm"
+            };
+            break;
+          case 'date':
+            var _date = data.fields[attrib] || null;
+            _date = (_date.length == 10) ? _date + 'T12:00:00' : _date;
+            var date = getDateFromIso(_date);
+            date.setHours(0, 0, 0);
+            resp = {
+              value: _date,
+              date: date,
+              format: "dd.mm.yyyy"
+            };
+            break;
+          case 'number':
+            resp = {
+              value: parseFloat(data.fields[attrib]) || null,
+              format: "0"
+            };
+            break;
+          case 'string':
+            resp.value = data.fields[attrib] || '';
+            break;
+          case 'option':
+            resp.value = data.fields[attrib].value || 'n/a';
+            break;
+          case 'array|option':
+            resp.value = '';
+            var _values = [];
+            // Try casting array to values
+            if (data.fields[attrib].length > 0 && data.fields[attrib][0].hasOwnProperty('value'))
+              for (var i = 0; i < data.fields[attrib].length; i++)
+                _values.push(data.fields[attrib][i].value);
+
+            resp.value = _values.join(',');
+            break;
+          case 'array|string':
+            resp.value = '';
+            var _values = data.fields[attrib];
+
+            if (Array.isArray(_values) && _values.length > 0) {
+              // field "Sprint" is type string with custom value
+              if (_values[0].indexOf('service.sprint.Sprint') > -1) {
+                _values = [];
+                var _regEx = /name=([^,]+),/gi;
+                for (var i = 0; i < data.fields[attrib].length; i++) {
+                  var _sprintNameArr = null;
+                  _sprintNameArr = _regEx.exec(data.fields[attrib][i]);
+                  _regEx.lastIndex = 0; // Reset
+                  if (Array.isArray(_sprintNameArr) && _sprintNameArr.length == 2) _values.push(_sprintNameArr[1]);
+                }
+              }
+              resp.value = _values.join(', ');
+            }
+            break;
+          case 'user':
+            resp = {
+              value: (UserStorage.getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
+              avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
+            };
+            break;
+          case 'array|user':
+            resp.value = data.fields[attrib].map(function (el) {
+              return ((UserStorage.getValue('dspuseras_name') == 1 ? el.displayName : el.name) || 'Unknown');
+            }).join(', ');
+            break;
+          case 'group':
+            resp.value = data.fields[attrib].name || '';
+            break;
+          case 'array|group':
+          case 'array|versions':
+            resp.value = data.fields[attrib].map(function (el) {
+              return (el.name || 'n/a');
+            }).join(', ');
+            break;
+          case 'versions':
+            resp = {
+              value: data.fields[attrib].name,
+              format: (data.fields[attrib].released == true) ? '@[green]' : ''
+            };
+            break;
+
+          default:
+            debug.log('unifyIssueAttrib(%s) no format defined yet for custom field.(02)', attrib);
+            resp.value = data[attrib] || data.fields[attrib];
+            break;
+        }
+
+      } else {
+        debug.info('unifyIssueAttrib(%s) is custom field, but no format defined in customFields:%s.', attrib, customFields);
+        resp.value = data.fields[attrib] || data[attrib];
+      }
+
+      return resp;
     }
 
-    if (customFields.hasOwnProperty(attrib)) {
-      var format = customFields[attrib];
-      switch(format) {
-        case EpicField.EPIC_KEY:
+    // regular fields
+    switch (attrib) {
+      case 'status':
+        resp = {
+          value: data.fields.status.name || 'n/a',
+          color: data.fields.status.statusCategory.colorName || 'black',
+          format: '@[' + (data.fields.status.statusCategory.colorName || 'black') + ']'
+        };
+        break;
+      case 'resolution':
+        resp = {
+          value: data.fields.resolution.name,
+          format: '@[green]'
+        };
+        break;
+      case 'key':
+        resp = {
+          value: data.key || 'n/a',
+          link: getCfg_('jira_url') + "/browse/" + data.key
+        };
+        break;
+      case 'summary':
+      case 'description':
+      case 'environment':
+        resp.value = data.fields[attrib] || '';
+        break;
+      case 'issuetype':
+        resp = {
+          value: data.fields.issuetype.name || '',
+          subtask: data.fields.issuetype.subtask || false,
+          iconUrl: data.fields.issuetype.iconUrl || ''
+        };
+        break;
+      case 'assignee':
+      case 'creator':
+      case 'reporter':
+        resp = {
+          value: (UserStorage.getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
+          avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
+        };
+        break;
+      case 'priority':
+        resp = {
+          value: data.fields.priority.name || 'n/a',
+          iconUrl: data.fields.priority.iconUrl || ''
+        };
+        break;
+      case 'updated':
+      case 'created':
+      case 'resolutiondate':
+      case 'lastViewed':
+        resp = {
+          value: data.fields[attrib] || null,
+          date: getDateFromIso(data.fields[attrib]),
+          format: "dd.mm.yyyy hh:mm"
+        };
+        break;
+      case 'duedate':
+        // very dirty - just cant get arround timezone issue when date is in format 'YYYY-MM-DD'
+        // @TODO: require proper generic solution for this
+        var _duedate = data.fields.duedate || null;
+        if (_duedate != null) {
+          _duedate = (_duedate.length == 10) ? _duedate + 'T12:00:00' : _duedate;
           resp = {
-            epic  : true,
-            value : data.fields[attrib] || 'n/a',
-            link  : getCfg_('jira_url') + "/browse/" + data.fields[attrib]
-          };
-          break;
-        case 'datetime':
-          var _date = data.fields[attrib] || null;
-          resp = {
-            value : _date,
-            date  : getDateFromIso(_date),
-            format: "dd.mm.yyyy hh:mm"
-          };
-          break;
-        case 'date':
-          var _date = data.fields[attrib] || null;
-          _date     = (_date.length == 10) ? _date + 'T12:00:00' : _date;
-          var date  = getDateFromIso(_date);
-          date.setHours(0,0,0);
-          resp      = {
-            value : _date,
-            date  : date,
+            value: _duedate,
+            date: getDateFromIso(_duedate),
             format: "dd.mm.yyyy"
           };
-          break;
-        case 'number':
+        } else {
           resp = {
-            value : parseFloat(data.fields[attrib]) || null,
-            format: "0"
+            value: ""
           };
-          break;
-        case 'string':
-          resp.value = data.fields[attrib] || '';
-          break;
-        case 'option':
-          resp.value = data.fields[attrib].value || 'n/a';
-          break;
-        case 'array|option':
-          resp.value = '';
-          var _values = [];
-          // Try casting array to values
-          if (data.fields[attrib].length > 0 && data.fields[attrib][0].hasOwnProperty('value'))
-            for (var i = 0; i < data.fields[attrib].length; i++) 
-              _values.push(data.fields[attrib][i].value);
+        }
+        break;
+      case 'timespent':
+      case 'timeestimate':
+      case 'timeoriginalestimate':
+      case 'aggregatetimespent':
+      case 'aggregatetimeestimate':
+      case 'remainingEstimate':
+        resp = {
+          value: (UserStorage.getValue('dspdurationas') == "w") ? formatTimeDiff(parseInt(data.fields[attrib]) || 0) : parseInt(data.fields[attrib]) || 0
+        };
+        break;
+      case 'project':
+        resp = {
+          value: data.fields.project.name
+        };
+        break;
+      case 'labels':
+        resp = {
+          value: data.fields.labels.join(',')
+        };
+        break;
+      case 'components':
+      case 'fixVersions':
+      case 'versions':
+        // array of objects with element name in property 'name'
+        resp = {
+          value: data.fields[attrib].map(function (value) {
+            return value.name;
+          }).join(', ')
+        };
+        break;
+      case 'aggregateprogress':
+      case 'progress':
+        var percent = data.fields[attrib].percent || 0;
+        percent = Utilities.formatString("%.Xf%".replace('X', 0), percent);
+        resp = {
+          value: percent,
+          format: "0%"
+        };
+        break;
+      case 'workratio':
+        resp = {
+          value: parseInt(data.fields[attrib]) / 100 || 0,
+          format: "0%"
+        };
+        break;
+      case 'user':
+        resp = {
+          displayName: data.displayName + (data.active == true ? '' : ' (X)'),
+          name: data.name,
+          emailAddress: data.emailAddress,
+          active: data.active,
+          value: data.displayName,
+          format: "@"
+        };
+        break;
+      case 'group':
+        var _dName = (data.labels.length > 0) ? data.labels[0].text : data.name;
+        resp = {
+          displayName: _dName,
+          name: data.name,
+          value: _dName,
+          format: "@"
+        };
+        break;
+      case 'userMin':
+        resp = {
+          displayName: data.displayName + (data.active == true ? '' : ' (X)'),
+          name: data.name,
+          active: data.active,
+        };
+        break;
+      case 'groupMin':
+        var _dName = (data.labels.length > 0) ? data.labels[0].text : data.name;
+        resp = {
+          displayName: _dName,
+          name: data.name,
+        };
+        break;
+      case 'votes':
+        resp = {
+          value: data.fields[attrib].votes,
+          format: '0',
+        };
+        break;
+      case 'watches':
+        resp = {
+          value: data.fields[attrib].watchCount || 0,
+          format: '0',
+        };
+        break;
 
-          resp.value = _values.join(',');
-          break;
-        case 'array|string':
-          resp.value = '';
-          var _values = data.fields[attrib];
-
-          if (Array.isArray(_values) && _values.length>0) {
-            // field "Sprint" is type string with custom value
-            if (_values[0].indexOf('service.sprint.Sprint') > -1) {
-              _values = [];
-              var _regEx = /name=([^,]+),/gi;
-              for (var i = 0; i < data.fields[attrib].length; i++) {
-                var _sprintNameArr = null;
-                _sprintNameArr = _regEx.exec(data.fields[attrib][i]);
-                _regEx.lastIndex = 0; // Reset
-                if(Array.isArray(_sprintNameArr) && _sprintNameArr.length==2) _values.push(_sprintNameArr[1]);
-              }
-            }
-            resp.value = _values.join(',');
-          }
-          break;
-        case 'user':
-          resp = {
-            value: (UserStorage.getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
-            avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
-          };
-          break;
-        case 'array|user':
-          resp.value = data.fields[attrib].map(function(el){
-            return ((UserStorage.getValue('dspuseras_name') == 1 ? el.displayName : el.name) || 'Unknown');
-          }).join(', ');
-          break;
-        case 'group':
-          resp.value = data.fields[attrib].name || '';
-          break;
-        case 'array|group':
-        case 'array|versions':
-          resp.value = data.fields[attrib].map(function(el){
-            return (el.name || 'n/a');
-          }).join(', ');
-          break;
-        case 'versions':
-          resp = {
-            value: data.fields[attrib].name,
-            format: (data.fields[attrib].released == true) ? '@[green]' : ''
-          };
-          break;
-
-        default:
-          debug.log('unifyIssueAttrib(%s) no format defined yet for custom field.(02)', attrib);
-          resp.value = data[attrib] || data.fields[attrib];
-          break;
-      }
-      
-    } else {
-      debug.info('unifyIssueAttrib(%s) is custom field, but no format defined in customFields:%s.', attrib, customFields);
-      resp.value = data.fields[attrib] || data[attrib];
+      default:
+        debug.info('unifyIssueAttrib(' + attrib + ') no format defined yet.(01)');
+        resp.value = data[attrib] || data.fields[attrib];
+        break;
     }
-
-    return resp;
-  }
-  
-  // regular fields
-  switch(attrib) {
-    case 'status':
-      resp = {
-        value: data.fields.status.name || 'n/a',
-        color: data.fields.status.statusCategory.colorName || 'black',
-        format: '@[' + (data.fields.status.statusCategory.colorName || 'black') + ']'
-      };
-      break;
-    case 'resolution':
-      resp = {
-        value: data.fields.resolution.name,
-        format: '@[green]'
-      };
-      break;
-    case 'key':
-      resp = {
-        value: data.key || 'n/a',
-        link: getCfg_('jira_url') + "/browse/" + data.key
-      };
-      break;
-    case 'summary':
-    case 'description':
-    case 'environment':
-      resp.value = data.fields[attrib] || '';
-      break;
-    case 'issuetype':
-      resp = {
-        value: data.fields.issuetype.name || '',
-        subtask: data.fields.issuetype.subtask || false,
-        iconUrl: data.fields.issuetype.iconUrl || ''
-      };
-      break;
-    case 'assignee':
-    case 'creator':
-    case 'reporter':
-      resp = {
-        value: (UserStorage.getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
-        avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
-      };
-      break;
-    case 'priority':
-      resp = {
-        value: data.fields.priority.name || 'n/a',
-        iconUrl: data.fields.priority.iconUrl || ''
-      };
-      break;
-    case 'updated':
-    case 'created':
-    case 'resolutiondate':
-    case 'lastViewed':
-      resp = {
-        value: data.fields[attrib] || null,
-        date: getDateFromIso(data.fields[attrib]),
-        format: "dd.mm.yyyy hh:mm"
-      };
-      break;
-    case 'duedate':
-      // very dirty - just cant get arround timezone issue when date is in format 'YYYY-MM-DD'
-      // @TODO: require proper generic solution for this
-      var _duedate = data.fields.duedate || null;
-      _duedate = (_duedate.length == 10) ? _duedate + 'T12:00:00' : _duedate;
-      resp = {
-        value: _duedate,
-        date: getDateFromIso(_duedate),
-        format: "dd.mm.yyyy"
-      };
-      break;
-    case 'timespent':
-    case 'timeestimate':
-    case 'timeoriginalestimate':
-    case 'aggregatetimespent':
-    case 'aggregatetimeestimate':
-    case 'remainingEstimate':
-      resp = {
-        value: (UserStorage.getValue('dspdurationas') == "w") ? formatTimeDiff(parseInt(data.fields[attrib]) || 0) : parseInt(data.fields[attrib]) || 0
-      };
-      break;
-    case 'project':
-      resp = {
-        value: data.fields.project.name
-      };
-      break;
-    case 'labels':
-      resp = {
-        value: data.fields.labels.join(',')
-      };
-      break;
-    case 'components':
-    case 'fixVersions':
-    case 'versions':
-      // array of objects with element name in property 'name'
-      resp = {
-        value: data.fields[attrib].map(function(value) {
-          return value.name;
-        }).join(', ')
-      };
-      break;
-    case 'aggregateprogress':
-    case 'progress':
-      var percent = data.fields[attrib].percent || 0;
-      percent = Utilities.formatString("%.Xf%".replace('X',0), percent);
-      resp = {
-        value: percent,
-        format: "0%"
-      };
-      break;
-    case 'workratio':
-      resp = {
-        value: parseInt(data.fields[attrib]) / 100 || 0,
-        format: "0%"
-      };
-      break;
-    case 'user':
-      resp = {
-        displayName: data.displayName + (data.active==true?'':' (X)'),
-        name: data.name,
-        emailAddress: data.emailAddress,
-        active: data.active,
-        value: data.displayName,
-        format: "@"
-      };
-      break;
-    case 'group':
-      var _dName = (data.labels.length > 0) ? data.labels[0].text : data.name;
-      resp = {
-        displayName: _dName,
-        name: data.name,
-        value: _dName,
-        format: "@"
-      };
-      break;
-    case 'userMin':
-      resp = {
-        displayName: data.displayName + (data.active==true?'':' (X)'),
-        name: data.name,
-        active: data.active,
-      };
-      break;
-    case 'groupMin':
-      var _dName = (data.labels.length > 0) ? data.labels[0].text : data.name;
-      resp = {
-        displayName: _dName,
-        name: data.name,
-      };
-      break;
-    case 'votes':
-      resp = {
-        value: data.fields[attrib].votes,
-        format: '0',
-      };
-      break;
-    case 'watches':
-      resp = {
-        value: data.fields[attrib].watchCount || 0,
-        format: '0',
-      };
-      break;
-
-    default:
-      debug.info('unifyIssueAttrib(' + attrib + ') no format defined yet.(01)');
-      resp.value = data[attrib] || data.fields[attrib];
-      break;
-  }
   } catch (e) {
-    debug.error("Error in unifyIssueAttrib field"+attrib+" exception "+e);
+    debug.error("Error in unifyIssueAttrib field '" + attrib + "' exception " + e);
     debug.log(JSON.stringify(e));
     debug.log(JSON.stringify(data));
   }
-  
+
   return resp;
 }
 
@@ -566,12 +574,12 @@ function getIssue(issueKey, fields) {
     'errorMessage': ''
   };
 
-  var ok = function(resp, httpResp, status) {
-    if(resp && resp.fields) {
+  var ok = function (resp, httpResp, status) {
+    if (resp && resp.fields) {
       response = {
-        'data'             : resp.issues || resp,
-        'status'           : status,
-        'errorMessage'     : resp.hasOwnProperty('warningMessages') ? resp.warningMessages : 'No results found.'
+        'data': resp.issues || resp,
+        'status': status,
+        'errorMessage': resp.hasOwnProperty('warningMessages') ? resp.warningMessages : 'No results found.'
       };
     } else {
       // Something funky is up with the JSON response.
@@ -579,7 +587,7 @@ function getIssue(issueKey, fields) {
     }
   };
 
-  var error = function(resp, httpResp, status) {
+  var error = function (resp, httpResp, status) {
     debug.error('[%s] %s - %s', status, resp, httpResp);
 
     var msgs = resp.hasOwnProperty('errorMessages') ? resp.errorMessages : [];
@@ -590,21 +598,21 @@ function getIssue(issueKey, fields) {
   };
 
   var request = new Request();
-  var requestParams = {issueIdOrKey: issueKey};
-  if (fields!= null) {
+  var requestParams = { issueIdOrKey: issueKey };
+  if (fields != null) {
     requestParams["fields"] = fields;
   }
   request.call('issueStatus', requestParams)
     .withSuccessHandler(ok)
     .withFailureHandler(error);
-  
+
   return response;
 }
 
 
 // Node required code block
 module.exports = {
-  getIssue: getIssue, 
+  getIssue: getIssue,
   unifyIssueAttrib: unifyIssueAttrib,
   getTicketSheet: getTicketSheet
 };
