@@ -97,7 +97,7 @@ function formatFieldValueForJira(fieldDefinition, value) {
     return value;
   }
 
-  if (fieldDefinition.schemaType == "number") {
+  if (fieldDefinition.schemaType == "number" || fieldDefinition.schemaType == "date") {
     if (value == "") {
       value = null;
     }

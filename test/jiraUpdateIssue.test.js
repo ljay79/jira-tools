@@ -122,7 +122,13 @@ const jiraFieldList = [
     name: "Original Estimate",
     custom: false
 
-  }
+  },
+  {
+    schemaType: "date",
+    key: "duedate",
+    name: "Due Date",
+    custom: false
+   }
 ]
 
 
@@ -544,6 +550,18 @@ describe("Converting data from spreadsheet cells to Jira format - field by field
     expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string
     expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe("1223"); // just pass it a string
     expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null); // null required to clear a number field
+  })
+
+
+
+  test("Date Time fields for JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[16];
+    expect(jiraFieldToUse.key).toBe("duedate"); // just in case the test data gets re-ordered
+    expect(jiraFieldToUse.schemaType).toBe("date"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null); // null
+    expect(formatFieldValueForJira(jiraFieldToUse, "abc")).toBe("abc"); // just pass it a string
+    expect(formatFieldValueForJira(jiraFieldToUse, "12/04/1988")).toBe("12/04/1988"); // just pass it a string
   })
 
   test("Format empty sprint fields for JIRA", () => {
