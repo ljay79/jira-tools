@@ -316,4 +316,5 @@ test("Read Only fields", () => {
   expect(readonly).not.toContain("summary");
   expect(readonly).not.toContain("description");
   expect(readonly).not.toContain("assignee");
+  expect(readonly).not.toContain("priority");
 })
