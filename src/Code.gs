@@ -10,7 +10,7 @@
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
-var BUILD = '1.1.0';
+var BUILD = '1.2.0';
 
 /** 
  * Add a nice menu option for the users.
@@ -52,10 +52,8 @@ function addMenu() {
     .addItem('Configure custom fields', 'menuCustomFields')
     .addItem('About', 'dialogAbout');
 
-    if (environmentConfiguration.features.updateJira.enabled) {
-        menu.addSeparator()
-        .addItem('Update Jira Issues (BETA)', 'menuUpdateJiraIssues');
-    }
+  menu.addSeparator()
+    .addItem('Update Jira Issues (BETA)', 'menuUpdateJiraIssues');
 
     menu.addToUi();
 }
