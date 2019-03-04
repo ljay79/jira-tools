@@ -6,11 +6,7 @@ var environmentConfiguration = {
   "name": "Local",
   "description": "Local development environment",
   "debugEnabled": true,
-  "features": {
-    "updateJira": {
-      "enabled": true
-    }
-  }
+  "features": {}
 }
 
 // Node required code block

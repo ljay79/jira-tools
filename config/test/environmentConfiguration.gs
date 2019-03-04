@@ -6,9 +6,5 @@ var environmentConfiguration = {
   "name": "Test",
   "description": "GAS test enviroment",
   "debugEnabled": true,
-  "features": {
-    "updateJira": {
-      "enabled": true
-    }
-  }
+  "features": {}
 };
