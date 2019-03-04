@@ -223,7 +223,7 @@ function IssueSearch(searchQuery) {
     response.status = status;
     response.errorMessage = msgs.join("\n");
 
-    debug.time('IssueSearch.search(' + startAt + ')');
+    debug.timeEnd('IssueSearch.search(' + startAt + ')');
   }
 
   /**
