@@ -20,6 +20,19 @@ test("unifyIssueAttrib ", () => {
       summary: "A summary",
       description: "This is the description",
       environment: "An environment",
+      assignee: null,
+      reporter: {
+        "name": "abcd1234",
+        "key": "plemon",
+        "emailAddress": "Paul.Lemon@gmail.com",
+        "avatarUrls": {
+          "48x48": "https://jira/useravatar?avatarId=10182",
+          "24x24": "https://jira/useravatar?size=small&avatarId=10182",
+          "16x16": "https://jira/useravatar?size=xsmall&avatarId=10182",
+          "32x32": "https://jira/useravatar?size=medium&avatarId=10182"
+        },
+        "displayName": "Lemon, Paul"
+      },
       customfield_epic_link: "EPC-22",
       customfield_custom1: 22,
       customfield_custom2: "hello",
@@ -68,6 +81,8 @@ test("unifyIssueAttrib ", () => {
   expect(unifyIssueAttrib("description",testIssue).value).toBe("This is the description");
   expect(unifyIssueAttrib("environment",testIssue).value).toBe("An environment");
   expect(unifyIssueAttrib("duedate",testIssue).value).toBe("");
+  expect(unifyIssueAttrib("assignee",testIssue).value).toBe("");
+  expect(unifyIssueAttrib("reporter",testIssue).value).toBe("abcd1234");
   var epicResult = unifyIssueAttrib("customfield_epic_link",testIssue);
   expect(epicResult.value).toBe("EPC-22");
   expect(epicResult.link).toBe("https://jiraserver/browse/EPC-22");

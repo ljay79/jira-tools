@@ -419,10 +419,17 @@ function unifyIssueAttrib(attrib, data) {
       case 'assignee':
       case 'creator':
       case 'reporter':
-        resp = {
-          value: (UserStorage.getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
-          avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
-        };
+        if (data.fields[attrib] != null && data.fields[attrib] != undefined) {
+          resp = {
+            value: (UserStorage.getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
+            avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
+          };
+        } else {
+          resp = {
+            value:"",
+            avatarUrls: ""
+          }
+        }
         break;
       case 'priority':
         resp = {
