@@ -51,9 +51,10 @@ function addMenu() {
     .addItem('Settings', 'dialogSettings')
     .addItem('Configure custom fields', 'menuCustomFields')
     .addItem('About', 'dialogAbout');
-
-  menu.addSeparator()
-    .addItem('Update Jira Issues (BETA)', 'menuUpdateJiraIssues');
+    if (environmentConfiguration.features.updateJira.enabled) {
+      menu.addSeparator()
+      .addItem('Update Jira Issues (BETA)', 'menuUpdateJiraIssues');
+    }
 
     menu.addToUi();
 }

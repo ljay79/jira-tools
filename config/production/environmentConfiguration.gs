@@ -8,7 +8,7 @@ var environmentConfiguration = {
   "debugEnabled": false,
   "features": {
     "updateJira": {
-      "enabled": false
+      "enabled": true
     }
   }
 };
