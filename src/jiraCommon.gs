@@ -292,7 +292,7 @@ function unifyIssueAttrib(attrib, data) {
             break;
           case 'date':
             var _date = data.fields[attrib] || null;
-            _date = (_date.length == 10) ? _date + 'T12:00:00' : _date;
+            _date = (null !== _date && _date.length == 10) ? _date + 'T12:00:00' : _date;
             var date = getDateFromIso(_date);
             date.setHours(0, 0, 0);
             resp = {
