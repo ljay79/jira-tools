@@ -18,14 +18,13 @@ function recalcCustomFunctions() {
 function JST_EPICLABEL(TicketId) {
   var request   = new Request();
   var response  = {};
-  var epicField = UserStorage.getValue('jst_epic');
 
   if(TicketId == '') {
     throw new Error("{TicketId} can not be empty.");
   }
 
-  if(undefined == epicField || epicField.usable !== true || epicField.label_key == null) {
-    debug.error("epicField seems not be configured: %s", epicField);
+  if(!EpicField.isUsable()) {
+    debug.error("epicField seems not be configured: %s", EpicField.getJson());
     throw new Error("Please configure your Jira Epic field first. Go to 'Project Aid for Jira' -> 'Configure custom fields'");
   }
 
@@ -33,12 +32,12 @@ function JST_EPICLABEL(TicketId) {
     issueIdOrKey: TicketId, 
     fields: [
       'summary',
-      epicField.label_key
+      EpicField.getLabelKey()
     ]
   }).getResponse();
 
   if(response.statusCode === 200 && response.respData && response.respData.fields) {
-    var value = response.respData.fields[epicField.label_key];
+    var value = response.respData.fields[EpicField.getLabelKey()];
     if ( value === undefined || value == '') value = TicketId;
     return value;
   } else {

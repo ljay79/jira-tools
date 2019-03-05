@@ -43,3 +43,33 @@ test('jsLib - getDateFromIso()', () => {
   expect(timeSecOnly(jsLib.getDateFromIso(''))).toEqual(timeSecOnly(new Date()));
 });
 
+test('copyObject', () => {
+  var src = {
+    prop1: "value1",
+    prop2: "value2"
+  };
+  var newObject = jsLib.copyObject(src);
+  expect(Object.keys(newObject).length).toBe(2);
+  expect(newObject.prop1).toBe("value1");
+  expect(newObject.prop2).toBe("value2");
+
+  src.prop1 = "New value";
+  expect(newObject.prop1).toBe("value1");
+});
+
+
+test('reverse', () => {
+
+    expect(jsLib.reverse("abc")).toBe("cba");
+    expect(jsLib.reverse(123)).toBeNull();
+});
+
+test('camelize', () => {
+
+  expect(jsLib.camelize("My Name")).toBe("myName");
+  expect(jsLib.camelize("my name")).toBe("myName");
+  expect(jsLib.camelize("My API handler")).toBe("myAPIHandler");
+  expect(jsLib.camelize("My    name   is  ")).toBe("myNameIs"); 
+  
+});
+

@@ -1,6 +1,4 @@
 
-PropertiesService = require('./mocks/PropertiesService');
-ScriptApp = require('./mocks/ScriptApp');
 global.environmentConfiguration = require('../src/environmentConfiguration.gs');
 
 beforeEach(() =>  {
@@ -184,6 +182,8 @@ test('check if debug mode is turned on appropriately', () => {
     { num:11, userDebug: false, environmentDebug: true, authmode: ScriptApp.AuthMode.LIMITED, debugIsEnabled: true },
     { num:12, userDebug: false, environmentDebug: true, authmode: ScriptApp.AuthMode.FULL, debugIsEnabled: true },
   ];
+  // @TODO - better implemented using jest describe.each https://jestjs.io/docs/en/api#describeeachtable-name-fn-timeout
+  
   scenarioList.forEach((scenario) => {
     // reset imported modules so that the debug code re-initiliases
     jest.resetModules();

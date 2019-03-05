@@ -33,7 +33,7 @@
   <form name="issue-update" action="" method="post">
     <p>This is BETA functionality</p>
     <div class="block field-list">
-      <h2>Configure columns and jira fields</h2>
+      <h2>Configure columns and Jira fields</h2>
       <div class="titles">
         <span class="headerTitle">Columns</span>
         <span class="jiraFieldTitle">Jira Field</span>
@@ -51,10 +51,10 @@
             ?>
           <option value="<?= fieldId ?>" <? if (allJiraFields[fieldId]==headerName) { ?>selected
             <?}?>
-            <? if ( readOnlyFields[allJiraFields[fieldId]]) {?> data-readonly="true" class="readonly"
+            <? if ( readOnlyFields[fieldId]) {?> data-readonly="true" class="readonly"
             <?}?> >
             <?= allJiraFields[fieldId]?>
-            <? if ( readOnlyFields[allJiraFields[fieldId]]) {?> (Read only)
+            <? if ( readOnlyFields[fieldId]) {?> (Read only)
             <?}?>
           </option>
           <? 
@@ -107,7 +107,7 @@
       if (event) event.preventDefault();
       hideAlert();
 
-      showAlert("updating jira...", 1);
+      showAlert("Updating Jira...", 1);
       $('#results').empty();
       jiraFields = {};
       $("input:checked").each(function (n) {
@@ -122,11 +122,11 @@
           jiraFields[jirafieldChosen] = headerIndex;
         }
       });
-      console.log(jiraFields);
+
       google.script.run
         .withSuccessHandler(onResponse)
         .withFailureHandler(errorInServerCallback)
-        .dialogProcessIssuesFromSheet(jiraFields);
+        .callbackProcessIssuesFromSheet(jiraFields);
 
     }
 
@@ -135,14 +135,26 @@
     }
 
     function onResponse(result) {
-      var done = result.status === true;
-      showAlert(result.message, done, 10000);
-      $('#results').empty();
-      if (result.errors.length > 0) {
-        $('#results').append('<h2>' + result.message + '</h2>');
-        for (var i = 0; i < result.errors.length; i++) {
-          $('#results').append("<div class='item error'>" + result.errors[i] + "</div>");
+      var hasErrors = (result.errors.length > 0);
+      var statusMessage;
+      if (result.status) {
+        if (result.rowsUpdated==1) {
+          statusMessage = "1 Jira Issue Updated";
+        } else {
+          statusMessage = result.rowsUpdated+" Jira Issues Updated";
         }
+      } else {
+        statusMessage = "See below for error(s)";
+      }
+      showAlert(statusMessage, !hasErrors && result.status , 10000);
+      $('#results').empty();
+      if (hasErrors) {
+        $('#results').append('<h2 class="error">' + result.errors.length + ' Error(s)</h2>');
+        for (var i = 0; i < result.errors.length; i++) {
+          $('#results').append("<div class='item'>" + result.errors[i] + "</div>");
+        }
+      } else if (!result.status) {
+        $('#results').append('<h2 class="error">' + result.message + '</h2>');
       }
     }
 

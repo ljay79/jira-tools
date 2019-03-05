@@ -6,7 +6,7 @@ var rename = require('gulp-rename');
 var changed = require('gulp-changed');
 var argv = require('yargs').argv;
 var directoryExists = require('directory-exists');
-
+var eslint = require('gulp-eslint');
 /**
  * Cleans out the dist folders of previously built or pulled code
  */
@@ -137,6 +137,19 @@ gulp.task('copy-changed-pulled-code', function (done) {
     .src(["dist/pull/**/*", "dist/pull/**/.*","!dist/pull/environmentConfiguration.gs"])
     .pipe(changed('src'))
     .pipe(gulp.dest('src'))
+});
+
+gulp.task('lint', (done) => {
+  return gulp.src("src/*.gs")
+      // eslint() attaches the lint output to the "eslint" property
+      // of the file object so it can be used by other modules.
+      .pipe(eslint())
+      // eslint.format() outputs the lint results to the console.
+      // Alternatively use eslint.formatEach() (see Docs).
+      .pipe(eslint.format())
+      // To have the process exit with an error code (1) on
+      // lint error, return the stream and pipe to failAfterError last.
+      .pipe(eslint.failAfterError());
 });
 
 /**

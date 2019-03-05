@@ -12,6 +12,19 @@ function extend(src, obj2) {
 }
 
 /**
+ * Copy keys and values from src into a new object
+ * @param src {Object}
+ * @return {object}
+ */
+function copyObject(src) {
+  var result ={};
+  for (var key in src) {
+    result[key] = src[key];
+  }
+  return result;
+}
+
+/**
  * Reverses the input text.
  *
  * @param {string} input The text to reverse.
@@ -298,6 +311,9 @@ function removeFromArray(array, element) {
 module.exports = {
   buildUrl: buildUrl,
   getDateFromIso: getDateFromIso,
-  extend: extend
+  extend: extend,
+  copyObject: copyObject,
+  reverse: reverse,
+  camelize: camelize
 };
 // End of Node required code block
