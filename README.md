@@ -380,12 +380,12 @@ To speed up development of features the code is set up to be able to run locally
 The Google App Scripts (GAS) runtime environment differs from Node.js. For example, in the GAS runtime, any function available in a _.gs_ file in your project is automatically available to call from other files.
 Node.js does not allow that.
 
-In enable to allow the running of the unit tests locally using Node.js each _.gs_ file requires the use of import and export statements to make the files available e.g. The following `require` statements imports the '`getCfg`', '`setCfg`' and '`hasSettings`' functions defined in '_settings.gs_' into in another JS file (when running in Node).
+In enable to allow the running of the unit tests locally using Node.js each _.gs_ file requires the use of import and export statements to make the files available e.g. The following `require` statements imports the '`getCfg_`', '`setCfg_`' and '`hasSettings`' functions defined in '_settings.gs_' into in another JS file (when running in Node).
 
 ```markdown
 // Node required code block
-const getCfg = require("./settings.gs").getCfg;
-const setCfg = require("./settings.gs").setCfg;
+const getCfg_ = require("./settings.gs").getCfg_;
+const setCfg_ = require("./settings.gs").setCfg_;
 const hasSettings = require("./settings.gs").hasSettings;
 // End of Node required code block
 ```
@@ -393,7 +393,7 @@ const hasSettings = require("./settings.gs").hasSettings;
 This exports statement in 'settings.gs' is also required
 ```markdown
 // Node required code block
-module.exports = {getCfg: getCfg, setCfg: setCfg, hasSettings: hasSettings}
+module.exports = {getCfg_: getCfg_, setCfg_: setCfg_, hasSettings: hasSettings}
 // End of Node required code block
 ```
 

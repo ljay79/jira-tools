@@ -20,8 +20,11 @@ function menuUpdateJiraIssues() {
   selectedData.allJiraFields = extend(
     { "": "select a jira field...", issueKey: "Key" }, 
     IssueFields.getAvailableFields());
-    
-  var readOnlyFields = { "Updated": true, "Issue Type": true, "Created": true };
+  var readOnlyFieldArray = IssueFields.getReadonlyFields();
+  var readOnlyFields = {};
+  readOnlyFieldArray.forEach(function(fieldKey) {
+    readOnlyFields[fieldKey] = true;
+  })
   selectedData.readOnlyFields = readOnlyFields;
   var dialog = getDialog('views/dialogs/updateJiraIssues', selectedData);
   dialog

@@ -20,24 +20,19 @@ function updateJiraIssues(headerRow, dataRows) {
   if (hasValidationErrors()) {
     return result;
   }
-  
+
   var statusTransitioner = new IssueTransitioner();
   var rowNum = 0;
-  dataRows.forEach(function(dataRow) {
+  dataRows.forEach(function (dataRow) {
     var packagedRow = packageRowForUpdate(headerRow, dataRow);
     rowNum++;
     if (packagedRow.key == null) {
       result.errors.push("No Key value found in row " + rowNum);
     } else {
       if (packagedRow.fields["status"] != null) {
-        var statusTransition = statusTransitioner.transition(packagedRow.key, packagedRow.fields["status"]);
-        delete (packagedRow.fields["status"]);
-        if (!statusTransition.success) {
-          statusTransition.errors.forEach(function (message) {
-            result.errors.push("[" + packagedRow.key + "] " + message);
-          });
-        }
+        updateStatus(packagedRow);
       }
+      checkForFieldsWhichCantBeEmpty(packagedRow);
       var updateResult = updateIssueinJira(packagedRow,
         function (key, success, message) {
           if (!success) {
@@ -55,14 +50,34 @@ function updateJiraIssues(headerRow, dataRows) {
       if (updateResult) {
         result.rowsUpdated++;
       }
-    } 
+    }
   });
   result.message = result.rowsUpdated + " jira issues(s) updated, " + result.errors.length + " errors.";
   result.status = (result.rowsUpdated > 0);
   result.finished = true;
 
   return result;
-  
+
+  function checkForFieldsWhichCantBeEmpty(packagedRow) {
+    if (packagedRow.fields.hasOwnProperty("priority")) {
+      var checkValue = packagedRow.fields["priority"];
+      if (checkValue == null || checkValue =="") {
+        result.errors.push("[" + packagedRow.key + "] you must enter a value for field Priority");
+        delete(packagedRow.fields["priority"]);
+      }
+    }
+  }
+
+  function updateStatus(packagedRow) {
+    var statusTransition = statusTransitioner.transition(packagedRow.key, packagedRow.fields["status"]);
+    delete (packagedRow.fields["status"]);
+    if (!statusTransition.success) {
+      statusTransition.errors.forEach(function (message) {
+        result.errors.push("[" + packagedRow.key + "] " + message);
+      });
+    }
+  }
+
   function hasValidationErrors() {
     if (headerRow === null || Object.keys(headerRow).length == 0) {
       result.finished = true;
@@ -92,27 +107,31 @@ function formatFieldValueForJira(fieldDefinition, value) {
     if (value == "") {
       value = null;
     } else {
-      value = value.split(",");
+      if (typeof value === 'string' || value instanceof String) {
+        value = value.split(/,\s?/);
+      }
     }
     return value;
   }
-
-  if (fieldDefinition.schemaType == "number") {
+  var nullableSchemaTypes = ["number", "date", "user", "array|string", "user", "priority"];
+  if (nullableSchemaTypes.indexOf(fieldDefinition.schemaType) >= 0) {
     if (value == "") {
       value = null;
     }
-    return value;
   }
+  var fieldsUsingName = ["user", "priority"];
+  if (fieldsUsingName.indexOf(fieldDefinition.schemaType) >= 0 && value != null) {
+    value = { name: value };
+  }
+
+
   if (fieldDefinition.custom && fieldDefinition.schemaType == "array|string") {
     // array|string as a schematpe is used by many fields
     // intended first to fix bug with setting sprint fields to empty
     // currently there is no other way to identify the sprint field
-    if (value == "") {
-      value = null;
-    } else if (!isNaN(value)) {
+    if (value != null && !isNaN(value)) {
       value = +value;
     }
-    return value;
   }
   return value;
 }
@@ -125,7 +144,7 @@ function formatFieldValueForJira(fieldDefinition, value) {
  */
 function packageRowForUpdate(headerRow, dataRow) {
   var keyFieldName = "issuekey";
-  var result = { key: null, fields: {}, update:{} };
+  var result = { key: null, fields: {}, update: {} };
   var filteredHeaders = getMatchingJiraFields(headerRow);
   for (var headerId in filteredHeaders) {
     var index = filteredHeaders[headerId].index;
@@ -136,7 +155,7 @@ function packageRowForUpdate(headerRow, dataRow) {
       if (headerId.toLowerCase() != keyFieldName) {
         // is this a field which needs to be put in fields of an update section
         if (isIssueScreenField(headerId)) {
-          result.update[headerId] = prepareUpdateField(headerId,value);
+          result.update[headerId] = prepareUpdateField(headerId, value);
         } else {
           result.fields[headerId] = value;
         }
@@ -147,8 +166,23 @@ function packageRowForUpdate(headerRow, dataRow) {
       }
     }
   }
-  if (Object.keys(result.update).length ==0) {
-    delete(result.update);
+
+  // move any timetracking fields into a single object in the data
+  result.fields.timetracking = {}
+  if (result.fields.hasOwnProperty("timeoriginalestimate")) {
+    result.fields.timetracking.originalEstimate = result.fields.timeoriginalestimate;
+    delete (result.fields.timeoriginalestimate);
+  }
+  if (result.fields.hasOwnProperty("timeestimate")) {
+    result.fields.timetracking.remainingEstimate = result.fields.timeestimate;
+    delete (result.fields.timeestimate);
+  }
+  // delete any unnecessary keys in the response
+  if (Object.keys(result.fields.timetracking).length == 0) {
+    delete (result.fields.timetracking);
+  }
+  if (Object.keys(result.update).length == 0) {
+    delete (result.update);
   }
   return result;
 
@@ -156,14 +190,16 @@ function packageRowForUpdate(headerRow, dataRow) {
     return headerId == "components" || headerId == "fixVersions";
   }
 
-  function prepareUpdateField(headerId,value) {
-    listOfItems = value.split(/\s*,\s*/);
+  function prepareUpdateField(headerId, value) {
     updateItems = [];
-    listOfItems.forEach(function (item) {
-      if (item.trim().length>0) {
-        updateItems.push({ "name": item.trim() });
-      }
-    });
+    if (value != null) {
+      listOfItems = value.split(/\s*,\s*/);
+      listOfItems.forEach(function (item) {
+        if (item.trim().length > 0) {
+          updateItems.push({ "name": item.trim() });
+        }
+      });
+    }
     return [{ set: updateItems }];
   }
 }
@@ -237,7 +273,7 @@ function updateIssueinJira(issueData, callback) {
     payload.fields = issueData.fields;
   }
   if (issueData.update != null) {
-    extend(payload.update,issueData.update);
+    extend(payload.update, issueData.update);
   }
   request.call(method, payload);
   request.withSuccessHandler(ok);
