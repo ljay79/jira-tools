@@ -6,28 +6,59 @@
 
 /* ######## DEV- WIP - Testing #################### */
 
-function newControllerAction() {
-  var jsonIssues = '[{"expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields","id": "33184","self": "https://dyhltd.atlassian.net/rest/api/2/issue/33184","key": "TP-15","fields": {"summary": "Test Story 1 - appended2","status": {"self": "https://dyhltd.atlassian.net/rest/api/2/status/10004","description": "The issue is open and awaiting review and further refining to process into Sprints Backlog.","iconUrl": "https://dyhltd.atlassian.net/images/icons/status_generic.gif","name": "To Do","id": "10004","statusCategory": {"self": "https://dyhltd.atlassian.net/rest/api/2/statuscategory/2","id": 2,"key": "new","colorName": "blue-gray","name": "To Do"}}}}, {"expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields","id": "33178","self": "https://dyhltd.atlassian.net/rest/api/2/issue/33178","key": "TP-9","fields": {"summary": "CLONE - Test task of Epic 4 - appended","status": {"self": "https://dyhltd.atlassian.net/rest/api/2/status/3","description": "This issue is being actively worked on at the moment by the assignee.","iconUrl": "https://dyhltd.atlassian.net/images/icons/statuses/inprogress.png","name": "In Progress","id": "3","statusCategory": {"self": "https://dyhltd.atlassian.net/rest/api/2/statuscategory/4","id": 4,"key": "indeterminate","colorName": "yellow","name": "In Progress"}}}}]';
-  jsonIssues = JSON.parse(jsonIssues);
-
-  var attributes = {
-    filter   : getFilter(14406),
-    issues   : jsonIssues,
-    sheet    : getTicketSheet(),
-    renderer : IssueTableRendererDefault_
+function tableFromMeta() {
+  var _meta = {
+    sheetId: "sid_230234225",
+	tableId: "tbl_rB2D5",
+	name: null,
+	rangeA1: "B2:D5",
+	rangeCoord: {
+      row: {from: 2, to: 9},
+      col: {from: 2, to: 4}
+	},
+	headerRowOffse: 1,
+	headerValues: ["key", "summary", "status"],
+	filter: {
+      id: 14406,
+      name: "01 - Test Project - All Issues",
+      jql: "project = TP ORDER BY lastViewed DESC"
+	},
+    maxResults: 6,
+	renderer: "IssueTableRendererDefault_",
+	time_lastupdated: 1551636173161
   };
 
-  var table = new IssueTable_(attributes);
-  if( renderer = table.render() ) {
-    // toast with status message
-      var msg = "Finished inserting " 
-               + renderer.getInfo().totalInserted 
-               + " Jira issues out of " 
-               + jsonIssues.length
-               + " total found records.";
+  var table = new IssueTable_({metaData: _meta});
+
+  var ok = function(resp, status, errorMessage) {
+    var renderer;
+    table.setIssues(resp.data);
+
+    if( renderer = table.render() ) {
+      // toast with status message
+      var msg = "Finished inserting " + renderer.getInfo().totalInserted 
+               + " Jira issues out of " + resp.data.total + " total found records.";
       SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
       debug.log(msg);
-  }
+      
+      console.log('renderer.info: %s', renderer.getInfo());
+
+      console.log('==>> Table Meta: %s', table.getMeta());
+      
+      IssueTableIndex_.addTable(table);
+    }
+
+    debug.timeEnd('insertIssueTable()');
+  };
+
+  var Search = new IssueSearch(table.getMeta('filter').jql);
+  Search.setOrderBy()
+        .setFields(table.getMeta('headerValues'))
+        .setMaxResults( table.getMeta('maxResults') )
+        .setStartAt(0)
+        .search()      
+        .withSuccessHandler(ok);
+  
 }
 
 function newControllerActionLive() {
@@ -36,10 +67,11 @@ function newControllerActionLive() {
   var ok = function(resp, status, errorMessage) {
     var renderer,
         attributes = {
-          filter   : getFilter(14406),
-          issues   : resp.data,
-          sheet    : getTicketSheet(),
-          renderer : IssueTableRendererDefault_
+          filter     : getFilter(14406),
+          maxResults : resp.data.maxResults,
+          issues     : resp.data,
+          sheet      : getTicketSheet(),
+          renderer   : IssueTableRendererDefault_
         };
     
     var table = new IssueTable_(attributes);
@@ -52,6 +84,10 @@ function newControllerActionLive() {
                + " total found records.";
       SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
       debug.log(msg);
+      
+      console.log('renderer.info: %s', renderer.getInfo());
+
+      console.log('==>> Table Meta: %s', table.getMeta());
     }
 
     debug.timeEnd('insertIssueTable()');
@@ -60,22 +96,12 @@ function newControllerActionLive() {
   var Search = new IssueSearch("status = Done");
   Search.setOrderBy()
         .setFields(['key', 'summary', 'status'])
-        .setMaxResults(75)
+        .setMaxResults(11)
         .setStartAt(0)
         .search()      
         .withSuccessHandler(ok);
 }
 
-
-function testDefineRange() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var range = getTicketSheet().getRange(TestTable.rangeA1);
-  ss.setNamedRange(TestTable.rangeName, range);
-
-  // check
-  var rangeCheck = ss.getRangeByName(TestTable.rangeName);
-  var rangeCheckName = rangeCheck.getA1Notation();
-}
 
 function testTable1() {
   console.log('testTable1()');
@@ -157,4 +183,20 @@ function onEditTableMeta(e) {
       break;
   }
 
+}
+
+
+
+function testTriggerDialog() {
+  console.log('testTriggerDialog()');
+
+  SpreadsheetTriggers_.register('onEdit', 'onEditOpenDialog', true);
+  SpreadsheetTriggers_.register('onChange', 'onEditOpenDialog', true);
+}
+
+function onEditOpenDialog(e) {
+  debug.log('onEditOpenDialog()');
+  dialogAbout();
+  
+  debug.log('END<!--');
 }

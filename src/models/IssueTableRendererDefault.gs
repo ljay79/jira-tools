@@ -15,12 +15,7 @@ function RendererFactory_(RendererClassName) {
       break;
   }
 }
-function test(){
-  var sheetId = sheetIdPropertySafe('sid_498497364', true);
-  var sheet = getSheetById(sheetId);
-  console.log(typeof sheet);
-  console.log(sheet.getSheetId());
-}
+
 
 function IssueTableRendererDefault_(IssueTable) {
   var that = this,
@@ -30,7 +25,9 @@ function IssueTableRendererDefault_(IssueTable) {
       rowIndex = 0, numColumns = 0,
       info = {
         totalInserted : 0,
-        finishRendering: false
+        finishRendering: false,
+        oRangeA1: {from: null, to:null},
+        headerRowOffset: 0
       };
 
   /**
@@ -73,6 +70,9 @@ function IssueTableRendererDefault_(IssueTable) {
     prepareHeaderValues();
 
     initRange = sheet.setActiveSelection(IssueTable.getMeta('rangeA1'));
+    info.oRangeA1.from = initRange.getCell(1, 1).getA1Notation();
+    info.oRangeA1.to   = initRange.getCell(initRange.getNumRows(), initRange.getNumColumns()).getA1Notation();
+    console.log('info: %s', info);
 
     if (filterName = IssueTable.getMeta('filter').name) {
       that.addSummary("Filter: " + filterName);
@@ -82,7 +82,7 @@ function IssueTableRendererDefault_(IssueTable) {
 
     debug.timeEnd('IssueTableRendererDefault_.render()');
     debug.log('IssueTableRendererDefault_.render() <- finished rendering %s issues with %s columns.', info.totalInserted, numColumns);
-    
+
     info.finishRendering = true;
 
     return that;
@@ -102,6 +102,9 @@ function IssueTableRendererDefault_(IssueTable) {
       .getCell(1,1)
       .setValue(summary);
 
+    info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
+    info.headerRowOffset = 1;
+
     SpreadsheetApp.flush();
 
     return that;
@@ -115,16 +118,19 @@ function IssueTableRendererDefault_(IssueTable) {
     var values = [], formats = [];
 
     for(var i=0; i<headers.length; i++) {
-      values.push( headerNames(headers[i]) );
+      values.push( IssueFields.getHeaderName(headers[i]) );
       formats.push('bold');
     }
 
     range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
+
     range.clearContent()
       .clearNote()
       .clearFormat()
       .setValues([ values ])
       .setFontWeights([ formats ]);
+
+    info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
 
     SpreadsheetApp.flush();
 
@@ -189,6 +195,8 @@ function IssueTableRendererDefault_(IssueTable) {
         .setNumberFormats([ formats ])
         .activate();
 
+      info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
+
       // flush sheet every 25 rows (to often is bad for performance, to less bad for UX)
       if(i % 25 === 0) {
         SpreadsheetApp.flush();
@@ -211,6 +219,15 @@ function IssueTableRendererDefault_(IssueTable) {
   };
 
   /**
+   * Return array of header values
+   *
+   * @return {Array}
+   */
+  that.getHeaders = function () {
+    return headers;
+  };
+
+  /**
    * Sorting the header/columns based on definition/order in global var ISSUE_COLUMNS.
    * Improves a consistent column listing/sorting and defined fields first before alpha sorting the rest.
    * @returns {IssueTableRendererDefault_}
@@ -221,8 +238,8 @@ function IssueTableRendererDefault_(IssueTable) {
       headers.push(k);
     }
 
-    // sort fields based on defined order in ISSUE_COLUMNS
-    headers = _sortKeysByRef(headers, ISSUE_COLUMNS);
+    // sort fields based on defined order in IssueFields.getBuiltInJiraFields()
+    headers = _sortKeysByRef(headers, IssueFields.getBuiltInJiraFields());
     headers.unshift('key');
 
     numColumns = headers.length;

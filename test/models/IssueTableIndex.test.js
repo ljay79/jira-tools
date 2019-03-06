@@ -74,3 +74,45 @@ test("IssueTableIndex_ duplicated index prevention",()=> {
   expect(TableIndex.getTable('table1_A').getTableId()).toBe('table1_A');
   expect(TableIndex.getTable('table2_B').getTableId()).toBe('table2_B');
 });
+
+/*
+Note for coding tests - working GAS tests
+
+
+function findByTableId() {
+  var table = IssueTableIndex_.getTable('tbl_rB2D5');
+  if (!table) {
+    console.log('Table NOT found!');
+  } else {
+    console.log('Found Table Meta: %s', table.getMeta());
+  }
+}
+
+function findAllBySheet() {
+  //sheetId1: 602713257
+  //sheetId2: 230234225
+  var tables = IssueTableIndex_.getAllTablesBySheet(602713257);
+  if (tables.length == 0) {
+    console.log('Table NOT found!');
+  } else {
+    console.log('Found Tables: %s', tables.length);
+  }
+
+  var tables = IssueTableIndex_.getAllTablesBySheet(230234225);
+  if (tables.length == 0) {
+    console.log('Table NOT found!');
+  } else {
+    console.log('Found Tables: %s', tables.length);
+  }
+}
+
+function findTableByCoord() {
+  var table = IssueTableIndex_.getTableByCoord('230234225', 3, 4);
+  if (!table) {
+    console.log('Table NOT found!');
+  } else {
+    console.log('Found Tables: %s', table);
+  }
+}
+
+*/

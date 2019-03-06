@@ -22,21 +22,18 @@ var SpreadsheetTriggers_ = require('../SpreadsheetTriggers.gs').SpreadsheetTrigg
  */
 function IssueTable_(attributes) {
   var that = this,
+      Sheet,
       issues = {},
       metaData = {
         sheetId : sheetIdPropertySafe(), // sample: '6.02713257E8'
         tableId : null,                  // sample: 'table1_1550871398921'
         name : null,                     // sample: 'My pending Issues'
-        /*
-         * Range names: - Can contain only letters, numbers, and underscores. - Can't start with a number, or the words "true" or "false." -
-         * Can't contain any spaces or punctuation. - Must be 1–250 characters. - Can't be in either A1 or R1C1 syntax. For example, you might
-         * get an error if you give your range a name like "A1:B2" or "R1C1:R2C2."
-         */
-        rangeName : null,                // sample: 'table1_6_02713257E8'
         rangeA1 : null,                  // sample: 'A1:F4'
-        headerRowOffset : 1,             // sample: 1
+        rangeCoord : null,               // sample: {row: {from: 1, to: 10}, col: {from: 1, to: 5}}
+        headerRowOffset : 0,             // sample: 1
         headerValues : [],               // sample: [Summary,Key,Status,Epic]
         filter: {id: 0, jql: null},      // sample: {id: 1234, jql: 'status = Done and project in ("JST")'}
+        maxResults : null,               // sample: 10
         renderer: null,                  // sample: IssueTableRendererDefault_
         time_lastupdated : (new Date()).getTime() // sample: 1550871398921
       };
@@ -53,6 +50,9 @@ function IssueTable_(attributes) {
     if (attributes.hasOwnProperty('metaData')) {
       // initialize with existing data (ie: that.fromJson()
       metaData = extend(metaData, attributes.metaData);
+
+      var _sheetId = sheetIdPropertySafe(metaData.sheetId, true);
+      Sheet = getSheetById(_sheetId);
     } else {
       // new init to generate new table; validate required options
       if (!attributes.hasOwnProperty('filter') 
@@ -74,12 +74,20 @@ function IssueTable_(attributes) {
         throw new Error("{attributes.renderer} must be defined. Ie: of type 'IssueTableRendererDefault_' or string of class name.");
       }
 
-      that.setMeta('filter', attributes.filter)
-        .setIssues(attributes.issues)
+      /* ---- */
+
+      that.setMeta('filter', {
+        id   : attributes.filter.id || 0,
+        name : attributes.filter.name || '',
+        jql  : attributes.filter.jql
+      });
+      that.setIssues(attributes.issues)
         .setRenderer(attributes.renderer)
       ;
-      that.setMeta('sheetId', sheetIdPropertySafe(attributes.sheet.getSheetId()))
-        .setMeta('rangeA1', attributes.sheet.getActiveCell().getA1Notation())
+
+      Sheet = attributes.sheet;
+      that.setMeta('sheetId', sheetIdPropertySafe(Sheet.getSheetId()))
+        .setMeta('rangeA1', Sheet.getActiveCell().getA1Notation())
       ;
     }
   };
@@ -170,10 +178,32 @@ function IssueTable_(attributes) {
   };
 
   /**
+   * Setting/Generating a table id string and stores it to metaData.
+   * 
+   * @param {string|null} tableId    Optional tableId to use or null to generate a new one.
+   * @return {string}
+   */
+  that.setTableId = function(tableId) {
+    tableId = tableId || null;
+    if (tableId === null) {
+      tableId = 'r' + metaData.rangeA1.replace(':', '');
+      tableId = 'tbl_' + tableId;
+    }
+
+    metaData.tableId = tableId;
+
+    return metaData.tableId;
+  };
+
+  /**
    * Wrapper/Helper to get tables table id
    * @return {string}
    */
   that.getTableId = function () {
+    if (null === metaData.tableId) {
+      that.setTableId();
+    }
+
     return metaData.tableId;
   };
 
@@ -205,13 +235,54 @@ function IssueTable_(attributes) {
     if (typeof renderer !== 'object' || !renderer.hasOwnProperty('render')) {
       throw new Error("{renderer} must be an object/class but is '" + typeof renderer + "'. Ie: of type 'IssueTableRendererDefault_'.");
     }
+
+    renderer.render();
+
+    // store render info to IssueTable meta data
+    var renderInfo = renderer.getInfo();
+    metaData.headerRowOffset = renderInfo.headerRowOffset;
+    metaData.headerValues = renderer.getHeaders();
+
+    // setting range info
+    setRange(renderInfo.oRangeA1.from + ':' + renderInfo.oRangeA1.to);
+
+    return renderer;
+  };
+
+  /**
+   * Setting relevant range information and store them in metaData.
+   *
+   * @return {IssueTable_}
+   */
+  setRange = function(rangeA1) {
+    metaData.rangeA1 = rangeA1;
+    // setting named range
+    var _rangeName = 's' + Sheet.getIndex() + '_';
+    var _range = Sheet.getRange(rangeA1);
+    _rangeName += that.getTableId().replace(/[^a-zA-Z0-9\_]/g, '');
+
+    // named ranges must be unique per Spreadsheet
+    Sheet.getParent().setNamedRange(_rangeName, _range);
     
-    return renderer.render();
+    // for easier and faster Is-In-Range checks, we store the numeric coordinates too
+    metaData.rangeCoord = {
+      row: {
+        from : _range.getRow(),
+        to   : _range.getLastRow()
+      },
+      col: {
+        from : _range.getColumn(),
+        to   : _range.getLastColumn()
+      }
+    };
+
+    return that;
   };
 
   // Initialize this object/class
   init(attributes);
 }
+
 
 // Node required code block
 module.exports = IssueTable_;

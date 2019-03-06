@@ -38,8 +38,7 @@ function sheetIdPropertySafe(sheetId, revert) {
     sheetId = sheetId.replace(/sid\_/g, '');
   } else {
     sheetId = sheetId || getTicketSheet().getSheetId();
-    //sheetId = ('sid_' + JSON.stringify(sheetId)).replace(/[^a-zA-Z0-9_]/g, '_');
-    sheetId = 'sid_' + JSON.stringify(sheetId);
+    sheetId = 'sid_' + ((typeof sheetId === 'string') ? sheetId : JSON.stringify(sheetId));
   }
 
   return sheetId;
