@@ -4,13 +4,9 @@
 
 var environmentConfiguration = {
   "name": "Local",
-  "description": "local test enviroment",
-  "debugEnabled": false,
-  "features": {
-    "updateJira": {
-      "enabled": true
-    }
-  }
+  "description": "Local development environment",
+  "debugEnabled": true,
+  "features": {}
 };
 
 // Node required code block

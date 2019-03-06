@@ -50,12 +50,10 @@ function addMenu() {
     .addSeparator()
     .addItem('Settings', 'dialogSettings')
     .addItem('Configure custom fields', 'menuCustomFields')
-    .addItem('About', 'dialogAbout');
-
-  menu.addSeparator()
-    .addItem('Update Jira Issues (BETA)', 'menuUpdateJiraIssues');
-
-    menu.addToUi();
+    .addItem('About', 'dialogAbout')
+    .addSeparator()
+    .addItem('Update Jira Issues (BETA)', 'menuUpdateJiraIssues')
+    .addToUi();
 }
 
 // Node required code block

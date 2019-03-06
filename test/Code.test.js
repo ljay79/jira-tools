@@ -1,12 +1,13 @@
 /**
  * Tests based on documentation here
  * https://developers.google.com/gsuite/add-ons/concepts/addon-authorization#editor_add-on_authorization
+
  */
+
 
 beforeEach(() => {
   SpreadsheetApp.resetMocks();
 });
-
 test('onOpen builds menu', () => {
   var onOpen = require('../src/Code.gs').onOpen;
   var e = {
@@ -27,22 +28,10 @@ test('Update Jira menu option appears based on feature switch', () => {
   var e = {
     authMode: ScriptApp.AuthMode.LIMITED
   }
-
-  // see how many menu items are created without the feature switch
-  environmentConfiguration.features.updateJira.enabled = false;
   onOpen(e);
   var addItemMock =  SpreadsheetApp.getUi().createAddonMenu().addItem.mock;
-  var menuItemsCreatedWithoutFeature = addItemMock.calls.length;
-  //expect(addItemMock.calls[menuItemsCreatedWithoutFeature-1][0]).not.toBe('Update Jira Issues (BETA)');
-  expect(addItemMock.calls[menuItemsCreatedWithoutFeature-1][1]).not.toBe('dialogIssuesFromSheet');
+  var menuItemCount = addItemMock.calls.length;
+  expect(addItemMock.calls[menuItemCount-1][0]).toBe('Update Jira Issues (BETA)');
+  expect(addItemMock.calls[menuItemCount-1][1]).toBe('menuUpdateJiraIssues');
   SpreadsheetApp.resetMocks();
-
-  // now enable the feature and check if its added.
-  environmentConfiguration.features.updateJira.enabled = true;
-  onOpen(e);
-  var addItemMock =  SpreadsheetApp.getUi().createAddonMenu().addItem.mock;
-  var menuItemsCreatedWithFeature = addItemMock.calls.length;
-  //expect(menuItemsCreatedWithFeature).toBe(menuItemsCreatedWithoutFeature+1)
-  expect(addItemMock.calls[menuItemsCreatedWithFeature-1][0]).toBe('Update Jira Issues (BETA)');
-  expect(addItemMock.calls[menuItemsCreatedWithFeature-1][1]).toBe('menuUpdateJiraIssues');
 });

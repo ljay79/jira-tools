@@ -66,39 +66,46 @@ const jiraFieldList = [
     supported: true
   },
   {
-    schemaType:  "array|string",
+    schemaType: "array|string",
     key: "components",
     name: "Components",
     custom: false,
     supported: true
   },
   {
-    schemaType:  "array|string" ,
+    schemaType: "array|string",
     key: "fixVersions",
     name: "Fix Versions",
     custom: false,
     supported: true
   },
   {
-    schemaType:  "string" ,
+    schemaType: "user",
+    key: "assignee",
+    name: "Assignee",
+    custom: false,
+    supported: true
+  },
+  {
+    schemaType: "string",
     key: "columnA",
     name: "XYZ field",
     custom: false
   },
   {
-    schemaType: "string" ,
+    schemaType: "string",
     key: "columnB",
     name: "ABC field",
     custom: false
   },
   {
-    schemaType:  "string" ,
+    schemaType: "string",
     key: "issuekey",
     name: "Key",
     custom: false
   },
   {
-    schemaType: "string" ,
+    schemaType: "string",
     key: "issuekey",
     name: "Key",
     custom: false
@@ -108,7 +115,32 @@ const jiraFieldList = [
     key: "status",
     name: "Status",
     custom: false
-  }
+  },
+  {
+    schemaType: "number",
+    key: "timeoriginalestimate",
+    name: "Original Estimate",
+    custom: false
+
+  },
+  {
+    schemaType: "date",
+    key: "duedate",
+    name: "Due Date",
+    custom: false
+   },
+   {
+     schemaType: "number",
+     key: "timeestimate",
+     name: "Remaining Estimate",
+     custom: false
+   },
+   {
+     schemaType: "priority",
+     key: "priority",
+     name: "Priority",
+     custom: false
+   }
 ]
 
 
@@ -117,7 +149,7 @@ describe('processing list of Jira Issues with status transition', () => {
 
 
   const updateJiraIssues = require('../src/jiraUpdateIssue.gs').updateJiraIssues;
-  
+
   // mock the transitioning code
   const jiraStatusTransitioner = require('../src/jiraIssueStatusUpdates/issueTransitioner.gs');
   jest.mock('../src/jiraIssueStatusUpdates/issueTransitioner.gs', () => jest.fn());
@@ -215,7 +247,6 @@ describe('processing list of Jira Issues', () => {
     expect(result.finished).toBe(true);
   });
 
-
   test("Update a single issue", () => {
     jiraApiMock.setAllResponsesSuccesfull(204);
 
@@ -227,6 +258,32 @@ describe('processing list of Jira Issues', () => {
     expect(result.finished).toBe(true);
     expect(jiraApiMock.call.mock.calls.length).toBe(result.rowsUpdated);
   });
+
+  test("Checking fields which must have a value", () => {
+    jiraApiMock.setAllResponsesSuccesfull(204);
+
+    var result = updateJiraIssues({ columnA: 2,priority: 1, Key: 0 }, [["PBI-1", "","column A value"]]);
+    expect(result.message).not.toBeNull();
+    expect(result.rowsUpdated).toBe(1);
+    expect(result.errors.length).toBe(1);
+    expect(result.status).toBe(true);
+    expect(result.finished).toBe(true);
+    expect(jiraApiMock.call.mock.calls.length).toBe(1);
+    expect(jiraApiMock.call.mock.calls[0][0]).toBe("issueUpdate");
+    expect(jiraApiMock.call.mock.calls[0][1].fields["priority"]).not.toBeDefined();
+
+
+    var result = updateJiraIssues({ columnA: 2,priority: 1, Key: 0 }, [["PBI-1", "P1","column A value"]]);
+    expect(result.message).not.toBeNull();
+    expect(result.rowsUpdated).toBe(1);
+    expect(result.errors.length).toBe(0);
+    expect(result.status).toBe(true);
+    expect(result.finished).toBe(true);
+    expect(jiraApiMock.call.mock.calls.length).toBe(2);
+    expect(jiraApiMock.call.mock.calls[1][0]).toBe("issueUpdate");
+    expect(jiraApiMock.call.mock.calls[1][1].fields["priority"]).toEqual({name:"P1"});
+  });
+
 
   test("Update two issues", () => {
     jiraApiMock.setAllResponsesSuccesfull(204);
@@ -290,83 +347,156 @@ describe('processing list of Jira Issues', () => {
 });
 
 
-
-
-test('packing a row', () => {
+describe("Packing data from a spreadsheet row ready for Jira API", () => {
   const packageRowForUpdate = require('../src/jiraUpdateIssue.gs').packageRowForUpdate;
 
-  var result = packageRowForUpdate({ "My custom field": 1, Key: 0 }, ["PBI-1", "column A value"]);
-  expect(result).not.toBeNull();
-  expect(result.key).toBe("PBI-1");
-  expect(result.fields).not.toBeNull();
-  expect(result.fields.custom1234).toBe("column A value");
-  expect(Object.keys(result.fields).length).toBe(1);
+  test('simple row', () => {
+    var result = packageRowForUpdate({ "My custom field": 1, Key: 0 }, ["PBI-1", "column A value"]);
+    expect(result).not.toBeNull();
+    expect(result.key).toBe("PBI-1");
+    expect(result.fields).not.toBeNull();
+    expect(result.fields.custom1234).toBe("column A value");
+    expect(Object.keys(result.fields).length).toBe(1);
 
-  var result = packageRowForUpdate({ Key: 0, "My custom field": 1, "My custom field 2": 3 }, ["PBI-1", "column A value", "should be ignored", "column B value"]);
-  expect(result).not.toBeNull();
-  expect(result.key).toBe("PBI-1");
-  expect(result.fields).not.toBeNull();
-  expect(result.fields.custom1234).toBe("column A value");
-  expect(result.fields.custom5678).toBe("column B value");
-  expect(Object.keys(result.fields).length).toBe(2);
-  expect(result.update).not.toBeDefined();
+    var result = packageRowForUpdate({ Key: 0, "My custom field": 1, "My custom field 2": 3 }, ["PBI-1", "column A value", "should be ignored", "column B value"]);
+    expect(result).not.toBeNull();
+    expect(result.key).toBe("PBI-1");
+    expect(result.fields).not.toBeNull();
+    expect(result.fields.custom1234).toBe("column A value");
+    expect(result.fields.custom5678).toBe("column B value");
+    expect(Object.keys(result.fields).length).toBe(2);
+    expect(result.update).not.toBeDefined();
+    expect(result.fields.timetracking).not.toBeDefined();
 
-  var result = packageRowForUpdate({ Key: 0, columnA: 1, columnB: 3 }, ["", "column A value", "should be ignored", "column B value"]);
-  expect(result).not.toBeNull();
-  expect(result.key).toBeNull();
+    var result = packageRowForUpdate({ "My custom field": 1, Key: 0 }, ["PBI-22", "column A value"]);
+    expect(result).not.toBeNull();
+    expect(result.key).toBe("PBI-22");
+    expect(result.fields).not.toBeNull();
+    expect(result.fields.custom1234).toBe("column A value");
+    expect(result.update).not.toBeDefined();
+    expect(result.fields.timetracking).not.toBeDefined();
+    expect(Object.keys(result.fields).length).toBe(1);
 
-  var result = packageRowForUpdate({ Key: 0, columnA: 1, columnB: 3 }, [null, "column A value", "should be ignored", "column B value"]);
-  expect(result).not.toBeNull();
-  expect(result.key).toBeNull();
+    var result = packageRowForUpdate({ number1: 1, issuekey: 0 }, ["PBI-22", ""]);
+    expect(result).not.toBeNull();
+    expect(result.key).toBe("PBI-22");
+    expect(result.fields).not.toBeNull();
+    expect(result.fields.number1).toBe(null);
+    expect(Object.keys(result.fields).length).toBe(1);
+    expect(result.update).not.toBeDefined();
+    expect(result.fields.timetracking).not.toBeDefined();
 
+  });
 
-  var result = packageRowForUpdate({ columnA: 1, columnB: 3 }, [null, "column A value", "should be ignored", "column B value"]);
-  expect(result).not.toBeNull();
-  expect(result.key).toBeNull();
+  test("Null value for a key", () => {
+    var result = packageRowForUpdate({ Key: 0, columnA: 1, columnB: 3 }, ["", "column A value", "should be ignored", "column B value"]);
+    expect(result).not.toBeNull();
+    expect(result.key).toBeNull();
 
-  var result = packageRowForUpdate( { "My custom field": 1, Key: 0 }, ["PBI-22", "column A value"]);
-  expect(result).not.toBeNull();
-  expect(result.key).toBe("PBI-22");
-  expect(result.fields).not.toBeNull();
-  expect(result.fields.custom1234).toBe("column A value");
-  expect(result.update).not.toBeDefined();
-  expect(Object.keys(result.fields).length).toBe(1);
-
-
-  var result = packageRowForUpdate({ number1: 1, issuekey: 0 }, ["PBI-22", ""]);
-  expect(result).not.toBeNull();
-  expect(result.key).toBe("PBI-22");
-  expect(result.fields).not.toBeNull();
-  expect(result.fields.number1).toBe(null);
-  expect(Object.keys(result.fields).length).toBe(1);
-  expect(result.update).not.toBeDefined();
-});
-
-test("packing a row with Components and Fix Versions in the payload", () => {
-  const packageRowForUpdate = require('../src/jiraUpdateIssue.gs').packageRowForUpdate;
-  var result = packageRowForUpdate({ "My custom field": 1, Key: 0, "Components": 2 }, ["PBI-1", "column A value", "x,y,z"]);
-  expect(result).not.toBeNull();
-  expect(result.key).toBe("PBI-1");
-  expect(result.fields).not.toBeNull();
-  expect(result.fields.custom1234).toBe("column A value");
-  expect(result.update).not.toBeNull();
-  expect(result.update.components).toBeDefined();
-  expect(result.update.components.length).toBe(1);
-  expect(result.update.components[0]).toEqual({ "set": [{ "name": "x" }, { "name": "y" }, { "name": "z" }] });
-  expect(Object.keys(result.fields).length).toBe(1);
+    var result = packageRowForUpdate({ Key: 0, columnA: 1, columnB: 3 }, [null, "column A value", "should be ignored", "column B value"]);
+    expect(result).not.toBeNull();
+    expect(result.key).toBeNull();
 
 
-  var result = packageRowForUpdate({ "My custom field": 1, Key: 0, "Components": 2 }, ["PBI-1", "column A value", ""]);
-  expect(result).not.toBeNull();
-  expect(result.key).toBe("PBI-1");
-  expect(result.fields).not.toBeNull();
-  expect(result.fields.custom1234).toBe("column A value");
-  expect(result.update).not.toBeNull();
-  expect(result.update.components).toBeDefined();
-  expect(result.update.components.length).toBe(1);
-  expect(result.update.components[0]).toEqual({ "set": [] });
-  expect(Object.keys(result.fields).length).toBe(1);
-});
+    var result = packageRowForUpdate({ columnA: 1, columnB: 3 }, [null, "column A value", "should be ignored", "column B value"]);
+    expect(result).not.toBeNull();
+    expect(result.key).toBeNull();
+
+
+  });
+
+  test("Put time estimates in format for JIRA", () => {
+    var result = packageRowForUpdate(
+      { "Original Estimate": 1, Key: 0 },
+      ["PBI-1", "1d",]
+    );
+    /*schemaType: "string",
+    key: "timeoriginalestimate",
+    name: "Original Estimate",
+    custom: false*/
+    expect(result.key).toBe("PBI-1");
+    expect(result.fields).toBeDefined();
+    expect(result.fields.timeoriginalestimate).not.toBeDefined();
+    expect(result.fields.timetracking).toBeDefined();
+    expect(result.fields.timetracking.originalEstimate).toBeDefined();
+    expect(result.fields.timetracking.originalEstimate).toBe("1d");
+    /*
+    "timetracking": {
+      "originalEstimate": "10",
+      "remainingEstimate": "5"
+    },
+    */
+
+    var result = packageRowForUpdate(
+      { "Original Estimate": 1, Key: 0 },
+      ["PBI-1", "",]
+    );
+    /*schemaType: "string",
+    key: "timeoriginalestimate",
+    name: "Original Estimate",
+    custom: false*/
+    expect(result.key).toBe("PBI-1");
+    expect(result.fields).toBeDefined();
+    expect(result.fields.timeoriginalestimate).not.toBeDefined();
+    expect(result.fields.timetracking).toBeDefined();
+    expect(result.fields.timetracking.originalEstimate).toBeDefined();
+    expect(result.fields.timetracking.originalEstimate).toBeNull();
+
+
+    var result = packageRowForUpdate(
+      { "Remaining Estimate": 1, Key: 0 },
+      ["PBI-1", "1d",]
+    );
+    expect(result.key).toBe("PBI-1");
+    expect(result.fields).toBeDefined();
+    expect(result.fields.timeestimate).not.toBeDefined();
+    expect(result.fields.timetracking).toBeDefined();
+    expect(result.fields.timetracking.remainingEstimate).toBeDefined();
+    expect(result.fields.timetracking.remainingEstimate).toBe("1d");
+    var result = packageRowForUpdate(
+      {"Original Estimate": 2, "Remaining Estimate": 1, Key: 0 },
+      ["PBI-1", "1d","2d"]
+    );
+    expect(result.key).toBe("PBI-1");
+    expect(result.fields).toBeDefined();
+    expect(result.fields.timeoriginalestimate).not.toBeDefined();
+    expect(result.fields.timeestimate).not.toBeDefined();
+    expect(result.fields.timetracking).toBeDefined();
+    expect(result.fields.timetracking.remainingEstimate).toBeDefined();
+    expect(result.fields.timetracking.remainingEstimate).toBe("1d");
+    expect(result.fields.timetracking.originalEstimate).toBeDefined();
+    expect(result.fields.timetracking.originalEstimate).toBe("2d");
+  });
+
+
+  test("packing a row with Components and Fix Versions in the payload", () => {
+    var result = packageRowForUpdate({ "My custom field": 1, Key: 0, "Components": 2 }, ["PBI-1", "column A value", "x,y,z"]);
+    expect(result).not.toBeNull();
+    expect(result.key).toBe("PBI-1");
+    expect(result.fields).not.toBeNull();
+    expect(result.fields.custom1234).toBe("column A value");
+    expect(result.update).not.toBeNull();
+    expect(result.update.components).toBeDefined();
+    expect(result.update.components.length).toBe(1);
+    expect(result.update.components[0]).toEqual({ "set": [{ "name": "x" }, { "name": "y" }, { "name": "z" }] });
+    expect(Object.keys(result.fields).length).toBe(1);
+
+
+    var result = packageRowForUpdate({ "My custom field": 1, Key: 0, "Components": 2 }, ["PBI-1", "column A value", ""]);
+    expect(result).not.toBeNull();
+    expect(result.key).toBe("PBI-1");
+    expect(result.fields).not.toBeNull();
+    expect(result.fields.custom1234).toBe("column A value");
+    expect(result.update).not.toBeNull();
+    expect(result.update.components).toBeDefined();
+    expect(result.update.components.length).toBe(1);
+    expect(result.update.components[0]).toEqual({ "set": [] });
+    expect(Object.keys(result.fields).length).toBe(1);
+  });
+}
+)
+
+
 
 test("Posting Individual Issues to Jira - Not Found Error", () => {
 
@@ -449,57 +579,92 @@ test("field validation", () => {
   const getMatchingJiraFields = require("../src/jiraUpdateIssue.gs").getMatchingJiraFields;
 
   var getFilteredList = getMatchingJiraFields(
-    { "custom1234": 1, "Not a Match": 2, "My custom field 2": 3 }
+    { "custom1234": 1, "Not a Match": 2, "My custom field 2": 3, "Original Estimate": 4 }
   );
   expect(getFilteredList).not.toBeNull();
-  expect(Object.keys(getFilteredList).length).toBe(2);
+  expect(Object.keys(getFilteredList).length).toBe(3);
   expect(getFilteredList["custom1234"]).not.toBeNull();
   expect(getFilteredList["custom1234"].index).toBe(1);
   expect(getFilteredList["custom1234"].definition.name).toBe("My custom field");
   expect(getFilteredList["custom5678"].index).toBe(3);
+  expect(getFilteredList["timeoriginalestimate"].index).toBe(4);
+  expect(getFilteredList["timeoriginalestimate"].definition.name).toBe("Original Estimate");
+
   expect(getFilteredList["Not a Match"]).not.toBeDefined();
   expect(getFilteredList["My custom field 2"]).not.toBeDefined();
 });
 
+describe("Converting data from spreadsheet cells to Jira format - field by field ", () => {
+  test("Format string fields for JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[0];
+    expect(jiraFieldToUse.schemaType).toBe("string"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string 
+    expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe("1223"); // just pass it a string 
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(""); // just pass it a string 
+  })
 
-test("Format string fields for JIRA", () => {
-  const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
-  var jiraFieldToUse = jiraFieldList[0];
-  expect(jiraFieldToUse.schemaType).toBe("string"); // just in case the test data gets re-ordered
-  expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string 
-  expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe("1223"); // just pass it a string 
-  expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(""); // just pass it a string 
-})
+  test("Format empty number fields for JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[4];
+    expect(jiraFieldToUse.key).toBe("number1"); // just in case the test data gets re-ordered
+    expect(jiraFieldToUse.schemaType).toBe("number"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string
+    expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe("1223"); // just pass it a string
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null); // null required to clear a number field
+  })
 
-test("Format empty number fields for JIRA", () => {
-  const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
-  var jiraFieldToUse = jiraFieldList[4];
-  expect(jiraFieldToUse.key).toBe("number1"); // just in case the test data gets re-ordered
-  expect(jiraFieldToUse.schemaType).toBe("number"); // just in case the test data gets re-ordered
-  expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string
-  expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe("1223"); // just pass it a string
-  expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null); // null required to clear a number field
-})
 
-test("Format empty sprint fields for JIRA", () => {
-  const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
-  var jiraFieldToUse = jiraFieldList[5];
-  expect(jiraFieldToUse.key).toBe("custom_sprint"); // just in case the test data gets re-ordered
-  expect(jiraFieldToUse.schemaType).toBe("array|string"); // just in case the test data gets re-ordered
-  expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string - let JIRA error
-  expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe(1223); // convert to number
-  expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null); // null required to clear a number field
-})
 
-test("Sending labels to JIRA", () => {
-  const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
-  var jiraFieldToUse = jiraFieldList[6];
-  expect(jiraFieldToUse.key).toBe("labels"); // just in case the test data gets re-ordered
-  expect(jiraFieldToUse.schemaType).toBe("array|string"); // just in case the test data gets re-ordered
-  expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null);
-  expect(formatFieldValueForJira(jiraFieldToUse, "GNS-Metapod")).toEqual(["GNS-Metapod"]);
-  expect(formatFieldValueForJira(jiraFieldToUse, "GNS-Metapod,Test")).toEqual(["GNS-Metapod", "Test"]);
+  test("Date Time fields for JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[16];
+    expect(jiraFieldToUse.key).toBe("duedate"); // just in case the test data gets re-ordered
+    expect(jiraFieldToUse.schemaType).toBe("date"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null); // null
+    expect(formatFieldValueForJira(jiraFieldToUse, "abc")).toBe("abc"); // just pass it a string
+    expect(formatFieldValueForJira(jiraFieldToUse, "12/04/1988")).toBe("12/04/1988"); // just pass it a string
+  })
+
+  test("Format empty sprint fields for JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[5];
+    expect(jiraFieldToUse.key).toBe("custom_sprint"); // just in case the test data gets re-ordered
+    expect(jiraFieldToUse.schemaType).toBe("array|string"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string - let JIRA error
+    expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe(1223); // convert to number
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null); // null required to clear a number field
+  })
+
+  test("Sending labels to JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[6];
+    expect(jiraFieldToUse.key).toBe("labels"); // just in case the test data gets re-ordered
+    expect(jiraFieldToUse.schemaType).toBe("array|string"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null);
+    expect(formatFieldValueForJira(jiraFieldToUse, "GNS-Metapod")).toEqual(["GNS-Metapod"]);
+    expect(formatFieldValueForJira(jiraFieldToUse, "GNS-Metapod,Test")).toEqual(["GNS-Metapod", "Test"]);
+    expect(formatFieldValueForJira(jiraFieldToUse, "GNS-Metapod, Test")).toEqual(["GNS-Metapod", "Test"]);
+  });
+
+  test("Sending users to JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[9];
+    expect(jiraFieldToUse.schemaType).toBe("user"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null);
+    expect(formatFieldValueForJira(jiraFieldToUse, "plemon")).toEqual({ name: "plemon" });
+  });
+
+
+  test("Sending prioirty values to JIRA", () => {
+    const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
+    var jiraFieldToUse = jiraFieldList[18];
+    expect(jiraFieldToUse.schemaType).toBe("priority"); // just in case the test data gets re-ordered
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null);
+    expect(formatFieldValueForJira(jiraFieldToUse, "P1")).toEqual({ name: "P1" });
+  });
 });
+
 
 test("Including fields and/or items in the update ", () => {
   const updateIssueinJira = require('../src/jiraUpdateIssue.gs').updateIssueinJira;
@@ -546,7 +711,4 @@ test("Including fields and/or items in the update ", () => {
   expect(putCall[1]["update"]["components"]).toBe(componentsData);
   // should have a comment
   expect(jiraApiMock.call.mock.calls[0][1]["update"]["comment"][0]["add"]["body"]).toBeDefined();
-
-
-
 });

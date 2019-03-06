@@ -57,10 +57,10 @@ function dialogSettings() {
  */
 function getServerCfg() {
   return {
-    available: getCfg('available'),
-    url: getCfg('jira_url'),
-    username: getCfg('jira_username'),
-    password: getCfg('jira_password'),
+    available: getCfg_('available'),
+    url: getCfg_('jira_url'),
+    username: getCfg_('jira_username'),
+    password: getCfg_('jira_password'),
     workhours: UserStorage.getValue('workhours'),
     dspuseras_name: UserStorage.getValue('dspuseras_name'),
     dspdurationas: UserStorage.getValue('dspdurationas')

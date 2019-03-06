@@ -1,6 +1,6 @@
 // Node required code block
-const getCfg = require("./settings.gs").getCfg;
-const setCfg = require("./settings.gs").setCfg;
+const getCfg_ = require("./settings.gs").getCfg_;
+const setCfg_ = require("./settings.gs").setCfg_;
 const hasSettings = require("./settings.gs").hasSettings;
 const debug = require("./debug.gs").debug;
 const buildUrl = require("./jsLib.gs").buildUrl;
@@ -77,22 +77,22 @@ function testConnection() {
 
   var ok = function(responseData, httpResponse, statusCode) {
     response = 'Connection successfully established.';
-    debug.log('%s to server [%s] %s', response, getCfg('server_type'), getCfg('jira_url'));
-    setCfg('available', true);
+    debug.log('%s to server [%s] %s', response, getCfg_('server_type'), getCfg_('jira_url'));
+    setCfg_('available', true);
   };
 
   var error = function(responseData, httpResponse, statusCode) {
     response = 'Could not connect to Jira Server!';
     response += httpErrorCodes[statusCode] ? '\n ('+statusCode+') ' + httpErrorCodes[statusCode] : '('+statusCode+')';
-    debug.warn('%s Server [%s] %s', response, getCfg('server_type'), getCfg('jira_url'));
-    setCfg('available', false);
+    debug.warn('%s Server [%s] %s', response, getCfg_('server_type'), getCfg_('jira_url'));
+    setCfg_('available', false);
   };
 
   req.call('dashboard')
     .withSuccessHandler(ok)
     .withFailureHandler(error);
 
-  return {status: (getCfg('available')==true), response: response};
+  return {status: (getCfg_('available')==true), response: response};
 };
 
 /**
@@ -106,11 +106,11 @@ function Request() {
       jiraQueryParams = {};
 
   this.init = function() {
-    server_type = getCfg('server_type') || 'onDemand';
-    available = getCfg('available');
-    url = getCfg('jira_url');
-    username = getCfg('jira_username');
-    password = getCfg('jira_password');
+    server_type = getCfg_('server_type') || 'onDemand';
+    available = getCfg_('available');
+    url = getCfg_('jira_url');
+    username = getCfg_('jira_username');
+    password = getCfg_('jira_password');
     jiraMethod = null;
   };
 
