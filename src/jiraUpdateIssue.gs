@@ -61,9 +61,9 @@ function updateJiraIssues(headerRow, dataRows) {
   function checkForFieldsWhichCantBeEmpty(packagedRow) {
     if (packagedRow.fields.hasOwnProperty("priority")) {
       var checkValue = packagedRow.fields["priority"];
-      if (checkValue == null || checkValue =="") {
+      if (checkValue == null || checkValue == "") {
         result.errors.push("[" + packagedRow.key + "] you must enter a value for field Priority");
-        delete(packagedRow.fields["priority"]);
+        delete (packagedRow.fields["priority"]);
       }
     }
   }
@@ -103,35 +103,34 @@ function updateJiraIssues(headerRow, dataRows) {
  * @param value - the value from the spreadsheet for the specified field
  */
 function formatFieldValueForJira(fieldDefinition, value) {
-  if (fieldDefinition.key == "labels") {
-    if (value == "") {
-      value = null;
-    } else {
-      if (typeof value === 'string' || value instanceof String) {
-        value = value.split(/,\s?/);
-      }
-    }
-    return value;
-  }
   var nullableSchemaTypes = ["number", "date", "user", "array|string", "user", "priority"];
   if (nullableSchemaTypes.indexOf(fieldDefinition.schemaType) >= 0) {
     if (value == "") {
       value = null;
     }
   }
+
+  if (fieldDefinition.schemaType == 'array|string') {
+    if (typeof value === 'string' || value instanceof String) {
+      var itemArray = value.split(/,\s?/);
+      value = [];
+      // array|string as a schematpe is used by many fields
+      // the type is used where an array of integers is expected by the API 
+      // this is only at the moment used for Sprint IDs
+      // this code looks for strings which contain numeric ids inside the array 
+      // and converts them to actual integers
+      // feels hacky...
+      itemArray.forEach(function (item) {
+        if (item != null && !isNaN(item)) {
+          item = +item;
+        }
+        value.push(item);
+      });
+    }
+  }
   var fieldsUsingName = ["user", "priority"];
   if (fieldsUsingName.indexOf(fieldDefinition.schemaType) >= 0 && value != null) {
     value = { name: value };
-  }
-
-
-  if (fieldDefinition.custom && fieldDefinition.schemaType == "array|string") {
-    // array|string as a schematpe is used by many fields
-    // intended first to fix bug with setting sprint fields to empty
-    // currently there is no other way to identify the sprint field
-    if (value != null && !isNaN(value)) {
-      value = +value;
-    }
   }
   return value;
 }
@@ -193,7 +192,7 @@ function packageRowForUpdate(headerRow, dataRow) {
   function prepareUpdateField(headerId, value) {
     updateItems = [];
     if (value != null) {
-      listOfItems = value.split(/\s*,\s*/);
+      listOfItems = value;//.split(/\s*,\s*/);
       listOfItems.forEach(function (item) {
         if (item.trim().length > 0) {
           updateItems.push({ "name": item.trim() });
