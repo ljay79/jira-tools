@@ -5,10 +5,8 @@ var SpreadsheetTriggers_ = require('../SpreadsheetTriggers.gs').SpreadsheetTrigg
 // End of Node required code block
 
 /*
- * @TODO: remove testing
- * @TODO. remove all unnccessary console.log from class
+ * @TODO: remove testing @TODO. remove all unnccessary console.log from class
  */
-
 
 /**
  * @file Contains class used reflect a Jira IssueTable's meta data for google sheet tables.
@@ -41,11 +39,11 @@ function IssueTable_(attributes) {
   /**
    * Initialize anything necessary for the class object
    * 
-   * @param {object} initData    Optional JSON representation of an IssueTable_ data set to load into instance
+   * @param {object} initData Optional JSON representation of an IssueTable_ data set to load into instance
    * @return void
    */
   init = function (attributes) {
-    attributes = attributes || {metaData: {}};
+    attributes = attributes || {metaData : {}};
 
     if (attributes.hasOwnProperty('metaData')) {
       // initialize with existing data (ie: that.fromJson()
@@ -62,11 +60,11 @@ function IssueTable_(attributes) {
             throw new Error("{attributes.filter} must be an object of type 'Filter'. {id:{int}, jql: {strong}, ..}");
       }
 
-      if (!attributes.hasOwnProperty('issues') || typeof attributes.issues !== 'object' ) {
+      if (!attributes.hasOwnProperty('issues') || typeof attributes.issues !== 'object') {
         throw new Error("{attributes.issues} must be an object. Jira api response object of type issues.");
       }
 
-      if (!attributes.hasOwnProperty('sheet') || typeof attributes.sheet !== 'object' ) {
+      if (!attributes.hasOwnProperty('sheet') || typeof attributes.sheet !== 'object') {
         throw new Error("{attributes.sheet} must be an object of type 'Sheet'.");
       }
 
@@ -77,24 +75,21 @@ function IssueTable_(attributes) {
       /* ---- */
 
       that.setMeta('filter', {
-        id   : attributes.filter.id || 0,
+        id : attributes.filter.id || 0,
         name : attributes.filter.name || '',
-        jql  : attributes.filter.jql
+        jql : attributes.filter.jql
       });
-      that.setIssues(attributes.issues)
-        .setRenderer(attributes.renderer)
-      ;
+      that.setIssues(attributes.issues).setRenderer(attributes.renderer);
 
       Sheet = attributes.sheet;
       that.setMeta('sheetId', sheetIdPropertySafe(Sheet.getSheetId()))
-        .setMeta('rangeA1', Sheet.getActiveCell().getA1Notation())
-      ;
+        .setMeta('rangeA1', Sheet.getActiveCell().getA1Notation());
     }
   };
 
   /**
    * Setting the table renderer
-   *
+   * 
    * @param {string|function} Classname or class of IssueTableRenderer
    * @return {IssueTable_}
    */
@@ -131,8 +126,9 @@ function IssueTable_(attributes) {
 
   /**
    * Setting a key/value pair to internal data object
-   * @param {string} key    Name/Key of value to store
-   * @param {mixed} value    The value for key
+   * 
+   * @param {string} key Name/Key of value to store
+   * @param {mixed} value The value for key
    * @return {IssueTable_}
    */
   that.setMeta = function (key, value) {
@@ -150,8 +146,8 @@ function IssueTable_(attributes) {
   /**
    * Getting data from object storage by specific key or everything.
    * 
-   * @param {string} key    The data key name to retrieve. If left undefined, function returns entire data object.
-   * @param {mixed} defaultValue    Optional default value to return in case data could not be found
+   * @param {string} key The data key name to retrieve. If left undefined, function returns entire data object.
+   * @param {mixed} defaultValue Optional default value to return in case data could not be found
    * @return {mixed}
    */
   that.getMeta = function (key, defaultValue) {
@@ -171,6 +167,7 @@ function IssueTable_(attributes) {
 
   /**
    * Wrapper/Helper to get tables sheet id
+   * 
    * @return {string}
    */
   that.getSheetId = function () {
@@ -180,10 +177,10 @@ function IssueTable_(attributes) {
   /**
    * Setting/Generating a table id string and stores it to metaData.
    * 
-   * @param {string|null} tableId    Optional tableId to use or null to generate a new one.
+   * @param {string|null} tableId Optional tableId to use or null to generate a new one.
    * @return {string}
    */
-  that.setTableId = function(tableId) {
+  that.setTableId = function (tableId) {
     tableId = tableId || null;
     if (tableId === null) {
       tableId = 'r' + metaData.rangeA1.replace(':', '');
@@ -197,6 +194,7 @@ function IssueTable_(attributes) {
 
   /**
    * Wrapper/Helper to get tables table id
+   * 
    * @return {string}
    */
   that.getTableId = function () {
@@ -210,7 +208,7 @@ function IssueTable_(attributes) {
   /**
    * Converts tables data to JSON object string representation
    * 
-   * @return {string}    Entire data object stringified with JSON.stringify
+   * @return {string} Entire data object stringified with JSON.stringify
    */
   that.toJson = function () {
     return JSON.stringify(metaData);
@@ -224,7 +222,7 @@ function IssueTable_(attributes) {
    */
   that.fromJson = function (json) {
     var metaData = JSON.parse(json); // Parsing the json string.
-    return new IssueTable_({metaData: metaData});
+    return new IssueTable_({metaData : metaData});
   };
 
   /**
@@ -251,10 +249,10 @@ function IssueTable_(attributes) {
 
   /**
    * Setting relevant range information and store them in metaData.
-   *
+   * 
    * @return {IssueTable_}
    */
-  setRange = function(rangeA1) {
+  setRange = function (rangeA1) {
     metaData.rangeA1 = rangeA1;
     // setting named range
     var _rangeName = 's' + Sheet.getIndex() + '_';
@@ -263,16 +261,16 @@ function IssueTable_(attributes) {
 
     // named ranges must be unique per Spreadsheet
     Sheet.getParent().setNamedRange(_rangeName, _range);
-    
+
     // for easier and faster Is-In-Range checks, we store the numeric coordinates too
     metaData.rangeCoord = {
-      row: {
+      row : {
         from : _range.getRow(),
-        to   : _range.getLastRow()
+        to : _range.getLastRow()
       },
-      col: {
+      col : {
         from : _range.getColumn(),
-        to   : _range.getLastColumn()
+        to : _range.getLastColumn()
       }
     };
 
@@ -282,7 +280,6 @@ function IssueTable_(attributes) {
   // Initialize this object/class
   init(attributes);
 }
-
 
 // Node required code block
 module.exports = IssueTable_;

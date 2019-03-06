@@ -118,5 +118,5 @@ test("IssueTable_ from/to JSON conversion works", ()=> {
 
   // values in IssueTable match passed values?
   expect(table.getMeta()).toMatchObject(testData);
-  //expect(table.toJson()).toBe(JSON.stringify(testData)); //doesnt work as soon object keys are not in same order
+  // expect(table.toJson()).toBe(JSON.stringify(testData)); //doesnt work as soon object keys are not in same order
 });

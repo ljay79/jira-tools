@@ -16,8 +16,8 @@ function findByTableId() {
 }
 
 function findAllBySheet() {
-  //sheetId1: 602713257
-  //sheetId2: 230234225
+  // sheetId1: 602713257
+  // sheetId2: 230234225
   var tables = IssueTableIndex_.getAllTablesBySheet(602713257);
   if (tables.length == 0) {
     console.log('Table NOT found!');
@@ -42,7 +42,7 @@ function findTableByCoord() {
   } else {
     console.log('Found Tables: %s', table);
   }
-  
+
   // OK Case
   console.log('===========> case 1');
   var table = IssueTableIndex_.getTableByCoord(230234225, 3, 4);
@@ -60,7 +60,7 @@ function findTableByCoord() {
   } else {
     console.log('Found Tables: %s', table);
   }
-  
+
   // Not OK Case
   console.log('===========> case 4');
   var table = IssueTableIndex_.getTableByCoord(9999, 50, 400);
@@ -71,10 +71,7 @@ function findTableByCoord() {
   }
 }
 
-
-
 /* ######## ------------------ #################### */
-
 
 /**
  * @file Contains class used to persist IssueTable data and access it.
@@ -84,7 +81,7 @@ function findTableByCoord() {
  * Creates a new IssueTableIndex_ object, which is used to persist IssueTables and related information.
  */
 IssueTableIndex_ = {
-  _storage: null,
+  _storage : null,
   _index : {}, // only index of all table ids
   _tables : {}, // actual array/object of IssueTables
 
@@ -165,21 +162,20 @@ IssueTableIndex_ = {
 
   /**
    * Get all stored IssueTable's for passed Sheet Id.
-   *
-   * @param {string} sheetId    Optional SheetId to fetch tables for. Default current active Sheet.
-   * @return {array}    Returns array of found IssueTable objects. Empty array if nothing found.
+   * 
+   * @param {string} sheetId Optional SheetId to fetch tables for. Default current active Sheet.
+   * @return {array} Returns array of found IssueTable objects. Empty array if nothing found.
    */
-  getAllTablesBySheet: function (sheetId) {
+  getAllTablesBySheet : function (sheetId) {
     sheetId = sheetIdPropertySafe(sheetId);
     debug.log('getAllTablesBySheet(%s)', sheetId);
 
-    var tables = [],
-        sheetIdx, tableIndexId, IssueTable;
+    var tables = [], sheetIdx, tableIndexId, IssueTable;
 
     // load everything from storage
     this._load();
 
-    for ( sheetIdx in this._index[sheetId]) {
+    for (sheetIdx in this._index[sheetId]) {
       if (this._index[sheetId].hasOwnProperty(sheetIdx)) {
         tableIndexId = this.tableIndexName(sheetId, this._index[sheetId][sheetIdx]);
         if (null !== this._tables[tableIndexId]) {
@@ -192,15 +188,15 @@ IssueTableIndex_ = {
     return tables;
   },
 
-  getTableByCoord: function(sheetId, columnOrRange, row) {
+  getTableByCoord : function (sheetId, columnOrRange, row) {
     debug.log('getTableByCoord(%s, %s, %s)', sheetId, columnOrRange, row);
     debug.time('IssueTableIndex.getTableByCoord()');
 
     var sheetId = sheetIdPropertySafe(sheetId);
-    var column  = (typeof columnOrRange === 'object') ? columnOrRange.getColumn() : parseInt(columnOrRange);
-    var row     = (typeof columnOrRange === 'object') ? columnOrRange.getRow() : parseInt(row);
+    var column = (typeof columnOrRange === 'object') ? columnOrRange.getColumn() : parseInt(columnOrRange);
+    var row = (typeof columnOrRange === 'object') ? columnOrRange.getRow() : parseInt(row);
     var sheetIdx, tableIndexId, tableJson;
-    var respond = function(response) {
+    var respond = function (response) {
       debug.timeEnd('IssueTableIndex.getTableByCoord()');
       return response;
     };
@@ -214,28 +210,28 @@ IssueTableIndex_ = {
     }
 
     // for each table within sheet
-    for ( sheetIdx in this._index[sheetId]) {
+    for (sheetIdx in this._index[sheetId]) {
       if (this._index[sheetId].hasOwnProperty(sheetIdx)) {
         tableIndexId = this.tableIndexName(sheetId, this._index[sheetId][sheetIdx]);
         if (null !== this._tables[tableIndexId]) {
           // we usually would init a new IssueTable to access that meta,
           // but performance vise we access the JSON object directly!?
           tableJson = JSON.parse(this._tables[tableIndexId]);
-          if (typeof tableJson !== 'object') continue;
+          if (typeof tableJson !== 'object')
+            continue;
 
           // check passed coordinates are within current table range
-          if (column >= tableJson.rangeCoord.col.from 
-              && column <= tableJson.rangeCoord.col.to
-              && row >= tableJson.rangeCoord.row.from 
-              && row <= tableJson.rangeCoord.row.to)
-          {
+          if (column >= tableJson.rangeCoord.col.from && column <= tableJson.rangeCoord.col.to && row >= tableJson.rangeCoord.row.from
+              && row <= tableJson.rangeCoord.row.to) {
             // found it ..
-            return respond(new IssueTable_({metaData: tableJson}));
+            return respond(new IssueTable_({
+              metaData : tableJson
+            }));
           }
         }
       }
-    } //END: loop over sheet's tables
-    
+    } // END: loop over sheet's tables
+
     return respond(false);
   },
 
@@ -247,8 +243,8 @@ IssueTableIndex_ = {
    */
   _getStorage : function () {
     if (null === this._storage) {
-      //storage_ = new Storage_('paj_tables', PropertiesService.getDocumentProperties() || {});
-      //@TODO: remove before production - only for better debugging
+      // storage_ = new Storage_('paj_tables', PropertiesService.getDocumentProperties() || {});
+      // @TODO: remove before production - only for better debugging
       this._storage = new Storage_('paj_tables', PropertiesService.getScriptProperties() || {});
     }
 

@@ -2,11 +2,11 @@
 
 // End of Node required code block
 
-//@TOOD: probably move to own file
+// @TOOD: probably move to own file
 function RendererFactory_(RendererClassName) {
   var name = 'RendererFactory_';
-  
-  switch(RendererClassName) {
+
+  switch (RendererClassName) {
     case 'IssueTableRendererDefault_':
       return new IssueTableRendererDefault_(this);
       break;
@@ -16,24 +16,26 @@ function RendererFactory_(RendererClassName) {
   }
 }
 
-
 function IssueTableRendererDefault_(IssueTable) {
   var that = this,
-      sheet, initRange,
-      epicField = UserStorage.getValue('jst_epic'),
-      issues = [], headers = [], 
-      rowIndex = 0, numColumns = 0,
-      info = {
-        totalInserted : 0,
-        finishRendering: false,
-        oRangeA1: {from: null, to:null},
-        headerRowOffset: 0
-      };
+    sheet, initRange,
+    epicField = UserStorage.getValue('jst_epic'),
+    issues = [], headers = [],
+    rowIndex = 0, numColumns = 0,
+    info = {
+      totalInserted : 0,
+      finishRendering : false,
+      oRangeA1 : {
+        from : null,
+        to : null
+      },
+      headerRowOffset : 0
+    };
 
   /**
    * @desc Initialization, validation
    */
-  init = function() {
+  init = function () {
     // check data to rendering
     if (typeof IssueTable !== 'object') {
       throw new Error("{IssueTable} is not a valid instance of class IssueTable_.");
@@ -44,7 +46,7 @@ function IssueTableRendererDefault_(IssueTable) {
     if (!IssueTable.hasOwnProperty('getIssues')) {
       throw new ReferenceError("{IssueTable} is not a valid instance of class IssueTable_. Implementation of method 'getIssues' missing.");
     }
-    
+
     issues = IssueTable.getIssues();
     if (typeof issues !== 'object') {
       throw new Error("{IssueTable.getIissues()} must return an array but returned " + (typeof issues) + ".");
@@ -52,7 +54,7 @@ function IssueTableRendererDefault_(IssueTable) {
     if (!issues[0].hasOwnProperty('fields')) {
       throw new ReferenceError("{IssueTable.getIissues()} did not return a valid Jira issues response object. [" + issues + "]");
     }
-    
+
     var sheetId = sheetIdPropertySafe(IssueTable.getSheetId(), true);
     sheet = getSheetById(sheetId);
     if (typeof sheet !== 'object') {
@@ -71,7 +73,7 @@ function IssueTableRendererDefault_(IssueTable) {
 
     initRange = sheet.setActiveSelection(IssueTable.getMeta('rangeA1'));
     info.oRangeA1.from = initRange.getCell(1, 1).getA1Notation();
-    info.oRangeA1.to   = initRange.getCell(initRange.getNumRows(), initRange.getNumColumns()).getA1Notation();
+    info.oRangeA1.to = initRange.getCell(initRange.getNumRows(), initRange.getNumColumns()).getA1Notation();
     console.log('info: %s', info);
 
     if (filterName = IssueTable.getMeta('filter').name) {
@@ -87,19 +89,18 @@ function IssueTableRendererDefault_(IssueTable) {
 
     return that;
   };
-  
+
   /**
-   * @desc Adding a summary line
-   * (not yet used)
-   * @return this  For chaining
+   * @desc Adding a summary line (not yet used)
+   * @return this For chaining
    */
-  that.addSummary = function(summary) {
+  that.addSummary = function (summary) {
     range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
 
     range.clearContent()
       .clearNote()
       .clearFormat()
-      .getCell(1,1)
+      .getCell(1, 1)
       .setValue(summary);
 
     info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
@@ -112,13 +113,13 @@ function IssueTableRendererDefault_(IssueTable) {
 
   /**
    * @desc Add column headers into 1st/2nd row
-   * @return this  For chaining
+   * @return this For chaining
    */
-  that.addHeader = function() {
+  that.addHeader = function () {
     var values = [], formats = [];
 
-    for(var i=0; i<headers.length; i++) {
-      values.push( IssueFields.getHeaderName(headers[i]) );
+    for (var i = 0; i < headers.length; i++) {
+      values.push(IssueFields.getHeaderName(headers[i]));
       formats.push('bold');
     }
 
@@ -127,8 +128,8 @@ function IssueTableRendererDefault_(IssueTable) {
     range.clearContent()
       .clearNote()
       .clearFormat()
-      .setValues([ values ])
-      .setFontWeights([ formats ]);
+      .setValues([values])
+      .setFontWeights([formats]);
 
     info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
 
@@ -136,34 +137,34 @@ function IssueTableRendererDefault_(IssueTable) {
 
     return that;
   };
-  
+
   /**
    * @desc Fill in all data into a sheet table with values and format
-   * @return this  For chaining
+   * @return this For chaining
    */
-  that.fillTable = function() {
+  that.fillTable = function () {
     info.totalInserted = issues.length;
-    var range = sheet.getRange(initRange.getRow(), initRange.getColumn(), 1, headers.length); //obsolete?
+    var range = sheet.getRange(initRange.getRow(), initRange.getColumn(), 1, headers.length); // obsolete?
 
     // loop over each resulted issue (row)
-    for(var i=0; i<issues.length; i++) {
+    for (var i = 0; i < issues.length; i++) {
       var issue = issues[i];
       var values = [];
-      var formats = []; //http://www.blackcj.com/blog/2015/05/18/cell-number-formatting-with-google-apps-script/
+      var formats = []; // http://www.blackcj.com/blog/2015/05/18/cell-number-formatting-with-google-apps-script/
       range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
 
       // loop over each header (column)
-      for(var j=0; j<headers.length; j++) {
+      for (var j = 0; j < headers.length; j++) {
         var key = unifyIssueAttrib(headers[j], issue);
 
         // for some custom formatting
-        switch(true) {
+        switch (true) {
           case key.hasOwnProperty('date'):
             key.value = (key.value != null) ? key.date : '';
             break;
           case (key.hasOwnProperty('epic') && key.epic === true):
             if (key.value != 'n/a') {
-              if(undefined == epicField || epicField.usable === false || epicField.label_key == null) {
+              if (undefined == epicField || epicField.usable === false || epicField.label_key == null) {
                 key.value = '=HYPERLINK("' + key.link + '"; "' + key.value + '")';
               } else {
                 key.value = '=HYPERLINK("' + key.link + '"; JST_EPICLABEL("' + key.value + '"))';
@@ -175,12 +176,12 @@ function IssueTableRendererDefault_(IssueTable) {
             break;
         }
 
-        values.push( key.value );
-        formats.push( key.format || '@' );
+        values.push(key.value);
+        formats.push(key.format || '@');
       } // END: header/columns loop
 
       // just check if values (column) length is as we expect?!
-      if( values.length != numColumns ) {
+      if (values.length != numColumns) {
         for (var l = 0; l < values.length; l++) {
           values.push('');
           formats.push('@');
@@ -191,14 +192,14 @@ function IssueTableRendererDefault_(IssueTable) {
       range.clearContent()
         .clearNote()
         .clearFormat()
-        .setValues([ values ])
-        .setNumberFormats([ formats ])
+        .setValues([values])
+        .setNumberFormats([formats])
         .activate();
 
       info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
 
       // flush sheet every 25 rows (to often is bad for performance, to less bad for UX)
-      if(i % 25 === 0) {
+      if (i % 25 === 0) {
         SpreadsheetApp.flush();
       }
 
@@ -211,16 +212,16 @@ function IssueTableRendererDefault_(IssueTable) {
 
   /**
    * Return Info object.
-   *
-   * @return {object}    {totalInserted:<{number}>}
+   * 
+   * @return {object} {totalInserted:<{number}>}
    */
-  that.getInfo = function() {
+  that.getInfo = function () {
     return info;
   };
 
   /**
    * Return array of header values
-   *
+   * 
    * @return {Array}
    */
   that.getHeaders = function () {
@@ -228,13 +229,14 @@ function IssueTableRendererDefault_(IssueTable) {
   };
 
   /**
-   * Sorting the header/columns based on definition/order in global var ISSUE_COLUMNS.
-   * Improves a consistent column listing/sorting and defined fields first before alpha sorting the rest.
+   * Sorting the header/columns based on definition/order in global var ISSUE_COLUMNS. Improves a consistent column listing/sorting and
+   * defined fields first before alpha sorting the rest.
+   * 
    * @returns {IssueTableRendererDefault_}
    */
-  prepareHeaderValues = function() {
+  prepareHeaderValues = function () {
     // prep headers
-    for(var k in issues[0].fields) {
+    for ( var k in issues[0].fields) {
       headers.push(k);
     }
 
@@ -249,17 +251,15 @@ function IssueTableRendererDefault_(IssueTable) {
 }
 
 /**
- * @TODO: Move to appropiate file (not jiraCommand.gs, jsLib.gs, but where?)
- *
- * Get a sheet from current active Spreadsheet by ID passed.
- * @param {int|string} id    The sheet id to get a Sheet for.
+ * @TODO: Move to appropiate file (not jiraCommand.gs, jsLib.gs, but where?) Get a sheet from current active Spreadsheet by ID passed.
+ * @param {int|string} id The sheet id to get a Sheet for.
  * @return {undefined|Sheet}
  */
 function getSheetById(id) {
   id = (typeof id === 'string') ? parseInt(id) : id;
-  return SpreadsheetApp.getActive().getSheets().filter(
-    function(s) { return s.getSheetId() === id; }
-  )[0];
+  return SpreadsheetApp.getActive().getSheets().filter(function (s) {
+    return s.getSheetId() === id;
+  })[0];
 }
 
 // Node required code block

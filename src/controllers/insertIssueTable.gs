@@ -1,4 +1,3 @@
-
 // @TODO: dialog insert issues from filter
 
 // @TODO: menu insert issues from filter
@@ -8,43 +7,51 @@
 
 function tableFromMeta() {
   var _meta = {
-    sheetId: "sid_230234225",
-	tableId: "tbl_rB2D5",
-	name: null,
-	rangeA1: "B2:D5",
-	rangeCoord: {
-      row: {from: 2, to: 9},
-      col: {from: 2, to: 4}
-	},
-	headerRowOffse: 1,
-	headerValues: ["key", "summary", "status"],
-	filter: {
-      id: 14406,
-      name: "01 - Test Project - All Issues",
-      jql: "project = TP ORDER BY lastViewed DESC"
-	},
-    maxResults: 6,
-	renderer: "IssueTableRendererDefault_",
-	time_lastupdated: 1551636173161
+    sheetId : "sid_230234225",
+    tableId : "tbl_rB2D5",
+    name : null,
+    rangeA1 : "B2:D5",
+    rangeCoord : {
+      row : {
+        from : 2,
+        to : 9
+      },
+      col : {
+        from : 2,
+        to : 4
+      }
+    },
+    headerRowOffse : 1,
+    headerValues : ["key", "summary", "status"],
+    filter : {
+      id : 14406,
+      name : "01 - Test Project - All Issues",
+      jql : "project = TP ORDER BY lastViewed DESC"
+    },
+    maxResults : 6,
+    renderer : "IssueTableRendererDefault_",
+    time_lastupdated : 1551636173161
   };
 
-  var table = new IssueTable_({metaData: _meta});
+  var table = new IssueTable_({
+    metaData : _meta
+  });
 
-  var ok = function(resp, status, errorMessage) {
+  var ok = function (resp, status, errorMessage) {
     var renderer;
     table.setIssues(resp.data);
 
-    if( renderer = table.render() ) {
+    if (renderer = table.render()) {
       // toast with status message
-      var msg = "Finished inserting " + renderer.getInfo().totalInserted 
-               + " Jira issues out of " + resp.data.total + " total found records.";
+      var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
+          + " total found records.";
       SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
       debug.log(msg);
-      
+
       console.log('renderer.info: %s', renderer.getInfo());
 
       console.log('==>> Table Meta: %s', table.getMeta());
-      
+
       IssueTableIndex_.addTable(table);
     }
 
@@ -53,38 +60,34 @@ function tableFromMeta() {
 
   var Search = new IssueSearch(table.getMeta('filter').jql);
   Search.setOrderBy()
-        .setFields(table.getMeta('headerValues'))
-        .setMaxResults( table.getMeta('maxResults') )
-        .setStartAt(0)
-        .search()      
-        .withSuccessHandler(ok);
-  
+    .setFields(table.getMeta('headerValues'))
+    .setMaxResults(table.getMeta('maxResults'))
+    .setStartAt(0)
+    .search()
+    .withSuccessHandler(ok);
+
 }
 
 function newControllerActionLive() {
   debug.time('insertIssueTable()');
 
-  var ok = function(resp, status, errorMessage) {
-    var renderer,
-        attributes = {
-          filter     : getFilter(14406),
-          maxResults : resp.data.maxResults,
-          issues     : resp.data,
-          sheet      : getTicketSheet(),
-          renderer   : IssueTableRendererDefault_
-        };
-    
+  var ok = function (resp, status, errorMessage) {
+    var renderer, attributes = {
+      filter : getFilter(14406),
+      maxResults : resp.data.maxResults,
+      issues : resp.data,
+      sheet : getTicketSheet(),
+      renderer : IssueTableRendererDefault_
+    };
+
     var table = new IssueTable_(attributes);
-    if( renderer = table.render() ) {
+    if (renderer = table.render()) {
       // toast with status message
-      var msg = "Finished inserting " 
-               + renderer.getInfo().totalInserted 
-               + " Jira issues out of " 
-               + resp.data.total 
-               + " total found records.";
+      var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
+          + " total found records.";
       SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
       debug.log(msg);
-      
+
       console.log('renderer.info: %s', renderer.getInfo());
 
       console.log('==>> Table Meta: %s', table.getMeta());
@@ -94,14 +97,8 @@ function newControllerActionLive() {
   };
 
   var Search = new IssueSearch("status = Done");
-  Search.setOrderBy()
-        .setFields(['key', 'summary', 'status'])
-        .setMaxResults(11)
-        .setStartAt(0)
-        .search()      
-        .withSuccessHandler(ok);
+  Search.setOrderBy().setFields(['key', 'summary', 'status']).setMaxResults(11).setStartAt(0).search().withSuccessHandler(ok);
 }
-
 
 function testTable1() {
   console.log('testTable1()');
@@ -185,8 +182,6 @@ function onEditTableMeta(e) {
 
 }
 
-
-
 function testTriggerDialog() {
   console.log('testTriggerDialog()');
 
@@ -197,6 +192,6 @@ function testTriggerDialog() {
 function onEditOpenDialog(e) {
   debug.log('onEditOpenDialog()');
   dialogAbout();
-  
+
   debug.log('END<!--');
 }

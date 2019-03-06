@@ -23,8 +23,8 @@ test("IssueTableIndex_ accessibility test",()=> {
   expect(TableIndex).not.toHaveProperty('storage_');
   
   // data property should be private (not yet)
-//  expect(TableIndex).not.toHaveProperty('index_');
-//  expect(TableIndex).not.toHaveProperty('tables_');
+// expect(TableIndex).not.toHaveProperty('index_');
+// expect(TableIndex).not.toHaveProperty('tables_');
   expect(TableIndex).toHaveProperty('index_');
   expect(TableIndex).toHaveProperty('tables_');
 
@@ -76,43 +76,19 @@ test("IssueTableIndex_ duplicated index prevention",()=> {
 });
 
 /*
-Note for coding tests - working GAS tests
-
-
-function findByTableId() {
-  var table = IssueTableIndex_.getTable('tbl_rB2D5');
-  if (!table) {
-    console.log('Table NOT found!');
-  } else {
-    console.log('Found Table Meta: %s', table.getMeta());
-  }
-}
-
-function findAllBySheet() {
-  //sheetId1: 602713257
-  //sheetId2: 230234225
-  var tables = IssueTableIndex_.getAllTablesBySheet(602713257);
-  if (tables.length == 0) {
-    console.log('Table NOT found!');
-  } else {
-    console.log('Found Tables: %s', tables.length);
-  }
-
-  var tables = IssueTableIndex_.getAllTablesBySheet(230234225);
-  if (tables.length == 0) {
-    console.log('Table NOT found!');
-  } else {
-    console.log('Found Tables: %s', tables.length);
-  }
-}
-
-function findTableByCoord() {
-  var table = IssueTableIndex_.getTableByCoord('230234225', 3, 4);
-  if (!table) {
-    console.log('Table NOT found!');
-  } else {
-    console.log('Found Tables: %s', table);
-  }
-}
-
-*/
+ * Note for coding tests - working GAS tests
+ * 
+ * 
+ * function findByTableId() { var table = IssueTableIndex_.getTable('tbl_rB2D5'); if (!table) { console.log('Table NOT found!'); } else {
+ * console.log('Found Table Meta: %s', table.getMeta()); } }
+ * 
+ * function findAllBySheet() { //sheetId1: 602713257 //sheetId2: 230234225 var tables = IssueTableIndex_.getAllTablesBySheet(602713257); if
+ * (tables.length == 0) { console.log('Table NOT found!'); } else { console.log('Found Tables: %s', tables.length); }
+ * 
+ * var tables = IssueTableIndex_.getAllTablesBySheet(230234225); if (tables.length == 0) { console.log('Table NOT found!'); } else {
+ * console.log('Found Tables: %s', tables.length); } }
+ * 
+ * function findTableByCoord() { var table = IssueTableIndex_.getTableByCoord('230234225', 3, 4); if (!table) { console.log('Table NOT
+ * found!'); } else { console.log('Found Tables: %s', table); } }
+ * 
+ */
