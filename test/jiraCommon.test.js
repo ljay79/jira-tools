@@ -135,7 +135,7 @@ test('sheetIdPropertySafe() generates property safe string from an sheet id', ()
 
   var result = '';
   var sheetId = jiraCommon.getTicketSheet().getSheetId();
-  var expectedId = 'sid_' + JSON.stringify(sheetId);
+  var expectedId = 'sid_' + sheetId;
 
   result = jiraCommon.sheetIdPropertySafe(sheetId);
   expect(result).toBe(expectedId);

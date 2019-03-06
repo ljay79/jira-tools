@@ -15,7 +15,7 @@ var Range = {
 var Sheet = {
   // Returns the ID of the sheet represented by this object
   getSheetId: jest.fn().mockImplementation(() => {
-    return '5.1234567890' + randNum;
+    return '5123456789' + randNum;
   }),
   // Gets the position of the sheet in its parent spreadsheet. Starts at 1.
   getIndex: jest.fn().mockImplementation(() => {
@@ -36,6 +36,11 @@ var Sheet = {
  */
 var Spreadsheet = {
   getActiveSheet: jest.fn().mockImplementation(() => Sheet),
+
+  //Return array of Sheet's
+  getSheets : jest.fn().mockImplementation(() => {
+    return [Sheet, Sheet];
+  }),
 
   // Gets a unique identifier for this spreadsheet.
   getId: jest.fn().mockImplementation(() => {

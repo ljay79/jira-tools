@@ -13,10 +13,13 @@ var UI = {
 
 var SpreadsheetApp = {
   getUi: jest.fn().mockImplementation(() => UI ),
+  getActive: jest.fn().mockImplementation(() => Spreadsheet ),
   getActiveSpreadsheet: jest.fn().mockImplementation(() => Spreadsheet ),
   resetMocks: function() {
     mocks = [
       [SpreadsheetApp.getUi,UI],
+      [SpreadsheetApp.getActive, Spreadsheet],
+      [SpreadsheetApp.getActiveSpreadsheet, Spreadsheet],
       [UI.createAddonMenu,ADDONMENU],
       [ADDONMENU.addItem,ADDONMENU],
       [ADDONMENU.addSeparator,ADDONMENU],

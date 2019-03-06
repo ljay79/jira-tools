@@ -243,9 +243,9 @@ IssueTableIndex_ = {
    */
   _getStorage : function () {
     if (null === this._storage) {
-      // storage_ = new Storage_('paj_tables', PropertiesService.getDocumentProperties() || {});
+      this._storage = new Storage_('paj_tables', PropertiesService.getDocumentProperties() || {});
       // @TODO: remove before production - only for better debugging
-      this._storage = new Storage_('paj_tables', PropertiesService.getScriptProperties() || {});
+      //this._storage = new Storage_('paj_tables', PropertiesService.getScriptProperties() || {});
     }
 
     return this._storage;

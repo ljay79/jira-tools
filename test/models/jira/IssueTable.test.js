@@ -26,7 +26,7 @@ test("IssueTable_ accessibility test",()=> {
   expect(tableData).toMatchObject({
     'sheetId': jiraCommon.sheetIdPropertySafe(),
     'tableId': null,
-    'headerRowOffset': 1
+    'headerRowOffset': 0
   });
   expect(tableData).toHaveProperty('time_lastupdated');
 
@@ -50,7 +50,7 @@ test("IssueTable_ accessibility test",()=> {
   expect(tableData).toMatchObject({
     'sheetId': jiraCommon.sheetIdPropertySafe(),
     'tableId': tableId,
-    'headerRowOffset': 1,
+    'headerRowOffset': 0,
     'random_data_key': 'random Data Value'
   });
 
