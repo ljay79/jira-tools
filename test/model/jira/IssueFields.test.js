@@ -173,6 +173,10 @@ test("Get all fields from Jira", () => {
   var result = IssueFields.getAllFields(successCallBack, errorCallBack);
   expect(successCallBack.mock.calls.length).toBe(0);
   expect(errorCallBack.mock.calls.length).toBe(1);
+  expect(errorCallBack.mock.calls[0].length).toBe(3);
+  expect(errorCallBack.mock.calls[0][0]).toContain("mocked error");
+  expect(errorCallBack.mock.calls[0][1]).toBe(404);
+  expect(errorCallBack.mock.calls[0][2]).toBe(false);
   expect(result.length).toBe(0);
 });
 

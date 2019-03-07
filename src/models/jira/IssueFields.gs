@@ -67,7 +67,7 @@ IssueFields = (function () {
         var msg = "Failed to retrieve Jira Fields info with status [" + status + "]!\\n"
           + jiraErrorMessage;
         if (errorCallBack != null) {
-          errorCallBack(msg);
+          errorCallBack(msg,httpResp,status);
         }
       };
       request.call("field")
