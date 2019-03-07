@@ -632,8 +632,7 @@ describe("Converting data from spreadsheet cells to Jira format - field by field
     expect(jiraFieldToUse.key).toBe("custom_sprint"); // just in case the test data gets re-ordered
     expect(jiraFieldToUse.schemaType).toBe("array|string"); // just in case the test data gets re-ordered
     expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toEqual(["PB-1"]); // just pass it a string - let JIRA error
-    expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toEqual([1223]); // convert to number
-    expect(formatFieldValueForJira(jiraFieldToUse, "1223,234")).toEqual([1223, 234]); // null required to clear a number field
+    expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toEqual(1223); // convert to number
     expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null); // null required to clear a number field
   })
 

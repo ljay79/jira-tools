@@ -83,7 +83,7 @@ test("Convert Jira Field Responses to internal field data", () => {
   expect(result.schemaType).toBe("string");
 
   result = IssueFields.convertJiraResponse({
-    schema: { type: "a custom field not recognised" },
+    schema: { type: "a custom field not recognised", custom: "customFieldType" },
     key: "abc",
     name: "ABC field",
     custom: true
@@ -93,6 +93,8 @@ test("Convert Jira Field Responses to internal field data", () => {
   expect(result.name).toBe("ABC field");
   expect(result.supported).toBe(false);
   expect(result.schemaType).toBe("a custom field not recognised");
+  expect(result.customType).toBe("customFieldType");
+  
 
 
 
@@ -293,12 +295,12 @@ test("getCustomFields", () => {
 });
 
 test("Creating Fields", () => {
-
   var epicField = IssueFields.createField_(
     EpicField.getKey(),
     EpicField.getName(),
     true,
     EpicField.EPIC_KEY,
+    EpicField.EPIC_KEY+" type",
     true
   );
   expect(epicField.supported).toBe(true);

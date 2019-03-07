@@ -305,7 +305,7 @@ IssueFields = (function () {
    * 
    * @returns {object}
    */
-  function createField_(key, name, isCustom, schemaType, isVirtual) {
+  function createField_(key, name, isCustom, schemaType, customType, isVirtual) {
     // isVirtual defaults to false
     return {
       key: key,
@@ -313,6 +313,7 @@ IssueFields = (function () {
       custom: isCustom,
       schemaType: schemaType,
       supported: (SupportedTypes.indexOf(schemaType) > -1),
+      customType: customType,
       isVirtual: (isVirtual == null) ? false : isVirtual
     };
   }
@@ -331,6 +332,7 @@ IssueFields = (function () {
           };
    */
   function convertJiraResponse(jiraFieldResponse) {
+    var customType = null;
     // EPIC customization
     if (jiraFieldResponse.schema && jiraFieldResponse.schema.custom) {
       if (jiraFieldResponse.schema.custom.indexOf(':gh-epic-link') > -1) {
@@ -339,16 +341,19 @@ IssueFields = (function () {
       if (jiraFieldResponse.schema.custom.indexOf(':gh-epic-label') > -1) {
         EpicField.setLabelKey(jiraFieldResponse.key || jiraFieldResponse.id);
       }
+      customType = jiraFieldResponse.schema.custom;
     }
     var _type = (jiraFieldResponse.schema ? jiraFieldResponse.schema.type : null) || null;
     if (jiraFieldResponse.schema && jiraFieldResponse.schema.items) {
       _type += '|' + jiraFieldResponse.schema.items;
     }
+    
     return createField_(
       jiraFieldResponse.key || jiraFieldResponse.id, // Server API returns ".id" only while Cloud returns both with same value
       jiraFieldResponse.name,
       jiraFieldResponse.custom,
-      _type
+      _type,
+      customType
     );
   }
 
@@ -366,7 +371,14 @@ IssueFields = (function () {
     // EPIC usable?
     if (EpicField.isUsable()) {
       // add custom field 'Epic' to beginning of array
-      allJiraFields_.unshift(createField_(EpicField.getKey(), EpicField.getName(), true, EpicField.EPIC_KEY, true));
+      allJiraFields_.unshift(
+        createField_(
+          EpicField.getKey(), 
+          EpicField.getName(), 
+          true,
+          EpicField.EPIC_KEY,
+          null, 
+          true));
     }
   }
 

@@ -112,20 +112,13 @@ function formatFieldValueForJira(fieldDefinition, value) {
 
   if (fieldDefinition.schemaType == 'array|string') {
     if (typeof value === 'string' || value instanceof String) {
-      var itemArray = value.split(/,\s?/);
-      value = [];
-      // array|string as a schematpe is used by many fields
-      // the type is used where an array of integers is expected by the API 
-      // this is only at the moment used for Sprint IDs
-      // this code looks for strings which contain numeric ids inside the array 
-      // and converts them to actual integers
-      // feels hacky...
-      itemArray.forEach(function (item) {
-        if (item != null && !isNaN(item)) {
-          item = +item;
-        }
-        value.push(item);
-      });
+      if (value != null && !isNaN(value)) {
+        // assume if the value is numeric it should be a sprint id 
+        // really need a better way to do this.
+        value = +value;
+      } else {
+        value = value.split(/,\s?/);
+      }
     }
   }
   var fieldsUsingName = ["user", "priority"];
