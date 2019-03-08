@@ -645,6 +645,8 @@ describe("Converting data from spreadsheet cells to Jira format - field by field
     expect(formatFieldValueForJira(jiraFieldToUse, "GNS-Metapod")).toEqual(["GNS-Metapod"]);
     expect(formatFieldValueForJira(jiraFieldToUse, "GNS-Metapod,Test")).toEqual(["GNS-Metapod", "Test"]);
     expect(formatFieldValueForJira(jiraFieldToUse, "GNS-Metapod, Test")).toEqual(["GNS-Metapod", "Test"]);
+    expect(formatFieldValueForJira(jiraFieldToUse, ",GNS-Metapod, Test")).toEqual(["GNS-Metapod", "Test"]);
+    expect(formatFieldValueForJira(jiraFieldToUse, ",GNS-Metapod,, Test")).toEqual(["GNS-Metapod", "Test"]);
 
 
     // bug https://github.com/ljay79/jira-tools/issues/173

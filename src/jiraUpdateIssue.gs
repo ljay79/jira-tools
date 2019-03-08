@@ -4,6 +4,7 @@ const IssueFields = require('src/models/jira/IssueFields.gs');
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
 const debug = require("./debug.gs").debug;
 const extend = require("./jsLib.gs").extend;
+const splitCommaList_ = require("./jsLib.gs").splitCommaList_;
 const IssueTransitioner = require('./jiraIssueStatusUpdates/issueTransitioner.gs');
 // End of Node required code block
 
@@ -117,7 +118,7 @@ function formatFieldValueForJira(fieldDefinition, value) {
         // really need a better way to do this.
         value = +value;
       } else {
-        value = value.split(/,\s?/);
+        value = splitCommaList_(value);
       }
     }
   }

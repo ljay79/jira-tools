@@ -306,6 +306,28 @@ function removeFromArray(array, element) {
   }
 }
 
+/**
+ * Splits string into a comma separated list
+ * trims whitespace and the start and end of each element
+ * ignores empty elements
+ * @param listInString {String} String containing comma separated list
+ * @return {Array}
+ */
+function splitCommaList_(listInString) {
+  if (typeof listInString === 'string' || listInString instanceof String) {
+    var listOfItems = listInString.split(/,\s?/);
+    value = [];
+    listOfItems.forEach(function (item) {
+      if (item.trim().length > 0) {
+        value.push(item.trim());
+      }
+    });
+    return value;
+  } else {
+    return [];
+  }
+}
+
 
 // Node required code block
 module.exports = {
@@ -314,6 +336,7 @@ module.exports = {
   extend: extend,
   copyObject: copyObject,
   reverse: reverse,
-  camelize: camelize
+  camelize: camelize,
+  splitCommaList_: splitCommaList_
 };
 // End of Node required code block

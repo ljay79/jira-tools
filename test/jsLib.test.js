@@ -65,11 +65,18 @@ test('reverse', () => {
 });
 
 test('camelize', () => {
-
   expect(jsLib.camelize("My Name")).toBe("myName");
   expect(jsLib.camelize("my name")).toBe("myName");
   expect(jsLib.camelize("My API handler")).toBe("myAPIHandler");
   expect(jsLib.camelize("My    name   is  ")).toBe("myNameIs"); 
   
+});
+
+test('splitCommaList_', () => {
+  expect(jsLib.splitCommaList_("GNS-Metapod")).toEqual(["GNS-Metapod"]);
+  expect(jsLib.splitCommaList_("GNS-Metapod,Test")).toEqual(["GNS-Metapod", "Test"]);
+  expect(jsLib.splitCommaList_("GNS-Metapod, Test")).toEqual(["GNS-Metapod", "Test"]);
+  expect(jsLib.splitCommaList_(",GNS-Metapod, Test")).toEqual(["GNS-Metapod", "Test"]);
+  expect(jsLib.splitCommaList_(",GNS-Metapod,, Test")).toEqual(["GNS-Metapod", "Test"]);
 });
 
