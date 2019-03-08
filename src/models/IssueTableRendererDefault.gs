@@ -200,10 +200,10 @@ function IssueTableRendererDefault_(IssueTable) {
             break;
           case (key.hasOwnProperty('epic') && key.epic === true):
             if (key.value != 'n/a') {
-              if (undefined == epicField || epicField.usable === false || epicField.label_key == null) {
-                key.value = '=HYPERLINK("' + key.link + '"; "' + key.value + '")';
-              } else {
+              if (EpicField.isUsable()) {
                 key.value = '=HYPERLINK("' + key.link + '"; JST_EPICLABEL("' + key.value + '"))';
+              } else {
+                key.value = '=HYPERLINK("' + key.link + '"; "' + key.value + '")';
               }
             }
             break;
