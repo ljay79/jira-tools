@@ -307,6 +307,18 @@ function removeFromArray(array, element) {
   }
 }
 
+/**
+ * @TODO: Move to appropiate file (not jiraCommand.gs, jsLib.gs, but where?) Get a sheet from current active Spreadsheet by ID passed.
+ * @param {int|string} id The sheet id to get a Sheet for.
+ * @return {undefined|Sheet}
+ */
+function getSheetById(id) {
+  id = (typeof id === 'string') ? parseInt(id) : id;
+  return SpreadsheetApp.getActive().getSheets().filter(function (s) {
+    return s.getSheetId() === id;
+  })[0];
+}
+
 
 // Node required code block
 module.exports = {
@@ -315,6 +327,8 @@ module.exports = {
   extend: extend,
   copyObject: copyObject,
   reverse: reverse,
-  camelize: camelize
+  camelize: camelize,
+  getSheetById: getSheetById,
+  _sortKeysByRef: _sortKeysByRef
 };
 // End of Node required code block
