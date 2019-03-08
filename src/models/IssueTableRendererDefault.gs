@@ -71,10 +71,14 @@ function IssueTableRendererDefault_(IssueTable) {
 
     prepareHeaderValues();
 
-    initRange = sheet.setActiveSelection(IssueTable.getMeta('rangeA1'));
+    if (null === IssueTable.getMeta('rangeA1')) {
+      initRange = sheet.getActiveRange();
+    } else {
+      initRange = sheet.setActiveSelection(IssueTable.getMeta('rangeA1'));
+    }
+
     info.oRangeA1.from = initRange.getCell(1, 1).getA1Notation();
     info.oRangeA1.to = initRange.getCell(initRange.getNumRows(), initRange.getNumColumns()).getA1Notation();
-    console.log('info: %s', info);
 
     if (filterName = IssueTable.getMeta('filter').name) {
       that.addSummary("Filter: " + filterName);
