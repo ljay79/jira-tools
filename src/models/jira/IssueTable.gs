@@ -1,9 +1,9 @@
 // Node required code block
 const extend = require('../../jsLib.gs').extend;
+const getSheetById = require('../../jsLib.gs').getSheetById;
 const sheetIdPropertySafe = require('../../jiraCommon.gs').sheetIdPropertySafe;
 var SpreadsheetTriggers_ = require('../SpreadsheetTriggers.gs').SpreadsheetTriggers_;
 var IssueTableRendererDefault_ = require('../IssueTableRendererDefault.gs').IssueTableRendererDefault_;
-var getSheetById = require('../IssueTableRendererDefault.gs').getSheetById;
 // End of Node required code block
 
 /*
@@ -11,11 +11,11 @@ var getSheetById = require('../IssueTableRendererDefault.gs').getSheetById;
  */
 
 /**
- * @file Contains class used reflect a Jira IssueTable's meta data for google sheet tables.
+ * @file Contains class which is used to reflect a Jira IssueTable's meta data for google sheet tables.
  */
 
 /**
- * Creates new IssueTable_ instance to reflect the meta data of a IssueTable in google sheets.
+ * @desc Creates new IssueTable_ instance to reflect the meta data of a IssueTable in google sheets.
  * 
  * @param {object} data Optional JSON representation of previously stored IssueTable data object.
  * @Constructor
@@ -40,7 +40,7 @@ function IssueTable_(attributes) {
       };
 
   /**
-   * Initialize anything necessary for the class object
+   * @desc Initialize anything necessary for the class object
    * 
    * @param {object} initData Optional JSON representation of an IssueTable_ data set to load into instance
    * @return void
@@ -93,7 +93,7 @@ function IssueTable_(attributes) {
   };
 
   /**
-   * Setting the table renderer
+   * @desc Setting the table renderer
    * 
    * @param {string|function} Classname or class of IssueTableRenderer
    * @return {IssueTable_}
@@ -104,24 +104,26 @@ function IssueTable_(attributes) {
     } else {
       metaData.renderer = rendererClass.name;
     }
+    metaData.time_lastupdated = (new Date()).getTime();
 
     return that;
   };
 
   /**
-   * Set the Jira api response object "issues"
+   * @desc Set the Jira api response object "issues"
    * 
    * @param {object} issuesJson
    * @return {IssueTable_}
    */
   that.setIssues = function (issuesJson) {
     issues = issuesJson || {};
+    metaData.time_lastupdated = (new Date()).getTime();
 
     return that;
   };
 
   /**
-   * Get the Jira issues object
+   * @desc Get the Jira issues object
    * 
    * @return {array} issues
    */
@@ -130,7 +132,7 @@ function IssueTable_(attributes) {
   };
 
   /**
-   * Setting a key/value pair to internal data object
+   * @desc Setting a key/value pair to internal data object
    * 
    * @param {string} key Name/Key of value to store
    * @param {mixed} value The value for key
@@ -149,7 +151,7 @@ function IssueTable_(attributes) {
   };
 
   /**
-   * Getting data from object storage by specific key or everything.
+   * @desc Getting data from object storage by specific key or everything.
    * 
    * @param {string} key The data key name to retrieve. If left undefined, function returns entire data object.
    * @param {mixed} defaultValue Optional default value to return in case data could not be found
@@ -171,7 +173,7 @@ function IssueTable_(attributes) {
   }
 
   /**
-   * Wrapper/Helper to get tables sheet id
+   * @desc Wrapper/Helper to get tables sheet id
    * 
    * @return {string}
    */
@@ -180,7 +182,7 @@ function IssueTable_(attributes) {
   };
 
   /**
-   * Setting/Generating a table id string and stores it to metaData.
+   * @desc Setting/Generating a table id string and stores it to metaData.
    * 
    * @param {string|null} tableId Optional tableId to use or null to generate a new one.
    * @return {string}
@@ -193,12 +195,13 @@ function IssueTable_(attributes) {
     }
 
     metaData.tableId = tableId;
+    metaData.time_lastupdated = (new Date()).getTime();
 
     return metaData.tableId;
   };
 
   /**
-   * Wrapper/Helper to get tables table id
+   * @desc Wrapper/Helper to get tables table id
    * 
    * @return {string}
    */
@@ -211,7 +214,7 @@ function IssueTable_(attributes) {
   };
 
   /**
-   * Converts tables data to JSON object string representation
+   * @desc Converts tables data to JSON object string representation
    * 
    * @return {string} Entire data object stringified with JSON.stringify
    */
@@ -220,7 +223,7 @@ function IssueTable_(attributes) {
   };
 
   /**
-   * Takes stringified JSON to parse into JSON object and use for initialize a IssueTable object.
+   * @desc Takes stringified JSON to parse into JSON object and use for initialize a IssueTable object.
    * 
    * @param {string} json The JSON string to parse and load into a new IssueTable instance
    * @return {IssueTable_} A new instance of IssueTable_ with all data from [json] load into.
@@ -233,6 +236,7 @@ function IssueTable_(attributes) {
   };
 
   /**
+   * @desc Calling the set renderer and render table
    * @return {IssueTableRenderer_}
    */
   that.render = function () {
@@ -249,14 +253,15 @@ function IssueTable_(attributes) {
     metaData.headerValues = renderer.getHeaders();
 
     // setting range info
-    setRange(renderInfo.oRangeA1.from + ':' + renderInfo.oRangeA1.to);
+    that.setRange(renderInfo.oRangeA1.from + ':' + renderInfo.oRangeA1.to);
 
     return renderer;
   };
 
   /**
-   * Setting relevant range information and store them in metaData.
+   * @desc Setting relevant range information and store them in metaData.
    * 
+   * @param {string} rangeA1    A1 notation of a range
    * @return {IssueTable_}
    */
   setRange = function (rangeA1) {

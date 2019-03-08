@@ -1,13 +1,27 @@
 // Node required code block
-
+const getSheetById = require('../../jsLib.gs').getSheetById;
+const _sortKeysByRef = require('../../jsLib.gs')._sortKeysByRef;
+const sheetIdPropertySafe = require('../jiraCommon.gs').sheetIdPropertySafe;
+const unifyIssueAttrib = require('../jiraCommon.gs').unifyIssueAttrib;
+const UserStorage = require('./gas/UserStorage.gs');
+const IssueTable_ = require('./jira/IssueTable.gs');
+const IssueFields = require('./jira/IssueFields.gs');
 // End of Node required code block
 
-// @TOOD: probably move to own file
+/**
+ * @TOOD: probably move to own file
+ * Factory class to instantiate different IssueTableRenderer classes.
+ * 
+ * @param {string} RendererClassName    Classname of a IssueTableRenderer class
+ * @return {object} An instance of type IssueTableRenderer_
+ */
 function RendererFactory_(RendererClassName) {
+  debug.log('RendererFactory_(%s)', RendererClassName);
   var name = 'RendererFactory_';
 
   switch (RendererClassName) {
     case 'IssueTableRendererDefault_':
+      debug.log('Instantiate new IssueTableRendererDefault_');
       return new IssueTableRendererDefault_(this);
       break;
     default:
@@ -16,8 +30,18 @@ function RendererFactory_(RendererClassName) {
   }
 }
 
+/**
+ * @file Contains class for rendering jira issue tables
+ */
+
+/**
+ * @desc Creates a new IssueTableRenderer instance (Default), which is used to insert an table of issues into a sheet.
+ * 
+ * @param {IssueTable_} IssueTable    The instance of IssueTable_ to render table
+ * @constructor
+ */
 function IssueTableRendererDefault_(IssueTable) {
-  var that = this,
+  var that = this, // clear encapsulation of scope's
     sheet, initRange,
     epicField = UserStorage.getValue('jst_epic'),
     issues = [], headers = [],
@@ -34,6 +58,8 @@ function IssueTableRendererDefault_(IssueTable) {
 
   /**
    * @desc Initialization, validation
+   * @throws Error
+   * @throws ReferenceError
    */
   init = function () {
     // check data to rendering
@@ -66,6 +92,10 @@ function IssueTableRendererDefault_(IssueTable) {
 
   /* -------- */
 
+  /**
+   * @desc Rendering the issues into a table in defined sheet.
+   * @return {IssueTableRendererDefault_}
+   */
   that.render = function () {
     debug.time('IssueTableRendererDefault_.render()');
 
@@ -77,6 +107,7 @@ function IssueTableRendererDefault_(IssueTable) {
       initRange = sheet.setActiveSelection(IssueTable.getMeta('rangeA1'));
     }
 
+    // save the range coords for info object
     info.oRangeA1.from = initRange.getCell(1, 1).getA1Notation();
     info.oRangeA1.to = initRange.getCell(initRange.getNumRows(), initRange.getNumColumns()).getA1Notation();
 
@@ -95,7 +126,8 @@ function IssueTableRendererDefault_(IssueTable) {
   };
 
   /**
-   * @desc Adding a summary line (not yet used)
+   * @desc Adding a summary line
+   * @param {string} summary    Text to be inserted as a table summary line
    * @return this For chaining
    */
   that.addSummary = function (summary) {
@@ -215,17 +247,15 @@ function IssueTableRendererDefault_(IssueTable) {
   };
 
   /**
-   * Return Info object.
-   * 
-   * @return {object} {totalInserted:<{number}>}
+   * @desc Return Info object.
+   * @return {object} {totalInserted:<{number}>, ..}
    */
   that.getInfo = function () {
     return info;
   };
 
   /**
-   * Return array of header values
-   * 
+   * @desc Return array of header values
    * @return {Array}
    */
   that.getHeaders = function () {
@@ -233,8 +263,9 @@ function IssueTableRendererDefault_(IssueTable) {
   };
 
   /**
-   * Sorting the header/columns based on definition/order in global var ISSUE_COLUMNS. Improves a consistent column listing/sorting and
-   * defined fields first before alpha sorting the rest.
+   * @desc Sorting the header/columns based on definition/order in global 
+   *       var ISSUE_COLUMNS. Improves a consistent column listing/sorting and
+   *       defined fields first before alpha sorting the rest.
    * 
    * @returns {IssueTableRendererDefault_}
    */
@@ -254,21 +285,10 @@ function IssueTableRendererDefault_(IssueTable) {
   };
 }
 
-/**
- * @TODO: Move to appropiate file (not jiraCommand.gs, jsLib.gs, but where?) Get a sheet from current active Spreadsheet by ID passed.
- * @param {int|string} id The sheet id to get a Sheet for.
- * @return {undefined|Sheet}
- */
-function getSheetById(id) {
-  id = (typeof id === 'string') ? parseInt(id) : id;
-  return SpreadsheetApp.getActive().getSheets().filter(function (s) {
-    return s.getSheetId() === id;
-  })[0];
-}
 
 // Node required code block
 module.exports = {
-  IssueTableRendererDefault_ : IssueTableRendererDefault_,
-  getSheetById : getSheetById
+  RendererFactory_ : RendererFactory_,
+  IssueTableRendererDefault_ : IssueTableRendererDefault_
 }
 // End of Node required code block

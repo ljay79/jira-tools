@@ -1,4 +1,5 @@
 // Node required code block
+const getSheetById = require('../../jsLib.gs').getSheetById;
 const sheetIdPropertySafe = require('../jiraCommon.gs').sheetIdPropertySafe;
 var Storage_ = require('../Storage.gs').Storage_;
 var IssueTable_ = require('./jira/IssueTable.gs');
@@ -90,13 +91,13 @@ IssueTableIndex_ = {
   _tables : {}, // actual array/object of IssueTables
 
   /**
-   * Adding a IssueTable to storage.
+   * @desc Adding a IssueTable to storage.
    * 
    * @param {IssueTable_} IssueTable The IssueTable object to store in script storage
    * @return {IssueTableIndex_} Allow chaining
    */
   addTable : function (IssueTable) {
-    debug.log('addTable() <= %s', IssueTable.toJson());
+    debug.log('IssueTableIndex_.addTable() <= %s', IssueTable.toJson());
     var tblSheetId = IssueTable.getSheetId();
     var tblTableId = IssueTable.getTableId();
 
@@ -123,7 +124,7 @@ IssueTableIndex_ = {
   },
 
   /**
-   * Return a perviously stored IssueTable if available.
+   * @desc Return a perviously stored IssueTable if available.
    * 
    * @param {string} tableId Table Id to fetch
    * @param {sheetId} sheetId Optional: Sheet Id to fetch table for. Default: current active sheets id
@@ -131,7 +132,7 @@ IssueTableIndex_ = {
    */
   getTable : function (tableId, sheetId) {
     sheetId = sheetIdPropertySafe(sheetId);
-    debug.log('getTable(%s, %s)', tableId, sheetId);
+    debug.log('IssueTableIndex_.getTable(%s, %s)', tableId, sheetId);
 
     // load everything from storage
     this._load();
@@ -154,7 +155,7 @@ IssueTableIndex_ = {
   },
 
   /**
-   * Format a usable string from sheetId and tableId
+   * @desc Format a usable string from sheetId and tableId
    * 
    * @param {string} sheetId The sheet's sanitized id
    * @param {string} tableId The table id
@@ -165,14 +166,14 @@ IssueTableIndex_ = {
   },
 
   /**
-   * Get all stored IssueTable's for passed Sheet Id.
+   * @desc Get all stored IssueTable's for passed Sheet Id.
    * 
    * @param {string} sheetId Optional SheetId to fetch tables for. Default current active Sheet.
    * @return {array} Returns array of found IssueTable objects. Empty array if nothing found.
    */
   getAllTablesBySheet : function (sheetId) {
     sheetId = sheetIdPropertySafe(sheetId);
-    debug.log('getAllTablesBySheet(%s)', sheetId);
+    debug.log('IssueTableIndex_.getAllTablesBySheet(%s)', sheetId);
 
     var tables = [], sheetIdx, tableIndexId, IssueTable;
 
@@ -192,8 +193,17 @@ IssueTableIndex_ = {
     return tables;
   },
 
+  /**
+   * @desc Search for a indexed table by its coordinates within a sheet.
+   * 
+   * @param {string} sheetId    Optional SheetId to fetch tables for. Default current active Sheet.
+   * @param {int|Range} columnOrRange    A Range instance or column index used to find matching table
+   * @param {int|null} row    If column is integer a row index is required as well 
+   *                          to identify a cell-coord to search a indexed table for.
+   * @return {FALSE|IssueTable_} If table found it returns a instance of IssueTable_, or FALSE if nothing found.
+   */
   getTableByCoord : function (sheetId, columnOrRange, row) {
-    debug.log('getTableByCoord(%s, %s, %s)', sheetId, columnOrRange, row);
+    debug.log('IssueTableIndex_.getTableByCoord(%s, %s, %s)', sheetId, columnOrRange, row);
     debug.time('IssueTableIndex.getTableByCoord()');
 
     var sheetId = sheetIdPropertySafe(sheetId);
@@ -242,9 +252,11 @@ IssueTableIndex_ = {
   /**
    * @TODO: call by Trigger (ie when a sheet is deleted)
    * @desc Prune all orphaned tables in index.
+   * 
    * @return {IssueTableIndex_} Allow chaining
    */
   prune : function () {
+    debug.log('IssueTableIndex_.prune()');
     // load everything from storage
     this._load();
 
@@ -355,6 +367,7 @@ IssueTableIndex_ = {
 
   /**
    * @desc Initialize anything necessary for the class object
+   * 
    * @return void
    */
   _getStorage : function () {
@@ -368,8 +381,9 @@ IssueTableIndex_ = {
   },
 
   /**
-   * Loading all available relevant data from storage. Atm its ok that _load() is called frequently, underlying Storage has a in-memory
-   * cache to reduce service api calls to Google's property storage.
+   * @desc Loading all available relevant data from storage. Atm its ok that 
+   *       _load() is called frequently, underlying Storage has a in-memory
+   *       cache to reduce service api calls to Google's property storage.
    * 
    * @return {IssueTableIndex_} Allow chaining
    */
@@ -400,7 +414,7 @@ IssueTableIndex_ = {
   },
 
   /**
-   * Save all data to storage
+   * @desc Save all data to storage
    * 
    * @return {IssueTableIndex_} Allow chaining
    */
