@@ -6,6 +6,7 @@ var IssueTableRendererDefault_ = require('../IssueTableRendererDefault.gs').Issu
 var getSheetById = require('../IssueTableRendererDefault.gs').getSheetById;
 // End of Node required code block
 
+
 /*
  * @TODO: remove testing @TODO. remove all unnccessary console.log from class
  */
@@ -30,6 +31,7 @@ function IssueTable_(attributes) {
         name : null,                     // sample: 'My pending Issues'
         rangeA1 : null,                  // sample: 'A1:F4'
         rangeCoord : null,               // sample: {row: {from: 1, to: 10}, col: {from: 1, to: 5}}
+        rangeName : null,                // sample: 's2_tbl_rA1F4'
         headerRowOffset : 0,             // sample: 1
         headerValues : [],               // sample: [Summary,Key,Status,Epic]
         filter: {id: 0, jql: null},      // sample: {id: 1234, jql: 'status = Done and project in ("JST")'}
@@ -263,6 +265,7 @@ function IssueTable_(attributes) {
 
     // named ranges must be unique per Spreadsheet
     Sheet.getParent().setNamedRange(_rangeName, _range);
+    metaData.rangeName = _rangeName;
 
     // for easier and faster Is-In-Range checks, we store the numeric coordinates too
     metaData.rangeCoord = {
