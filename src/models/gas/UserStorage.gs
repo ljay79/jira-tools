@@ -44,6 +44,14 @@ var UserStorage = {
       this._appStorage = new Storage_('jst', PropertiesService.getUserProperties()||{});
     }
     return this._appStorage;
+  },
+
+  /**
+   * Reset the local storage
+   * Used for tests to verify that data is persisted
+   */
+  _resetLocalStorage: function() {
+    this._appStorage = false;
   }
 };
 
