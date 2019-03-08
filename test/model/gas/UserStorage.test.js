@@ -39,14 +39,12 @@ test("It should get values from PropertiesService", () => {
 
 test("The in memory cache of the Storage class should prevent multiple calls to PropertiesService", () => {
   PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
-    console.log("PropertiesService.mockUserProps.getProperty v1 called");
     return JSON.stringify("first call result (cached)");
   });
   expect(UserStorage.getValue("test4")).toBe("first call result (cached)");
   expect(PropertiesService.mockUserProps.getProperty.mock.calls.length).toBe(1);
   expect(PropertiesService.mockUserProps.getProperty.mock.calls[0][0]).toBe("jst.test4");
   PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
-    console.log("PropertiesService.mockUserProps.getProperty v2 called");
     return JSON.stringify("wont be used - data is cached");
   });
   expect(UserStorage.getValue("test4")).toBe("first call result (cached)");
@@ -68,4 +66,11 @@ test("Data should be retained in Properties service", ()=> {
   expect(UserStorage.getValue("test4")).toBe("something");
   UserStorage._resetLocalStorage();
   expect(UserStorage.getValue("test4")).toBe("something");
+});
+
+test("Errors thrown in property service are caught", ()=> {
+  PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
+    throw "this is a technical error"
+  });
+  expect(() => UserStorage.getValue("test4")).toThrowError("There was a problem fetching your settings from the Google Service. Please try again later.");
 });

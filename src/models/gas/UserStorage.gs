@@ -14,7 +14,12 @@ var UserStorage = {
    * @return {*} The stored value.
    */
   getValue: function(key) {
-    return this._getAppStorage().getValue(key);
+    try {
+      return this._getAppStorage().getValue(key);
+    } catch (e) {
+      debug.error(e);
+      throw "There was a problem fetching your settings from the Google Service. Please try again later."
+    }
   },
 
   /**
