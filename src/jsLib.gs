@@ -284,6 +284,7 @@ function formatWorkhours() {
 function _sortKeysByRef(usortObject, referenceObject) {
   var _sortedObject = Object.keys(referenceObject).filter(function(n) {
     var found = usortObject.indexOf(n) > -1;
+    //@TODO: the delete of undefined returned by removeFromArray() makes no sense?
     if (found) delete removeFromArray(usortObject, n);
 	return found;
   });
@@ -296,7 +297,7 @@ function _sortKeysByRef(usortObject, referenceObject) {
  * 
  * @param {Array} array    Array to remove element from
  * @param {String|Number} element    Element to remove from array
- * @return {Array}
+ * @return void
  */
 function removeFromArray(array, element) {
   const index = array.indexOf(element);
