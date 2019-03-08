@@ -71,6 +71,10 @@ function findTableByCoord() {
   }
 }
 
+function pruneOrphanedTables() {
+  IssueTableIndex_.prune();
+};
+
 /* ######## ------------------ #################### */
 
 /**
@@ -235,7 +239,120 @@ IssueTableIndex_ = {
     return respond(false);
   },
 
+  /**
+   * @TODO: call by Trigger (ie when a sheet is deleted)
+   * @desc Prune all orphaned tables in index.
+   * @return {IssueTableIndex_} Allow chaining
+   */
+  prune : function() {
+    // load everything from storage
+    this._load();
+
+    // get all sheets, go over all tables and check, if they might still exists
+    // if not, remove them from index and storage
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var idxI, idxT;
+
+    // loop over all sheet Ids in index
+    for (idxI in this._index) {
+      // @TODO: ugly to be required everywhere, but appears necessary for iteration over object
+      if (!this._index.hasOwnProperty(idxI)) {
+        continue;
+      }
+
+      // define used variables
+      var tableIndexId
+          , oIssueTable
+          , IssueTable
+          , _sheetId
+          , Sheet
+          , range
+          , removeFromIndex = false
+          , _actualHeader = ''
+          , _expectedHeader = '';
+
+      // loop over each table Ids in sheet's index - reverse loop bc of index manipulation with Array.splice()
+      for ( idxT = this._index[idxI].length; idxT--;) {
+        if (!this._index[idxI].hasOwnProperty(idxT)) {
+          continue;
+        }
+
+        tableIndexId = this.tableIndexName(idxI, this._index[idxI][idxT]);
+
+        // Flag to indicate, wether to remove data from index or not 
+        removeFromIndex = false;
+
+        // Throwing individual Errors to be logged in Catch/Finally block and jump to data removal right away
+        try {
+          if (this._tables[tableIndexId] === null) {
+            // table does not exist in index anymoe
+            removeFromIndex = true;
+            throw new Error('Table with id '+tableIndexId+' not existing in current Index.');
+          }
+
+          // try initializing an IssueTable from indexed data
+          oIssueTable = new IssueTable_();
+          IssueTable = oIssueTable.fromJson(this._tables[tableIndexId]);
+          _sheetId = sheetIdPropertySafe(IssueTable.getSheetId(), true);
+
+          Sheet = getSheetById(_sheetId);
+          if (Sheet === undefined) {
+            removeFromIndex = true;
+            throw new Error('Sheet with id ' + _sheetId + ' not existing in current Spreadsheet.');
+          }
+
+          // look up range
+          range = Sheet.getRange(IssueTable.getMeta('rangeA1'));
+          // get range of header only
+          range = Sheet.getRange(
+            range.getRow()+IssueTable.getMeta('headerRowOffset'), 
+            range.getColumn(), 
+            1, 
+            (range.getLastColumn()-range.getColumn()+1)
+          );
+
+          // check for expected table header
+          _actualHeader   = JSON.stringify(range.getValues()[0]).toLowerCase();
+          _expectedHeader = JSON.stringify(IssueTable.getMeta('headerValues')).toLowerCase();
+          if (_actualHeader != _expectedHeader) {
+            // IssueTable's header is not the same anymore, changed and therefor not matching index anymore
+            removeFromIndex = true;
+            throw new Error('Found table header not matching expected ones.');
+          }
+
+        } catch (e) {
+
+          debug.info('Pruning table [%s] for reason: %s', tableIndexId, e);
+
+        } finally {
+
+          if (removeFromIndex === true) {
+            this._index[idxI].splice(idxT, 1);
+            delete this._tables[tableIndexId];
+            this._getStorage().removeValue(tableIndexId);
+
+            try {
+              // TRY to remove named range no matter what we wont care about failure
+              ss.removeNamedRange(IssueTable.getMeta('rangeName'));
+            } catch (e){}
+
+          }
+        } // END: try
+      } // END: for each table
+
+      if (this._index[idxI].length === 0) {
+        // remove sheetId from index, as there are no tables anymore
+        delete this._index[idxI];
+      }
+
+    } // END: for each sheet
+
+    return this._save();
+  },
+
+
   /* -- private methods -- */
+
 
   /**
    * @desc Initialize anything necessary for the class object
@@ -243,16 +360,18 @@ IssueTableIndex_ = {
    */
   _getStorage : function () {
     if (null === this._storage) {
-      this._storage = new Storage_('paj_tables', PropertiesService.getDocumentProperties() || {});
+      //this._storage = new Storage_('paj_tables', PropertiesService.getDocumentProperties() || {});
       // @TODO: remove before production - only for better debugging
-      //this._storage = new Storage_('paj_tables', PropertiesService.getScriptProperties() || {});
+      this._storage = new Storage_('paj_tables', PropertiesService.getScriptProperties() || {});
     }
 
     return this._storage;
   },
 
   /**
-   * Loading all available relevant data from storage
+   * Loading all available relevant data from storage.
+   * Atm its ok that _load() is called frequently, underlying Storage has
+   * a in-memory cache to reduce service api calls to Google's property storage.
    * 
    * @return {IssueTableIndex_} Allow chaining
    */
