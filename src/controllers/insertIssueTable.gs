@@ -7,20 +7,14 @@
 
 function tableFromMeta() {
   var _meta = {
-    sheetId : "sid_230234225",
-    tableId : "tbl_rB2D5",
+    // sheetId : "sid_230234225",
+    // tableId : "tbl_rH15D24",
     name : null,
-    rangeA1 : "B2:D5",
-    rangeCoord : {
-      row : {
-        from : 2,
-        to : 9
-      },
-      col : {
-        from : 2,
-        to : 4
-      }
-    },
+    // rangeA1 : "E1:G8",
+    rangeA1 : "A15:C23",
+    /*
+     * rangeCoord : { row : { from : 2, to : 9 }, col : { from : 2, to : 4 } },
+     */
     headerRowOffse : 1,
     headerValues : ["key", "summary", "status"],
     filter : {
@@ -36,6 +30,7 @@ function tableFromMeta() {
   var table = new IssueTable_({
     metaData : _meta
   });
+  // table.setTableId();
 
   var ok = function (resp, status, errorMessage) {
     var renderer;

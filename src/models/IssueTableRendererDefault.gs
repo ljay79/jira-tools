@@ -268,7 +268,7 @@ function getSheetById(id) {
 
 // Node required code block
 module.exports = {
-    IssueTableRendererDefault_: IssueTableRendererDefault_,
-    getSheetById: getSheetById
+  IssueTableRendererDefault_ : IssueTableRendererDefault_,
+  getSheetById : getSheetById
 }
 // End of Node required code block

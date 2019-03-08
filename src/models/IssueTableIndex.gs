@@ -244,7 +244,7 @@ IssueTableIndex_ = {
    * @desc Prune all orphaned tables in index.
    * @return {IssueTableIndex_} Allow chaining
    */
-  prune : function() {
+  prune : function () {
     // load everything from storage
     this._load();
 
@@ -272,14 +272,14 @@ IssueTableIndex_ = {
           , _expectedHeader = '';
 
       // loop over each table Ids in sheet's index - reverse loop bc of index manipulation with Array.splice()
-      for ( idxT = this._index[idxI].length; idxT--;) {
+      for (idxT = this._index[idxI].length; idxT--;) {
         if (!this._index[idxI].hasOwnProperty(idxT)) {
           continue;
         }
 
         tableIndexId = this.tableIndexName(idxI, this._index[idxI][idxT]);
 
-        // Flag to indicate, wether to remove data from index or not 
+        // Flag to indicate, wether to remove data from index or not
         removeFromIndex = false;
 
         // Throwing individual Errors to be logged in Catch/Finally block and jump to data removal right away
@@ -287,7 +287,7 @@ IssueTableIndex_ = {
           if (this._tables[tableIndexId] === null) {
             // table does not exist in index anymoe
             removeFromIndex = true;
-            throw new Error('Table with id '+tableIndexId+' not existing in current Index.');
+            throw new Error('Table with id ' + tableIndexId + ' not existing in current Index.');
           }
 
           // try initializing an IssueTable from indexed data
@@ -305,14 +305,14 @@ IssueTableIndex_ = {
           range = Sheet.getRange(IssueTable.getMeta('rangeA1'));
           // get range of header only
           range = Sheet.getRange(
-            range.getRow()+IssueTable.getMeta('headerRowOffset'), 
-            range.getColumn(), 
-            1, 
-            (range.getLastColumn()-range.getColumn()+1)
+            range.getRow() + IssueTable.getMeta('headerRowOffset'),
+            range.getColumn(),
+            1,
+            (range.getLastColumn() - range.getColumn() + 1)
           );
 
           // check for expected table header
-          _actualHeader   = JSON.stringify(range.getValues()[0]).toLowerCase();
+          _actualHeader = JSON.stringify(range.getValues()[0]).toLowerCase();
           _expectedHeader = JSON.stringify(IssueTable.getMeta('headerValues')).toLowerCase();
           if (_actualHeader != _expectedHeader) {
             // IssueTable's header is not the same anymore, changed and therefor not matching index anymore
@@ -334,7 +334,8 @@ IssueTableIndex_ = {
             try {
               // TRY to remove named range no matter what we wont care about failure
               ss.removeNamedRange(IssueTable.getMeta('rangeName'));
-            } catch (e){}
+            } catch (e) {
+            }
 
           }
         } // END: try
@@ -350,9 +351,7 @@ IssueTableIndex_ = {
     return this._save();
   },
 
-
   /* -- private methods -- */
-
 
   /**
    * @desc Initialize anything necessary for the class object
@@ -360,7 +359,7 @@ IssueTableIndex_ = {
    */
   _getStorage : function () {
     if (null === this._storage) {
-      //this._storage = new Storage_('paj_tables', PropertiesService.getDocumentProperties() || {});
+      // this._storage = new Storage_('paj_tables', PropertiesService.getDocumentProperties() || {});
       // @TODO: remove before production - only for better debugging
       this._storage = new Storage_('paj_tables', PropertiesService.getScriptProperties() || {});
     }
@@ -369,9 +368,8 @@ IssueTableIndex_ = {
   },
 
   /**
-   * Loading all available relevant data from storage.
-   * Atm its ok that _load() is called frequently, underlying Storage has
-   * a in-memory cache to reduce service api calls to Google's property storage.
+   * Loading all available relevant data from storage. Atm its ok that _load() is called frequently, underlying Storage has a in-memory
+   * cache to reduce service api calls to Google's property storage.
    * 
    * @return {IssueTableIndex_} Allow chaining
    */

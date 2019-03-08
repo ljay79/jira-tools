@@ -6,7 +6,6 @@ var IssueTableRendererDefault_ = require('../IssueTableRendererDefault.gs').Issu
 var getSheetById = require('../IssueTableRendererDefault.gs').getSheetById;
 // End of Node required code block
 
-
 /*
  * @TODO: remove testing @TODO. remove all unnccessary console.log from class
  */
@@ -47,7 +46,9 @@ function IssueTable_(attributes) {
    * @return void
    */
   init = function (attributes) {
-    attributes = attributes || {metaData : {}};
+    attributes = attributes || {
+      metaData : {}
+    };
 
     if (attributes.hasOwnProperty('metaData')) {
       // initialize with existing data (ie: that.fromJson()
@@ -57,7 +58,7 @@ function IssueTable_(attributes) {
       Sheet = getSheetById(_sheetId);
     } else {
       // new init to generate new table; validate required options
-      if (!attributes.hasOwnProperty('filter') 
+      if (!attributes.hasOwnProperty('filter')
           || typeof attributes.filter !== 'object'
           || !attributes.filter.hasOwnProperty('id')
           || !attributes.filter.hasOwnProperty('jql') ) {
@@ -226,7 +227,9 @@ function IssueTable_(attributes) {
    */
   that.fromJson = function (json) {
     var metaData = JSON.parse(json); // Parsing the json string.
-    return new IssueTable_({metaData : metaData});
+    return new IssueTable_({
+      metaData : metaData
+    });
   };
 
   /**
