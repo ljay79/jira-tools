@@ -83,6 +83,10 @@ function IssueTable_(attributes) {
         jql : attributes.filter.jql
       });
       that.setIssues(attributes.issues).setRenderer(attributes.renderer);
+      
+      if (attributes.hasOwnProperty('maxResults')) {
+        that.setMeta('maxResults', attributes.maxResults);
+      }
 
       Sheet = attributes.sheet;
       that.setMeta('sheetId', sheetIdPropertySafe(Sheet.getSheetId()))
