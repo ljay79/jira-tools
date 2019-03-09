@@ -16,7 +16,6 @@ var IssueTableRendererDefault_ = require('../IssueTableRendererDefault.gs').Issu
 
 /**
  * @desc Creates new IssueTable_ instance to reflect the meta data of a IssueTable in google sheets.
- * 
  * @param {object} data Optional JSON representation of previously stored IssueTable data object.
  * @Constructor
  */
@@ -41,7 +40,6 @@ function IssueTable_(attributes) {
 
   /**
    * @desc Initialize anything necessary for the class object
-   * 
    * @param {object} initData Optional JSON representation of an IssueTable_ data set to load into instance
    * @return void
    */
@@ -61,7 +59,7 @@ function IssueTable_(attributes) {
       if (!attributes.hasOwnProperty('filter')
           || typeof attributes.filter !== 'object'
           || !attributes.filter.hasOwnProperty('id')
-          || !attributes.filter.hasOwnProperty('jql') ) {
+          || !attributes.filter.hasOwnProperty('jql')) {
             throw new Error("{attributes.filter} must be an object of type 'Filter'. {id:{int}, jql: {strong}, ..}");
       }
 
@@ -94,7 +92,6 @@ function IssueTable_(attributes) {
 
   /**
    * @desc Setting the table renderer
-   * 
    * @param {string|function} Classname or class of IssueTableRenderer
    * @return {IssueTable_}
    */
@@ -111,7 +108,6 @@ function IssueTable_(attributes) {
 
   /**
    * @desc Set the Jira api response object "issues"
-   * 
    * @param {object} issuesJson
    * @return {IssueTable_}
    */
@@ -124,7 +120,6 @@ function IssueTable_(attributes) {
 
   /**
    * @desc Get the Jira issues object
-   * 
    * @return {array} issues
    */
   that.getIssues = function () {
@@ -133,7 +128,6 @@ function IssueTable_(attributes) {
 
   /**
    * @desc Setting a key/value pair to internal data object
-   * 
    * @param {string} key Name/Key of value to store
    * @param {mixed} value The value for key
    * @return {IssueTable_}
@@ -152,7 +146,6 @@ function IssueTable_(attributes) {
 
   /**
    * @desc Getting data from object storage by specific key or everything.
-   * 
    * @param {string} key The data key name to retrieve. If left undefined, function returns entire data object.
    * @param {mixed} defaultValue Optional default value to return in case data could not be found
    * @return {mixed}
@@ -174,7 +167,6 @@ function IssueTable_(attributes) {
 
   /**
    * @desc Wrapper/Helper to get tables sheet id
-   * 
    * @return {string}
    */
   that.getSheetId = function () {
@@ -183,7 +175,6 @@ function IssueTable_(attributes) {
 
   /**
    * @desc Setting/Generating a table id string and stores it to metaData.
-   * 
    * @param {string|null} tableId Optional tableId to use or null to generate a new one.
    * @return {string}
    */
@@ -202,7 +193,6 @@ function IssueTable_(attributes) {
 
   /**
    * @desc Wrapper/Helper to get tables table id
-   * 
    * @return {string}
    */
   that.getTableId = function () {
@@ -215,7 +205,6 @@ function IssueTable_(attributes) {
 
   /**
    * @desc Converts tables data to JSON object string representation
-   * 
    * @return {string} Entire data object stringified with JSON.stringify
    */
   that.toJson = function () {
@@ -224,7 +213,6 @@ function IssueTable_(attributes) {
 
   /**
    * @desc Takes stringified JSON to parse into JSON object and use for initialize a IssueTable object.
-   * 
    * @param {string} json The JSON string to parse and load into a new IssueTable instance
    * @return {IssueTable_} A new instance of IssueTable_ with all data from [json] load into.
    */
@@ -260,8 +248,7 @@ function IssueTable_(attributes) {
 
   /**
    * @desc Setting relevant range information and store them in metaData.
-   * 
-   * @param {string} rangeA1    A1 notation of a range
+   * @param {string} rangeA1 A1 notation of a range
    * @return {IssueTable_}
    */
   setRange = function (rangeA1) {
@@ -274,18 +261,6 @@ function IssueTable_(attributes) {
     // named ranges must be unique per Spreadsheet
     Sheet.getParent().setNamedRange(_rangeName, _range);
     metaData.rangeName = _rangeName;
-
-    // for easier and faster Is-In-Range checks, we store the numeric coordinates too
-    metaData.rangeCoord = {
-      row : {
-        from : _range.getRow(),
-        to : _range.getLastRow()
-      },
-      col : {
-        from : _range.getColumn(),
-        to : _range.getLastColumn()
-      }
-    };
 
     return that;
   };
