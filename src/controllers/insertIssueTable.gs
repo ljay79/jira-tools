@@ -1,74 +1,19 @@
-// @TODO: dialog insert issues from filter
-
-// @TODO: menu insert issues from filter
-// @TODO: callbacks
-
 /* ######## DEV- WIP - Testing #################### */
 
-function tableFromMeta() {
-  var _meta = {
-    // sheetId : "sid_230234225",
-    // tableId : "tbl_rH15D24",
-    name : null,
-    rangeA1 : "A15:C23",
-    headerRowOffse : 1,
-    headerValues : ["key", "summary", "status"],
-    filter : {
-      id : 14406,
-      name : "01 - Test Project - All Issues",
-      jql : "project = TP ORDER BY lastViewed DESC"
-    },
-    maxResults : 6,
-    renderer : "IssueTableRendererDefault_",
-    time_lastupdated : 1551636173161
-  };
-
-  var table = new IssueTable_({
-    metaData : _meta
-  });
-  // table.setTableId();
-
-  var ok = function (resp, status, errorMessage) {
-    var renderer;
-    table.setIssues(resp.data);
-
-    if (renderer = table.render()) {
-      // toast with status message
-      var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
-          + " total found records.";
-      SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
-      debug.log(msg);
-
-      console.log('renderer.info: %s', renderer.getInfo());
-
-      console.log('==>> Table Meta: %s', table.getMeta());
-
-      IssueTableIndex_.addTable(table);
-    }
-
-    debug.timeEnd('insertIssueTable()');
-  };
-
-  var Search = new IssueSearch(table.getMeta('filter').jql);
-  Search.setOrderBy()
-    .setFields(table.getMeta('headerValues'))
-    .setMaxResults(table.getMeta('maxResults'))
-    .setStartAt(0)
-    .search()
-    .withSuccessHandler(ok);
-
-}
-
-function newControllerActionLive() {
-  debug.time('insertIssueTable()');
+/*
+Inserting a new IssueTable from a Jira saved filter.
+Inserting at current active cell in active sheet
+*/
+function TESTinsertTableFromFilter() {
+  debug.log('TESTinsertTableFromFilter()');
 
   var ok = function (resp, status, errorMessage) {
     var renderer, attributes = {
       filter : getFilter(14406),
-      maxResults : resp.data.maxResults,
       issues : resp.data,
       sheet : getTicketSheet(),
-      renderer : IssueTableRendererDefault_
+      renderer : IssueTableRendererDefault_,
+      maxResults: Search.getMaxResults()
     };
 
     var table = new IssueTable_(attributes);
@@ -79,17 +24,60 @@ function newControllerActionLive() {
       SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
       debug.log(msg);
 
+      // add table to index
+      IssueTableIndex_.addTable(table);
       console.log('renderer.info: %s', renderer.getInfo());
-
       console.log('==>> Table Meta: %s', table.getMeta());
     }
-
-    debug.timeEnd('insertIssueTable()');
   };
 
   var Search = new IssueSearch("status = Done");
-  Search.setOrderBy().setFields(['key', 'summary', 'status']).setMaxResults(11).setStartAt(0).search().withSuccessHandler(ok);
+  Search.setOrderBy()
+    .setFields(['key', 'summary', 'status'])
+    .setMaxResults(5)
+    .setStartAt(0)
+    .search()
+    .withSuccessHandler(ok)
+  ;
 }
+
+/*
+Fetching a table from index and using its meta data to (re)insert table into sheet.
+Used for Refreshing entire Issue Tables
+*/
+function TESTrefreshTableFromMeta() {
+  debug.log('TESTinsertTableFromMeta()');
+
+  // Get table from Meta
+  var Table = IssueTableIndex_.getTable('tbl_rF1H7', '1264944547');
+
+  var ok = function (resp, status, errorMessage) {
+    var renderer;
+    Table.setIssues(resp.data);
+
+    if (renderer = Table.render()) {
+      // toast with status message
+      var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
+          + " total found records.";
+      SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
+      debug.log(msg);
+
+      // add table to index
+      console.log('renderer.info: %s', renderer.getInfo());
+      console.log('==>> Table Meta: %s', Table.getMeta());
+    }
+  };
+
+  var Search = new IssueSearch(Table.getMeta('filter').jql);
+  Search.setOrderBy()
+    .setFields(Table.getMeta('headerValues'))
+    .setMaxResults(Table.getMeta('maxResults') || 10)
+    .setStartAt(0)
+    .search()
+    .withSuccessHandler(ok)
+  ;
+}
+
 
 /* ######## ------------------ #################### */
 
