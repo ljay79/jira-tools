@@ -1,9 +1,8 @@
 /* ######## DEV- WIP - Testing #################### */
 
 /*
-Inserting a new IssueTable from a Jira saved filter.
-Inserting at current active cell in active sheet
-*/
+ * Inserting a new IssueTable from a Jira saved filter. Inserting at current active cell in active sheet
+ */
 function TESTinsertTableFromFilter() {
   debug.log('TESTinsertTableFromFilter()');
 
@@ -42,14 +41,14 @@ function TESTinsertTableFromFilter() {
 }
 
 /*
-Fetching a table from index and using its meta data to (re)insert table into sheet.
-Used for Refreshing entire Issue Tables
-*/
+ * Fetching a table from index and using its meta data to (re)insert table into sheet. Used for Refreshing entire Issue Tables
+ */
 function TESTrefreshTableFromMeta() {
   debug.log('TESTinsertTableFromMeta()');
 
   // Get table from Meta
-  var Table = IssueTableIndex_.getTable('tbl_rF1H7', '1264944547');
+  // var Table = IssueTableIndex_.getTable('tbl_rE9G15', '1088328195');
+  var Table = IssueTableIndex_.getTable('tbl_rA12C18', '1088328195');
 
   var ok = function (resp, status, errorMessage) {
     var renderer;
@@ -71,6 +70,43 @@ function TESTrefreshTableFromMeta() {
   var Search = new IssueSearch(Table.getMeta('filter').jql);
   Search.setOrderBy()
     .setFields(Table.getMeta('headerValues'))
+    .setMaxResults(Table.getMeta('maxResults') || 10)
+    .setStartAt(0)
+    .search()
+    .withSuccessHandler(ok)
+  ;
+}
+
+
+function TESTrefreshTableFromMeta2() {
+  debug.log('TESTinsertTableFromMeta2()');
+
+  // Get table from Meta
+  var Table = IssueTableIndex_.getTable('tbl_rE9G15', '1088328195');
+
+  var ok = function (resp, status, errorMessage) {
+    var renderer;
+    Table.setIssues(resp.data);
+
+    if (renderer = Table.render()) {
+      // toast with status message
+      var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
+          + " total found records.";
+      SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
+      debug.log(msg);
+
+      // add table to index
+      console.log('renderer.info: %s', renderer.getInfo());
+      console.log('==>> Table Meta: %s', Table.getMeta());
+    }
+  };
+  
+  // var headers = Table.getMeta('headerValues');
+  var headers = ['key', 'summary', 'status', 'assignee'];
+  
+  var Search = new IssueSearch(Table.getMeta('filter').jql);
+  Search.setOrderBy()
+    .setFields(headers)
     .setMaxResults(Table.getMeta('maxResults') || 10)
     .setStartAt(0)
     .search()
@@ -192,8 +228,9 @@ InsertIssueTable_Controller_ = {
 
           response.status = true;
 
-          // set trigger for index cleanup
+          // set trigger for index cleanup and modification detection
           that.setTriggerPruneIndex();
+          that.setTriggerIssueTableModification();
         }
       }
     };
@@ -205,7 +242,7 @@ InsertIssueTable_Controller_ = {
 
     var Search = new IssueSearch(attributes.filter.jql);
     Search
-      //.setOrderBy()
+      // .setOrderBy()
       .setFields(columns)
       .setMaxResults(attributes.maxResults)
       .setStartAt(startAt)
@@ -223,8 +260,12 @@ InsertIssueTable_Controller_ = {
   setTriggerPruneIndex : function () {
     debug.log(this.name + '.setTriggerPruneIndex()');
     SpreadsheetTriggers_.register('onChange', 'TriggerPruneIssueTableIndex_', true);
-  }
+  },
 
+  setTriggerIssueTableModification : function () {
+    debug.log(this.name + '.setTriggerIssueTableModification()');
+    SpreadsheetTriggers_.register('onEdit', 'TriggerIssueTableModification_', true);
+  }
 }
 
 /**
@@ -233,12 +274,71 @@ InsertIssueTable_Controller_ = {
  * @return void
  */
 function TriggerPruneIssueTableIndex_(e) {
-  debug.log('TriggerPruneIssueTableIndex_() - e.changeType: %s', e.changeType);
+  debug.time('[TriggerPruneIssueTableIndex_]');
+  debug.log('[TriggerPruneIssueTableIndex_] - e.changeType: %s', e.changeType);
 
   if (e.changeType !== 'REMOVE_GRID') {
     debug.log('[TriggerPruneIssueTableIndex_] changeType [%s] not monitored. Skip.', e.changeType);
+    debug.timeEnd('[TriggerPruneIssueTableIndex_]');
     return;
   }
 
   IssueTableIndex_.prune();
+  debug.timeEnd('[TriggerPruneIssueTableIndex_]');
+}
+
+/**
+ * @desc Trigger to react on structural changes in a defined range of an IssueTable. Alerting to user, that changes on the grid will disable
+ *       any IssueTable refresh options (Indexer).
+ * @param {EventObject} e
+ *          {"authMode":{},"range":{"columnStart":5,"rowStart":14,"rowEnd":14,"columnEnd":5},"source":{},"oldValue":"TP-15","user":{"nickname":"user","email":"user@sample.com"},"triggerUid":"6799221736938207327"}
+ * @return void
+ */
+function TriggerIssueTableModification_(e) {
+  debug.time('[TriggerIssueTableModification_]');
+  debug.log('[TriggerIssueTableModification_] - e:  %s', JSON.stringify(e));
+
+  var IssueTable = IssueTableIndex_.getTableByCoord(e.range.getSheet().getSheetId(), e.range);
+  if (!IssueTable) {
+    debug.timeEnd('[TriggerIssueTableModification_]');
+    return;
+  }
+
+  // Found IssueTable affected by modified range
+  var ui = SpreadsheetApp.getUi();
+  var warningSuspendSeconds = 120 * 1000;
+  var tmpWarningId = 'warning.' + IssueTable.getSheetId() + '__' + IssueTable.getTableId();
+  var lastWarningTime = UserStorage.getValue(tmpWarningId);
+  var timeNow = (new Date()).getTime();
+
+  if (lastWarningTime === null || lastWarningTime < (timeNow - warningSuspendSeconds)) {
+    UserStorage.setValue(tmpWarningId, timeNow);
+
+    // prompt can handle UnDo in case of single cell value change
+    if (e.oldValue) {
+      debug.log('[TriggerIssueTableModification_] Show warning with option to revert changes cell value.');
+      var result = ui.alert(
+        'Warning! Please confirm',
+        'Changes in this Issue table may prevent "IssueTable Refresh". '
+        + 'Changed cell values may be overwritten by an automated updates.  '
+        + 'Press "OK" is you want to ingore this, or click "Cancel" to revert your change.',
+        ui.ButtonSet.OK_CANCEL);
+
+      if (result == ui.Button.CANCEL) {
+        debug.log('[TriggerIssueTableModification_] reverted cell value.');
+        e.range.setValue(e.oldValue).activate();
+      }
+    } else {
+      debug.log('[TriggerIssueTableModification_] Show warning without options.');
+      ui.alert(
+        'Warning!',
+        'Changes in this issue table may prevent "IssueTable Refresh".',
+        ui.ButtonSet.OK);
+    }
+
+  } else {
+    debug.log('[TriggerIssueTableModification_] DONT show warning: %ss elapsed from %s', (timeNow - lastWarningTime)/1000, warningSuspendSeconds/1000);
+  }
+
+  debug.timeEnd('[TriggerIssueTableModification_]');
 }
