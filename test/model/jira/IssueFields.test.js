@@ -265,9 +265,37 @@ test("headerNames", () => {
 
 
 describe("Checking custom field behaviour", () => {
-  test("getCustomFields", () => {
+
+  // mock the API return for all fields with the additional data needed for customType
+  const jiraApiFieldResponse = [
+    {
+      schema: {
+        custom: "com.pyxis.greenhopper.jira:gh-sprint", type: "array", items: "string", customId: 11090
+      }, navigable: true, orderable: true, custom: true, name: "Sprint", id: "custom_sprint", searchable: true
+    }, {
+      schema: {
+        custom: "com.atlassian.jira.plugin.system.customfieldtypes:float", type: "number", customId: 15691
+      }, navigable: true, orderable: true, custom: true, name: "Number", id: "custom_number", searchable: true
+    }, {
+      schema: {
+        custom: "com.atlassian.jira.plugin.system.customfieldtypes:textfield", type: "string", customId: 10500
+      }, navigable: true, orderable: true, custom: true, name: "Contact Info", id: "custom_string", searchable: true
+    }, {
+      schema: {
+        type: "string", customId: 10501
+      }, navigable: true, orderable: true, custom: true, name: "Contact Thing", id: "custom_string2", searchable: true
+    }
+  ];
+
+  beforeEach( () => {
     PropertiesService.resetMocks();
     PropertiesService.resetMockUserData();
+    UserStorage._resetLocalStorage();
+    jiraApiMock.resetMocks();
+
+  })
+
+  test("getCustomFields", () => {
     UserStorage.setValue(
       "favoriteCustomFields",
       [
@@ -299,45 +327,29 @@ describe("Checking custom field behaviour", () => {
     expect(result.customy).toBe("Type 2");
     expect(result.customz).toBe("Type 3");
   });
+
+
   test("Fixes up schema if customType was not present", () => {
     // addition of customType to field schema may mean saved custom fields do not contain the correct data
-    PropertiesService.resetMocks();
-    PropertiesService.resetMockUserData();
-    UserStorage._resetLocalStorage();
-    jiraApiMock.resetMocks();
+    
     // mock the older format in the users prefences
     PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
       return JSON.stringify([
         { key: "custom_sprint", name: "Sprint", schemaType: "array|string", supported: true },
         { key: "custom_string", name: "String", schemaType: "string", supported: true },
         { key: "custom_number", name: "Number", schemaType: "number", supported: true },
+        { key: "custom_string2", name: "Number", schemaType: "number", supported: true },
       ]
       );
     });
 
-    // mock the API return for all fields with the additional data needed for customType
-    const jiraApiFieldResponse = [
-      {
-        schema: {
-          custom: "com.pyxis.greenhopper.jira:gh-sprint", type: "array", items: "string", customId: 11090
-        }, navigable: true, orderable: true, custom: true, name: "Sprint", id: "custom_sprint", searchable: true
-      }, {
-        schema: {
-          custom: "com.atlassian.jira.plugin.system.customfieldtypes:float", type: "number", customId: 15691
-        }, navigable: true, orderable: true, custom: true, name: "Number", id: "custom_number", searchable: true
-      }, {
-        schema: {
-          custom: "com.atlassian.jira.plugin.system.customfieldtypes:textfield", type: "string", customId: 10500
-        }, navigable: true, orderable: true, custom: true, name: "Gracenote Contact Info", id: "custom_string", searchable: true
-      },
-    ];
+    
     jiraApiMock.setNextJiraResponse(200, "field", jiraApiFieldResponse);
 
     var favouriteCustomFields = IssueFields.getAvailableCustomFields();
-    console.log(jiraApiMock.call.mock.calls);
     expect(jiraApiMock.call).toBeCalledTimes(1);
     expect(PropertiesService.mockUserProps.getProperty).toBeCalledTimes(1);
-    expect(favouriteCustomFields.length).toBe(3);
+    expect(favouriteCustomFields.length).toBe(4);
     expect(favouriteCustomFields[0].key).toBe("custom_sprint");
     expect(favouriteCustomFields[0].customType).toBe("gh-sprint");
     expect(favouriteCustomFields[0].schemaType).toBe("array|string");
@@ -347,6 +359,9 @@ describe("Checking custom field behaviour", () => {
     expect(favouriteCustomFields[2].key).toBe("custom_number");
     expect(favouriteCustomFields[2].customType).toBe("float");
     expect(favouriteCustomFields[2].schemaType).toBe("number");
+    expect(favouriteCustomFields[3].key).toBe("custom_string2");
+    expect(favouriteCustomFields[3].customType).toBe("none");// no custom field in the JIRA response - set it as none
+    expect(favouriteCustomFields[3].schemaType).toBe("string");
     expect(PropertiesService.mockUserProps.setProperty).toBeCalledTimes(2);
 
     // now try again the schema should not need updating
@@ -355,15 +370,54 @@ describe("Checking custom field behaviour", () => {
     expect(PropertiesService.mockUserProps.getProperty).toBeCalledTimes(2);
     // no need for call the jira API again to get all feeds as schema is up to date
     expect(jiraApiMock.call).toBeCalledTimes(1);
-    // no need for save of properties
+    // the favourites should now be saved
     expect(PropertiesService.mockUserProps.setProperty).toBeCalledTimes(2);
+    // not testing epic behaviour here
+    //expect(PropertiesService.mockUserProps.setProperty.mock.calls[0][0]).toBe("jst.jst_epic");
+    expect(PropertiesService.mockUserProps.setProperty.mock.calls[1][0]).toBe("jst.favoriteCustomFields");
+    // check that four items are stored
+    expect(JSON.parse(PropertiesService.mockUserProps.setProperty.mock.calls[1][1]).length).toBe(4);
     // check the data still contains customType now
-    expect(favouriteCustomFields.length).toBe(3);
+    expect(favouriteCustomFields.length).toBe(4);
     expect(favouriteCustomFields[0].customType).toBe("gh-sprint");
     expect(favouriteCustomFields[1].key).toBe("custom_string");
     expect(favouriteCustomFields[2].customType).toBe("float");
+    expect(favouriteCustomFields[3].key).toBe("custom_string2");
+  });
+
+
+  test("Fields no longer present in JIRA are cleaned up", ()=> {
+    PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
+      return JSON.stringify([
+        // customType field is missing to trigger validation
+        { key: "custom_sprint", name: "Sprint", schemaType: "array|string", supported: true },
+        { key: "custom_string", name: "String", schemaType: "string", supported: true },
+        { key: "custom_number", name: "Number", schemaType: "number", supported: true },
+        // this field is not in the JIRA mocked field response so should be removed
+        { key: "not_exists", name: "Number", schemaType: "number", supported: true },
+      ]
+      );
+    });
+    jiraApiMock.setNextJiraResponse(200, "field", jiraApiFieldResponse);
+
+    var favouriteCustomFields = IssueFields.getAvailableCustomFields();;
+    expect(favouriteCustomFields.length).toBe(3);
+    expect(favouriteCustomFields[0].key).toBe("custom_sprint");
+    expect(favouriteCustomFields[1].key).toBe("custom_string");
+    expect(favouriteCustomFields[2].key).toBe("custom_number");
+
+    expect(PropertiesService.mockUserProps.setProperty).toBeCalledTimes(2);
+    // not testing epic behaviour here
+    //expect(PropertiesService.mockUserProps.setProperty.mock.calls[0][0]).toBe("jst.jst_epic");
+    expect(PropertiesService.mockUserProps.setProperty.mock.calls[1][0]).toBe("jst.favoriteCustomFields");
+    // check that three items are stored  as field "not_exists" is no longer present
+    expect(JSON.parse(PropertiesService.mockUserProps.setProperty.mock.calls[1][1]).length).toBe(3);
+    
+    // favourite not_exists is now longer present
   });
 })
+
+
 
 test("Creating Fields", () => {
   var epicField = IssueFields.createField_(

@@ -2,7 +2,7 @@
  * Controller file for setting and reading the users selects custom fields 
  */
 
- // Node required code block
+// Node required code block
 const debug = require("src/debug.gs").debug;
 const EpicField = require("src/models/jira/EpicField.gs");
 const UserStorage = require("src/models/gas/UserStorage.gs");
@@ -18,7 +18,7 @@ const IssueFields = require("src/models/jira/IssueFields.gs");
 function menuCustomFields() {
   if (!hasSettings(true)) return;
 
-  var dialog = getDialog('views/dialogs/customFields', {favoriteCustomFields: (UserStorage.getValue('favoriteCustomFields') || [])});
+  var dialog = getDialog('views/dialogs/customFields', { favoriteCustomFields: (UserStorage.getValue('favoriteCustomFields') || []) });
 
   dialog
     .setWidth(480)
@@ -38,17 +38,18 @@ function menuCustomFields() {
  */
 function callbackFetchCustomFields() {
   var customFields = [];
-  var ok = function(customFieldsUnsorted) {
-    customFields = customFieldsUnsorted;
+  IssueFields.getAllCustomFields(
+    // ok callback
+    function (customFieldsUnsorted) {
+      customFields = customFieldsUnsorted;
       // sorting by supported type and name
-    customFields.sort(sortCustomFields_);
-  };
-
-  var error = function(message) {
-    debug.error(message);
-  };
-  IssueFields.getAllCustomFields(ok, error);
-
+      customFields.sort(sortCustomFields_);
+    }, 
+    // error callback
+    function (message) {
+      debug.error(message);
+    }
+  );
   return customFields;
 }
 
@@ -61,22 +62,22 @@ function callbackFetchCustomFields() {
  * @param b field to compare
  */
 function sortCustomFields_(a, b) {
-    // epic field at the top
-    if (a.key ==  EpicField.EPIC_KEY) {
-      return -1;
-    }
-    if (b.key ==  EpicField.EPIC_KEY) {
-      return 1;
-    }
-    // supported fields first then use alphabetical order.
-    var keyA = (a.supported ? '0' : '1') + a.name.toLowerCase();
-    var keyB = (b.supported ? '0' : '1') + b.name.toLowerCase();
-    if (keyA < keyB)
-      return -1;
-    if (keyA > keyB)
-      return 1;
-    return 0;
+  // epic field at the top
+  if (a.key == EpicField.EPIC_KEY) {
+    return -1;
   }
+  if (b.key == EpicField.EPIC_KEY) {
+    return 1;
+  }
+  // supported fields first then use alphabetical order.
+  var keyA = (a.supported ? '0' : '1') + a.name.toLowerCase();
+  var keyB = (b.supported ? '0' : '1') + b.name.toLowerCase();
+  if (keyA < keyB)
+    return -1;
+  if (keyA > keyB)
+    return 1;
+  return 0;
+}
 
 /**
  * @desc Form handler for dialogCustomFields.
@@ -87,7 +88,7 @@ function sortCustomFields_(a, b) {
 function callbackSaveCustomFields(jsonFormData) {
   UserStorage.setValue('favoriteCustomFields', jsonFormData.favoriteCustomFields);
   debug.log("Saved favoriteCustomFields: %s", jsonFormData.favoriteCustomFields);
-  return {status: true, message: 'Ok'};
+  return { status: true, message: 'Ok' };
 }
 
 

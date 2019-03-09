@@ -68,7 +68,7 @@ IssueFields = (function () {
         var msg = "Failed to retrieve Jira Fields info with status [" + status + "]!\\n"
           + jiraErrorMessage;
         if (errorCallBack != null) {
-          errorCallBack(msg,httpResp,status);
+          errorCallBack(msg, httpResp, status);
         }
       };
       request.call("field")
@@ -128,7 +128,7 @@ IssueFields = (function () {
    */
   function getAllCustomFieldsByKey() {
     var allCustomFieldsArray = getAllCustomFields();
-    return convertArrayToObj_(allCustomFieldsArray, function(field) {return field.key});
+    return convertArrayToObj_(allCustomFieldsArray, function (field) { return field.key });
   }
 
   /**
@@ -178,40 +178,12 @@ IssueFields = (function () {
    */
   function getAvailableCustomFields(format) {
     format = format || CUSTOMFIELD_FORMAT_RAW;
-    var customFields = UserStorage.getValue('favoriteCustomFields') || [];
 
-    var schemaUpdated = false;
-    var customTypeUpdateNeeded = false;
-    // using attribute schemaType conistently across the code base
-    // however a user may have an object stored with attribute "type" in their preferences
-    customFields.forEach(function (field) {
-      if (field.type != null) {
-        field.schemaType = field.type;
-        delete (field.type);
-        schemaUpdated = true;
-      }
-      if (!field.hasOwnProperty('customType')) {
-        customTypeUpdateNeeded = true;
-      }
-    });
-    if (customTypeUpdateNeeded) {
-      var allCustomFieldsByKey = this.getAllCustomFieldsByKey();
-      var newCustomFields = [];
-      customFields.forEach(function (field) {
-        var newField = allCustomFieldsByKey[field.key];
-        newCustomFields.push(newField);
-      });
-      customFields = newCustomFields;
-      schemaUpdated = true;
-    }
-    if (schemaUpdated) {
-     // console.log("Schema of favourite fields was updated - saving data");
-      UserStorage.setValue('favoriteCustomFields',customFields);
-    } else {
-      //console.log("Schema of favourite fields was validated - no changes necessary");
-    }
+    var customFields = UserStorage.getValue('favoriteCustomFields') || [];
+    customFields = validateCustomFields_(customFields);
 
     var fieldsFormatted = {};
+
     // TODO: this code branch appears unnessaruy
     // getCustomFields is not called without a parameter or with CUSTOMFIELD_FORMAT_RAW
     if (format === CUSTOMFIELD_FORMAT_RAW) {
@@ -231,6 +203,56 @@ IssueFields = (function () {
     }
 
     return fieldsFormatted;
+  }
+
+
+  /**
+   * check all fields stored in preferences have valid data / schema
+   * If not the schema will be fixed, once per user, and stored in their preferences
+   * @param customFields {object} Fields from users preferences
+   * @returns {object} the users selected custom fields with the schema updated
+   */
+  function validateCustomFields_(customFields) {
+    var schemaUpdated = false;
+    var customTypeUpdateNeeded = false;
+
+    customFields.forEach(function (field) {
+      // using attribute schemaType conistently across the code base
+      // however a user may have an object stored with attribute "type" in their preferences
+      if (field.type != null) {
+        field.schemaType = field.type;
+        delete (field.type);
+        schemaUpdated = true;
+      }
+      // customType was added to identify custom plugin fields like Sprint
+      if (!field.hasOwnProperty('customType')) {
+        customTypeUpdateNeeded = true;
+      }
+    });
+
+    // Have to get the field defifintions from Jira and update the data in the preferences
+    // this is to find the value for customType
+    if (customTypeUpdateNeeded) {
+      var allCustomFieldsByKey = getAllCustomFieldsByKey();
+      var newCustomFields = [];
+      customFields.forEach(function (field) {
+        var newField = allCustomFieldsByKey[field.key];
+        if (newField == null) {
+          // this field previously selected by the user no longer exists on JIRA
+          // unlikely edge case
+          debug.error('Field '+field.key+' saved in the users custom fields is not present in the JIRA');
+        } else {
+          newCustomFields.push(newField);
+        }
+      });
+      customFields = newCustomFields;
+      schemaUpdated = true;
+    }
+
+    if (schemaUpdated) {
+      UserStorage.setValue('favoriteCustomFields', customFields);
+    }
+    return customFields;
   }
 
   // Jira issue fields/columns
@@ -341,7 +363,7 @@ IssueFields = (function () {
    */
   function createField_(key, name, isCustom, schemaType, customType, isVirtual) {
     // isVirtual defaults to false
-    if (customType != null && customType.length>0 && customType.indexOf(":")>=0) {
+    if (customType != null && customType.length > 0 && customType.indexOf(":") >= 0) {
       customType = customType.split(":")[1];
     }
     return {
@@ -379,12 +401,14 @@ IssueFields = (function () {
         EpicField.setLabelKey(jiraFieldResponse.key || jiraFieldResponse.id);
       }
       customType = jiraFieldResponse.schema.custom;
+    } else {
+      customType = "none";
     }
     var _type = (jiraFieldResponse.schema ? jiraFieldResponse.schema.type : null) || null;
     if (jiraFieldResponse.schema && jiraFieldResponse.schema.items) {
       _type += '|' + jiraFieldResponse.schema.items;
     }
-    
+
     return createField_(
       jiraFieldResponse.key || jiraFieldResponse.id, // Server API returns ".id" only while Cloud returns both with same value
       jiraFieldResponse.name,
@@ -410,11 +434,11 @@ IssueFields = (function () {
       // add custom field 'Epic' to beginning of array
       allJiraFields_.unshift(
         createField_(
-          EpicField.getKey(), 
-          EpicField.getName(), 
+          EpicField.getKey(),
+          EpicField.getName(),
           true,
           EpicField.EPIC_KEY,
-          null, 
+          null,
           true));
     }
   }
@@ -461,9 +485,6 @@ IssueFields = (function () {
     createField_: createField_ // exposed for unit testing
   }
 })();
-
-
-
 
 
 // Node required code block
