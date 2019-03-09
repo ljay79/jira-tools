@@ -9,6 +9,7 @@ const EpicField = require("src/models/jira/EpicField.gs");
 const UserStorage = require("src/models/gas/UserStorage.gs");
 const extend = require("src/jsLib.gs").extend;
 const camelize = require('src/jsLib.gs').camelize;
+const convertArrayToObj_ = require('src/jsLib.gs').convertArrayToObj_;
 // End of Node required code block
 
 IssueFields = (function () {
@@ -96,6 +97,7 @@ IssueFields = (function () {
    * Returns all custom fields from the Jira Instance including the EpicField
    * @param successCallBack  - call back function if the list is retrieved succesfully
    * @param errorCallBack - call back if there is an error
+   * @returns {Array} - array of custom fields returned
    */
   function getAllCustomFields(successCallBack, errorCallBack) {
     var customFields = [];
@@ -118,6 +120,16 @@ IssueFields = (function () {
     getAllFields(ok, error);
     return customFields;
   };
+
+  /**
+   * Returns all custom fields from the Jira Instance including the EpicField
+   * returned as an object where the fields key is used as the key in the Object
+   * @returns {Object} - Object of custom fields
+   */
+  function getAllCustomFieldsByKey() {
+    var allCustomFieldsArray = getAllCustomFields();
+    return convertArrayToObj_(allCustomFieldsArray, function(field) {return field.key});
+  }
 
   /**
   * Looks through an array of valid JIRA fields and finds the best matching one
@@ -168,14 +180,36 @@ IssueFields = (function () {
     format = format || CUSTOMFIELD_FORMAT_RAW;
     var customFields = UserStorage.getValue('favoriteCustomFields') || [];
 
+    var schemaUpdated = false;
+    var customTypeUpdateNeeded = false;
     // using attribute schemaType conistently across the code base
     // however a user may have an object stored with attribute "type" in their preferences
     customFields.forEach(function (field) {
       if (field.type != null) {
         field.schemaType = field.type;
         delete (field.type);
+        schemaUpdated = true;
+      }
+      if (!field.hasOwnProperty('customType')) {
+        customTypeUpdateNeeded = true;
       }
     });
+    if (customTypeUpdateNeeded) {
+      var allCustomFieldsByKey = this.getAllCustomFieldsByKey();
+      var newCustomFields = [];
+      customFields.forEach(function (field) {
+        var newField = allCustomFieldsByKey[field.key];
+        newCustomFields.push(newField);
+      });
+      customFields = newCustomFields;
+      schemaUpdated = true;
+    }
+    if (schemaUpdated) {
+     // console.log("Schema of favourite fields was updated - saving data");
+      UserStorage.setValue('favoriteCustomFields',customFields);
+    } else {
+      //console.log("Schema of favourite fields was validated - no changes necessary");
+    }
 
     var fieldsFormatted = {};
     // TODO: this code branch appears unnessaruy
@@ -307,6 +341,9 @@ IssueFields = (function () {
    */
   function createField_(key, name, isCustom, schemaType, customType, isVirtual) {
     // isVirtual defaults to false
+    if (customType != null && customType.length>0 && customType.indexOf(":")>=0) {
+      customType = customType.split(":")[1];
+    }
     return {
       key: key,
       name: name,
@@ -408,6 +445,7 @@ IssueFields = (function () {
     SupportedTypes: SupportedTypes,
     getAllFields: getAllFields,
     getAllCustomFields: getAllCustomFields,
+    getAllCustomFieldsByKey: getAllCustomFieldsByKey,
     getAvailableFields: getAvailableFields,
     getMatchingField: getMatchingField,
     getAvailableCustomFields: getAvailableCustomFields,

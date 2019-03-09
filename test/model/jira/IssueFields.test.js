@@ -94,7 +94,7 @@ test("Convert Jira Field Responses to internal field data", () => {
   expect(result.supported).toBe(false);
   expect(result.schemaType).toBe("a custom field not recognised");
   expect(result.customType).toBe("customFieldType");
-  
+
 
 
 
@@ -246,9 +246,9 @@ test("Get all custom fields from Jira", () => {
 test("headerNames", () => {
   PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
     return JSON.stringify([
-      { key: "custom1", name: "Custom 1" },
-      { key: "custom2", name: "Custom 2" },
-      { key: "custom_epiclink", name: "Epic Link" }
+      { key: "custom1", name: "Custom 1", schemaType: "Type 1", customType: "1" },
+      { key: "custom2", name: "Custom 2", schemaType: "Type 1", customType: "2" },
+      { key: "custom_epiclink", name: "Epic Link", customType: "3" }
     ]
     );
   });
@@ -257,46 +257,113 @@ test("headerNames", () => {
   expect(IssueFields.getHeaderName("hello world")).toBe("helloWorld");
   expect(IssueFields.getHeaderName("key")).toBe("Key");
   expect(IssueFields.getHeaderName("summary")).toBe("Summary");
+
   expect(IssueFields.getHeaderName("custom1")).toBe("Custom 1");
   expect(IssueFields.getHeaderName("custom2")).toBe("Custom 2");
   expect(IssueFields.getHeaderName("custom_epiclink")).toBe("Epic");
 })
 
 
-test("getCustomFields", () => {
-  PropertiesService.resetMocks();
-  PropertiesService.resetMockUserData();
-  UserStorage.setValue(
-    "favoriteCustomFields",
-    [
-      { key: "customx", name: "Custom X", schemaType: "Type 1" },
-      { key: "customy", name: "Custom Y", schemaType: "Type 2" },
-      { key: "customz", name: "Custom Z", type: "Type 3" }
+describe("Checking custom field behaviour", () => {
+  test("getCustomFields", () => {
+    PropertiesService.resetMocks();
+    PropertiesService.resetMockUserData();
+    UserStorage.setValue(
+      "favoriteCustomFields",
+      [
+        { key: "customx", name: "Custom X", schemaType: "Type 1", customType: "1" },
+        { key: "customy", name: "Custom Y", schemaType: "Type 2", customType: "2" },
+        { key: "customz", name: "Custom Z", type: "Type 3", customType: "3" }
+      ]
+    );
+    var result = IssueFields.getAvailableCustomFields();
+    expect(result.length).toBe(3);
+    expect(result[0]).toEqual({ key: "customx", name: "Custom X", schemaType: "Type 1", customType: "1" });
+    result = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_RAW);
+    expect(result.length).toBe(3);
+    expect(result).toEqual([
+      { key: "customx", name: "Custom X", schemaType: "Type 1", customType: "1" },
+      { key: "customy", name: "Custom Y", schemaType: "Type 2", customType: "2" },
+      { key: "customz", name: "Custom Z", schemaType: "Type 3", customType: "3" }
     ]
-  );
-  var result = IssueFields.getAvailableCustomFields();
-  expect(result.length).toBe(3);
-  expect(result[0]).toEqual({ key: "customx", name: "Custom X", schemaType: "Type 1" });
-  result = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_RAW);
-  expect(result.length).toBe(3);
-  expect(result).toEqual([
-    { key: "customx", name: "Custom X", schemaType: "Type 1" },
-    { key: "customy", name: "Custom Y", schemaType: "Type 2" },
-    { key: "customz", name: "Custom Z", schemaType: "Type 3" }
-  ]
-  );
-  result = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_SEARCH);
-  expect(Object.keys(result).length).toBe(3);
-  expect(result.customx).toBe("Custom X");
-  expect(result.customy).toBe("Custom Y");
-  expect(result.customz).toBe("Custom Z");
+    );
+    result = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_SEARCH);
+    expect(Object.keys(result).length).toBe(3);
+    expect(result.customx).toBe("Custom X");
+    expect(result.customy).toBe("Custom Y");
+    expect(result.customz).toBe("Custom Z");
 
-  result = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_UNIFY);
-  expect(Object.keys(result).length).toBe(3);
-  expect(result.customx).toBe("Type 1");
-  expect(result.customy).toBe("Type 2");
-  expect(result.customz).toBe("Type 3");
-});
+    result = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_UNIFY);
+    expect(Object.keys(result).length).toBe(3);
+    expect(result.customx).toBe("Type 1");
+    expect(result.customy).toBe("Type 2");
+    expect(result.customz).toBe("Type 3");
+  });
+  test("Fixes up schema if customType was not present", () => {
+    // addition of customType to field schema may mean saved custom fields do not contain the correct data
+    PropertiesService.resetMocks();
+    PropertiesService.resetMockUserData();
+    UserStorage._resetLocalStorage();
+    jiraApiMock.resetMocks();
+    // mock the older format in the users prefences
+    PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
+      return JSON.stringify([
+        { key: "custom_sprint", name: "Sprint", schemaType: "array|string", supported: true },
+        { key: "custom_string", name: "String", schemaType: "string", supported: true },
+        { key: "custom_number", name: "Number", schemaType: "number", supported: true },
+      ]
+      );
+    });
+
+    // mock the API return for all fields with the additional data needed for customType
+    const jiraApiFieldResponse = [
+      {
+        schema: {
+          custom: "com.pyxis.greenhopper.jira:gh-sprint", type: "array", items: "string", customId: 11090
+        }, navigable: true, orderable: true, custom: true, name: "Sprint", id: "custom_sprint", searchable: true
+      }, {
+        schema: {
+          custom: "com.atlassian.jira.plugin.system.customfieldtypes:float", type: "number", customId: 15691
+        }, navigable: true, orderable: true, custom: true, name: "Number", id: "custom_number", searchable: true
+      }, {
+        schema: {
+          custom: "com.atlassian.jira.plugin.system.customfieldtypes:textfield", type: "string", customId: 10500
+        }, navigable: true, orderable: true, custom: true, name: "Gracenote Contact Info", id: "custom_string", searchable: true
+      },
+    ];
+    jiraApiMock.setNextJiraResponse(200, "field", jiraApiFieldResponse);
+
+    var favouriteCustomFields = IssueFields.getAvailableCustomFields();
+    console.log(jiraApiMock.call.mock.calls);
+    expect(jiraApiMock.call).toBeCalledTimes(1);
+    expect(PropertiesService.mockUserProps.getProperty).toBeCalledTimes(1);
+    expect(favouriteCustomFields.length).toBe(3);
+    expect(favouriteCustomFields[0].key).toBe("custom_sprint");
+    expect(favouriteCustomFields[0].customType).toBe("gh-sprint");
+    expect(favouriteCustomFields[0].schemaType).toBe("array|string");
+    expect(favouriteCustomFields[1].key).toBe("custom_string");
+    expect(favouriteCustomFields[1].customType).toBe("textfield");
+    expect(favouriteCustomFields[1].schemaType).toBe("string");
+    expect(favouriteCustomFields[2].key).toBe("custom_number");
+    expect(favouriteCustomFields[2].customType).toBe("float");
+    expect(favouriteCustomFields[2].schemaType).toBe("number");
+    expect(PropertiesService.mockUserProps.setProperty).toBeCalledTimes(2);
+
+    // now try again the schema should not need updating
+    UserStorage._resetLocalStorage(); // reset in memory cache to force request to Properties Service
+    var favouriteCustomFields2 = IssueFields.getAvailableCustomFields();
+    expect(PropertiesService.mockUserProps.getProperty).toBeCalledTimes(2);
+    // no need for call the jira API again to get all feeds as schema is up to date
+    expect(jiraApiMock.call).toBeCalledTimes(1);
+    // no need for save of properties
+    expect(PropertiesService.mockUserProps.setProperty).toBeCalledTimes(2);
+    // check the data still contains customType now
+    expect(favouriteCustomFields.length).toBe(3);
+    expect(favouriteCustomFields[0].customType).toBe("gh-sprint");
+    expect(favouriteCustomFields[1].key).toBe("custom_string");
+    expect(favouriteCustomFields[2].customType).toBe("float");
+  });
+})
 
 test("Creating Fields", () => {
   var epicField = IssueFields.createField_(
@@ -304,13 +371,61 @@ test("Creating Fields", () => {
     EpicField.getName(),
     true,
     EpicField.EPIC_KEY,
-    EpicField.EPIC_KEY+" type",
+    EpicField.EPIC_KEY + ":type",
     true
   );
   expect(epicField.supported).toBe(true);
   expect(epicField.name).toBe(EpicField.getName());
   expect(epicField.key).toBe(EpicField.getKey());
   expect(epicField.custom).toBe(true);
+  expect(epicField.customType).toBe("type");
+  expect(epicField.isVirtual).toBe(true);
+
+
+  epicField = IssueFields.createField_(
+    EpicField.getKey(),
+    EpicField.getName(),
+    true,
+    EpicField.EPIC_KEY,
+    null,
+    true
+  );
+  expect(epicField.supported).toBe(true);
+  expect(epicField.name).toBe(EpicField.getName());
+  expect(epicField.key).toBe(EpicField.getKey());
+  expect(epicField.custom).toBe(true);
+  expect(epicField.customType).toBeNull();
+  expect(epicField.isVirtual).toBe(true);
+
+  epicField = IssueFields.createField_(
+    EpicField.getKey(),
+    EpicField.getName(),
+    true,
+    EpicField.EPIC_KEY,
+    ":type",
+    true
+  );
+  expect(epicField.supported).toBe(true);
+  expect(epicField.name).toBe(EpicField.getName());
+  expect(epicField.key).toBe(EpicField.getKey());
+  expect(epicField.custom).toBe(true);
+  expect(epicField.customType).toBe("type");
+  expect(epicField.isVirtual).toBe(true);
+
+
+  epicField = IssueFields.createField_(
+    EpicField.getKey(),
+    EpicField.getName(),
+    true,
+    EpicField.EPIC_KEY,
+    "blah:",
+    true
+  );
+  expect(epicField.supported).toBe(true);
+  expect(epicField.name).toBe(EpicField.getName());
+  expect(epicField.key).toBe(EpicField.getKey());
+  expect(epicField.custom).toBe(true);
+  expect(epicField.customType).toBe("");
   expect(epicField.isVirtual).toBe(true);
 });
 
@@ -324,3 +439,4 @@ test("Read Only fields", () => {
   expect(readonly).not.toContain("assignee");
   expect(readonly).not.toContain("priority");
 })
+

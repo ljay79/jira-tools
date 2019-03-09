@@ -1,0 +1,651 @@
+{
+  "expand": "schema,names",
+  "startAt": 50,
+  "maxResults": 50,
+  "total": 59,
+  "issues": [
+    {
+      "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+      "id": "994522",
+      "self": "https://jira.gracenote.com/rest/api/2/issue/994522",
+      "key": "TJT-11",
+      "fields": {
+        "summary": "Metapod Retro Improvement: Automate posting of completed high priority tickets to Engineering Sports",
+        "customfield_11090": [
+          "com.atlassian.greenhopper.service.sprint.Sprint@54083c95[id=5532,rapidViewId=918,state=CLOSED,name=GNS-METAPOD SPRINT 2,startDate=2018-11-28T08:02:53.810-08:00,endDate=2019-01-08T08:02:00.000-08:00,completeDate=2019-01-09T06:19:20.624-08:00,sequence=5532,goal=We help some teams to achieve their sprint goals]"
+        ],
+        "watches": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-11/watchers",
+          "watchCount": 3,
+          "isWatching": true
+        },
+        "customfield_11091": null,
+        "customfield_13490": [
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=lepa7003",
+            "name": "lepa7003",
+            "key": "plemon",
+            "emailAddress": "Paul.Lemon@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?avatarId=10182",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&avatarId=10182",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&avatarId=10182",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&avatarId=10182"
+            },
+            "displayName": "Lemon, Paul",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          },
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=stma7001",
+            "name": "stma7001",
+            "key": "msteinbruckner",
+            "emailAddress": "Marten.Steinbruckner@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?ownerId=msteinbruckner&avatarId=21074",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&ownerId=msteinbruckner&avatarId=21074",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&ownerId=msteinbruckner&avatarId=21074",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&ownerId=msteinbruckner&avatarId=21074"
+            },
+            "displayName": "Steinbruckner, Marten",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          },
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=whcl7001",
+            "name": "whcl7001",
+            "key": "cwheadon",
+            "emailAddress": "Cliff.Wheadon@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?ownerId=cwheadon&avatarId=27262",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&ownerId=cwheadon&avatarId=27262",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&ownerId=cwheadon&avatarId=27262",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&ownerId=cwheadon&avatarId=27262"
+            },
+            "displayName": "Wheadon, Cliff",
+            "active": true,
+            "timeZone": "America/Halifax"
+          }
+        ],
+        "customfield_12491": null,
+        "timeoriginalestimate": null,
+        "customfield_10001": 3.0,
+        "priority": {
+          "self": "https://jira.gracenote.com/rest/api/2/priority/3",
+          "iconUrl": "https://jira.gracenote.com/images/icons/priorities/lowest.svg",
+          "name": "P3 - Medium",
+          "id": "3"
+        },
+        "customfield_10034": 8.0,
+        "customfield_10035": null,
+        "environment": null,
+        "duedate": null,
+        "votes": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-11/votes",
+          "votes": 0,
+          "hasVoted": false
+        }
+      }
+    },
+    {
+      "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+      "id": "994521",
+      "self": "https://jira.gracenote.com/rest/api/2/issue/994521",
+      "key": "TJT-10",
+      "fields": {
+        "summary": "Create a Team Drive with the right folder structure in the right place",
+        "customfield_11090": null,
+        "watches": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-10/watchers",
+          "watchCount": 2,
+          "isWatching": true
+        },
+        "customfield_11091": null,
+        "customfield_13490": [
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=lepa7003",
+            "name": "lepa7003",
+            "key": "plemon",
+            "emailAddress": "Paul.Lemon@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?avatarId=10182",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&avatarId=10182",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&avatarId=10182",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&avatarId=10182"
+            },
+            "displayName": "Lemon, Paul",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          },
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=stma7001",
+            "name": "stma7001",
+            "key": "msteinbruckner",
+            "emailAddress": "Marten.Steinbruckner@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?ownerId=msteinbruckner&avatarId=21074",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&ownerId=msteinbruckner&avatarId=21074",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&ownerId=msteinbruckner&avatarId=21074",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&ownerId=msteinbruckner&avatarId=21074"
+            },
+            "displayName": "Steinbruckner, Marten",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          }
+        ],
+        "customfield_12491": null,
+        "timeoriginalestimate": null,
+        "customfield_10001": 21.0,
+        "priority": {
+          "self": "https://jira.gracenote.com/rest/api/2/priority/3",
+          "iconUrl": "https://jira.gracenote.com/images/icons/priorities/lowest.svg",
+          "name": "P3 - Medium",
+          "id": "3"
+        },
+        "customfield_10034": 13.0,
+        "customfield_10035": null,
+        "environment": null,
+        "duedate": null,
+        "votes": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-10/votes",
+          "votes": 0,
+          "hasVoted": false
+        }
+      }
+    },
+    {
+      "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+      "id": "994520",
+      "self": "https://jira.gracenote.com/rest/api/2/issue/994520",
+      "key": "TJT-9",
+      "fields": {
+        "summary": "Sprint Goal Visibility to stakeholders",
+        "customfield_11090": null,
+        "watches": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-9/watchers",
+          "watchCount": 2,
+          "isWatching": true
+        },
+        "customfield_11091": null,
+        "customfield_13490": [
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=lepa7003",
+            "name": "lepa7003",
+            "key": "plemon",
+            "emailAddress": "Paul.Lemon@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?avatarId=10182",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&avatarId=10182",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&avatarId=10182",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&avatarId=10182"
+            },
+            "displayName": "Lemon, Paul",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          },
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=stma7001",
+            "name": "stma7001",
+            "key": "msteinbruckner",
+            "emailAddress": "Marten.Steinbruckner@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?ownerId=msteinbruckner&avatarId=21074",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&ownerId=msteinbruckner&avatarId=21074",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&ownerId=msteinbruckner&avatarId=21074",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&ownerId=msteinbruckner&avatarId=21074"
+            },
+            "displayName": "Steinbruckner, Marten",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          }
+        ],
+        "customfield_12491": null,
+        "timeoriginalestimate": null,
+        "customfield_10001": 1.0,
+        "priority": {
+          "self": "https://jira.gracenote.com/rest/api/2/priority/3",
+          "iconUrl": "https://jira.gracenote.com/images/icons/priorities/lowest.svg",
+          "name": "P3 - Medium",
+          "id": "3"
+        },
+        "customfield_10034": 2.0,
+        "customfield_10035": null,
+        "environment": null,
+        "duedate": null,
+        "votes": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-9/votes",
+          "votes": 0,
+          "hasVoted": false
+        }
+      }
+    },
+    {
+      "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+      "id": "994519",
+      "self": "https://jira.gracenote.com/rest/api/2/issue/994519",
+      "key": "TJT-8",
+      "fields": {
+        "summary": "Sprint Goal - crafted by POs on a single theme",
+        "customfield_11090": null,
+        "watches": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-8/watchers",
+          "watchCount": 3,
+          "isWatching": true
+        },
+        "customfield_11091": null,
+        "customfield_13490": [
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=lepa7003",
+            "name": "lepa7003",
+            "key": "plemon",
+            "emailAddress": "Paul.Lemon@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?avatarId=10182",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&avatarId=10182",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&avatarId=10182",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&avatarId=10182"
+            },
+            "displayName": "Lemon, Paul",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          },
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=stma7001",
+            "name": "stma7001",
+            "key": "msteinbruckner",
+            "emailAddress": "Marten.Steinbruckner@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?ownerId=msteinbruckner&avatarId=21074",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&ownerId=msteinbruckner&avatarId=21074",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&ownerId=msteinbruckner&avatarId=21074",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&ownerId=msteinbruckner&avatarId=21074"
+            },
+            "displayName": "Steinbruckner, Marten",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          },
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=wevi7001",
+            "name": "wevi7001",
+            "key": "vvandeweerd",
+            "emailAddress": "Vincent.vandeWeerd@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?ownerId=vvandeweerd&avatarId=25365",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&ownerId=vvandeweerd&avatarId=25365",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&ownerId=vvandeweerd&avatarId=25365",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&ownerId=vvandeweerd&avatarId=25365"
+            },
+            "displayName": "Weerd, Vincent",
+            "active": true,
+            "timeZone": "Etc/GMT"
+          }
+        ],
+        "customfield_12491": null,
+        "timeoriginalestimate": null,
+        "customfield_10001": 1.0,
+        "priority": {
+          "self": "https://jira.gracenote.com/rest/api/2/priority/3",
+          "iconUrl": "https://jira.gracenote.com/images/icons/priorities/lowest.svg",
+          "name": "P3 - Medium",
+          "id": "3"
+        },
+        "customfield_10034": 2.0,
+        "customfield_10035": null,
+        "environment": null,
+        "duedate": null,
+        "votes": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-8/votes",
+          "votes": 0,
+          "hasVoted": false
+        }
+      }
+    },
+    {
+      "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+      "id": "994518",
+      "self": "https://jira.gracenote.com/rest/api/2/issue/994518",
+      "key": "TJT-7",
+      "fields": {
+        "summary": "Definition of Done",
+        "customfield_11090": null,
+        "watches": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-7/watchers",
+          "watchCount": 2,
+          "isWatching": true
+        },
+        "customfield_11091": null,
+        "customfield_13490": [
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=lepa7003",
+            "name": "lepa7003",
+            "key": "plemon",
+            "emailAddress": "Paul.Lemon@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?avatarId=10182",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&avatarId=10182",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&avatarId=10182",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&avatarId=10182"
+            },
+            "displayName": "Lemon, Paul",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          },
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=stma7001",
+            "name": "stma7001",
+            "key": "msteinbruckner",
+            "emailAddress": "Marten.Steinbruckner@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?ownerId=msteinbruckner&avatarId=21074",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&ownerId=msteinbruckner&avatarId=21074",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&ownerId=msteinbruckner&avatarId=21074",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&ownerId=msteinbruckner&avatarId=21074"
+            },
+            "displayName": "Steinbruckner, Marten",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          }
+        ],
+        "customfield_12491": null,
+        "timeoriginalestimate": null,
+        "customfield_10001": 15.0,
+        "priority": {
+          "self": "https://jira.gracenote.com/rest/api/2/priority/3",
+          "iconUrl": "https://jira.gracenote.com/images/icons/priorities/lowest.svg",
+          "name": "P3 - Medium",
+          "id": "3"
+        },
+        "customfield_10034": null,
+        "customfield_10035": null,
+        "environment": null,
+        "duedate": null,
+        "votes": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-7/votes",
+          "votes": 0,
+          "hasVoted": false
+        }
+      }
+    },
+    {
+      "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+      "id": "994517",
+      "self": "https://jira.gracenote.com/rest/api/2/issue/994517",
+      "key": "TJT-6",
+      "fields": {
+        "summary": "Smart Checklists Are Now Available in JIRA!!!",
+        "customfield_11090": [
+          "com.atlassian.greenhopper.service.sprint.Sprint@54083c95[id=5532,rapidViewId=918,state=CLOSED,name=GNS-METAPOD SPRINT 2,startDate=2018-11-28T08:02:53.810-08:00,endDate=2019-01-08T08:02:00.000-08:00,completeDate=2019-01-09T06:19:20.624-08:00,sequence=5532,goal=We help some teams to achieve their sprint goals]"
+        ],
+        "watches": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-6/watchers",
+          "watchCount": 3,
+          "isWatching": true
+        },
+        "customfield_11091": null,
+        "customfield_13490": [
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=suia7001",
+            "name": "suia7001",
+            "key": "isutherland",
+            "emailAddress": "Ian.Sutherland@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?ownerId=isutherland&avatarId=29062",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&ownerId=isutherland&avatarId=29062",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&ownerId=isutherland&avatarId=29062",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&ownerId=isutherland&avatarId=29062"
+            },
+            "displayName": "Ian Sutherland",
+            "active": true,
+            "timeZone": "America/Halifax"
+          },
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=lepa7003",
+            "name": "lepa7003",
+            "key": "plemon",
+            "emailAddress": "Paul.Lemon@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?avatarId=10182",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&avatarId=10182",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&avatarId=10182",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&avatarId=10182"
+            },
+            "displayName": "Lemon, Paul",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          },
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=stma7001",
+            "name": "stma7001",
+            "key": "msteinbruckner",
+            "emailAddress": "Marten.Steinbruckner@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?ownerId=msteinbruckner&avatarId=21074",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&ownerId=msteinbruckner&avatarId=21074",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&ownerId=msteinbruckner&avatarId=21074",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&ownerId=msteinbruckner&avatarId=21074"
+            },
+            "displayName": "Steinbruckner, Marten",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          }
+        ],
+        "customfield_12491": null,
+        "timeoriginalestimate": null,
+        "customfield_10001": 3.0,
+        "priority": {
+          "self": "https://jira.gracenote.com/rest/api/2/priority/3",
+          "iconUrl": "https://jira.gracenote.com/images/icons/priorities/lowest.svg",
+          "name": "P3 - Medium",
+          "id": "3"
+        },
+        "customfield_10034": null,
+        "customfield_10035": null,
+        "environment": null,
+        "duedate": null,
+        "votes": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-6/votes",
+          "votes": 0,
+          "hasVoted": false
+        }
+      }
+    },
+    {
+      "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+      "id": "994513",
+      "self": "https://jira.gracenote.com/rest/api/2/issue/994513",
+      "key": "TJT-3",
+      "fields": {
+        "summary": "Ensure all pod sprint durations are consistent.",
+        "customfield_11090": null,
+        "watches": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-3/watchers",
+          "watchCount": 2,
+          "isWatching": true
+        },
+        "customfield_11091": null,
+        "customfield_13490": [
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=lepa7003",
+            "name": "lepa7003",
+            "key": "plemon",
+            "emailAddress": "Paul.Lemon@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?avatarId=10182",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&avatarId=10182",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&avatarId=10182",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&avatarId=10182"
+            },
+            "displayName": "Lemon, Paul",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          },
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=stma7001",
+            "name": "stma7001",
+            "key": "msteinbruckner",
+            "emailAddress": "Marten.Steinbruckner@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?ownerId=msteinbruckner&avatarId=21074",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&ownerId=msteinbruckner&avatarId=21074",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&ownerId=msteinbruckner&avatarId=21074",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&ownerId=msteinbruckner&avatarId=21074"
+            },
+            "displayName": "Steinbruckner, Marten",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          }
+        ],
+        "customfield_12491": null,
+        "timeoriginalestimate": null,
+        "customfield_10001": 8.0,
+        "priority": {
+          "self": "https://jira.gracenote.com/rest/api/2/priority/3",
+          "iconUrl": "https://jira.gracenote.com/images/icons/priorities/lowest.svg",
+          "name": "P3 - Medium",
+          "id": "3"
+        },
+        "customfield_10034": null,
+        "customfield_10035": null,
+        "environment": null,
+        "duedate": null,
+        "votes": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-3/votes",
+          "votes": 0,
+          "hasVoted": false
+        }
+      }
+    },
+    {
+      "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+      "id": "994512",
+      "self": "https://jira.gracenote.com/rest/api/2/issue/994512",
+      "key": "TJT-2",
+      "fields": {
+        "summary": "Empower Pods to select their own sprint durations",
+        "customfield_11090": null,
+        "watches": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-2/watchers",
+          "watchCount": 2,
+          "isWatching": true
+        },
+        "customfield_11091": null,
+        "customfield_13490": [
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=lepa7003",
+            "name": "lepa7003",
+            "key": "plemon",
+            "emailAddress": "Paul.Lemon@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?avatarId=10182",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&avatarId=10182",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&avatarId=10182",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&avatarId=10182"
+            },
+            "displayName": "Lemon, Paul",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          },
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=stma7001",
+            "name": "stma7001",
+            "key": "msteinbruckner",
+            "emailAddress": "Marten.Steinbruckner@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?ownerId=msteinbruckner&avatarId=21074",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&ownerId=msteinbruckner&avatarId=21074",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&ownerId=msteinbruckner&avatarId=21074",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&ownerId=msteinbruckner&avatarId=21074"
+            },
+            "displayName": "Steinbruckner, Marten",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          }
+        ],
+        "customfield_12491": null,
+        "timeoriginalestimate": null,
+        "customfield_10001": 13.0,
+        "priority": {
+          "self": "https://jira.gracenote.com/rest/api/2/priority/3",
+          "iconUrl": "https://jira.gracenote.com/images/icons/priorities/lowest.svg",
+          "name": "P3 - Medium",
+          "id": "3"
+        },
+        "customfield_10034": null,
+        "customfield_10035": null,
+        "environment": null,
+        "duedate": null,
+        "votes": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-2/votes",
+          "votes": 0,
+          "hasVoted": false
+        }
+      }
+    },
+    {
+      "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+      "id": "994511",
+      "self": "https://jira.gracenote.com/rest/api/2/issue/994511",
+      "key": "TJT-1",
+      "fields": {
+        "summary": "NEW Summary",
+        "customfield_11090": null,
+        "watches": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-1/watchers",
+          "watchCount": 2,
+          "isWatching": true
+        },
+        "customfield_11091": null,
+        "customfield_13490": [
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=lepa7003",
+            "name": "lepa7003",
+            "key": "plemon",
+            "emailAddress": "Paul.Lemon@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?avatarId=10182",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&avatarId=10182",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&avatarId=10182",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&avatarId=10182"
+            },
+            "displayName": "Lemon, Paul",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          },
+          {
+            "self": "https://jira.gracenote.com/rest/api/2/user?username=stma7001",
+            "name": "stma7001",
+            "key": "msteinbruckner",
+            "emailAddress": "Marten.Steinbruckner@nielsen.com",
+            "avatarUrls": {
+              "48x48": "https://jira.gracenote.com/secure/useravatar?ownerId=msteinbruckner&avatarId=21074",
+              "24x24": "https://jira.gracenote.com/secure/useravatar?size=small&ownerId=msteinbruckner&avatarId=21074",
+              "16x16": "https://jira.gracenote.com/secure/useravatar?size=xsmall&ownerId=msteinbruckner&avatarId=21074",
+              "32x32": "https://jira.gracenote.com/secure/useravatar?size=medium&ownerId=msteinbruckner&avatarId=21074"
+            },
+            "displayName": "Steinbruckner, Marten",
+            "active": true,
+            "timeZone": "Europe/Amsterdam"
+          }
+        ],
+        "customfield_12491": null,
+        "timeoriginalestimate": null,
+        "customfield_10001": 13.0,
+        "priority": {
+          "self": "https://jira.gracenote.com/rest/api/2/priority/3",
+          "iconUrl": "https://jira.gracenote.com/images/icons/priorities/lowest.svg",
+          "name": "P3 - Medium",
+          "id": "3"
+        },
+        "customfield_10034": null,
+        "customfield_10035": null,
+        "environment": null,
+        "duedate": null,
+        "votes": {
+          "self": "https://jira.gracenote.com/rest/api/2/issue/TJT-1/votes",
+          "votes": 0,
+          "hasVoted": false
+        }
+      }
+    }
+  ]
+}
