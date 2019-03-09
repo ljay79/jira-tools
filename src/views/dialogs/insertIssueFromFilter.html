@@ -144,7 +144,7 @@
         google.script.run
           .withSuccessHandler(onResponse)
           .withFailureHandler(onResponse)
-          .insertIssuesFromFilter(formData);
+          .callbackInsertIssueFromFilter(formData);
       }
 
       function onResponse(response) {
