@@ -113,10 +113,11 @@ function formatFieldValueForJira(fieldDefinition, value) {
 
   if (fieldDefinition.schemaType == 'array|string') {
     if (typeof value === 'string' || value instanceof String) {
-      if (value != null && !isNaN(value)) {
-        // assume if the value is numeric it should be a sprint id 
-        // really need a better way to do this.
-        value = +value;
+      if (fieldDefinition.customType == "gh-sprint") {
+        // Sprint IDs should be numeric
+        if (value != null && !isNaN(value)) {
+          value = +value;
+        } 
       } else {
         value = splitCommaList_(value);
       }
@@ -186,7 +187,7 @@ function packageRowForUpdate(headerRow, dataRow) {
   function prepareUpdateField(headerId, value) {
     updateItems = [];
     if (value != null) {
-      listOfItems = value;//.split(/\s*,\s*/);
+      listOfItems = value;
       listOfItems.forEach(function (item) {
         if (item.trim().length > 0) {
           updateItems.push({ "name": item.trim() });
