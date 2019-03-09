@@ -37,16 +37,17 @@ function findAllBySheet() {
 function findTableByCoord() {
   // OK Case
   console.log('===========> case 2');
-  var table = IssueTableIndex_.getTableByCoord(undefined, 3, 4);
+  var table = IssueTableIndex_.getTableByCoord(757827655, 3, 7);
   if (!table) {
     console.log('Table NOT found!');
   } else {
     console.log('Found Tables: %s', table);
   }
+  return;
 
   // OK Case
   console.log('===========> case 1');
-  var table = IssueTableIndex_.getTableByCoord(230234225, 3, 4);
+  var table = IssueTableIndex_.getTableByCoord(230234225, 3, 7);
   if (!table) {
     console.log('Table NOT found!');
   } else {
@@ -72,10 +73,6 @@ function findTableByCoord() {
   }
 }
 
-function pruneOrphanedTables() {
-  IssueTableIndex_.prune();
-};
-
 /* ######## ------------------ #################### */
 
 /**
@@ -92,7 +89,6 @@ IssueTableIndex_ = {
 
   /**
    * @desc Adding a IssueTable to storage.
-   * 
    * @param {IssueTable_} IssueTable The IssueTable object to store in script storage
    * @return {IssueTableIndex_} Allow chaining
    */
@@ -125,7 +121,6 @@ IssueTableIndex_ = {
 
   /**
    * @desc Return a perviously stored IssueTable if available.
-   * 
    * @param {string} tableId Table Id to fetch
    * @param {sheetId} sheetId Optional: Sheet Id to fetch table for. Default: current active sheets id
    * @return {IssueTable_} Returns instance of IssueTable with loaded data if found, or empty instance if not
@@ -156,7 +151,6 @@ IssueTableIndex_ = {
 
   /**
    * @desc Format a usable string from sheetId and tableId
-   * 
    * @param {string} sheetId The sheet's sanitized id
    * @param {string} tableId The table id
    * @return {string}
@@ -167,7 +161,6 @@ IssueTableIndex_ = {
 
   /**
    * @desc Get all stored IssueTable's for passed Sheet Id.
-   * 
    * @param {string} sheetId Optional SheetId to fetch tables for. Default current active Sheet.
    * @return {array} Returns array of found IssueTable objects. Empty array if nothing found.
    */
@@ -195,11 +188,9 @@ IssueTableIndex_ = {
 
   /**
    * @desc Search for a indexed table by its coordinates within a sheet.
-   * 
-   * @param {string} sheetId    Optional SheetId to fetch tables for. Default current active Sheet.
-   * @param {int|Range} columnOrRange    A Range instance or column index used to find matching table
-   * @param {int|null} row    If column is integer a row index is required as well 
-   *                          to identify a cell-coord to search a indexed table for.
+   * @param {string} sheetId Optional SheetId to fetch tables for. Default current active Sheet.
+   * @param {int|Range} columnOrRange A Range instance or column index used to find matching table
+   * @param {int|null} row If column is integer a row index is required as well to identify a cell-coord to search a indexed table for.
    * @return {FALSE|IssueTable_} If table found it returns a instance of IssueTable_, or FALSE if nothing found.
    */
   getTableByCoord : function (sheetId, columnOrRange, row) {
@@ -209,7 +200,7 @@ IssueTableIndex_ = {
     var sheetId = sheetIdPropertySafe(sheetId);
     var column = (typeof columnOrRange === 'object') ? columnOrRange.getColumn() : parseInt(columnOrRange);
     var row = (typeof columnOrRange === 'object') ? columnOrRange.getRow() : parseInt(row);
-    var sheetIdx, tableIndexId, tableJson;
+    var sheetIdx, tableIndexId, tableJson, sheet, namedRange;
     var respond = function (response) {
       debug.timeEnd('IssueTableIndex.getTableByCoord()');
       return response;
@@ -231,12 +222,19 @@ IssueTableIndex_ = {
           // we usually would init a new IssueTable to access that meta,
           // but performance vise we access the JSON object directly!?
           tableJson = JSON.parse(this._tables[tableIndexId]);
+
           if (typeof tableJson !== 'object')
             continue;
 
+          sheet = getSheetById(sheetIdPropertySafe(sheetId, true));
+          if (sheet === undefined) {
+            continue;
+          }
+          namedRange = sheet.getParent().getRangeByName(tableJson.rangeName);
+
           // check passed coordinates are within current table range
-          if (column >= tableJson.rangeCoord.col.from && column <= tableJson.rangeCoord.col.to && row >= tableJson.rangeCoord.row.from
-              && row <= tableJson.rangeCoord.row.to) {
+          if (column >= namedRange.getColumn() && column <= namedRange.getLastColumn() && row >= namedRange.getRow()
+              && row <= namedRange.getLastRow()) {
             // found it ..
             return respond(new IssueTable_({
               metaData : tableJson
@@ -252,7 +250,6 @@ IssueTableIndex_ = {
   /**
    * @TODO: call by Trigger (ie when a sheet is deleted)
    * @desc Prune all orphaned tables in index.
-   * 
    * @return {IssueTableIndex_} Allow chaining
    */
   prune : function () {
@@ -314,14 +311,15 @@ IssueTableIndex_ = {
           }
 
           // look up range
-          range = Sheet.getRange(IssueTable.getMeta('rangeA1'));
+          range = Sheet.getParent().getRangeByName(IssueTable.getMeta('rangeName'));
+          if (range === null) {
+            removeFromIndex = true;
+            throw new Error('Named range with name ' + IssueTable.getMeta('rangeName') + ' is not existing in current Spreadsheet.');
+          }
+
           // get range of header only
-          range = Sheet.getRange(
-            range.getRow() + IssueTable.getMeta('headerRowOffset'),
-            range.getColumn(),
-            1,
-            (range.getLastColumn() - range.getColumn() + 1)
-          );
+          range = Sheet.getRange(range.getRow() + IssueTable.getMeta('headerRowOffset'), range.getColumn(), 1, (range.getLastColumn()
+              - range.getColumn() + 1));
 
           // check for expected table header
           _actualHeader = JSON.stringify(range.getValues()[0]).toLowerCase();
@@ -367,7 +365,6 @@ IssueTableIndex_ = {
 
   /**
    * @desc Initialize anything necessary for the class object
-   * 
    * @return void
    */
   _getStorage : function () {
@@ -381,10 +378,8 @@ IssueTableIndex_ = {
   },
 
   /**
-   * @desc Loading all available relevant data from storage. Atm its ok that 
-   *       _load() is called frequently, underlying Storage has a in-memory
-   *       cache to reduce service api calls to Google's property storage.
-   * 
+   * @desc Loading all available relevant data from storage. Atm its ok that _load() is called frequently, underlying Storage has a
+   *       in-memory cache to reduce service api calls to Google's property storage.
    * @return {IssueTableIndex_} Allow chaining
    */
   _load : function () {
@@ -415,7 +410,6 @@ IssueTableIndex_ = {
 
   /**
    * @desc Save all data to storage
-   * 
    * @return {IssueTableIndex_} Allow chaining
    */
   _save : function () {
