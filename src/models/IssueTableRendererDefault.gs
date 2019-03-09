@@ -1,6 +1,6 @@
 // Node required code block
-const getSheetById = require('../../jsLib.gs').getSheetById;
-const _sortKeysByRef = require('../../jsLib.gs')._sortKeysByRef;
+const getSheetById = require('../jsLib.gs').getSheetById;
+const _sortKeysByRef = require('../jsLib.gs')._sortKeysByRef;
 const sheetIdPropertySafe = require('../jiraCommon.gs').sheetIdPropertySafe;
 const unifyIssueAttrib = require('../jiraCommon.gs').unifyIssueAttrib;
 const UserStorage = require('./gas/UserStorage.gs');

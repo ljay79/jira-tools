@@ -1,5 +1,5 @@
 // Node required code block
-const getSheetById = require('../../jsLib.gs').getSheetById;
+const getSheetById = require('../jsLib.gs').getSheetById;
 const sheetIdPropertySafe = require('../jiraCommon.gs').sheetIdPropertySafe;
 var Storage_ = require('../Storage.gs').Storage_;
 var IssueTable_ = require('./jira/IssueTable.gs');
@@ -372,9 +372,9 @@ IssueTableIndex_ = {
    */
   _getStorage : function () {
     if (null === this._storage) {
-      // this._storage = new Storage_('paj_tables', PropertiesService.getDocumentProperties() || {});
+      this._storage = new Storage_('paj_tables', PropertiesService.getDocumentProperties() || {});
       // @TODO: remove before production - only for better debugging
-      this._storage = new Storage_('paj_tables', PropertiesService.getScriptProperties() || {});
+      //this._storage = new Storage_('paj_tables', PropertiesService.getScriptProperties() || {});
     }
 
     return this._storage;

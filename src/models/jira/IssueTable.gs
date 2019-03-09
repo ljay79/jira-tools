@@ -253,7 +253,7 @@ function IssueTable_(attributes) {
     metaData.headerValues = renderer.getHeaders();
 
     // setting range info
-    that.setRange(renderInfo.oRangeA1.from + ':' + renderInfo.oRangeA1.to);
+    setRange(renderInfo.oRangeA1.from + ':' + renderInfo.oRangeA1.to);
 
     return renderer;
   };
