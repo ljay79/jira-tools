@@ -484,13 +484,23 @@ test("Creating Fields", () => {
 });
 
 test("Read Only fields", () => {
+  // mock some fields in the users preferences
+  PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
+    return JSON.stringify([
+      { key: "custom_sprint", name: "Sprint", schemaType: "array|string", customType: "gh-sprint" },
+      { key: "custom_string", name: "String", schemaType: "string", supported: true, customType: "gh-none" }
+    ]
+    );
+  });
   var readonly = IssueFields.getReadonlyFields();
   expect(readonly).toContain("project");
   expect(readonly).toContain("created");
   expect(readonly).toContain("updated");
+  expect(readonly).toContain("custom_sprint");
   expect(readonly).not.toContain("summary");
   expect(readonly).not.toContain("description");
   expect(readonly).not.toContain("assignee");
   expect(readonly).not.toContain("priority");
+  expect(readonly).not.toContain("custom_string");
 })
 

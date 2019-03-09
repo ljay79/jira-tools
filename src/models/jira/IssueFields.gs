@@ -327,7 +327,8 @@ IssueFields = (function () {
   }
 
   function getReadonlyFields() {
-    return [
+    // built in fields we know are readonly first
+    var readonly = [
       "updated",
       "issuetype",
       "created",
@@ -348,6 +349,14 @@ IssueFields = (function () {
       'votes',
       'jst_epic'
     ];
+    // now get the users favourite fields and remove readonly fields
+    var userFields = getAvailableCustomFields();
+    userFields.forEach(function(field) {
+      if (field.customType == "gh-sprint") {
+        readonly.push(field.key);
+      }
+    });
+    return readonly;
   }
 
 
