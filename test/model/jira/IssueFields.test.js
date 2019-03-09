@@ -115,7 +115,7 @@ test("Set all JIRA fields", () => {
   IssueFields.setAllFields_({ a: "b" });
   expect(IssueFields.getAllFields()).toEqual({ a: "b" });
 });
-
+describe("Fetching all fields from JIRA", () => {
 test("Get all fields from Jira", () => {
   var fieldList = [
     {
@@ -224,7 +224,6 @@ test("Get all custom fields from Jira", () => {
   ];
   //set up
   jiraApiMock.setNextJiraResponse(200, "field", fieldList);
-  const IssueFields = require("src/models/jira/IssueFields.gs");
   const successCallBack = jest.fn();
   const errorCallBack = jest.fn();
 
@@ -241,6 +240,36 @@ test("Get all custom fields from Jira", () => {
   expect(fieldListReturned[2].key).toBe("def");
   expect(result).toBe(fieldListReturned);
 
+  });
+
+  test("Error when fetching all custom fields from Jira", () => {
+
+    // when nothing is returned
+    jiraApiMock.setNextJiraResponse(500, "field", null);
+    const successCallBack = jest.fn();
+    const errorCallBack = jest.fn();
+  
+    // execute
+    var result = IssueFields.getAllCustomFields(successCallBack, errorCallBack);
+    // verify call backs
+    expect(successCallBack.mock.calls.length).toBe(0);
+    expect(errorCallBack.mock.calls.length).toBe(1);
+
+
+    //when unexpected message is returned
+    /* In response to error found in logs
+    TypeError: Funktion map in Objekt [object Object] nicht gefunden
+     at processFieldResponse_ (models/jira/IssueFields:363)
+    */
+    jiraApiMock.setNextJiraResponse(500, "field", "{msg:'some unexpected response'}");
+  
+    // execute
+    var result = IssueFields.getAllCustomFields(successCallBack, errorCallBack);
+    // verify call backs
+    expect(successCallBack.mock.calls.length).toBe(0);
+    expect(errorCallBack.mock.calls.length).toBe(2);
+  
+    });
 });
 
 test("headerNames", () => {
@@ -501,6 +530,4 @@ test("Read Only fields", () => {
   expect(readonly).not.toContain("description");
   expect(readonly).not.toContain("assignee");
   expect(readonly).not.toContain("priority");
-  expect(readonly).not.toContain("custom_string");
-})
-
+});

@@ -44,7 +44,6 @@ IssueFields = (function () {
       return allJiraFields_;
     } else {
       var request = new Request();
-      allJiraFields_ = [];
 
       var ok = function (respData, httpResp, status) {
 
@@ -52,8 +51,14 @@ IssueFields = (function () {
           error(respData, httpResp, status);
         } else {
           processFieldResponse_(respData)
-          if (successCallBack != null) {
-            successCallBack(allJiraFields_);
+          if (allJiraFields_.length>0) {
+            if (successCallBack != null) {
+              successCallBack(allJiraFields_);
+            }
+          } else {
+            if (errorCallBack != null) {
+              errorCallBack("No fields were returned from JIRA", httpResp, status);
+            }
           }
         }
       };
@@ -435,7 +440,11 @@ IssueFields = (function () {
   function processFieldResponse_(respData) {
     // reset custom epic field 
     EpicField.resetValue();
-    allJiraFields_.push.apply(allJiraFields_, respData.map(IssueFields.convertJiraResponse));
+    // parse all the fields
+    allJiraFields_ = [];
+    if (respData != null && Array.isArray(respData)) {
+      allJiraFields_.push.apply(allJiraFields_, respData.map(IssueFields.convertJiraResponse));
+    }
     // sorting by supported type and name
     allJiraFields_.sort(defaultFieldSort_);
     // EPIC usable?
