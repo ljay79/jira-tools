@@ -78,6 +78,14 @@ function IssueSearch(searchQuery) {
 
     return this;
   }
+  
+  /**
+   * @desc Return max results used for search
+   * @return {Number} iMaxResults
+   */
+  this.getMaxResults = function() {
+    return maxResults;
+  };
 
   /**
    * @desc Set max results per page

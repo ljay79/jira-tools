@@ -91,14 +91,11 @@ function newControllerActionLive() {
   Search.setOrderBy().setFields(['key', 'summary', 'status']).setMaxResults(11).setStartAt(0).search().withSuccessHandler(ok);
 }
 
-
 /* ######## ------------------ #################### */
-
 
 /**
  * @file Contains controller class and dialog/callback method for inserting issue tables from jira filter.
  */
-
 
 /**
  * @desc Wrapper: Dialog to choose issues filter
@@ -109,7 +106,7 @@ function menuInsertIssueFromFilter() {
 
 /**
  * @desc Wrapper: Dialog callback handler
- * @return {object} Object({status: [boolean], response: [string]}) 
+ * @return {object} Object({status: [boolean], response: [string]})
  */
 function callbackInsertIssueFromFilter(jsonFormData) {
   return InsertIssueTable_Controller_.callback(jsonFormData);
@@ -124,17 +121,18 @@ InsertIssueTable_Controller_ = {
   /**
    * @desc Dialog to configure Jira custom fields
    */
-  dialog : function() {
+  dialog : function () {
     debug.log(this.name + '.dialog()');
 
-    if (!hasSettings(true)) return;
+    if (!hasSettings(true))
+      return;
 
     var customFields = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_SEARCH);
     var userColumns = UserStorage.getValue('userColumns') || [];
     var dialog = getDialog('views/dialogs/insertIssueFromFilter', {
-      columns: IssueFields.getBuiltInJiraFields(),
-      customFields: customFields,
-      userColumns: userColumns.length > 0 ? userColumns : jiraColumnDefault
+      columns : IssueFields.getBuiltInJiraFields(),
+      customFields : customFields,
+      userColumns : userColumns.length > 0 ? userColumns : jiraColumnDefault
     });
 
     // try to adjust height depending on amount of jira fields to show
@@ -152,11 +150,11 @@ InsertIssueTable_Controller_ = {
 
     SpreadsheetApp.getUi().showModalDialog(dialog, 'List Jira issues from filter');
   },
-  
+
   /**
-   * @desc Form handler for dialogIssuesFromFilter. Retrieve issues for given 
-   *       filter with specified columns from Jira and insert into current active sheet.
-   * @param jsonFormData {object}  JSON Form object of all form values
+   * @desc Form handler for dialogIssuesFromFilter. Retrieve issues for given filter with specified columns from Jira and insert into
+   *       current active sheet.
+   * @param jsonFormData {object} JSON Form object of all form values
    * @return {object} Object({status: [boolean], response: [string]})
    */
   callback : function (jsonFormData) {
@@ -169,19 +167,19 @@ InsertIssueTable_Controller_ = {
         response = {status: false, message: ''};
 
     var Renderer, attributes = {
-        filter : jsonFormData['filter_id'] ? getFilter( parseInt(jsonFormData['filter_id']) ) : {},
-        maxResults : parseInt(jsonFormData['maxResults']) || 10000,
-        issues : {},
-        sheet : getTicketSheet(),
-        renderer : IssueTableRendererDefault_
-      };
+      filter : jsonFormData['filter_id'] ? getFilter(parseInt(jsonFormData['filter_id'])) : {},
+      maxResults : parseInt(jsonFormData['maxResults']) || 10000,
+      issues : {},
+      sheet : getTicketSheet(),
+      renderer : IssueTableRendererDefault_
+    };
 
     UserStorage.setValue('userColumns', columns); // store for re-use by user
 
-    var ok = function(resp, status, errorMessage) {
+    var ok = function (resp, status, errorMessage) {
       debug.log(this.name + '.ok() resp(len): %s; s: %s; msg: %s', resp.data.length, status, errorMessage);
 
-      if( status !== 200 ) {
+      if (status !== 200) {
         // Something funky is up with the JSON response.
         response.message = "Failed to retrieve jira issues!";
         Browser.msgBox(response.message, Browser.Buttons.OK);
@@ -212,7 +210,7 @@ InsertIssueTable_Controller_ = {
       }
     };
 
-    var error = function(resp, status, errorMessage) {
+    var error = function (resp, status, errorMessage) {
       response.message = "Failed to retrieve jira issues from filter with status [" + status + "]!\\n" + errorMessage;
       Browser.msgBox(response.message, Browser.Buttons.OK);
     };
@@ -234,7 +232,7 @@ InsertIssueTable_Controller_ = {
    * @desc Setting a trigger for the current spreadsheet.
    * @return void
    */
-  setTriggerPruneIndex: function() {
+  setTriggerPruneIndex : function () {
     debug.log(this.name + '.setTriggerPruneIndex()');
     SpreadsheetTriggers_.register('onChange', 'TriggerPruneIssueTableIndex_', true);
   }
