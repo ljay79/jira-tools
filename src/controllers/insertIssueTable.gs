@@ -10,11 +10,7 @@ function tableFromMeta() {
     // sheetId : "sid_230234225",
     // tableId : "tbl_rH15D24",
     name : null,
-    // rangeA1 : "E1:G8",
     rangeA1 : "A15:C23",
-    /*
-     * rangeCoord : { row : { from : 2, to : 9 }, col : { from : 2, to : 4 } },
-     */
     headerRowOffse : 1,
     headerValues : ["key", "summary", "status"],
     filter : {
@@ -95,101 +91,6 @@ function newControllerActionLive() {
   Search.setOrderBy().setFields(['key', 'summary', 'status']).setMaxResults(11).setStartAt(0).search().withSuccessHandler(ok);
 }
 
-function testTable1() {
-  console.log('testTable1()');
-
-  SpreadsheetTriggers_.register('onEdit', 'onEditTableMeta', true);
-  SpreadsheetTriggers_.register('onChange', 'onEditTableMeta', true);
-}
-
-function onEditTableMeta(e) {
-  console.log('onEditTableMeta(): %s', e);
-
-  // check against if current sheet has any monitored IssueTable (loop)
-  if (getTicketSheet().getSheetId() != TestTable.sheetId) {
-    console.log('not monitored sheet, leave...');
-    return;
-  }
-
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var rangeCheck = ss.getRangeByName(TestTable.rangeName);
-  // get range left/top corner
-  var rangeCoord = {
-    'c' : rangeCheck.getColumn(),
-    'r' : rangeCheck.getRow()
-  };
-
-  // EDIT, INSERT_ROW, INSERT_COLUMN, REMOVE_ROW, REMOVE_COLUMN, INSERT_GRID,
-  // REMOVE_GRID, FORMAT, or OTHER
-  switch (e.changeType) {
-    case 'EDIT': // cell values changed; currently same validation rules as rest
-
-    case 'REMOVE_GRID':
-    case 'INSERT_GRID':
-    case 'REMOVE_COLUMN':
-    case 'REMOVE_ROW':
-    case 'INSERT_COLUMN':
-    case 'INSERT_ROW':
-      // get issue table header (always in 2nd row)
-      var tableHeader = getTicketSheet().getRange(rangeCoord.r + TestTable.headerRowOffset, rangeCoord.c, 1,
-          (rangeCheck.getLastColumn() - rangeCoord.c + 1));
-      // header changed?
-      if (tableHeader.getValues()[0].join('|') !== TestTable.headerValues.join('|')) {
-        console.log('Compare header: %s !== %s', tableHeader.getValues()[0].join('|'), TestTable.headerValues.join('|'));
-        console.log('New header values: %s', tableHeader.getValues());
-
-        /*
-         * @TODO: logic needed to check new header values - parse and check if new value is a supported Jira field - yes: update meta - no:
-         * flag column to be skipped - header moved inside table range (relative offset update?) / not 2nd row anymore? allowed at all?
-         */
-
-        // update meta - changed header
-        TestTable.headerValues = tableHeader.getValues();
-
-      } else {
-        console.log('table header didnt change, skip...');
-      }
-
-      // check for structural changes and update table meta OR throw warning
-      // (refresh wont be possible after such change)
-      if (rangeCheck.getA1Notation() === TestTable.rangeA1) {
-        console.log('Range dimension didnt change, skip...');
-        // return; // nothing to do
-      } else {
-        console.log('! Range changed !');
-
-        /*
-         * !! check if new change is affecting IssueTable functionality If YES: prompt user with warning and undo or accept with IssueTable
-         * beeing converted to static sheet table (remove trigger) If NO: simply update TableMeta if necessary
-         */
-        // update meta - changed dimension/range
-        TestTable.rangeA1 = rangeCheck.getA1Notation();
-
-        console.log('New Tables Range: %s', TestTable.rangeA1);
-      }
-
-      break;
-
-    default:
-      return;
-      break;
-  }
-
-}
-
-function testTriggerDialog() {
-  console.log('testTriggerDialog()');
-
-  SpreadsheetTriggers_.register('onEdit', 'onEditOpenDialog', true);
-  SpreadsheetTriggers_.register('onChange', 'onEditOpenDialog', true);
-}
-
-function onEditOpenDialog(e) {
-  debug.log('onEditOpenDialog()');
-  dialogAbout();
-
-  debug.log('END<!--');
-}
 
 /* ######## ------------------ #################### */
 
@@ -262,9 +163,10 @@ InsertIssueTable_Controller_ = {
     debug.log(this.name + '.callback() <= %s', JSON.stringify(jsonFormData));
 
     jsonFormData = jsonFormData || {filter_id: 0};
-    var startAt    = parseInt(jsonFormData['startAt']) || 0,
+    var that = this,
+        startAt = parseInt(jsonFormData['startAt']) || 0,
         columns = jsonFormData['columns'] || jiraColumnDefault,
-        response   = {status: false, message: ''};
+        response = {status: false, message: ''};
 
     var Renderer, attributes = {
         filter : jsonFormData['filter_id'] ? getFilter( parseInt(jsonFormData['filter_id']) ) : {},
@@ -279,14 +181,16 @@ InsertIssueTable_Controller_ = {
     var ok = function(resp, status, errorMessage) {
       debug.log(this.name + '.ok() resp(len): %s; s: %s; msg: %s', resp.data.length, status, errorMessage);
 
-      if( status === 200 ) {
+      if( status !== 200 ) {
+        // Something funky is up with the JSON response.
+        response.message = "Failed to retrieve jira issues!";
+        Browser.msgBox(response.message, Browser.Buttons.OK);
+      } else if (resp.data.length === 0) {
         // any issues in result?
-        if( resp.data.length === 0 ) {
-          response.message = "No issues were found to match your search.";
-          Browser.msgBox(response.message, Browser.Buttons.OK);
-          return;
-        }
-
+        response.message = "No issues were found to match your search.";
+        Browser.msgBox(response.message, Browser.Buttons.OK);
+        return;
+      } else {
         attributes.issues = resp.data;
 
         var Table = new IssueTable_(attributes);
@@ -297,15 +201,14 @@ InsertIssueTable_Controller_ = {
           SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
           debug.log(msg);
 
+          // add table to index
           IssueTableIndex_.addTable(Table);
 
           response.status = true;
-        }
 
-      } else {
-        // Something funky is up with the JSON response.
-        response.message = "Failed to retrieve jira issues!";
-        Browser.msgBox(response.message, Browser.Buttons.OK);
+          // set trigger for index cleanup
+          that.setTriggerPruneIndex();
+        }
       }
     };
 
@@ -325,5 +228,31 @@ InsertIssueTable_Controller_ = {
       .withFailureHandler(error);
 
     return response;
+  },
+
+  /**
+   * @desc Setting a trigger for the current spreadsheet.
+   * @return void
+   */
+  setTriggerPruneIndex: function() {
+    debug.log(this.name + '.setTriggerPruneIndex()');
+    SpreadsheetTriggers_.register('onChange', 'TriggerPruneIssueTableIndex_', true);
   }
+
+}
+
+/**
+ * @desc Trigger to react on structural changes in a sheet. Will prune obsolete IssueTable references in index.
+ * @param {EventObject} e
+ * @return void
+ */
+function TriggerPruneIssueTableIndex_(e) {
+  debug.log('TriggerPruneIssueTableIndex_() - e.changeType: %s', e.changeType);
+
+  if (e.changeType !== 'REMOVE_GRID') {
+    debug.log('[TriggerPruneIssueTableIndex_] changeType [%s] not monitored. Skip.', e.changeType);
+    return;
+  }
+
+  IssueTableIndex_.prune();
 }
