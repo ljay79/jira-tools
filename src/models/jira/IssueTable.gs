@@ -84,6 +84,10 @@ function IssueTable_(attributes) {
       });
       that.setIssues(attributes.issues).setRenderer(attributes.renderer);
       
+      if (attributes.filter.hasOwnProperty('name')) {
+        that.setMeta('name', attributes.filter.name);
+      }
+
       if (attributes.hasOwnProperty('maxResults')) {
         that.setMeta('maxResults', attributes.maxResults);
       }
@@ -258,7 +262,7 @@ function IssueTable_(attributes) {
   setRange = function (rangeA1) {
     metaData.rangeA1 = rangeA1;
     // setting named range
-    var _rangeName = 's' + Sheet.getIndex() + '_';
+    var _rangeName = 'pa4j_s' + Sheet.getSheetId() + '_';
     var _range = Sheet.getRange(rangeA1);
     _rangeName += that.getTableId().replace(/[^a-zA-Z0-9\_]/g, '');
 
