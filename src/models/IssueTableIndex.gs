@@ -160,6 +160,35 @@ IssueTableIndex_ = {
   },
 
   /**
+   * @desc Get all stored IssueTable's.
+   * @return {array} Returns array of found IssueTable instances. Empty array if nothing found.
+   */
+  getAll : function () {
+    debug.log('IssueTableIndex_.getAll()');
+
+    var tables = [], sheetId, sheetIdx, tableIndexId, IssueTable;
+
+    // load everything from storage
+    this._load();
+
+    for (sheetId in this._index) {
+      if (this._index.hasOwnProperty(sheetId)) {
+        for (sheetIdx in this._index[sheetId]) {
+          if (this._index[sheetId].hasOwnProperty(sheetIdx)) {
+            tableIndexId = this.tableIndexName(sheetId, this._index[sheetId][sheetIdx]);
+            if (null !== this._tables[tableIndexId]) {
+              IssueTable = new IssueTable_();
+              tables.push(IssueTable.fromJson(this._tables[tableIndexId]));
+            }
+          }
+        }
+      }
+    }
+
+    return tables;
+  },
+
+  /**
    * @desc Get all stored IssueTable's for passed Sheet Id.
    * @param {string} sheetId Optional SheetId to fetch tables for. Default current active Sheet.
    * @return {array} Returns array of found IssueTable objects. Empty array if nothing found.

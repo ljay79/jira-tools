@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<!--
+
+- show sidebar with loading animation
+- onLoad: 
+-- load issuetables
+-- show/expand current (active) issuetable if available
+- onFocus: update list of tables in sheets
+
+- each IssueTable
+-- show "Refresh" button for immediate refresh
+-- open block with schedule options for each row on button click
+
+//-->
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
+  <style>
+    .sidebar {
+      padding: 0;
+    }
+    
+    .branding-below {
+      bottom: 56px;
+      top: 0;
+    }
+    .sidebar.bottom {
+      font-size: 12px;
+    }
+
+    table {
+      width: 100%;
+      border: 1px solid grey;
+    }
+    th,td {
+      vertical-align: top;
+      padding: 2px;
+    }
+
+    .error-container { display: none;  float: right; margin-bottom: 5px; padding: 5px 10px; text-align: center; color: #fff; }
+    .is-loading { text-align: center; animation: blink .5s infinite; }
+    @keyframes blink { 0% { color: #fff; } 50% { color: #777; } 100% { color: #fff; } }
+    .results p {color: #fff;}
+    </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="sidebar branding-below">
+
+  <div class="block is-loading">loading filters ...</div>
+
+  <div class="block" style="border:1px solid grey">
+    <strong>Table: Filter 01 - Lorem ipsum</strong><br/>
+    Tabellenblatt89!A1:F23<br/>
+    
+      <div class="block">
+        <button class="action">Schedule</button>
+        <button class="share">Refresh</button>
+      </div>
+  </div>
+
+
+
+</div>
+  
+<div class="sidebar bottom" style="padding: 12px">
+  <span class="gray">Project Aid for Jira v1.2.0</span>
+</div>
+
+<script>
+      function onInitSidebar(response) {
+        var loading = document.querySelector('.is-loading');
+            loading.classList.remove('is-loading');
+
+        response.list.forEach(function(option) {
+          var radio = document.createElement('div');
+          var radioInput = document.createElement('input');
+          var radioLabel = document.createElement('label');
+
+          radio.appendChild(radioInput);
+          radio.appendChild(radioLabel);
+
+          radioInput.addEventListener('change', inputValidatyHandler);
+          
+        });
+
+        window.dispatchEvent(new Event('load'));
+      }
+
+      google.script.run
+        .withSuccessHandler(onInitSidebar)
+        .getMyFilters(true);
+</script>
+</body>
+</html>
