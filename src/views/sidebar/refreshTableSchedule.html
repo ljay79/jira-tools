@@ -52,17 +52,9 @@
 
   <div class="block is-loading">loading filters ...</div>
 
-  <div class="block" style="border:1px solid grey">
-    <strong>Table: Filter 01 - Lorem ipsum</strong><br/>
-    Tabellenblatt89!A1:F23<br/>
-    
-      <div class="block">
-        <button class="action">Schedule</button>
-        <button class="share">Refresh</button>
-      </div>
+  <div id="table-container" style="border:1px dashed grey">
+  
   </div>
-
-
 
 </div>
   
@@ -70,29 +62,68 @@
   <span class="gray">Project Aid for Jira v1.2.0</span>
 </div>
 
+<div id="table-element-template" class="block" style="border:1px solid grey; display:none">
+  <div class="descr">
+    <strong class="name">Table: Filter 01 - Lorem ipsum</strong><br/>
+    <span class="location">Tabellenblatt89!A1:F23</span>
+  </div>
+  <div class="block">
+    <button class="action" disabled>Schedule</button>
+    <button class="share" disabled>Refresh</button>
+  </div>
+</div>
+
 <script>
+function refreshTable(event) {
+  var button = $(this);
+  button.prop('disabled', true);
+
+  function onResponse(response) {
+    var done = response.status === true;
+    if (done) {
+      button.prop('disabled', false);
+    }
+  }
+
+  google.script.run
+    .withSuccessHandler(onResponse)
+    .withFailureHandler(onResponse)
+    .cbRefreshIssueTable_refreshTable(event.data);
+}
+
       function onInitSidebar(response) {
         var loading = document.querySelector('.is-loading');
             loading.classList.remove('is-loading');
 
-        response.list.forEach(function(option) {
-          var radio = document.createElement('div');
-          var radioInput = document.createElement('input');
-          var radioLabel = document.createElement('label');
+        var table_element_tpl = jQuery('#table-element-template');
 
-          radio.appendChild(radioInput);
-          radio.appendChild(radioLabel);
-
-          radioInput.addEventListener('change', inputValidatyHandler);
+        response.tables.forEach(function(tableMeta){
+          var meta = JSON.parse(tableMeta);
+          var tableName = meta.name;
+          var tableLocation = meta.sheetName + '!' + meta.rangeA1;
+          
+          var divTable = table_element_tpl.clone().prop('id', null);
+          divTable.find('.descr > .name').html(tableName);
+          divTable.find('.descr > .location').html(tableLocation);
+          divTable.prop('data-table-id', meta.tableId)
+            .prop('data-sheet-id', meta.sheetId)
+            .show();
+            
+          // enable action buttons
+          divTable.find('.block > :button.share')
+            .prop('disabled', false)
+            .click(meta, refreshTable);
+          
+          divTable.appendTo('#table-container');
           
         });
-
+        
         window.dispatchEvent(new Event('load'));
       }
 
       google.script.run
         .withSuccessHandler(onInitSidebar)
-        .getMyFilters(true);
+        .cbRefreshIssueTable_initSidebar();
 </script>
 </body>
 </html>

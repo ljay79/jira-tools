@@ -40,80 +40,6 @@ function TESTinsertTableFromFilter() {
   ;
 }
 
-/*
- * Fetching a table from index and using its meta data to (re)insert table into sheet. Used for Refreshing entire Issue Tables
- */
-function TESTrefreshTableFromMeta() {
-  debug.log('TESTinsertTableFromMeta()');
-
-  // Get table from Meta
-  // var Table = IssueTableIndex_.getTable('tbl_rE9G15', '1088328195');
-  var Table = IssueTableIndex_.getTable('tbl_rA12C18', '1088328195');
-
-  var ok = function (resp, status, errorMessage) {
-    var renderer;
-    Table.setIssues(resp.data);
-
-    if (renderer = Table.render()) {
-      // toast with status message
-      var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
-          + " total found records.";
-      SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
-      debug.log(msg);
-
-      // add table to index
-      console.log('renderer.info: %s', renderer.getInfo());
-      console.log('==>> Table Meta: %s', Table.getMeta());
-    }
-  };
-
-  var Search = new IssueSearch(Table.getMeta('filter').jql);
-  Search.setOrderBy()
-    .setFields(Table.getMeta('headerValues'))
-    .setMaxResults(Table.getMeta('maxResults') || 10)
-    .setStartAt(0)
-    .search()
-    .withSuccessHandler(ok)
-  ;
-}
-
-
-function TESTrefreshTableFromMeta2() {
-  debug.log('TESTinsertTableFromMeta2()');
-
-  // Get table from Meta
-  var Table = IssueTableIndex_.getTable('tbl_rE9G15', '1088328195');
-
-  var ok = function (resp, status, errorMessage) {
-    var renderer;
-    Table.setIssues(resp.data);
-
-    if (renderer = Table.render()) {
-      // toast with status message
-      var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
-          + " total found records.";
-      SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
-      debug.log(msg);
-
-      // add table to index
-      console.log('renderer.info: %s', renderer.getInfo());
-      console.log('==>> Table Meta: %s', Table.getMeta());
-    }
-  };
-  
-  // var headers = Table.getMeta('headerValues');
-  var headers = ['key', 'summary', 'status', 'assignee'];
-  
-  var Search = new IssueSearch(Table.getMeta('filter').jql);
-  Search.setOrderBy()
-    .setFields(headers)
-    .setMaxResults(Table.getMeta('maxResults') || 10)
-    .setStartAt(0)
-    .search()
-    .withSuccessHandler(ok)
-  ;
-}
-
 
 /* ######## ------------------ #################### */
 
@@ -252,7 +178,7 @@ InsertIssueTable_Controller_ = {
 
     return response;
   },
-
+  
   /**
    * @desc Setting a trigger for the current spreadsheet.
    * @return void
@@ -262,6 +188,10 @@ InsertIssueTable_Controller_ = {
     SpreadsheetTriggers_.register('onChange', 'TriggerPruneIssueTableIndex_', true);
   },
 
+  /**
+   * @desc Setting a trigger for current sheet monitoring any IssueTable modification.
+   * @return void
+   */
   setTriggerIssueTableModification : function () {
     debug.log(this.name + '.setTriggerIssueTableModification()');
     SpreadsheetTriggers_.register('onEdit', 'TriggerIssueTableModification_', true);
@@ -319,7 +249,7 @@ function TriggerIssueTableModification_(e) {
       debug.log('[TriggerIssueTableModification_] Show warning with option to revert changes cell value.');
       var result = ui.alert(
         'Warning! Please confirm',
-        'Changes in this Issue table may prevent "IssueTable Refresh". '
+        'Changes in this Issue table may prevent "Refresh IssueTable". '
         + 'Changed cell values may be overwritten by an automated updates.  '
         + 'Press "OK" is you want to ingore this, or click "Cancel" to revert your change.',
         ui.ButtonSet.OK_CANCEL);
@@ -332,7 +262,7 @@ function TriggerIssueTableModification_(e) {
       debug.log('[TriggerIssueTableModification_] Show warning without options.');
       ui.alert(
         'Warning!',
-        'Changes in this issue table may prevent "IssueTable Refresh".',
+        'Changes in this issue table may prevent "Refresh IssueTable".',
         ui.ButtonSet.OK);
     }
 

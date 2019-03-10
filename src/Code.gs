@@ -53,6 +53,7 @@ function addMenu() {
     .addItem('About', 'dialogAbout')
     .addSeparator()
     .addItem('Update Jira Issues (BETA)', 'menuUpdateJiraIssues')
+    .addItem('Refresh IssueTable (BETA)', 'menuRefreshIssueTable')
     .addToUi();
 }
 

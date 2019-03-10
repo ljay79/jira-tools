@@ -1,44 +1,5 @@
 /* ######## DEV- WIP - Testing #################### */
 
-/*
- * Inserting a new IssueTable from a Jira saved filter. Inserting at current active cell in active sheet
- */
-function TESTinsertTableFromFilter() {
-  debug.log('TESTinsertTableFromFilter()');
-
-  var ok = function (resp, status, errorMessage) {
-    var renderer, attributes = {
-      filter : getFilter(14406),
-      issues : resp.data,
-      sheet : getTicketSheet(),
-      renderer : IssueTableRendererDefault_,
-      maxResults: Search.getMaxResults()
-    };
-
-    var table = new IssueTable_(attributes);
-    if (renderer = table.render()) {
-      // toast with status message
-      var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
-          + " total found records.";
-      SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
-      debug.log(msg);
-
-      // add table to index
-      IssueTableIndex_.addTable(table);
-      console.log('renderer.info: %s', renderer.getInfo());
-      console.log('==>> Table Meta: %s', table.getMeta());
-    }
-  };
-
-  var Search = new IssueSearch("status = Done");
-  Search.setOrderBy()
-    .setFields(['key', 'summary', 'status'])
-    .setMaxResults(5)
-    .setStartAt(0)
-    .search()
-    .withSuccessHandler(ok)
-  ;
-}
 
 /*
  * Fetching a table from index and using its meta data to (re)insert table into sheet. Used for Refreshing entire Issue Tables
@@ -122,146 +83,32 @@ function TESTrefreshTableFromMeta2() {
  */
 
 /**
- * @desc Wrapper: Dialog to choose issues filter
- */
-function menuInsertIssueFromFilter() {
-  InsertIssueTable_Controller_.dialog();
-}
-
-/**
  * @desc Wrapper: Sidebar for "Refresh IssueTable"
  */
 function menuRefreshIssueTable() {
-  InsertIssueTable_Controller_.sidebar();
+  RefreshIssueTable_Controller_.sidebar();
 }
 
 /**
- * @desc Wrapper: Dialog callback handler
- * @return {object} Object({status: [boolean], response: [string]})
+ * @desc Wrapper: Sidebar callback handler for initialization of sidebar content
+ * @return {object} Object({status: [boolean], tables: [object]})
  */
-function callbackInsertIssueFromFilter(jsonFormData) {
-  return InsertIssueTable_Controller_.callback(jsonFormData);
+function cbRefreshIssueTable_initSidebar() {
+  return RefreshIssueTable_Controller_.callbackInitSidebar();
+}
+
+function cbRefreshIssueTable_refreshTable(tableMetaData) {
+  return RefreshIssueTable_Controller_.callbackRefreshTable(tableMetaData);
 }
 
 /**
  * Creates a new IssueTableIndex_ object, which is used to persist IssueTables and related information.
  */
-InsertIssueTable_Controller_ = {
-  name : 'InsertIssueTable_Controller_',
+RefreshIssueTable_Controller_ = {
+  name : 'RefreshIssueTable_Controller_',
 
-  /**
-   * @desc Dialog to configure Jira custom fields
-   */
-  dialog : function () {
-    debug.log(this.name + '.dialog()');
-
-    if (!hasSettings(true))
-      return;
-
-    var customFields = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_SEARCH);
-    var userColumns = UserStorage.getValue('userColumns') || [];
-    var dialog = getDialog('views/dialogs/insertIssueFromFilter', {
-      columns : IssueFields.getBuiltInJiraFields(),
-      customFields : customFields,
-      userColumns : userColumns.length > 0 ? userColumns : jiraColumnDefault
-    });
-
-    // try to adjust height depending on amount of jira fields to show
-    var rowH = 32;
-    var height = 424;
-    height += (Math.ceil(Object.keys(IssueFields.getBuiltInJiraFields()).length % 4) * rowH);
-    height += (Math.ceil(Object.keys(customFields).length % 4) * rowH);
-
-    dialog
-      .setWidth(600)
-      .setHeight(height)
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-
-    debug.log('Processed: %s', dialog);
-
-    SpreadsheetApp.getUi().showModalDialog(dialog, 'List Jira issues from filter');
-  },
-
-  /**
-   * @desc Form handler for dialogIssuesFromFilter. Retrieve issues for given filter with specified columns from Jira and insert into
-   *       current active sheet.
-   * @param jsonFormData {object} JSON Form object of all form values
-   * @return {object} Object({status: [boolean], response: [string]})
-   */
-  callback : function (jsonFormData) {
-    debug.log(this.name + '.callback() <= %s', JSON.stringify(jsonFormData));
-
-    jsonFormData = jsonFormData || {filter_id: 0};
-    var that = this,
-        startAt = parseInt(jsonFormData['startAt']) || 0,
-        columns = jsonFormData['columns'] || jiraColumnDefault,
-        response = {status: false, message: ''};
-
-    var Renderer, attributes = {
-      filter : jsonFormData['filter_id'] ? getFilter(parseInt(jsonFormData['filter_id'])) : {},
-      maxResults : parseInt(jsonFormData['maxResults']) || 10000,
-      issues : {},
-      sheet : getTicketSheet(),
-      renderer : IssueTableRendererDefault_
-    };
-
-    UserStorage.setValue('userColumns', columns); // store for re-use by user
-
-    var ok = function (resp, status, errorMessage) {
-      debug.log(this.name + '.ok() resp(len): %s; s: %s; msg: %s', resp.data.length, status, errorMessage);
-
-      if (status !== 200) {
-        // Something funky is up with the JSON response.
-        response.message = "Failed to retrieve jira issues!";
-        Browser.msgBox(response.message, Browser.Buttons.OK);
-      } else if (resp.data.length === 0) {
-        // any issues in result?
-        response.message = "No issues were found to match your search.";
-        Browser.msgBox(response.message, Browser.Buttons.OK);
-        return;
-      } else {
-        attributes.issues = resp.data;
-
-        var Table = new IssueTable_(attributes);
-        if (Renderer = Table.render()) {
-          // toast with status message
-          var msg = "Finished inserting " + Renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
-              + " total found records.";
-          SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
-          debug.log(msg);
-
-          // add table to index
-          IssueTableIndex_.addTable(Table);
-
-          response.status = true;
-
-          // set trigger for index cleanup and modification detection
-          that.setTriggerPruneIndex();
-          that.setTriggerIssueTableModification();
-        }
-      }
-    };
-
-    var error = function (resp, status, errorMessage) {
-      response.message = "Failed to retrieve jira issues from filter with status [" + status + "]!\\n" + errorMessage;
-      Browser.msgBox(response.message, Browser.Buttons.OK);
-    };
-
-    var Search = new IssueSearch(attributes.filter.jql);
-    Search
-      // .setOrderBy()
-      .setFields(columns)
-      .setMaxResults(attributes.maxResults)
-      .setStartAt(startAt)
-      .search()      
-      .withSuccessHandler(ok)
-      .withFailureHandler(error);
-
-    return response;
-  },
-  
   sidebar : function () {
-    var sidebar = getDialog('views/sidebar/issueTableSchedule');
+    var sidebar = getDialog('views/sidebar/refreshTableSchedule');
 
     debug.log('Processed: %s', sidebar);
 
@@ -273,96 +120,73 @@ InsertIssueTable_Controller_ = {
     SpreadsheetApp.getUi().showSidebar(html);
   },
 
-  /**
-   * @desc Setting a trigger for the current spreadsheet.
-   * @return void
-   */
-  setTriggerPruneIndex : function () {
-    debug.log(this.name + '.setTriggerPruneIndex()');
-    SpreadsheetTriggers_.register('onChange', 'TriggerPruneIssueTableIndex_', true);
-  },
+  callbackInitSidebar : function () {
+    debug.log(this.name + '.callbackInitSidebar()');
 
-  /**
-   * @desc Setting a trigger for current sheet monitoring any IssueTable modification.
-   * @return void
-   */
-  setTriggerIssueTableModification : function () {
-    debug.log(this.name + '.setTriggerIssueTableModification()');
-    SpreadsheetTriggers_.register('onEdit', 'TriggerIssueTableModification_', true);
-  }
-}
-
-/**
- * @desc Trigger to react on structural changes in a sheet. Will prune obsolete IssueTable references in index.
- * @param {EventObject} e
- * @return void
- */
-function TriggerPruneIssueTableIndex_(e) {
-  debug.time('[TriggerPruneIssueTableIndex_]');
-  debug.log('[TriggerPruneIssueTableIndex_] - e.changeType: %s', e.changeType);
-
-  if (e.changeType !== 'REMOVE_GRID') {
-    debug.log('[TriggerPruneIssueTableIndex_] changeType [%s] not monitored. Skip.', e.changeType);
-    debug.timeEnd('[TriggerPruneIssueTableIndex_]');
-    return;
-  }
-
-  IssueTableIndex_.prune();
-  debug.timeEnd('[TriggerPruneIssueTableIndex_]');
-}
-
-/**
- * @desc Trigger to react on structural changes in a defined range of an IssueTable. Alerting to user, that changes on the grid will disable
- *       any IssueTable refresh options (Indexer).
- * @param {EventObject} e
- *          {"authMode":{},"range":{"columnStart":5,"rowStart":14,"rowEnd":14,"columnEnd":5},"source":{},"oldValue":"TP-15","user":{"nickname":"user","email":"user@sample.com"},"triggerUid":"6799221736938207327"}
- * @return void
- */
-function TriggerIssueTableModification_(e) {
-  debug.time('[TriggerIssueTableModification_]');
-  debug.log('[TriggerIssueTableModification_] - e:  %s', JSON.stringify(e));
-
-  var IssueTable = IssueTableIndex_.getTableByCoord(e.range.getSheet().getSheetId(), e.range);
-  if (!IssueTable) {
-    debug.timeEnd('[TriggerIssueTableModification_]');
-    return;
-  }
-
-  // Found IssueTable affected by modified range
-  var ui = SpreadsheetApp.getUi();
-  var warningSuspendSeconds = 120 * 1000;
-  var tmpWarningId = 'warning.' + IssueTable.getSheetId() + '__' + IssueTable.getTableId();
-  var lastWarningTime = UserStorage.getValue(tmpWarningId);
-  var timeNow = (new Date()).getTime();
-
-  if (lastWarningTime === null || lastWarningTime < (timeNow - warningSuspendSeconds)) {
-    UserStorage.setValue(tmpWarningId, timeNow);
-
-    // prompt can handle UnDo in case of single cell value change
-    if (e.oldValue) {
-      debug.log('[TriggerIssueTableModification_] Show warning with option to revert changes cell value.');
-      var result = ui.alert(
-        'Warning! Please confirm',
-        'Changes in this Issue table may prevent "Refresh IssueTable". '
-        + 'Changed cell values may be overwritten by an automated updates.  '
-        + 'Press "OK" is you want to ingore this, or click "Cancel" to revert your change.',
-        ui.ButtonSet.OK_CANCEL);
-
-      if (result == ui.Button.CANCEL) {
-        debug.log('[TriggerIssueTableModification_] reverted cell value.');
-        e.range.setValue(e.oldValue).activate();
+    var response = {
+      status: true, 
+      tables: []
+    };
+    
+    /* enhance data for sidebar functionality, then pass to response as JSON string */
+    IssueTableIndex_.getAll().forEach(function(table){
+      // add name of sheet
+      var sheet = getSheetById(sheetIdPropertySafe(table.getSheetId(), true));
+      if (typeof sheet !== 'object') {
+        return; // no sheet available, IssueTable seems orphaned
       }
-    } else {
-      debug.log('[TriggerIssueTableModification_] Show warning without options.');
-      ui.alert(
-        'Warning!',
-        'Changes in this issue table may prevent "Refresh IssueTable".',
-        ui.ButtonSet.OK);
+      table.setMeta('sheetName', sheet.getName());
+
+      response.tables.push(table.toJson());
+    });
+    
+    return response;
+  },
+  
+  callbackRefreshTable : function (tableMetaData) {
+    debug.log(this.name + '.callbackRefreshTable() <= %s', tableMetaData);
+
+    var response = {status: false};
+    
+    // Get table from Meta
+    var sheetId = sheetIdPropertySafe(tableMetaData.sheetId, true);
+    var Table = IssueTableIndex_.getTable(tableMetaData.tableId, sheetId);
+
+    var ok = function (resp, status, errorMessage) {
+      var renderer;
+      Table.setIssues(resp.data);
+
+      if (renderer = Table.render()) {
+        // toast with status message
+        var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
+        + " total found records.";
+        SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
+        debug.log(msg);
+
+        IssueTableIndex_.addTable(Table);
+        console.log('renderer.info: %s', renderer.getInfo());
+        console.log('==>> Table Meta: %s', Table.getMeta());
+      }
+    };
+    
+    if (typeof Table !== 'object') {
+      debug.error('Could not refresh IssueTable. Table not found!');
+      SpreadsheetApp.getUi().alert('Could not refresh IssueTable. Table not found!');
+      return response;
     }
 
-  } else {
-    debug.log('[TriggerIssueTableModification_] DONT show warning: %ss elapsed from %s', (timeNow - lastWarningTime)/1000, warningSuspendSeconds/1000);
+    var Search = new IssueSearch(Table.getMeta('filter').jql);
+    Search.setOrderBy()
+      .setFields(Table.getMeta('headerValues'))
+      .setMaxResults(Table.getMeta('maxResults') || 10)
+      .setStartAt(0)
+      .search()
+      .withSuccessHandler(ok)
+    ;
+
+    response.status = true;
+
+    return response;
   }
 
-  debug.timeEnd('[TriggerIssueTableModification_]');
 }
