@@ -1,6 +1,5 @@
 /* ######## DEV- WIP - Testing #################### */
 
-
 /*
  * Fetching a table from index and using its meta data to (re)insert table into sheet. Used for Refreshing entire Issue Tables
  */
@@ -38,7 +37,6 @@ function TESTrefreshTableFromMeta() {
   ;
 }
 
-
 function TESTrefreshTableFromMeta2() {
   debug.log('TESTinsertTableFromMeta2()');
 
@@ -61,10 +59,10 @@ function TESTrefreshTableFromMeta2() {
       console.log('==>> Table Meta: %s', Table.getMeta());
     }
   };
-  
+
   // var headers = Table.getMeta('headerValues');
   var headers = ['key', 'summary', 'status', 'assignee'];
-  
+
   var Search = new IssueSearch(Table.getMeta('filter').jql);
   Search.setOrderBy()
     .setFields(headers)
@@ -74,7 +72,6 @@ function TESTrefreshTableFromMeta2() {
     .withSuccessHandler(ok)
   ;
 }
-
 
 /* ######## ------------------ #################### */
 
@@ -124,12 +121,12 @@ RefreshIssueTable_Controller_ = {
     debug.log(this.name + '.callbackInitSidebar()');
 
     var response = {
-      status: true, 
-      tables: []
+      status : true,
+      tables : []
     };
-    
+
     /* enhance data for sidebar functionality, then pass to response as JSON string */
-    IssueTableIndex_.getAll().forEach(function(table){
+    IssueTableIndex_.getAll().forEach(function (table) {
       // add name of sheet
       var sheet = getSheetById(sheetIdPropertySafe(table.getSheetId(), true));
       if (typeof sheet !== 'object') {
@@ -139,15 +136,17 @@ RefreshIssueTable_Controller_ = {
 
       response.tables.push(table.toJson());
     });
-    
+
     return response;
   },
-  
+
   callbackRefreshTable : function (tableMetaData) {
     debug.log(this.name + '.callbackRefreshTable() <= %s', tableMetaData);
 
-    var response = {status: false};
-    
+    var response = {
+      status : false
+    };
+
     // Get table from Meta
     var sheetId = sheetIdPropertySafe(tableMetaData.sheetId, true);
     var Table = IssueTableIndex_.getTable(tableMetaData.tableId, sheetId);
@@ -159,7 +158,7 @@ RefreshIssueTable_Controller_ = {
       if (renderer = Table.render()) {
         // toast with status message
         var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
-        + " total found records.";
+            + " total found records.";
         SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
         debug.log(msg);
 
@@ -168,7 +167,7 @@ RefreshIssueTable_Controller_ = {
         console.log('==>> Table Meta: %s', Table.getMeta());
       }
     };
-    
+
     if (typeof Table !== 'object') {
       debug.error('Could not refresh IssueTable. Table not found!');
       SpreadsheetApp.getUi().alert('Could not refresh IssueTable. Table not found!');
@@ -178,7 +177,7 @@ RefreshIssueTable_Controller_ = {
     var Search = new IssueSearch(Table.getMeta('filter').jql);
     Search.setOrderBy()
       .setFields(Table.getMeta('headerValues'))
-      .setMaxResults(Table.getMeta('maxResults') || 10)
+      .setMaxResults(Table.getMeta('maxResults') || 1000)
       .setStartAt(0)
       .search()
       .withSuccessHandler(ok)

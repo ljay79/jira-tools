@@ -15,63 +15,79 @@
 -- open block with schedule options for each row on button click
 
 //-->
-  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
-  <style>
-    .sidebar {
-      padding: 0;
-    }
-    
-    .branding-below {
-      bottom: 56px;
-      top: 0;
-    }
-    .sidebar.bottom {
-      font-size: 12px;
-    }
+<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
+<style>
+.sidebar {
+	padding: 0;
+}
 
-    table {
-      width: 100%;
-      border: 1px solid grey;
-    }
-    th,td {
-      vertical-align: top;
-      padding: 2px;
-    }
+.branding-below {
+	bottom: 56px;
+	top: 0;
+}
 
-    .error-container { display: none;  float: right; margin-bottom: 5px; padding: 5px 10px; text-align: center; color: #fff; }
-    .is-loading { text-align: center; animation: blink .5s infinite; }
-    @keyframes blink { 0% { color: #fff; } 50% { color: #777; } 100% { color: #fff; } }
-    .results p {color: #fff;}
-    </style>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+.sidebar.bottom {
+	font-size: 12px;
+}
+
+table {
+	width: 100%;
+	border: 1px solid grey;
+}
+
+th, td {
+	vertical-align: top;
+	padding: 2px;
+}
+
+.error-container {
+	display: none;
+	float: right;
+	margin-bottom: 5px;
+	padding: 5px 10px;
+	text-align: center;
+	color: #fff;
+}
+
+.is-loading {
+	text-align: center;
+	animation: blink .5s infinite;
+}
+
+@keyframes blink { 0% { color: #fff; } 50% { color: #777; } 100% { color: #fff; } }
+
+.results p {
+	color: #fff;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
 
-<div class="sidebar branding-below">
+  <div class="sidebar branding-below">
 
-  <div class="block is-loading">loading filters ...</div>
+    <div class="block is-loading">loading filters ...</div>
 
-  <div id="table-container" style="border:1px dashed grey">
-  
+    <div id="table-container" style="border: 1px dashed grey"></div>
+
   </div>
 
-</div>
-  
-<div class="sidebar bottom" style="padding: 12px">
-  <span class="gray">Project Aid for Jira v1.2.0</span>
-</div>
+  <div class="sidebar bottom" style="padding: 12px">
+    <span class="gray">Project Aid for Jira v1.2.0</span>
+  </div>
 
-<div id="table-element-template" class="block" style="border:1px solid grey; display:none">
-  <div class="descr">
-    <strong class="name">Table: Filter 01 - Lorem ipsum</strong><br/>
-    <span class="location">Tabellenblatt89!A1:F23</span>
+  <div id="table-element-template" class="block"
+    style="border: 1px solid grey; display: none">
+    <div class="descr">
+      <strong class="name">Table: Filter 01 - Lorem ipsum</strong><br />
+      <span class="location">Tabellenblatt89!A1:F23</span>
+    </div>
+    <div class="block">
+      <button class="action" disabled>Schedule</button>
+      <button class="share" disabled>Refresh</button>
+    </div>
   </div>
-  <div class="block">
-    <button class="action" disabled>Schedule</button>
-    <button class="share" disabled>Refresh</button>
-  </div>
-</div>
 
 <script>
 function refreshTable(event) {
@@ -85,45 +101,38 @@ function refreshTable(event) {
     }
   }
 
-  google.script.run
-    .withSuccessHandler(onResponse)
-    .withFailureHandler(onResponse)
-    .cbRefreshIssueTable_refreshTable(event.data);
+  google.script.run.withSuccessHandler(onResponse).withFailureHandler(onResponse).cbRefreshIssueTable_refreshTable(event.data);
 }
 
-      function onInitSidebar(response) {
-        var loading = document.querySelector('.is-loading');
-            loading.classList.remove('is-loading');
+function onInitSidebar(response) {
+  var loading = document.querySelector('.is-loading');
+  loading.classList.remove('is-loading');
 
-        var table_element_tpl = jQuery('#table-element-template');
+  var table_element_tpl = jQuery('#table-element-template');
 
-        response.tables.forEach(function(tableMeta){
-          var meta = JSON.parse(tableMeta);
-          var tableName = meta.name;
-          var tableLocation = meta.sheetName + '!' + meta.rangeA1;
-          
-          var divTable = table_element_tpl.clone().prop('id', null);
-          divTable.find('.descr > .name').html(tableName);
-          divTable.find('.descr > .location').html(tableLocation);
-          divTable.prop('data-table-id', meta.tableId)
-            .prop('data-sheet-id', meta.sheetId)
-            .show();
-            
-          // enable action buttons
-          divTable.find('.block > :button.share')
-            .prop('disabled', false)
-            .click(meta, refreshTable);
-          
-          divTable.appendTo('#table-container');
-          
-        });
-        
-        window.dispatchEvent(new Event('load'));
-      }
+  response.tables.forEach(function (tableMeta) {
+    var meta = JSON.parse(tableMeta);
+    var tableName = meta.name;
+    var tableLocation = meta.sheetName + '!' + meta.rangeA1;
 
-      google.script.run
-        .withSuccessHandler(onInitSidebar)
-        .cbRefreshIssueTable_initSidebar();
+    var divTable = table_element_tpl.clone().prop('id', null);
+    divTable.find('.descr > .name').html(tableName);
+    divTable.find('.descr > .location').html(tableLocation);
+    divTable.prop('data-table-id', meta.tableId).prop('data-sheet-id', meta.sheetId).show();
+
+    // enable action buttons
+    divTable.find('.block > :button.share').prop('disabled', false).click(meta, refreshTable);
+
+    divTable.appendTo('#table-container');
+
+  });
+
+  window.dispatchEvent(new Event('load'));
+}
+
+google.script.run
+  .withSuccessHandler(onInitSidebar)
+  .cbRefreshIssueTable_initSidebar();
 </script>
 </body>
 </html>
