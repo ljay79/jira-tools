@@ -126,13 +126,11 @@ RefreshIssueTable_Controller_ = {
     };
 
     /* enhance data for sidebar functionality, then pass to response as JSON string */
-    IssueTableIndex_.getAll().forEach(function (table) {
+    //IssueTableIndex_.getAll().forEach(function (table) {
+    var activeSheet = getTicketSheet();
+    IssueTableIndex_.getAllTablesBySheet(activeSheet.getSheetId()).forEach(function (table) {
       // add name of sheet
-      var sheet = getSheetById(sheetIdPropertySafe(table.getSheetId(), true));
-      if (typeof sheet !== 'object') {
-        return; // no sheet available, IssueTable seems orphaned
-      }
-      table.setMeta('sheetName', sheet.getName());
+      table.setMeta('sheetName', activeSheet.getName());
 
       response.tables.push(table.toJson());
     });

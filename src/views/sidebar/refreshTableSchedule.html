@@ -18,6 +18,9 @@
 <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
 <style>
+body {
+  font-family: Roboto,RobotoDraft,Helvetica,Arial,sans-serif;
+}
 .sidebar {
 	padding: 0;
 }
@@ -60,16 +63,47 @@ th, td {
 .results p {
 	color: #fff;
 }
+
+#box-tip {
+  margin: 10px;
+  padding: 6px;
+  background-color: #e6f4ea;
+  color: #188038;
+  font-size: 12px;
+}
+#box-tip h4 {
+  color: #188038;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+#box-tip a,
+#box-tip a:active,
+#box-tip a:visited
+{
+  color: #188038;
+  font-size: 14px;
+  font-weight: bold;
+}
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
 
   <div class="sidebar branding-below">
-
+  
     <div class="block is-loading">loading filters ...</div>
-
+    
     <div id="table-container" style="border: 1px dashed grey"></div>
+    
+    <div id="box-tip">
+      <h4>Tips erkunden</h4>
+      <p>
+      You do not have any Jira "IssueTable" in your current sheet(s).<br/>
+      Menu: Add-ons > Project Aid for Jira > List issues from filter
+      </p>
+      <a href="#" alt="link to howto/help in github pages?!">Weitere Informationen</a>
+    </div>
 
   </div>
 
@@ -90,6 +124,15 @@ th, td {
   </div>
 
 <script>
+var box_tip = $('#box-tip');
+var loading = $('.is-loading');
+var issueTableContainer = $('#table-container');
+
+function resetSidebar() {
+  box_tip.show();
+  issueTableContainer.empty();
+}
+
 function refreshTable(event) {
   var button = $(this);
   button.prop('disabled', true);
@@ -104,11 +147,14 @@ function refreshTable(event) {
   google.script.run.withSuccessHandler(onResponse).withFailureHandler(onResponse).cbRefreshIssueTable_refreshTable(event.data);
 }
 
-function onInitSidebar(response) {
-  var loading = document.querySelector('.is-loading');
-  loading.classList.remove('is-loading');
+function onReloadSidebar(response) {
+  loading.removeClass('is-loading').hide();
 
-  var table_element_tpl = jQuery('#table-element-template');
+  var table_element_tpl = $('#table-element-template');
+
+  if (response.tables.length>0) {
+    box_tip.hide();
+  }
 
   response.tables.forEach(function (tableMeta) {
     var meta = JSON.parse(tableMeta);
@@ -123,16 +169,50 @@ function onInitSidebar(response) {
     // enable action buttons
     divTable.find('.block > :button.share').prop('disabled', false).click(meta, refreshTable);
 
-    divTable.appendTo('#table-container');
-
+    divTable.appendTo(issueTableContainer);
   });
 
   window.dispatchEvent(new Event('load'));
 }
 
+/*
 google.script.run
   .withSuccessHandler(onInitSidebar)
   .cbRefreshIssueTable_initSidebar();
+*/
+
+/* ---------------------- */
+
+$(function(){
+  poll();
+});
+
+function poll(interval) {
+  interval = interval || 500;
+  setTimeout(function(){
+    google.script.run
+      .withSuccessHandler(handleActiveSheet)
+      .withFailureHandler(showError)
+      .sheetIdPropertySafe();
+    poll();
+  }, interval);
+}
+
+function showError(error) {
+  alert('ERROR' + JSON.stringify(error));
+}
+
+var currentActiveSheetId = null;
+
+function handleActiveSheet(sheetId) {
+  if (currentActiveSheetId != sheetId) {
+    currentActiveSheetId = sheetId;
+    resetSidebar();
+    google.script.run
+      .withSuccessHandler(onReloadSidebar)
+      .cbRefreshIssueTable_initSidebar();
+  }
+}
 </script>
 </body>
 </html>
