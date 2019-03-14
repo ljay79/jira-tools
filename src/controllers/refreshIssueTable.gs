@@ -100,8 +100,8 @@ function cbRefreshIssueTable_refreshTable(tableMetaData) {
 
 function cbRefreshIssueTable_getResetSidebar() {
   var response = {
-    sheetId: sheetIdPropertySafe(),
-    currentActiveCellValue: getTicketSheet().getActiveCell().getValue()
+    sheetId : sheetIdPropertySafe(),
+    currentActiveCellValue : getTicketSheet().getActiveCell().getValue()
   };
 
   return response;

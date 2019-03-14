@@ -20,46 +20,48 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700">
 <style>
 :root {
-  --docs-material-font-family: Roboto,Helvetica,Arial,sans-serif;
-  --docs-material-header-font-family: var(--docs-material-font-family);
-  --docs-material-font-weight-normal: 400;
-  --docs-material-font-weight-bold: 500;
-  --docs-material-font-size-normal: 14px;
-  --docs-material-font-size-9: 9px;
-  --docs-material-font-size-11: 11px;
-  --docs-material-font-size-12: 12px;
-  --docs-material-font-size-22: 22px;
+    --docs-material-font-family: Roboto, Helvetica, Arial, sans-serif;
+    --docs-material-header-font-family: var(--docs-material-font-family);
+    --docs-material-font-weight-normal: 400;
+    --docs-material-font-weight-bold: 500;
+    --docs-material-font-size-normal: 14px;
+    --docs-material-font-size-9: 9px;
+    --docs-material-font-size-11: 11px;
+    --docs-material-font-size-12: 12px;
+    --docs-material-font-size-22: 22px;
 }
+
 html, body, html * {
-  /*font-family: 'Roboto-Light', 'Roboto-Medium', 'Roboto-Bold', 'Roboto', Helvetica, Arial, sans-serif;*/
-  font-family: Roboto, Helvetica, Arial, sans-serif;
-  font-size: 13px;
-  color: black;
-  font-weight: normal;
+	/*font-family: 'Roboto-Light', 'Roboto-Medium', 'Roboto-Bold', 'Roboto', Helvetica, Arial, sans-serif;*/
+	font-family: Roboto, Helvetica, Arial, sans-serif;
+	font-size: 13px;
+	color: black;
+	font-weight: normal;
 }
 @keyframes blink { 0% { color: #fff; } 50% { color: #777; } 100% { color: #fff; } }
 
-.loader,
-.loader:after {
-  border-radius: 50%;
-  width: 5em;
-  height: 5em;
+.loader, .loader:after {
+	border-radius: 50%;
+	width: 5em;
+	height: 5em;
 }
+
 .loader {
-  margin: 60px auto;
-  font-size: 10px;
-  position: relative;
-  text-indent: -9999em;
-  border-top: .7em solid rgba(24,158,26, 0.2);
-  border-right: .7em solid rgba(24,158,26, 0.2);
-  border-bottom: .7em solid rgba(24,158,26, 0.2);
-  border-left: .7em solid #189e1a;
-  -webkit-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  transform: translateZ(0);
-  -webkit-animation: load8 1.1s infinite linear;
-  animation: load8 1.1s infinite linear;
+	margin: 60px auto;
+	font-size: 10px;
+	position: relative;
+	text-indent: -9999em;
+	border-top: .7em solid rgba(24, 158, 26, 0.2);
+	border-right: .7em solid rgba(24, 158, 26, 0.2);
+	border-bottom: .7em solid rgba(24, 158, 26, 0.2);
+	border-left: .7em solid #189e1a;
+	-webkit-transform: translateZ(0);
+	-ms-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-animation: load8 1.1s infinite linear;
+	animation: load8 1.1s infinite linear;
 }
+
 @-webkit-keyframes load8 {
   0% {
     -webkit-transform: rotate(0deg);
@@ -80,77 +82,77 @@ html, body, html * {
     transform: rotate(360deg);
   }
 }
-
-
-
-
 .sidebar {
-  padding: 0;
+	padding: 0;
 }
+
 .branding-below {
-  bottom: 56px;
-  top: 0;
+	bottom: 56px;
+	top: 0;
 }
+
 .sidebar.bottom {
-  font-size: 12px;
-  padding: 12px;
+	font-size: 12px;
+	padding: 12px;
 }
 
 #box-tip {
-  margin: 10px;
-  padding: 15px;
-  background-color: #e6f4ea;
-  border-radius: 8px;
-  color: #188038;
+	margin: 10px;
+	padding: 15px;
+	background-color: #e6f4ea;
+	border-radius: 8px;
+	color: #188038;
 }
+
 #box-tip h4 {
-  color: #188038;
-  font-size: 14px;
-  font-weight: 500;
-  margin: 0 0 10px;
+	color: #188038;
+	font-size: 14px;
+	font-weight: 500;
+	margin: 0 0 10px;
 }
+
 #box-tip p {
-  color: #188038;
-  font-size: 12px;
-  letter-spacing: .3px;
-  line-height: normal;
+	color: #188038;
+	font-size: 12px;
+	letter-spacing: .3px;
+	line-height: normal;
 }
-#box-tip a,
-#box-tip a:active,
-#box-tip a:visited {
-  background-image: none;
-  border: 1px solid transparent!important;
-  border-radius: 4px;
-  box-shadow: none;
-  box-sizing: border-box;
-  font-family: var(--docs-material-header-font-family,Roboto,Helvetica,Arial,sans-serif);
-  font-weight: var(--docs-material-font-weight-bold,500);
-  font-size: 14px;
-  height: 36px;
-  letter-spacing: 0.25px;
-  line-height: 16px;
-  padding: 9px 24px 11px 24px;
-  background: #e6f4ea;
-  color: #188038;
-  display: inline-block;
+
+#box-tip a, #box-tip a:active, #box-tip a:visited {
+	background-image: none;
+	border: 1px solid transparent !important;
+	border-radius: 4px;
+	box-shadow: none;
+	box-sizing: border-box;
+	font-family: var(--docs-material-header-font-family, Roboto, Helvetica, Arial, sans-serif);
+	font-weight: var(--docs-material-font-weight-bold, 500);
+	font-size: 14px;
+	height: 36px;
+	letter-spacing: 0.25px;
+	line-height: 16px;
+	padding: 9px 24px 11px 24px;
+	background: #e6f4ea;
+	color: #188038;
+	display: inline-block;
 }
 
 #box-tip .tip-footer {
-  display: flex;
-  justify-content: flex-end;
+	display: flex;
+	justify-content: flex-end;
 }
 
 .issuetable {
-  font-size: 13px;
-  font-weight: 400;
-  border-bottom: 1px solid #ddd;
-  cursor: default;
-  padding: 10px 20px 10px 20px;
-  position: relative;
+	font-size: 13px;
+	font-weight: 400;
+	border-bottom: 1px solid #ddd;
+	cursor: default;
+	padding: 10px 20px 10px 20px;
+	position: relative;
 }
+
 .issuetable .name {
-  font-size: 14px;
-  font-weight: 500;
+	font-size: 14px;
+	font-weight: 500;
 }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -158,14 +160,14 @@ html, body, html * {
 <body>
   <div class="sidebar branding-below">
     <div class="loader">Loading ...</div>
-    
+
     <div id="table-container"></div>
-    
+
     <div id="box-tip">
       <h4>Explore Tips</h4>
       <p>
-      You do not have any Jira "IssueTable" in your current sheet(s).<br/>
-      Menu: Add-ons > Project Aid for Jira > List issues from filter
+        You do not have any Jira "IssueTable" in your current sheet(s).<br />
+        Menu: Add-ons > Project Aid for Jira > List issues from filter
       </p>
       <div class="tip-footer">
         <a href="https://github.com/ljay79/jira-tools/tree/master#issuetable">Read more</a>
@@ -187,93 +189,90 @@ html, body, html * {
       <button class="share" disabled>Refresh</button>
     </div>
   </div>
-<script>
-var box_tip = $('#box-tip');
-var loading = $('.loader');
-var issueTableContainer = $('#table-container');
+  <script>
+      var box_tip = $('#box-tip');
+      var loading = $('.loader');
+      var issueTableContainer = $('#table-container');
 
-function refreshTable(event) {
-  var button = $(this);
-  button.prop('disabled', true);
+      function refreshTable(event) {
+        var button = $(this);
+        button.prop('disabled', true);
 
-  function onResponse(response) {
-    var done = response.status === true;
-    if (done) {
-      button.prop('disabled', false);
-    }
-  }
+        function onResponse(response) {
+          var done = response.status === true;
+          if (done) {
+            button.prop('disabled', false);
+          }
+        }
 
-  google.script.run
-    .withSuccessHandler(onResponse)
-    .withFailureHandler(onResponse)
-    .cbRefreshIssueTable_refreshTable(event.data);
-}
+        google.script.run
+          .withSuccessHandler(onResponse)
+          .withFailureHandler(onResponse)
+          .cbRefreshIssueTable_refreshTable(event.data);
+      }
 
-function onReloadSidebar(response) {
-  loading.removeClass('loader').hide();
+      function onReloadSidebar(response) {
+        loading.removeClass('loader').hide();
 
-  var table_element_tpl = $('#table-element-template');
+        var table_element_tpl = $('#table-element-template');
 
-  issueTableContainer.empty();
-  if (response.tables.length>0) {
-    box_tip.hide();
-  } else {
-    box_tip.show();
-  }
+        issueTableContainer.empty();
+        if (response.tables.length > 0) {
+          box_tip.hide();
+        } else {
+          box_tip.show();
+        }
 
-  response.tables.forEach(function (tableMeta) {
-    var tableName = tableMeta.name;
-    var tableLocation = tableMeta.sheetName + '!' + tableMeta.rangeA1;
-    var updatedElapsed = tableMeta.timeElapsedFormatted || '';
+        response.tables.forEach(function (tableMeta) {
+          var tableName = tableMeta.name;
+          var tableLocation = tableMeta.sheetName + '!' + tableMeta.rangeA1;
+          var updatedElapsed = tableMeta.timeElapsedFormatted || '';
 
-    var divTable = table_element_tpl.clone().prop('id', null);
-    divTable.find('.descr > .name').html(tableName);
-    divTable.find('.descr > .location').html(tableLocation);
-    divTable.find('.descr > .updated > .time-elapsed').html(updatedElapsed);
-    divTable.prop('data-table-id', tableMeta.tableId).prop('data-sheet-id', tableMeta.sheetId).show();
+          var divTable = table_element_tpl.clone().prop('id', null);
+          divTable.find('.descr > .name').html(tableName);
+          divTable.find('.descr > .location').html(tableLocation);
+          divTable.find('.descr > .updated > .time-elapsed').html(updatedElapsed);
+          divTable.prop('data-table-id', tableMeta.tableId).prop('data-sheet-id', tableMeta.sheetId).show();
 
-    // enable action buttons
-    divTable.find('.block > :button.share').prop('disabled', false).click(tableMeta, refreshTable);
+          // enable action buttons
+          divTable.find('.block > :button.share').prop('disabled', false).click(tableMeta, refreshTable);
 
-    divTable.appendTo(issueTableContainer);
-  });
+          divTable.appendTo(issueTableContainer);
+        });
 
-  window.dispatchEvent(new Event('load'));
-}
+        window.dispatchEvent(new Event('load'));
+      }
 
-/* ---------------------- */
+      /* ---------------------- */
 
-$(function(){
-  poll();
-});
+      $(function () {
+        poll();
+      });
 
-function poll(interval) {
-  interval = interval || 1500;
-  setTimeout(function(){
-    google.script.run
-      .withSuccessHandler(handleActiveSheet)
-      .withFailureHandler(showError)
-      .cbRefreshIssueTable_getResetSidebar();
-    poll();
-  }, interval);
-}
+      function poll(interval) {
+        interval = interval || 1500;
+        setTimeout(function () {
+          google.script.run.withSuccessHandler(handleActiveSheet).withFailureHandler(showError).cbRefreshIssueTable_getResetSidebar();
+          poll();
+        }, interval);
+      }
 
-function showError(error) {
-  alert('ERROR' + JSON.stringify(error));
-}
+      function showError(error) {
+        alert('ERROR' + JSON.stringify(error));
+      }
 
-var currentActiveSheetId = null;
-var currentActiveCellValue = null;
+      var currentActiveSheetId = null;
+      var currentActiveCellValue = null;
 
-function handleActiveSheet(response) {
-  if (currentActiveSheetId != response.sheetId || response.currentActiveCellValue != currentActiveCellValue) {
-    currentActiveSheetId = response.sheetId;
-    currentActiveCellValue = response.currentActiveCellValue;
-    google.script.run
-      .withSuccessHandler(onReloadSidebar)
-      .cbRefreshIssueTable_initSidebar();
-  }
-}
-</script>
+      function handleActiveSheet(response) {
+        if (currentActiveSheetId != response.sheetId || response.currentActiveCellValue != currentActiveCellValue) {
+          currentActiveSheetId = response.sheetId;
+          currentActiveCellValue = response.currentActiveCellValue;
+          google.script.run
+            .withSuccessHandler(onReloadSidebar)
+            .cbRefreshIssueTable_initSidebar();
+        }
+      }
+    </script>
 </body>
 </html>
