@@ -98,6 +98,15 @@ function cbRefreshIssueTable_refreshTable(tableMetaData) {
   return RefreshIssueTable_Controller_.callbackRefreshTable(tableMetaData);
 }
 
+function cbRefreshIssueTable_getResetSidebar() {
+  var response = {
+    sheetId: sheetIdPropertySafe(),
+    currentActiveCellValue: getTicketSheet().getActiveCell().getValue()
+  };
+
+  return response;
+}
+
 /**
  * Creates a new IssueTableIndex_ object, which is used to persist IssueTables and related information.
  */
@@ -120,19 +129,23 @@ RefreshIssueTable_Controller_ = {
   callbackInitSidebar : function () {
     debug.log(this.name + '.callbackInitSidebar()');
 
-    var response = {
-      status : true,
-      tables : []
-    };
+    var dateFromSeconds = 0,
+        activeSheet = getTicketSheet(),
+        response = {
+          status : true,
+          tables : []
+        };
 
     /* enhance data for sidebar functionality, then pass to response as JSON string */
-    //IssueTableIndex_.getAll().forEach(function (table) {
-    var activeSheet = getTicketSheet();
     IssueTableIndex_.getAllTablesBySheet(activeSheet.getSheetId()).forEach(function (table) {
+      var tableMeta = table.getMeta();
       // add name of sheet
-      table.setMeta('sheetName', activeSheet.getName());
+      tableMeta.sheetName = activeSheet.getName();
+      // table last updated, elapsed time
+      dateFromSeconds = new Date(table.getMeta('time_lastupdated'));
+      tableMeta.timeElapsedFormatted = formatTimeDiff(new Date(), dateFromSeconds);
 
-      response.tables.push(table.toJson());
+      response.tables.push(tableMeta);
     });
 
     return response;
@@ -155,14 +168,12 @@ RefreshIssueTable_Controller_ = {
 
       if (renderer = Table.render()) {
         // toast with status message
-        var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
+        var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
             + " total found records.";
         SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
         debug.log(msg);
 
         IssueTableIndex_.addTable(Table);
-        console.log('renderer.info: %s', renderer.getInfo());
-        console.log('==>> Table Meta: %s', Table.getMeta());
       }
     };
 

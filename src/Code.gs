@@ -41,6 +41,7 @@ function onInstall(e) {
 function addMenu() {
 
   var menu = SpreadsheetApp.getUi().createAddonMenu()
+    .addItem('Refresh IssueTable (BETA)', 'menuRefreshIssueTable')
     .addItem('List issues from filter', 'menuInsertIssueFromFilter')
     .addItem('Create time report', 'dialogTimesheet')
     .addSeparator()
@@ -53,7 +54,6 @@ function addMenu() {
     .addItem('About', 'dialogAbout')
     .addSeparator()
     .addItem('Update Jira Issues (BETA)', 'menuUpdateJiraIssues')
-    .addItem('Refresh IssueTable (BETA)', 'menuRefreshIssueTable')
     .addToUi();
 }
 

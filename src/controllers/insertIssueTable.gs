@@ -18,7 +18,7 @@ function TESTinsertTableFromFilter() {
     var table = new IssueTable_(attributes);
     if (renderer = table.render()) {
       // toast with status message
-      var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
+      var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
           + " total found records.";
       SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
       debug.log(msg);
@@ -51,7 +51,7 @@ function TESTinsertTableFromFilter() {
  * @desc Wrapper: Dialog to choose issues filter
  */
 function menuInsertIssueFromFilter() {
-  InsertIssueTable_Controller_.dialog();
+  InsertIssueTable_Controller_.dialogOpen();
 }
 
 /**
@@ -59,7 +59,7 @@ function menuInsertIssueFromFilter() {
  * @return {object} Object({status: [boolean], response: [string]})
  */
 function callbackInsertIssueFromFilter(jsonFormData) {
-  return InsertIssueTable_Controller_.callback(jsonFormData);
+  return InsertIssueTable_Controller_.callbackInsertFromFilter(jsonFormData);
 }
 
 /**
@@ -71,11 +71,18 @@ InsertIssueTable_Controller_ = {
   /**
    * @desc Dialog to configure Jira custom fields
    */
-  dialog : function () {
+  dialogOpen : function () {
     debug.log(this.name + '.dialog()');
 
     if (!hasSettings(true))
       return;
+
+    // prune table and check if user tries to overwrite/overlap with an existing IssueTable
+    IssueTableIndex_.prune();
+    if (true === this.hasOverlappingTable(true) ) {
+      // will show warning/alter and skip opening the dialog
+      return;
+    }
 
     var customFields = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_SEARCH);
     var userColumns = UserStorage.getValue('userColumns') || [];
@@ -107,8 +114,8 @@ InsertIssueTable_Controller_ = {
    * @param jsonFormData {object} JSON Form object of all form values
    * @return {object} Object({status: [boolean], response: [string]})
    */
-  callback : function (jsonFormData) {
-    debug.log(this.name + '.callback() <= %s', JSON.stringify(jsonFormData));
+  callbackInsertFromFilter : function (jsonFormData) {
+    debug.log(this.name + '.callbackInsertFromFilter() <= %s', JSON.stringify(jsonFormData));
 
     jsonFormData = jsonFormData || {filter_id: 0};
     var that = this,
@@ -137,6 +144,7 @@ InsertIssueTable_Controller_ = {
         // any issues in result?
         response.message = "No issues were found to match your search.";
         Browser.msgBox(response.message, Browser.Buttons.OK);
+
         return;
       } else {
         attributes.issues = resp.data;
@@ -144,7 +152,7 @@ InsertIssueTable_Controller_ = {
         var Table = new IssueTable_(attributes);
         if (Renderer = Table.render()) {
           // toast with status message
-          var msg = "Finished inserting " + Renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
+          var msg = "Finished inserting " + Renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
               + " total found records.";
           SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
           debug.log(msg);
@@ -157,6 +165,9 @@ InsertIssueTable_Controller_ = {
           // set trigger for index cleanup and modification detection
           that.setTriggerPruneIndex();
           that.setTriggerIssueTableModification();
+          
+          // force sidebar update (refreshTableSchedule)
+          UserStorage.setValue('refreshIssueTableforceSidebarReset', true);
         }
       }
     };
@@ -178,7 +189,33 @@ InsertIssueTable_Controller_ = {
 
     return response;
   },
-  
+
+  hasOverlappingTable: function (withShowAlert) {
+    withShowAlert = withShowAlert || false;
+
+    try {
+      var activeRange = getTicketSheet().getActiveRange();
+      if (null === activeRange) activeRange = getTicketSheet().getCurrentCell();
+      
+      var table = IssueTableIndex_.getTableByCoord(getTicketSheet().getSheetId(), activeRange);
+      if (table) {
+        if (withShowAlert) {
+          SpreadsheetApp.getUi().alert('Warning!',
+                   'You are trying to insert a new IssueTable within an existing IssueTable. '
+                   + 'Please delete existing IssueTable or choose an empty cell/range in your sheet.',
+                   SpreadsheetApp.getUi().ButtonSet.OK);
+        }
+        return true;
+      }
+    } catch(e) {
+      // some exception orccured which should not interfer with UX in this case
+      debug.warn(this.name + '.hasOverlappingTable() - %s', e);
+      return false;
+    }
+    
+    return false;
+  },
+
   /**
    * @desc Setting a trigger for the current spreadsheet.
    * @return void
