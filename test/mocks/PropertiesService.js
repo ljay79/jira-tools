@@ -3,8 +3,8 @@
 var _userPropData = {};
 
 var UserProps = {
-  getProperty: jest.fn().mockImplementation((key)=>  _userPropData[key]),
-  setProperty: jest.fn().mockImplementation(function(key) { _userPropData[key] = data; }),
+  getProperty: jest.fn(),
+  setProperty: jest.fn(),
   deleteProperty: jest.fn()
 }
 
@@ -13,14 +13,16 @@ var PropertiesService = {
   getUserProperties: jest.fn(),
   resetMocks: function () {
     var mocks = [
-      [UserProps.getProperty, ""],
-      [UserProps.setProperty, null],
-      [UserProps.deleteProperty, null],
-      [PropertiesService.getUserProperties,UserProps]
+      [UserProps.getProperty, (key)=>  _userPropData[key]],
+      [UserProps.setProperty, (key,data) => { _userPropData[key] = data; }],
+      [UserProps.deleteProperty, (key) => {delete(_userPropData[key])}],
+      [PropertiesService.getUserProperties,() => UserProps]
     ];
     mocks.forEach((pair) => {
       pair[0].mockReset();
-      pair[0].mockImplementation(() => pair[1]);
+      if (pair[1] != null) {
+        pair[0].mockImplementation(pair[1]);
+      }
     });
   },
   resetMockUserData: function() {
