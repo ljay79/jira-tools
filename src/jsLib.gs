@@ -17,7 +17,7 @@ function extend(src, obj2) {
  * @return {object}
  */
 function copyObject(src) {
-  var result ={};
+  var result = {};
   for (var key in src) {
     result[key] = src[key];
   }
@@ -44,15 +44,15 @@ function reverse(string) {
  * @param parameters {object
  * @return {string}
  */
-function buildUrl(url, parameters){
+function buildUrl(url, parameters) {
   var qs = "";
-  for(var key in parameters) {
-	if(!parameters.hasOwnProperty(key)) continue;
+  for (var key in parameters) {
+    if (!parameters.hasOwnProperty(key)) continue;
     var value = parameters[key];
     qs += encodeURIComponent(key) + "=" + encodeURIComponent(value) + "&";
   }
-  if (qs.length > 0){
-    qs = qs.substring(0, qs.length-1); //chop off last "&"
+  if (qs.length > 0) {
+    qs = qs.substring(0, qs.length - 1); //chop off last "&"
     url = url + "?" + qs;
   }
   return url;
@@ -65,7 +65,7 @@ function buildUrl(url, parameters){
  * @return {string}
  */
 function camelize(str) {
-  return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {
+  return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function (match, index) {
     if (+match === 0) return ""; // or if (/\s+/.test(match)) for white spaces
     return index == 0 ? match.toLowerCase() : match.toUpperCase();
   });
@@ -77,11 +77,11 @@ function camelize(str) {
  * @return {Date}    In case of any issue or bad param it returns new Date()
  */
 function getDateFromIso(string) {
-  try{
+  try {
     var aDate = new Date();
     var regexp = "([0-9]{4})(-([0-9]{2})(-([0-9]{2})" +
-        "(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\\.([0-9]+))?)?" +
-        "(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?";
+      "(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\\.([0-9]+))?)?" +
+      "(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?";
     var d = string.match(new RegExp(regexp));
 
     var offset = 0;
@@ -102,7 +102,7 @@ function getDateFromIso(string) {
     time = (Number(date) + (offset * 60 * 1000));
     aDate.setTime(Number(time));
     return aDate;
-  } catch(e){
+  } catch (e) {
     return new Date();
   }
 }
@@ -113,7 +113,7 @@ function getDateFromIso(string) {
  * @return {string}
  */
 function escapeRegExp(strToEscape) {
-    return strToEscape.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+  return strToEscape.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }
 
 /**
@@ -123,9 +123,9 @@ function escapeRegExp(strToEscape) {
  * @return {string}
  */
 function trimChar(origString, charToTrim) {
-    charToTrim = escapeRegExp(charToTrim);
-    var regEx = new RegExp("^[" + charToTrim + "]+|[" + charToTrim + "]+$", "g");
-    return origString.replace(regEx, "");
+  charToTrim = escapeRegExp(charToTrim);
+  var regEx = new RegExp("^[" + charToTrim + "]+|[" + charToTrim + "]+$", "g");
+  return origString.replace(regEx, "");
 }
 
 /**
@@ -134,7 +134,7 @@ function trimChar(origString, charToTrim) {
  * @return {Boolean}
  */
 function isDate(date) {
-    return ((new Date(date) !== "Invalid Date" && !isNaN(new Date(date)) ) ? true : false);
+  return ((new Date(date) !== "Invalid Date" && !isNaN(new Date(date))) ? true : false);
 }
 
 
@@ -147,7 +147,7 @@ function isDate(date) {
  * @return {Array}    The modified array.
  */
 if (!Array.prototype.fill) {
-  Array.prototype.fill = function(value) {
+  Array.prototype.fill = function (value) {
 
     // Steps 1-2.
     if (this == null) {
@@ -177,7 +177,7 @@ if (!Array.prototype.fill) {
     var final = relativeEnd < 0 ?
       Math.max(len + relativeEnd, 0) :
       Math.min(relativeEnd, len);
-    
+
     // Step 12.
     while (k < final) {
       O[k] = value;
@@ -204,12 +204,12 @@ if (!Array.prototype.fill) {
  */
 function formatTimeDiff() {
   var delta, response = '';
-  if(arguments.length == 1) {
+  if (arguments.length == 1) {
     // delta passed to convert
     delta = arguments[0];
   } else if (arguments.length == 2) {
     // get total seconds between the times
-    if ( arguments[1] > arguments[0] ) {
+    if (arguments[1] > arguments[0]) {
       delta = Math.abs(arguments[1] - arguments[0]) / 1000;
     } else {
       delta = Math.abs(arguments[0] - arguments[1]) / 1000;
@@ -255,12 +255,12 @@ function formatTimeDiff() {
  */
 function formatWorkhours() {
   var delta, response = '';
-  if(arguments.length == 1) {
+  if (arguments.length == 1) {
     // delta passed to convert
     delta = arguments[0];
   } else if (arguments.length == 2) {
     // get total seconds between the times
-    if ( arguments[1] > arguments[0] ) {
+    if (arguments[1] > arguments[0]) {
       delta = Math.abs(arguments[1] - arguments[0]) / 1000;
     } else {
       delta = Math.abs(arguments[0] - arguments[1]) / 1000;
@@ -270,7 +270,7 @@ function formatWorkhours() {
   }
 
   var hours = Math.round(delta / 3600 * 100) / 100;
-  
+
   return hours;
 }
 
@@ -282,10 +282,10 @@ function formatWorkhours() {
  * @return {Array}    Original array with sorted keys
  */
 function _sortKeysByRef(usortObject, referenceObject) {
-  var _sortedObject = Object.keys(referenceObject).filter(function(n) {
+  var _sortedObject = Object.keys(referenceObject).filter(function (n) {
     var found = usortObject.indexOf(n) > -1;
     if (found) delete removeFromArray(usortObject, n);
-	return found;
+    return found;
   });
 
   return _sortedObject.concat(usortObject);
@@ -306,6 +306,43 @@ function removeFromArray(array, element) {
   }
 }
 
+/**
+ * Splits string into a comma separated list
+ * trims whitespace and the start and end of each element
+ * ignores empty elements
+ * @param listInString {String} String containing comma separated list
+ * @return {Array}
+ */
+function splitCommaList_(listInString) {
+  if (typeof listInString === 'string' || listInString instanceof String) {
+    var listOfItems = listInString.split(/,\s?/);
+    value = [];
+    listOfItems.forEach(function (item) {
+      if (item.trim().length > 0) {
+        value.push(item.trim());
+      }
+    });
+    return value;
+  } else {
+    return [];
+  }
+}
+
+/**
+ * Takes an array of items and returns an object with the same data 
+ * The object uses the passed in "keyFunction" paramater to gets the key from each field
+ * @param arrayInput {array}
+ * @param keyFunction {function}
+ * @returns objectOutput {object}
+ */
+function convertArrayToObj_(arrayInput, keyFunction) {
+  var objectToReturn = {}
+  arrayInput.forEach(function (el) {
+    objectToReturn[keyFunction(el)] = el;
+  });
+  return objectToReturn;
+}
+
 
 // Node required code block
 module.exports = {
@@ -314,6 +351,8 @@ module.exports = {
   extend: extend,
   copyObject: copyObject,
   reverse: reverse,
-  camelize: camelize
+  camelize: camelize,
+  splitCommaList_: splitCommaList_,
+  convertArrayToObj_: convertArrayToObj_
 };
 // End of Node required code block

@@ -9,6 +9,7 @@ const EpicField = require("src/models/jira/EpicField.gs");
 const UserStorage = require("src/models/gas/UserStorage.gs");
 const extend = require("src/jsLib.gs").extend;
 const camelize = require('src/jsLib.gs').camelize;
+const convertArrayToObj_ = require('src/jsLib.gs').convertArrayToObj_;
 // End of Node required code block
 
 IssueFields = (function () {
@@ -43,7 +44,6 @@ IssueFields = (function () {
       return allJiraFields_;
     } else {
       var request = new Request();
-      allJiraFields_ = [];
 
       var ok = function (respData, httpResp, status) {
 
@@ -51,8 +51,14 @@ IssueFields = (function () {
           error(respData, httpResp, status);
         } else {
           processFieldResponse_(respData)
-          if (successCallBack != null) {
-            successCallBack(allJiraFields_);
+          if (allJiraFields_.length>0) {
+            if (successCallBack != null) {
+              successCallBack(allJiraFields_);
+            }
+          } else {
+            if (errorCallBack != null) {
+              errorCallBack("No fields were returned from JIRA", httpResp, status);
+            }
           }
         }
       };
@@ -67,7 +73,7 @@ IssueFields = (function () {
         var msg = "Failed to retrieve Jira Fields info with status [" + status + "]!\\n"
           + jiraErrorMessage;
         if (errorCallBack != null) {
-          errorCallBack(msg);
+          errorCallBack(msg, httpResp, status);
         }
       };
       request.call("field")
@@ -96,6 +102,7 @@ IssueFields = (function () {
    * Returns all custom fields from the Jira Instance including the EpicField
    * @param successCallBack  - call back function if the list is retrieved succesfully
    * @param errorCallBack - call back if there is an error
+   * @returns {Array} - array of custom fields returned
    */
   function getAllCustomFields(successCallBack, errorCallBack) {
     var customFields = [];
@@ -118,6 +125,16 @@ IssueFields = (function () {
     getAllFields(ok, error);
     return customFields;
   };
+
+  /**
+   * Returns all custom fields from the Jira Instance including the EpicField
+   * returned as an object where the fields key is used as the key in the Object
+   * @returns {Object} - Object of custom fields
+   */
+  function getAllCustomFieldsByKey() {
+    var allCustomFieldsArray = getAllCustomFields();
+    return convertArrayToObj_(allCustomFieldsArray, function (field) { return field.key });
+  }
 
   /**
   * Looks through an array of valid JIRA fields and finds the best matching one
@@ -166,18 +183,12 @@ IssueFields = (function () {
    */
   function getAvailableCustomFields(format) {
     format = format || CUSTOMFIELD_FORMAT_RAW;
-    var customFields = UserStorage.getValue('favoriteCustomFields') || [];
 
-    // using attribute schemaType conistently across the code base
-    // however a user may have an object stored with attribute "type" in their preferences
-    customFields.forEach(function (field) {
-      if (field.type != null) {
-        field.schemaType = field.type;
-        delete (field.type);
-      }
-    });
+    var customFields = UserStorage.getValue('favoriteCustomFields') || [];
+    customFields = validateCustomFields_(customFields);
 
     var fieldsFormatted = {};
+
     // TODO: this code branch appears unnessaruy
     // getCustomFields is not called without a parameter or with CUSTOMFIELD_FORMAT_RAW
     if (format === CUSTOMFIELD_FORMAT_RAW) {
@@ -197,6 +208,56 @@ IssueFields = (function () {
     }
 
     return fieldsFormatted;
+  }
+
+
+  /**
+   * check all fields stored in preferences have valid data / schema
+   * If not the schema will be fixed, once per user, and stored in their preferences
+   * @param customFields {object} Fields from users preferences
+   * @returns {object} the users selected custom fields with the schema updated
+   */
+  function validateCustomFields_(customFields) {
+    var schemaUpdated = false;
+    var customTypeUpdateNeeded = false;
+
+    customFields.forEach(function (field) {
+      // using attribute schemaType conistently across the code base
+      // however a user may have an object stored with attribute "type" in their preferences
+      if (field.type != null) {
+        field.schemaType = field.type;
+        delete (field.type);
+        schemaUpdated = true;
+      }
+      // customType was added to identify custom plugin fields like Sprint
+      if (!field.hasOwnProperty('customType')) {
+        customTypeUpdateNeeded = true;
+      }
+    });
+
+    // Have to get the field defifintions from Jira and update the data in the preferences
+    // this is to find the value for customType
+    if (customTypeUpdateNeeded) {
+      var allCustomFieldsByKey = getAllCustomFieldsByKey();
+      var newCustomFields = [];
+      customFields.forEach(function (field) {
+        var newField = allCustomFieldsByKey[field.key];
+        if (newField == null) {
+          // this field previously selected by the user no longer exists on JIRA
+          // unlikely edge case
+          debug.error('Field '+field.key+' saved in the users custom fields is not present in the JIRA');
+        } else {
+          newCustomFields.push(newField);
+        }
+      });
+      customFields = newCustomFields;
+      schemaUpdated = true;
+    }
+
+    if (schemaUpdated) {
+      UserStorage.setValue('favoriteCustomFields', customFields);
+    }
+    return customFields;
   }
 
   // Jira issue fields/columns
@@ -271,7 +332,8 @@ IssueFields = (function () {
   }
 
   function getReadonlyFields() {
-    return [
+    // built in fields we know are readonly first
+    var readonly = [
       "updated",
       "issuetype",
       "created",
@@ -292,6 +354,14 @@ IssueFields = (function () {
       'votes',
       'jst_epic'
     ];
+    // now get the users favourite fields and remove readonly fields
+    var userFields = getAvailableCustomFields();
+    userFields.forEach(function(field) {
+      if (field.customType == "gh-sprint") {
+        readonly.push(field.key);
+      }
+    });
+    return readonly;
   }
 
 
@@ -305,14 +375,18 @@ IssueFields = (function () {
    * 
    * @returns {object}
    */
-  function createField_(key, name, isCustom, schemaType, isVirtual) {
+  function createField_(key, name, isCustom, schemaType, customType, isVirtual) {
     // isVirtual defaults to false
+    if (customType != null && customType.length > 0 && customType.indexOf(":") >= 0) {
+      customType = customType.split(":")[1];
+    }
     return {
       key: key,
       name: name,
       custom: isCustom,
       schemaType: schemaType,
       supported: (SupportedTypes.indexOf(schemaType) > -1),
+      customType: customType,
       isVirtual: (isVirtual == null) ? false : isVirtual
     };
   }
@@ -331,6 +405,7 @@ IssueFields = (function () {
           };
    */
   function convertJiraResponse(jiraFieldResponse) {
+    var customType = null;
     // EPIC customization
     if (jiraFieldResponse.schema && jiraFieldResponse.schema.custom) {
       if (jiraFieldResponse.schema.custom.indexOf(':gh-epic-link') > -1) {
@@ -339,16 +414,21 @@ IssueFields = (function () {
       if (jiraFieldResponse.schema.custom.indexOf(':gh-epic-label') > -1) {
         EpicField.setLabelKey(jiraFieldResponse.key || jiraFieldResponse.id);
       }
+      customType = jiraFieldResponse.schema.custom;
+    } else {
+      customType = "none";
     }
     var _type = (jiraFieldResponse.schema ? jiraFieldResponse.schema.type : null) || null;
     if (jiraFieldResponse.schema && jiraFieldResponse.schema.items) {
       _type += '|' + jiraFieldResponse.schema.items;
     }
+
     return createField_(
       jiraFieldResponse.key || jiraFieldResponse.id, // Server API returns ".id" only while Cloud returns both with same value
       jiraFieldResponse.name,
       jiraFieldResponse.custom,
-      _type
+      _type,
+      customType
     );
   }
 
@@ -360,13 +440,24 @@ IssueFields = (function () {
   function processFieldResponse_(respData) {
     // reset custom epic field 
     EpicField.resetValue();
-    allJiraFields_.push.apply(allJiraFields_, respData.map(IssueFields.convertJiraResponse));
+    // parse all the fields
+    allJiraFields_ = [];
+    if (respData != null && Array.isArray(respData)) {
+      allJiraFields_.push.apply(allJiraFields_, respData.map(IssueFields.convertJiraResponse));
+    }
     // sorting by supported type and name
     allJiraFields_.sort(defaultFieldSort_);
     // EPIC usable?
     if (EpicField.isUsable()) {
       // add custom field 'Epic' to beginning of array
-      allJiraFields_.unshift(createField_(EpicField.getKey(), EpicField.getName(), true, EpicField.EPIC_KEY, true));
+      allJiraFields_.unshift(
+        createField_(
+          EpicField.getKey(),
+          EpicField.getName(),
+          true,
+          EpicField.EPIC_KEY,
+          null,
+          true));
     }
   }
 
@@ -396,6 +487,7 @@ IssueFields = (function () {
     SupportedTypes: SupportedTypes,
     getAllFields: getAllFields,
     getAllCustomFields: getAllCustomFields,
+    getAllCustomFieldsByKey: getAllCustomFieldsByKey,
     getAvailableFields: getAvailableFields,
     getMatchingField: getMatchingField,
     getAvailableCustomFields: getAvailableCustomFields,
@@ -411,9 +503,6 @@ IssueFields = (function () {
     createField_: createField_ // exposed for unit testing
   }
 })();
-
-
-
 
 
 // Node required code block
