@@ -10,7 +10,7 @@
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
-var BUILD = '1.2.1';
+var BUILD = '1.3.0';
 
 /** 
  * Add a nice menu option for the users.
@@ -41,10 +41,10 @@ function onInstall(e) {
 function addMenu() {
 
   var menu = SpreadsheetApp.getUi().createAddonMenu()
-    .addItem('Refresh IssueTable (BETA)', 'menuRefreshIssueTable')
     .addItem('List issues from filter', 'menuInsertIssueFromFilter')
     .addItem('Create time report', 'dialogTimesheet')
     .addSeparator()
+    .addItem('Refresh IssueTable', 'menuRefreshIssueTable')
     .addItem('Update formulas in active sheet', 'recalcCustomFunctions')
     .addItem('Update issue key status "KEY-123 [Done]"', 'dialogRefreshTicketsIds')
     .addItem('Jira field map', 'menuJiraFieldMap')
