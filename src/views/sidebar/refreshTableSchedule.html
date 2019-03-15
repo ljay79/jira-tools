@@ -2,23 +2,11 @@
 <html>
 <head>
 <base target="_top">
-<!--
-
-- show sidebar with loading animation
-- onLoad: 
--- load issuetables
--- show/expand current (active) issuetable if available
-- onFocus: update list of tables in sheets
-
-- each IssueTable
--- show "Refresh" button for immediate refresh
--- open block with schedule options for each row on button click
-
-//-->
 <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700">
 <style>
+/* @TODO: extract into static css, assets and use S3 (see add-on logo storage */
 :root {
     --docs-material-font-family: Roboto, Helvetica, Arial, sans-serif;
     --docs-material-header-font-family: var(--docs-material-font-family);
@@ -38,7 +26,39 @@ html, body, html * {
 	color: black;
 	font-weight: normal;
 }
-@keyframes blink { 0% { color: #fff; } 50% { color: #777; } 100% { color: #fff; } }
+
+a, a:active, a:visited {
+	background-image: none;
+	border: 1px solid transparent !important;
+	border-radius: 4px;
+	box-shadow: none;
+	box-sizing: border-box;
+	font-family: var(--docs-material-header-font-family, Roboto, Helvetica, Arial, sans-serif);
+	font-weight: var(--docs-material-font-weight-bold, 500);
+	font-size: 14px;
+	height: 36px;
+	letter-spacing: 0.25px;
+	line-height: 16px;
+	padding: 9px 24px 11px 24px;
+	color: #188038;
+	display: inline-block;
+}
+a.feedback-link, a.feedback-link:active, a.feedback-link:visited
+{
+	border-radius: 4px;
+	font-family: var(--docs-material-header-font-family, Roboto, Helvetica, Arial, sans-serif);
+	font-weight: var(--docs-material-font-weight-bold, 500);
+	font-size: 14px;
+    height: auto;
+	letter-spacing: 0.25px;
+    line-height: normal;
+	padding: 0;
+	color: #188038;
+	display: inline-block;
+}
+.sidebar.bottom a.feedback-link {
+    float: right;
+}
 
 .loader, .loader:after {
 	border-radius: 50%;
@@ -87,7 +107,7 @@ html, body, html * {
 }
 
 .branding-below {
-	bottom: 56px;
+	bottom: 46px;
 	top: 0;
 }
 
@@ -118,23 +138,6 @@ html, body, html * {
 	line-height: normal;
 }
 
-#box-tip a, #box-tip a:active, #box-tip a:visited {
-	background-image: none;
-	border: 1px solid transparent !important;
-	border-radius: 4px;
-	box-shadow: none;
-	box-sizing: border-box;
-	font-family: var(--docs-material-header-font-family, Roboto, Helvetica, Arial, sans-serif);
-	font-weight: var(--docs-material-font-weight-bold, 500);
-	font-size: 14px;
-	height: 36px;
-	letter-spacing: 0.25px;
-	line-height: 16px;
-	padding: 9px 24px 11px 24px;
-	background: #e6f4ea;
-	color: #188038;
-	display: inline-block;
-}
 
 #box-tip .tip-footer {
 	display: flex;
@@ -146,13 +149,30 @@ html, body, html * {
 	font-weight: 400;
 	border-bottom: 1px solid #ddd;
 	cursor: default;
-	padding: 10px 20px 10px 20px;
+	padding: 10px 20px;
 	position: relative;
 }
 
 .issuetable .name {
 	font-size: 14px;
 	font-weight: 500;
+}
+
+.issuetable .actions {
+    margin-top: 10px;
+}
+.issuetable .actions .action {
+    /* Schedule button appears disabled, feature coming soon */
+    opacity: .5
+}
+
+.issuetable .schedule-setup {
+    border: 1px solid grey;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: aliceblue;
+    display: none;
+    font-style: italic;
 }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -176,24 +196,44 @@ html, body, html * {
   </div>
 
   <div class="sidebar bottom">
-    <span class="gray">Project Aid for Jira v1.2.0</span>
+    <a href="#" class="feedback-link">Leave feedback</a>
+    <span class="gray">Project Aid for Jira v<?= buildNumber ?></span>
   </div>
+
+  <!-- BGN: Template of HTML elements for an individual IssueTable //-->
   <div id="table-element-template" class="issuetable" style="display: none">
     <div class="descr">
       <span class="name">Table: Filter 01 - Lorem ipsum</span><br />
       <span class="location">Tabellenblatt89!A1:F23</span><br />
       <span class="updated">Updated: &gt;<span class="time-elapsed"></span></span>
     </div>
-    <div class="block">
-      <button class="action" disabled>Schedule</button>
+    <div class="schedule-setup">
+      Coming soon ...
+    </div>
+    <div class="block actions">
       <button class="share" disabled>Refresh</button>
+      <button class="action" disabled>Schedule</button>
     </div>
   </div>
+  <!-- END: Template //-->
+
   <script>
       var box_tip = $('#box-tip');
       var loading = $('.loader');
       var issueTableContainer = $('#table-container');
 
+      var issueTableContainer = $('#table-container');
+      $('a.feedback-link').each(function() {
+        $(this).click(function(event){
+          event.preventDefault();
+          leaveFeedback();
+        });
+      });
+
+      /**
+       * @desc Perform callback to refresh specific IssueTable in active Sheet.
+       * @param {Event} event    jQuery event, usually click on a button
+       */
       function refreshTable(event) {
         var button = $(this);
         button.prop('disabled', true);
@@ -228,14 +268,19 @@ html, body, html * {
           var tableLocation = tableMeta.sheetName + '!' + tableMeta.rangeA1;
           var updatedElapsed = tableMeta.timeElapsedFormatted || '';
 
-          var divTable = table_element_tpl.clone().prop('id', null);
+          var divTable = table_element_tpl.clone().removeAttr('id');
           divTable.find('.descr > .name').html(tableName);
           divTable.find('.descr > .location').html(tableLocation);
           divTable.find('.descr > .updated > .time-elapsed').html(updatedElapsed);
           divTable.prop('data-table-id', tableMeta.tableId).prop('data-sheet-id', tableMeta.sheetId).show();
 
           // enable action buttons
-          divTable.find('.block > :button.share').prop('disabled', false).click(tableMeta, refreshTable);
+          divTable.find('.actions > :button.share').prop('disabled', false).click(tableMeta, refreshTable);
+          divTable.find('.actions > :button.action')
+            .prop('disabled', false)
+            .click(tableMeta, function (event) {
+              var scheduleContainer = $(this).parent().parent().find('.schedule-setup').toggle();
+            });
 
           divTable.appendTo(issueTableContainer);
         });
@@ -243,31 +288,69 @@ html, body, html * {
         window.dispatchEvent(new Event('load'));
       }
 
-      /* ---------------------- */
+      function leaveFeedback() {
+        google.script.run.cbFeedback_getDialog();
+      }
 
+      /*
+       * Polling for sheet switches or change in IssueTable index of current sheet.
+       */
+      var pollError = 0;
       $(function () {
         poll();
       });
 
+      /**
+       * Poll every 1.5 second to check for changes
+       * in which case we update the sidebar
+       */
       function poll(interval) {
         interval = interval || 1500;
         setTimeout(function () {
-          google.script.run.withSuccessHandler(handleActiveSheet).withFailureHandler(showError).cbRefreshIssueTable_getResetSidebar();
+          google.script.run
+            .withSuccessHandler(handleActiveSheet)
+            .withFailureHandler(showError)
+            .cbRefreshIssueTable_getResetSidebar();
           poll();
         }, interval);
       }
 
+      /**
+       * @desc Show error message to user in form of an Alert.
+       *       We do this only, every 5th error. Details are logged to users console.
+       * @param {mixed} error
+       */
       function showError(error) {
-        alert('ERROR' + JSON.stringify(error));
+        if (error.hasOwnProperty('message')) {
+          console.error('cbRefreshIssueTable_getResetSidebar caused [%s]; Info:%s', error.message, error);
+        } else {
+          console.error('cbRefreshIssueTable_getResetSidebar caused Error: %s', error);
+        }
+
+        if (++pollError == 5) {
+          alert("Error in sidebar!\n\n" + error);
+          pollError = 0;
+        }
       }
 
+      /*
+       * each poll's response is compared to below 2 values, 
+       * then we decide, if a sidebar refresh/reset is necessary
+       */
       var currentActiveSheetId = null;
       var currentActiveCellValue = null;
 
+      /**
+       * @desc Handle poll response and react for sidebar changes.
+       * @param {object} response    Response object {sheetId:<number>, currentActiveCellValue:<string>}
+       * @return void
+       */
       function handleActiveSheet(response) {
         if (currentActiveSheetId != response.sheetId || response.currentActiveCellValue != currentActiveCellValue) {
+          // current active sheet changed OR the cell value/active cell changed
           currentActiveSheetId = response.sheetId;
           currentActiveCellValue = response.currentActiveCellValue;
+          // call google and fetch updated sidebar content (reload)
           google.script.run
             .withSuccessHandler(onReloadSidebar)
             .cbRefreshIssueTable_initSidebar();

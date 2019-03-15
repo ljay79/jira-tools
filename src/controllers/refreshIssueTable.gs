@@ -114,7 +114,9 @@ RefreshIssueTable_Controller_ = {
   name : 'RefreshIssueTable_Controller_',
 
   sidebar : function () {
-    var sidebar = getDialog('views/sidebar/refreshTableSchedule');
+    var sidebar = getDialog('views/sidebar/refreshTableSchedule', {
+      buildNumber: BUILD
+    });
 
     debug.log('Processed: %s', sidebar);
 
@@ -143,7 +145,7 @@ RefreshIssueTable_Controller_ = {
       tableMeta.sheetName = activeSheet.getName();
       // table last updated, elapsed time
       dateFromSeconds = new Date(table.getMeta('time_lastupdated'));
-      tableMeta.timeElapsedFormatted = formatTimeDiff(new Date(), dateFromSeconds);
+      tableMeta.timeElapsedFormatted = formatTimeDiff(new Date(), dateFromSeconds, 24);
 
       response.tables.push(tableMeta);
     });
