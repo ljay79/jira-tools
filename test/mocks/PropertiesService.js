@@ -64,13 +64,13 @@ var PropertiesService = {
       [ScriptProps.setProperty, (key,data) => { _scriptPropData[key] = data; }],
       [ScriptProps.deleteProperty, (key) => {delete(_scriptPropData[key])}],
       [ScriptProps.deleteAllProperties, null],
-      [PropertiesService.getScriptProperties, ScriptProps],
+      [PropertiesService.getScriptProperties,() => ScriptProps],
       
       [DocumentProps.getProperty, (key)=> _documentPropData[key]],
       [DocumentProps.setProperty, (key,data) => { _documentPropData[key] = data; }],
       [DocumentProps.deleteProperty, (key) => {delete(_documentPropData[key])}],
       [DocumentProps.deleteAllProperties, null],
-      [PropertiesService.getDocumentProperties, DocumentProps]
+      [PropertiesService.getDocumentProperties,() => DocumentProps]
     ];
     mocks.forEach((pair) => {
       pair[0].mockReset();
