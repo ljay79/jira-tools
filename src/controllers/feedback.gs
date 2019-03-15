@@ -23,14 +23,8 @@ Feedback_Controller_ = {
 
     var tempActiveUserKey = Session.getTemporaryActiveUserKey();
     var userProps = PropertiesService.getUserProperties();
-    var dialog = getDialog('views/dialogs/dialogFeedback', {
-      buildNumber: BUILD,
-      debugging: userProps.getProperty('debugging'),
-      tempUserKey: tempActiveUserKey,
-      environmentConfiguration: environmentConfiguration,
-      debugEnabled: debug.isEnabled()
-    });
-    
+    var dialog = getDialog('views/dialogs/dialogFeedback');
+
     dialog
       .setWidth(480)
       .setHeight(420)
