@@ -1,4 +1,3 @@
-
 /**
  * @file Contains controller class and dialog/callback method for inserting issue tables from jira filter.
  */
@@ -20,7 +19,7 @@ function cbRefreshIssueTable_initSidebar() {
 
 /**
  * @desc Wrapper: Sidebar callback handler, perform IssueTable refresh
- * @param {object} tableMetaData    Object with IssueTable meta data
+ * @param {object} tableMetaData Object with IssueTable meta data
  * @return {object} Object({status: [boolean]})
  */
 function cbRefreshIssueTable_refreshTable(tableMetaData) {
@@ -28,8 +27,7 @@ function cbRefreshIssueTable_refreshTable(tableMetaData) {
 }
 
 /**
- * @desc Wrapper: Sidebar callback handler to check if sidebar content should be refreshed.
- *       Ie: When user switches sheet.
+ * @desc Wrapper: Sidebar callback handler to check if sidebar content should be refreshed. Ie: When user switches sheet.
  * @return {object} Object({sheetId: [string], currentActiveCellValue: [string]})
  */
 function cbRefreshIssueTable_getResetSidebar() {
@@ -52,7 +50,7 @@ RefreshIssueTable_Controller_ = {
    */
   sidebar : function () {
     var sidebar = getDialog('views/sidebar/refreshTableSchedule', {
-      buildNumber: BUILD
+      buildNumber : BUILD
     });
 
     debug.log('Processed: %s', sidebar);
@@ -96,7 +94,7 @@ RefreshIssueTable_Controller_ = {
 
   /**
    * @desc Callback from sidebar to perform an IssueTable refresh
-   * @param {object} tableMetaData    Object with IssueTable meta data
+   * @param {object} tableMetaData Object with IssueTable meta data
    * @return {object} Object({status: [boolean]})
    */
   callbackRefreshTable : function (tableMetaData) {
@@ -147,7 +145,7 @@ RefreshIssueTable_Controller_ = {
 
 }
 
-//Node required code block
+// Node required code block
 module.exports = {
   menuRefreshIssueTable : menuRefreshIssueTable,
   cbRefreshIssueTable_initSidebar : cbRefreshIssueTable_initSidebar,

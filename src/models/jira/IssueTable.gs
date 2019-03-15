@@ -58,7 +58,7 @@ function IssueTable_(attributes) {
           || typeof attributes.filter !== 'object'
           || !attributes.filter.hasOwnProperty('id')
           || !attributes.filter.hasOwnProperty('jql')) {
-            throw new ReferenceError("{attributes.filter} must be an object of type 'Filter'. {id:{int}, jql: {strong}, ..}");
+        throw new ReferenceError("{attributes.filter} must be an object of type 'Filter'. {id:{int}, jql: {strong}, ..}");
       }
 
       if (!attributes.hasOwnProperty('issues') || typeof attributes.issues !== 'object') {
@@ -239,7 +239,8 @@ function IssueTable_(attributes) {
     debug.log('IssueTable_.render()');
     var renderer = RendererFactory_.call(that, metaData.renderer);
     if (typeof renderer !== 'object' || !renderer.hasOwnProperty('render')) {
-      throw new ReferenceError("{renderer} must be an object/class but is '" + typeof renderer + "'. Ie: of type 'IssueTableRendererDefault_'.");
+      throw new ReferenceError("{renderer} must be an object/class but is '" + typeof renderer
+          + "'. Ie: of type 'IssueTableRendererDefault_'.");
     }
 
     renderer.render();

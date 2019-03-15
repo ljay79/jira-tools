@@ -10,9 +10,9 @@ const IssueFields = require('./jira/IssueFields.gs');
 
 /**
  * Factory class to instantiate different IssueTableRenderer classes.
- * @TOOD: probably move to own file
  * 
- * @param {string} RendererClassName    Classname of a IssueTableRenderer class
+ * @TOOD: probably move to own file
+ * @param {string} RendererClassName Classname of a IssueTableRenderer class
  * @return {object} An instance of type IssueTableRenderer_
  */
 function RendererFactory_(RendererClassName) {
@@ -36,8 +36,7 @@ function RendererFactory_(RendererClassName) {
 
 /**
  * @desc Creates a new IssueTableRenderer instance (Default), which is used to insert an table of issues into a sheet.
- * 
- * @param {IssueTable_} IssueTable    The instance of IssueTable_ to render table
+ * @param {IssueTable_} IssueTable The instance of IssueTable_ to render table
  * @constructor
  */
 function IssueTableRendererDefault_(IssueTable) {
@@ -127,7 +126,7 @@ function IssueTableRendererDefault_(IssueTable) {
 
   /**
    * @desc Adding a summary line
-   * @param {string} summary    Text to be inserted as a table summary line
+   * @param {string} summary Text to be inserted as a table summary line
    * @return this For chaining
    */
   that.addSummary = function (summary) {
@@ -263,10 +262,8 @@ function IssueTableRendererDefault_(IssueTable) {
   };
 
   /**
-   * @desc Sorting the header/columns based on definition/order in global 
-   *       var ISSUE_COLUMNS. Improves a consistent column listing/sorting and
-   *       defined fields first before alpha sorting the rest.
-   * 
+   * @desc Sorting the header/columns based on definition/order in global var ISSUE_COLUMNS. Improves a consistent column listing/sorting
+   *       and defined fields first before alpha sorting the rest.
    * @returns {IssueTableRendererDefault_}
    */
   prepareHeaderValues = function () {
@@ -284,7 +281,6 @@ function IssueTableRendererDefault_(IssueTable) {
     return that;
   };
 }
-
 
 // Node required code block
 module.exports = {
