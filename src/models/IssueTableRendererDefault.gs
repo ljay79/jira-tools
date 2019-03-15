@@ -9,8 +9,8 @@ const IssueFields = require('./jira/IssueFields.gs');
 // End of Node required code block
 
 /**
- * @TOOD: probably move to own file
  * Factory class to instantiate different IssueTableRenderer classes.
+ * @TOOD: probably move to own file
  * 
  * @param {string} RendererClassName    Classname of a IssueTableRenderer class
  * @return {object} An instance of type IssueTableRenderer_
@@ -58,7 +58,7 @@ function IssueTableRendererDefault_(IssueTable) {
 
   /**
    * @desc Initialization, validation
-   * @throws Error
+   * @throws Error,ReferenceError
    * @throws ReferenceError
    */
   init = function () {

@@ -5,76 +5,6 @@ var Storage_ = require('../Storage.gs').Storage_;
 var IssueTable_ = require('./jira/IssueTable.gs');
 // End of Node required code block
 
-/* ######## DEV- WIP - Testing #################### */
-
-function findByTableId() {
-  var table = IssueTableIndex_.getTable('tbl_rB2D5');
-  if (!table) {
-    console.log('Table NOT found!');
-  } else {
-    console.log('Found Table Meta: %s', table.getMeta());
-  }
-}
-
-function findAllBySheet() {
-  // sheetId1: 602713257
-  // sheetId2: 230234225
-  var tables = IssueTableIndex_.getAllTablesBySheet(602713257);
-  if (tables.length == 0) {
-    console.log('Table NOT found!');
-  } else {
-    console.log('Found Tables: %s', tables.length);
-  }
-
-  var tables = IssueTableIndex_.getAllTablesBySheet(230234225);
-  if (tables.length == 0) {
-    console.log('Table NOT found!');
-  } else {
-    console.log('Found Tables: %s', tables.length);
-  }
-}
-
-function findTableByCoord() {
-  // OK Case
-  console.log('===========> case 2');
-  var table = IssueTableIndex_.getTableByCoord(757827655, 3, 7);
-  if (!table) {
-    console.log('Table NOT found!');
-  } else {
-    console.log('Found Tables: %s', table);
-  }
-  return;
-
-  // OK Case
-  console.log('===========> case 1');
-  var table = IssueTableIndex_.getTableByCoord(230234225, 3, 7);
-  if (!table) {
-    console.log('Table NOT found!');
-  } else {
-    console.log('Found Tables: %s', table);
-  }
-
-  // Not OK Case
-  console.log('===========> case 3');
-  var table = IssueTableIndex_.getTableByCoord(230234225, 50, 400);
-  if (!table) {
-    console.log('Table NOT found!');
-  } else {
-    console.log('Found Tables: %s', table);
-  }
-
-  // Not OK Case
-  console.log('===========> case 4');
-  var table = IssueTableIndex_.getTableByCoord(9999, 50, 400);
-  if (!table) {
-    console.log('Table NOT found!');
-  } else {
-    console.log('Found Tables: %s', table);
-  }
-}
-
-/* ######## ------------------ #################### */
-
 /**
  * @file Contains class used to persist IssueTable data and access it.
  */
@@ -123,7 +53,7 @@ IssueTableIndex_ = {
    * @desc Return a perviously stored IssueTable if available.
    * @param {string} tableId Table Id to fetch
    * @param {sheetId} sheetId Optional: Sheet Id to fetch table for. Default: current active sheets id
-   * @return {IssueTable_} Returns instance of IssueTable with loaded data if found, or empty instance if not
+   * @return {IssueTable_|FALSE} Returns instance of IssueTable with loaded data if found, or empty instance if not
    */
   getTable : function (tableId, sheetId) {
     sheetId = sheetIdPropertySafe(sheetId);
@@ -277,12 +207,12 @@ IssueTableIndex_ = {
   },
 
   /**
-   * @TODO: call by Trigger (ie when a sheet is deleted)
    * @desc Prune all orphaned tables in index.
    * @return {IssueTableIndex_} Allow chaining
    */
   prune : function () {
     debug.log('IssueTableIndex_.prune()');
+    debug.time('IssueTableIndex.prune()');
     // load everything from storage
     this._load();
 
@@ -387,6 +317,8 @@ IssueTableIndex_ = {
 
     } // END: for each sheet
 
+    debug.timeEnd('IssueTableIndex.prune()');
+
     return this._save();
   },
 
@@ -399,8 +331,6 @@ IssueTableIndex_ = {
   _getStorage : function () {
     if (null === this._storage) {
       this._storage = new Storage_('paj_tables', PropertiesService.getDocumentProperties() || {});
-      // @TODO: remove before production - only for better debugging
-      //this._storage = new Storage_('paj_tables', PropertiesService.getScriptProperties() || {});
     }
 
     return this._storage;

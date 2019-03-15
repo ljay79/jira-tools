@@ -6,10 +6,6 @@ var SpreadsheetTriggers_ = require('../SpreadsheetTriggers.gs').SpreadsheetTrigg
 var IssueTableRendererDefault_ = require('../IssueTableRendererDefault.gs').IssueTableRendererDefault_;
 // End of Node required code block
 
-/*
- * @TODO: remove testing @TODO. remove all unnccessary console.log from class
- */
-
 /**
  * @file Contains class which is used to reflect a Jira IssueTable's meta data for google sheet tables.
  */
@@ -41,9 +37,11 @@ function IssueTable_(attributes) {
   /**
    * @desc Initialize anything necessary for the class object
    * @param {object} initData Optional JSON representation of an IssueTable_ data set to load into instance
+   * @throws ReferenceError
    * @return void
    */
   init = function (attributes) {
+    debug.log('IssueTable_.init() <= %s', attributes);
     attributes = attributes || {
       metaData : {}
     };
@@ -60,19 +58,19 @@ function IssueTable_(attributes) {
           || typeof attributes.filter !== 'object'
           || !attributes.filter.hasOwnProperty('id')
           || !attributes.filter.hasOwnProperty('jql')) {
-            throw new Error("{attributes.filter} must be an object of type 'Filter'. {id:{int}, jql: {strong}, ..}");
+            throw new ReferenceError("{attributes.filter} must be an object of type 'Filter'. {id:{int}, jql: {strong}, ..}");
       }
 
       if (!attributes.hasOwnProperty('issues') || typeof attributes.issues !== 'object') {
-        throw new Error("{attributes.issues} must be an object. Jira api response object of type issues.");
+        throw new ReferenceError("{attributes.issues} must be an object. Jira api response object of type issues.");
       }
 
       if (!attributes.hasOwnProperty('sheet') || typeof attributes.sheet !== 'object') {
-        throw new Error("{attributes.sheet} must be an object of type 'Sheet'.");
+        throw new ReferenceError("{attributes.sheet} must be an object of type 'Sheet'.");
       }
 
       if (!attributes.hasOwnProperty('renderer')) {
-        throw new Error("{attributes.renderer} must be defined. Ie: of type 'IssueTableRendererDefault_' or string of class name.");
+        throw new ReferenceError("{attributes.renderer} must be defined. Ie: of type 'IssueTableRendererDefault_' or string of class name.");
       }
 
       /* ---- */
@@ -83,7 +81,7 @@ function IssueTable_(attributes) {
         jql : attributes.filter.jql
       });
       that.setIssues(attributes.issues).setRenderer(attributes.renderer);
-      
+
       if (attributes.filter.hasOwnProperty('name')) {
         that.setMeta('name', attributes.filter.name);
       }
@@ -104,6 +102,7 @@ function IssueTable_(attributes) {
    * @return {IssueTable_}
    */
   that.setRenderer = function (rendererClass) {
+    debug.log('IssueTable_.setRenderer() <= %s', rendererClass);
     if (typeof rendererClass === 'string') {
       metaData.renderer = rendererClass;
     } else {
@@ -233,12 +232,14 @@ function IssueTable_(attributes) {
 
   /**
    * @desc Calling the set renderer and render table
+   * @throws ReferenceError
    * @return {IssueTableRenderer_}
    */
   that.render = function () {
+    debug.log('IssueTable_.render()');
     var renderer = RendererFactory_.call(that, metaData.renderer);
     if (typeof renderer !== 'object' || !renderer.hasOwnProperty('render')) {
-      throw new Error("{renderer} must be an object/class but is '" + typeof renderer + "'. Ie: of type 'IssueTableRendererDefault_'.");
+      throw new ReferenceError("{renderer} must be an object/class but is '" + typeof renderer + "'. Ie: of type 'IssueTableRendererDefault_'.");
     }
 
     renderer.render();
@@ -260,6 +261,7 @@ function IssueTable_(attributes) {
    * @return {IssueTable_}
    */
   setRange = function (rangeA1) {
+    debug.log('IssueTable_.setRange() <= %s', rangeA1);
     metaData.rangeA1 = rangeA1;
     // setting named range
     var _rangeName = 'pa4j_s' + Sheet.getSheetId() + '_';

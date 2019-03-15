@@ -1,79 +1,3 @@
-/* ######## DEV- WIP - Testing #################### */
-
-/*
- * Fetching a table from index and using its meta data to (re)insert table into sheet. Used for Refreshing entire Issue Tables
- */
-function TESTrefreshTableFromMeta() {
-  debug.log('TESTinsertTableFromMeta()');
-
-  // Get table from Meta
-  // var Table = IssueTableIndex_.getTable('tbl_rE9G15', '1088328195');
-  var Table = IssueTableIndex_.getTable('tbl_rA12C18', '1088328195');
-
-  var ok = function (resp, status, errorMessage) {
-    var renderer;
-    Table.setIssues(resp.data);
-
-    if (renderer = Table.render()) {
-      // toast with status message
-      var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
-          + " total found records.";
-      SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
-      debug.log(msg);
-
-      // add table to index
-      console.log('renderer.info: %s', renderer.getInfo());
-      console.log('==>> Table Meta: %s', Table.getMeta());
-    }
-  };
-
-  var Search = new IssueSearch(Table.getMeta('filter').jql);
-  Search.setOrderBy()
-    .setFields(Table.getMeta('headerValues'))
-    .setMaxResults(Table.getMeta('maxResults') || 10)
-    .setStartAt(0)
-    .search()
-    .withSuccessHandler(ok)
-  ;
-}
-
-function TESTrefreshTableFromMeta2() {
-  debug.log('TESTinsertTableFromMeta2()');
-
-  // Get table from Meta
-  var Table = IssueTableIndex_.getTable('tbl_rE9G15', '1088328195');
-
-  var ok = function (resp, status, errorMessage) {
-    var renderer;
-    Table.setIssues(resp.data);
-
-    if (renderer = Table.render()) {
-      // toast with status message
-      var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.data.total
-          + " total found records.";
-      SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
-      debug.log(msg);
-
-      // add table to index
-      console.log('renderer.info: %s', renderer.getInfo());
-      console.log('==>> Table Meta: %s', Table.getMeta());
-    }
-  };
-
-  // var headers = Table.getMeta('headerValues');
-  var headers = ['key', 'summary', 'status', 'assignee'];
-
-  var Search = new IssueSearch(Table.getMeta('filter').jql);
-  Search.setOrderBy()
-    .setFields(headers)
-    .setMaxResults(Table.getMeta('maxResults') || 10)
-    .setStartAt(0)
-    .search()
-    .withSuccessHandler(ok)
-  ;
-}
-
-/* ######## ------------------ #################### */
 
 /**
  * @file Contains controller class and dialog/callback method for inserting issue tables from jira filter.
@@ -94,10 +18,20 @@ function cbRefreshIssueTable_initSidebar() {
   return RefreshIssueTable_Controller_.callbackInitSidebar();
 }
 
+/**
+ * @desc Wrapper: Sidebar callback handler, perform IssueTable refresh
+ * @param {object} tableMetaData    Object with IssueTable meta data
+ * @return {object} Object({status: [boolean]})
+ */
 function cbRefreshIssueTable_refreshTable(tableMetaData) {
   return RefreshIssueTable_Controller_.callbackRefreshTable(tableMetaData);
 }
 
+/**
+ * @desc Wrapper: Sidebar callback handler to check if sidebar content should be refreshed.
+ *       Ie: When user switches sheet.
+ * @return {object} Object({sheetId: [string], currentActiveCellValue: [string]})
+ */
 function cbRefreshIssueTable_getResetSidebar() {
   var response = {
     sheetId : sheetIdPropertySafe(),
@@ -108,11 +42,14 @@ function cbRefreshIssueTable_getResetSidebar() {
 }
 
 /**
- * Creates a new IssueTableIndex_ object, which is used to persist IssueTables and related information.
+ * Creates a new RefreshIssueTable_Controller_ object, controller for multiple actions.
  */
 RefreshIssueTable_Controller_ = {
   name : 'RefreshIssueTable_Controller_',
 
+  /**
+   * @desc Menu called to open new sidebar dialog.
+   */
   sidebar : function () {
     var sidebar = getDialog('views/sidebar/refreshTableSchedule', {
       buildNumber: BUILD
@@ -128,6 +65,10 @@ RefreshIssueTable_Controller_ = {
     SpreadsheetApp.getUi().showSidebar(html);
   },
 
+  /**
+   * @desc Callback from sidebar to get all initialization data.
+   * @return {object} Object({status: [boolean], tables: [object]})
+   */
   callbackInitSidebar : function () {
     debug.log(this.name + '.callbackInitSidebar()');
 
@@ -138,7 +79,7 @@ RefreshIssueTable_Controller_ = {
           tables : []
         };
 
-    /* enhance data for sidebar functionality, then pass to response as JSON string */
+    // enhance data for sidebar functionality, then pass to response as JSON string
     IssueTableIndex_.getAllTablesBySheet(activeSheet.getSheetId()).forEach(function (table) {
       var tableMeta = table.getMeta();
       // add name of sheet
@@ -153,6 +94,11 @@ RefreshIssueTable_Controller_ = {
     return response;
   },
 
+  /**
+   * @desc Callback from sidebar to perform an IssueTable refresh
+   * @param {object} tableMetaData    Object with IssueTable meta data
+   * @return {object} Object({status: [boolean]})
+   */
   callbackRefreshTable : function (tableMetaData) {
     debug.log(this.name + '.callbackRefreshTable() <= %s', tableMetaData);
 
@@ -200,3 +146,13 @@ RefreshIssueTable_Controller_ = {
   }
 
 }
+
+//Node required code block
+module.exports = {
+  menuRefreshIssueTable : menuRefreshIssueTable,
+  cbRefreshIssueTable_initSidebar : cbRefreshIssueTable_initSidebar,
+  cbRefreshIssueTable_refreshTable : cbRefreshIssueTable_refreshTable,
+  cbRefreshIssueTable_getResetSidebar : cbRefreshIssueTable_getResetSidebar,
+  RefreshIssueTable_Controller_ : RefreshIssueTable_Controller_
+}
+// End of Node required code block
