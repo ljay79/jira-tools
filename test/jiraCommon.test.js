@@ -60,19 +60,19 @@ test("unifyIssueAttrib ", () => {
   UserStorage.setValue(
     "favoriteCustomFields",
     [
-      {key:"customfield_custom1",name:"Custom 1",type: "number"},
-      {key:"customfield_custom2",name:"Custom 2",schemaType: "string"},
-      {key:"customfield_custom3",name:"Custom 3",schemaType: "option"},
-      {key:"customfield_stringArray",name:"String Array",schemaType: "array|string"},
-      {key:"customfield_stringArray2",name:"String Array",schemaType: "array|string"},
-      {key:"customfield_stringArray3",name:"String Array",schemaType: "array|string"},
-      {key:"customfield_stringArray4",name:"String Array",schemaType: "array|string"},
-      {key:"customfield_versions",name:"Version Array",schemaType: "array|versions"},
-      {key:"customfield_emptyversions",name:"Empty Version Array",schemaType: "array|versions"},
-      {key:"customfield_version_released",name:"Version",schemaType: "versions"},
-      {key:"customfield_version_unreleased",name:"Version",schemaType: "versions"},
-      {key:"customfield_sprints",name:"Sprints",schemaType:"array|string"}
-      
+      { key: "customfield_custom1", name: "Custom 1", type: "number", customType: "none" },
+      { key: "customfield_custom2", name: "Custom 2", schemaType: "string", customType: "none"  },
+      { key: "customfield_custom3", name: "Custom 3", schemaType: "option", customType: "none"  },
+      { key: "customfield_stringArray", name: "String Array", schemaType: "array|string", customType: "none"  },
+      { key: "customfield_stringArray2", name: "String Array", schemaType: "array|string", customType: "none"  },
+      { key: "customfield_stringArray3", name: "String Array", schemaType: "array|string", customType: "none"  },
+      { key: "customfield_stringArray4", name: "String Array", schemaType: "array|string", customType: "none"  },
+      { key: "customfield_versions", name: "Version Array", schemaType: "array|versions", customType: "none"  },
+      { key: "customfield_emptyversions", name: "Empty Version Array", schemaType: "array|versions", customType: "none"  },
+      { key: "customfield_version_released", name: "Version", schemaType: "versions", customType: "none"  },
+      { key: "customfield_version_unreleased", name: "Version", schemaType: "versions", customType: "none"  },
+      { key: "customfield_sprints", name: "Sprints", schemaType: "array|string", customType: "none"  }
+
     ]
   );
   var debug = require("../src/debug.gs").debug;

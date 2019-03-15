@@ -39,14 +39,14 @@ test("menuUpdateJiraIssues", () => {
   settingsMock.hasSettings.mockImplementation(() => {
     return true;
   });
-  // no values selected
+  // no values selected in the spreadsheet
   getValues.mockImplementationOnce(() => []);
+  // mock some user selected field properties 
   PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
     return JSON.stringify([
-      {key:"custom1",name:"Custom 1"},
-      {key:"custom2",name:"Custom 2"}
-    ]
-      
+      {key:"custom1",name:"Custom 1", type:"string", customType:"xxx"},
+      {key:"custom2",name:"Custom 2", type:"string", customType:"xyz"}
+    ]  
     );
   });
   menuUpdateJiraIssues();
