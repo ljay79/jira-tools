@@ -203,23 +203,28 @@ if (!Array.prototype.fill) {
  * @return {String}
  */
 function formatTimeDiff() {
-  var delta, response = '';
+  var delta, response = '', workhoursInSeconds = 24;
+  workhoursInSeconds = parseFloat(UserStorage.getValue('workhours')) * 3600;
+
   if(arguments.length == 1) {
     // delta passed to convert
     delta = arguments[0];
-  } else if (arguments.length == 2) {
+  } else if (arguments.length == 2 || arguments.length == 3) {
     // get total seconds between the times
     if ( arguments[1] > arguments[0] ) {
       delta = Math.abs(arguments[1] - arguments[0]) / 1000;
     } else {
       delta = Math.abs(arguments[0] - arguments[1]) / 1000;
     }
+    if (arguments.length == 3) {
+      // 3rd argument is optional work hours override as integer in hours
+      workhoursInSeconds = parseFloat(arguments[2]) * 3600;
+    }
   } else {
-    throw 'formatTime() accepts 1 or 2 arguments.';
+    throw 'formatTime() accepts 1 or 2(3) arguments.';
   }
 
   // calculate (and subtract) whole days (workday=8h)
-  var workhoursInSeconds = parseFloat(UserStorage.getValue('workhours')) * 3600;
   var days = Math.floor(delta / workhoursInSeconds);
   delta -= days * workhoursInSeconds;
 
@@ -240,7 +245,7 @@ function formatTimeDiff() {
   response += seconds > 0 ? seconds + 's ' : '';
 
   return response.trim();
-};
+}
 
 /**
  * @desc Converts time difference or seconds passed into (working-)hours.
