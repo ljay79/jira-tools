@@ -4,6 +4,7 @@ const IssueFields = require('src/models/jira/IssueFields.gs');
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
 const debug = require("./debug.gs").debug;
 const extend = require("./jsLib.gs").extend;
+const splitCommaList_ = require("./jsLib.gs").splitCommaList_;
 const IssueTransitioner = require('./jiraIssueStatusUpdates/issueTransitioner.gs');
 // End of Node required code block
 
@@ -61,9 +62,9 @@ function updateJiraIssues(headerRow, dataRows) {
   function checkForFieldsWhichCantBeEmpty(packagedRow) {
     if (packagedRow.fields.hasOwnProperty("priority")) {
       var checkValue = packagedRow.fields["priority"];
-      if (checkValue == null || checkValue =="") {
+      if (checkValue == null || checkValue == "") {
         result.errors.push("[" + packagedRow.key + "] you must enter a value for field Priority");
-        delete(packagedRow.fields["priority"]);
+        delete (packagedRow.fields["priority"]);
       }
     }
   }
@@ -103,35 +104,28 @@ function updateJiraIssues(headerRow, dataRows) {
  * @param value - the value from the spreadsheet for the specified field
  */
 function formatFieldValueForJira(fieldDefinition, value) {
-  if (fieldDefinition.key == "labels") {
-    if (value == "") {
-      value = null;
-    } else {
-      if (typeof value === 'string' || value instanceof String) {
-        value = value.split(/,\s?/);
-      }
-    }
-    return value;
-  }
   var nullableSchemaTypes = ["number", "date", "user", "array|string", "user", "priority"];
   if (nullableSchemaTypes.indexOf(fieldDefinition.schemaType) >= 0) {
     if (value == "") {
       value = null;
     }
   }
+
+  if (fieldDefinition.schemaType == 'array|string') {
+    if (typeof value === 'string' || value instanceof String) {
+      if (fieldDefinition.customType == "gh-sprint") {
+        // Sprint IDs should be numeric
+        if (value != null && !isNaN(value)) {
+          value = +value;
+        } 
+      } else {
+        value = splitCommaList_(value);
+      }
+    }
+  }
   var fieldsUsingName = ["user", "priority"];
   if (fieldsUsingName.indexOf(fieldDefinition.schemaType) >= 0 && value != null) {
     value = { name: value };
-  }
-
-
-  if (fieldDefinition.custom && fieldDefinition.schemaType == "array|string") {
-    // array|string as a schematpe is used by many fields
-    // intended first to fix bug with setting sprint fields to empty
-    // currently there is no other way to identify the sprint field
-    if (value != null && !isNaN(value)) {
-      value = +value;
-    }
   }
   return value;
 }
@@ -193,7 +187,7 @@ function packageRowForUpdate(headerRow, dataRow) {
   function prepareUpdateField(headerId, value) {
     updateItems = [];
     if (value != null) {
-      listOfItems = value.split(/\s*,\s*/);
+      listOfItems = value;
       listOfItems.forEach(function (item) {
         if (item.trim().length > 0) {
           updateItems.push({ "name": item.trim() });

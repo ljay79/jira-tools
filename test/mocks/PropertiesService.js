@@ -54,27 +54,29 @@ var PropertiesService = {
   getDocumentProperties: jest.fn(),
   resetMocks: function () {
     var mocks = [
-      [UserProps.getProperty, ""],
-      [UserProps.setProperty, null],
-      [UserProps.deleteProperty, null],
+      [UserProps.getProperty, (key)=> _userPropData[key]],
+      [UserProps.setProperty, (key,data) => { _userPropData[key] = data; }],
+      [UserProps.deleteProperty, (key) => {delete(_userPropData[key])}],
       [UserProps.deleteAllProperties, null],
-      [PropertiesService.getUserProperties, UserProps],
+      [PropertiesService.getUserProperties,() => UserProps],
       
-      [ScriptProps.getProperty, ""],
-      [ScriptProps.setProperty, null],
-      [ScriptProps.deleteProperty, null],
+      [ScriptProps.getProperty, (key)=> _scriptPropData[key]],
+      [ScriptProps.setProperty, (key,data) => { _scriptPropData[key] = data; }],
+      [ScriptProps.deleteProperty, (key) => {delete(_scriptPropData[key])}],
       [ScriptProps.deleteAllProperties, null],
-      [PropertiesService.getScriptProperties, ScriptProps],
+      [PropertiesService.getScriptProperties,() => ScriptProps],
       
-      [DocumentProps.getProperty, ""],
-      [DocumentProps.setProperty, null],
-      [DocumentProps.deleteProperty, null],
+      [DocumentProps.getProperty, (key)=> _documentPropData[key]],
+      [DocumentProps.setProperty, (key,data) => { _documentPropData[key] = data; }],
+      [DocumentProps.deleteProperty, (key) => {delete(_documentPropData[key])}],
       [DocumentProps.deleteAllProperties, null],
-      [PropertiesService.getDocumentProperties, DocumentProps]
+      [PropertiesService.getDocumentProperties,() => DocumentProps]
     ];
     mocks.forEach((pair) => {
       pair[0].mockReset();
-      pair[0].mockImplementation(() => pair[1]);
+      if (pair[1] != null) {
+        pair[0].mockImplementation(pair[1]);
+      }
     });
   },
   resetMockUserData: function() {
@@ -86,5 +88,7 @@ var PropertiesService = {
   mockScriptProps: ScriptProps,
   mockDocumentProps: DocumentProps
 }
+
 PropertiesService.resetMocks();
+
 module.exports = PropertiesService;
