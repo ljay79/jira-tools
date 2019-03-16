@@ -19,17 +19,18 @@
 }
 
 html, body, html * {
-  /*font-family: 'Roboto-Light', 'Roboto-Medium', 'Roboto-Bold', 'Roboto', Helvetica, Arial, sans-serif;*/
-  font-family: Roboto, Helvetica, Arial, sans-serif;
-  font-size: 13px;
-  color: black;
-  font-weight: normal;
+	/*font-family: 'Roboto-Light', 'Roboto-Medium', 'Roboto-Bold', 'Roboto', Helvetica, Arial, sans-serif;*/
+	font-family: Roboto, Helvetica, Arial, sans-serif;
+	font-size: 13px;
+	color: black;
+	font-weight: normal;
 }
 
 a { color: inherit; }
 
 fieldset legend {
     font-weight: 700;
+    padding: 4px 8px 0px 8px;
 }
 fieldset.block p {
     margin-top: 0;
@@ -42,17 +43,19 @@ textarea {
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
+  <form id="feedback" action="" method="post">
     <fieldset class="block">
       <legend>Give your valued feedback</legend>
-      <p>Lorem ipsum dolores ipsum dolores ipsum dolores ipsum dolores ipsum dolores ipsum dolores ipsum dolores ipsum dolores ipsum dolores </p>
+      <p>We like to hear your feedback. If you find issues or have suggestions for improvements, just leave us message.</p>
+      <p>You may also visit us on Github: <a href="https://github.com/ljay79/jira-tools/issues">https://github.com/ljay79/</a></p>
       <textarea name="feedback_msg"></textarea>
     </fieldset>
 
     <div class="block">
-      <input type="checkbox" name="aaa" value="1">
+      <input type="checkbox" name="data_privacy" value="1">
       <label>I understand and agree, this feedback is sent using my GMail account and my email address will be visible to the recipient(s).</label>
       <br>
-      <input type="checkbox" name="aaa" value="1">
+      <input type="checkbox" name="contact_me" value="1">
       <label>Yes, you may contact me about my feedback.</label>
     </div>
 
@@ -60,9 +63,53 @@ textarea {
       <button type="button" onclick="google.script.host.close()">Cancel</button>
       <button type="submit" class="action" disabled>Submit</button>
     </div>
+  </form>
+<script>
+var valid  = false;
+var action = document.querySelector('[type=submit]');
+var form   = document.forms['feedback'];
+var input  = $(form).find('input:text, input:checkbox, textarea');
 
-    <script>
-    
-    </script>
+function formSubmitHandler(event) {
+  if (event) event.preventDefault();
+  if (!valid) return;
+
+  google.script.run
+    .withSuccessHandler(onResponse)
+    .withFailureHandler(onResponse)
+    .cbFeedback_sendFeedback(this);
+}
+
+function inputValidatyHandler() {
+  var validaty = true;
+  input.each(function(e, el) {
+    switch(el.name) {
+      case 'feedback_msg':
+        validaty = validaty && el.value.length > 5;
+        break;
+      case 'data_privacy':
+        validaty = validaty && el.checked;
+        break;
+    }
+    action.disabled = validaty ? false : 'disabled';
+    return validaty;
+  });
+  valid = validaty;
+}
+
+function onResponse(response) {
+  google.script.host.close();
+}
+
+form.addEventListener('submit', formSubmitHandler);
+input.each(function(){
+  if (this.type == 'checkbox') {
+    $(this).on('change', inputValidatyHandler);
+  } else {
+    $(this).on('keyup', inputValidatyHandler);
+  }
+});
+window.addEventListener('load', inputValidatyHandler);
+</script>
   </body>
 </html>
