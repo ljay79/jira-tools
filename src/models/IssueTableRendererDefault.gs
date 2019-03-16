@@ -167,6 +167,7 @@ function IssueTableRendererDefault_(IssueTable) {
       .setFontWeights([formats]);
 
     info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
+    info.headers = values;
 
     SpreadsheetApp.flush();
 
@@ -251,14 +252,6 @@ function IssueTableRendererDefault_(IssueTable) {
    */
   that.getInfo = function () {
     return info;
-  };
-
-  /**
-   * @desc Return array of header values
-   * @return {Array}
-   */
-  that.getHeaders = function () {
-    return headers;
   };
 
   /**

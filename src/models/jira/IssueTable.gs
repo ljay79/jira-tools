@@ -248,7 +248,7 @@ function IssueTable_(attributes) {
     // store render info to IssueTable meta data
     var renderInfo = renderer.getInfo();
     metaData.headerRowOffset = renderInfo.headerRowOffset;
-    metaData.headerValues = renderer.getHeaders();
+    metaData.headerValues = renderInfo.headers;
 
     // setting range info
     setRange(renderInfo.oRangeA1.from + ':' + renderInfo.oRangeA1.to);
