@@ -26,18 +26,22 @@ html, body, html * {
 	font-weight: normal;
 }
 
-a { color: inherit; }
+a {
+	color: inherit;
+}
 
 fieldset legend {
-    font-weight: 700;
-    padding: 4px 8px 0px 8px;
+	font-weight: 700;
+	padding: 4px 8px 0px 8px;
 }
+
 fieldset.block p {
-    margin-top: 0;
+	margin-top: 0;
 }
+
 textarea {
-    width: 100%;
-    height: 100px;
+	width: 100%;
+	height: 100px;
 }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -46,8 +50,11 @@ textarea {
   <form id="feedback" action="" method="post">
     <fieldset class="block">
       <legend>Give your valued feedback</legend>
-      <p>We like to hear your feedback. If you find issues or have suggestions for improvements, just leave us message.</p>
-      <p>You may also visit us on Github: <a href="https://github.com/ljay79/jira-tools/issues">https://github.com/ljay79/</a></p>
+      <p>We like to hear your feedback. If you find issues or have
+        suggestions for improvements, just leave us message.</p>
+      <p>
+        You may also visit us on Github: <a href="https://github.com/ljay79/jira-tools/issues">https://github.com/ljay79/</a>
+      </p>
       <textarea name="feedback_msg"></textarea>
     </fieldset>
 
@@ -64,52 +71,54 @@ textarea {
       <button type="submit" class="action" disabled>Submit</button>
     </div>
   </form>
-<script>
-var valid  = false;
-var action = document.querySelector('[type=submit]');
-var form   = document.forms['feedback'];
-var input  = $(form).find('input:text, input:checkbox, textarea');
+  <script>
+      var valid = false;
+      var action = document.querySelector('[type=submit]');
+      var form = document.forms['feedback'];
+      var input = $(form).find('input:text, input:checkbox, textarea');
 
-function formSubmitHandler(event) {
-  if (event) event.preventDefault();
-  if (!valid) return;
+      function formSubmitHandler(event) {
+        if (event)
+          event.preventDefault();
+        if (!valid)
+          return;
 
-  google.script.run
-    .withSuccessHandler(onResponse)
-    .withFailureHandler(onResponse)
-    .cbFeedback_sendFeedback(this);
-}
+        google.script.run
+          .withSuccessHandler(onResponse)
+          .withFailureHandler(onResponse)
+          .cbFeedback_sendFeedback(this);
+      }
 
-function inputValidatyHandler() {
-  var validaty = true;
-  input.each(function(e, el) {
-    switch(el.name) {
-      case 'feedback_msg':
-        validaty = validaty && el.value.length > 5;
-        break;
-      case 'data_privacy':
-        validaty = validaty && el.checked;
-        break;
-    }
-    action.disabled = validaty ? false : 'disabled';
-    return validaty;
-  });
-  valid = validaty;
-}
+      function inputValidatyHandler() {
+        var validaty = true;
+        input.each(function (e, el) {
+          switch (el.name) {
+            case 'feedback_msg':
+              validaty = validaty && el.value.length > 5;
+              break;
+            case 'data_privacy':
+              validaty = validaty && el.checked;
+              break;
+          }
+          action.disabled = validaty ? false : 'disabled';
+          return validaty;
+        });
+        valid = validaty;
+      }
 
-function onResponse(response) {
-  google.script.host.close();
-}
+      function onResponse(response) {
+        google.script.host.close();
+      }
 
-form.addEventListener('submit', formSubmitHandler);
-input.each(function(){
-  if (this.type == 'checkbox') {
-    $(this).on('change', inputValidatyHandler);
-  } else {
-    $(this).on('keyup', inputValidatyHandler);
-  }
-});
-window.addEventListener('load', inputValidatyHandler);
-</script>
-  </body>
+      form.addEventListener('submit', formSubmitHandler);
+      input.each(function () {
+        if (this.type == 'checkbox') {
+          $(this).on('change', inputValidatyHandler);
+        } else {
+          $(this).on('keyup', inputValidatyHandler);
+        }
+      });
+      window.addEventListener('load', inputValidatyHandler);
+    </script>
+</body>
 </html>

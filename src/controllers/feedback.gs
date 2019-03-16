@@ -1,4 +1,3 @@
-
 /**
  * @file Contains controller class and dialog/callback method for Feedback feature.
  */
@@ -19,7 +18,6 @@ function cbFeedback_getDialog() {
 function cbFeedback_sendFeedback(jsonFormData) {
   return Feedback_Controller_.sendFeedback(jsonFormData);
 }
-
 
 /**
  * Creates a new IssueTableIndex_ object, which is used to persist IssueTables and related information.
@@ -45,7 +43,7 @@ Feedback_Controller_ = {
 
     SpreadsheetApp.getUi().showModalDialog(dialog, 'Provide Feedback');
   },
-  
+
   /**
    * @desc Sending feedback message as email from user.
    * @param {object} Json formatted form data
@@ -68,12 +66,14 @@ Feedback_Controller_ = {
     ;
 
     MailApp.sendEmail({
-      to: emailAddress,
-      subject: subject,
-      htmlBody: messageHtml,
+      to : emailAddress,
+      subject : subject,
+      htmlBody : messageHtml,
     });
 
-    return {status: true};
+    return {
+      status : true
+    };
   }
 
 }
