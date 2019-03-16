@@ -48,6 +48,10 @@ In fact, this add-on does not execute anything while the sheet is closed or not 
 `Connect to an external service`
 Required for establishing connection to the Jira RESTful API to fetch your Jira issue details when requested.
 
+`Send email as you`
+Send email that appears to have been sent by you (e.g., from your email address).
+This is necessary only when you submit our Feedback form inside the Add-on.
+
 `Publish this application as a web app or a service that may share your data`
 Implied when publishing this add-on as a google sheet add-on.
 NO data is shared with any third-party other then your google sheet and the used Jira instance.
