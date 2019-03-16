@@ -83,6 +83,7 @@ InsertIssueTable_Controller_ = {
       filter : jsonFormData['filter_id'] ? getFilter(parseInt(jsonFormData['filter_id'])) : {},
       maxResults : parseInt(jsonFormData['maxResults']) || 10000,
       issues : {},
+      columns : columns,
       sheet : getTicketSheet(),
       renderer : IssueTableRendererDefault_
     };

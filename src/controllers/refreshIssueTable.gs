@@ -131,7 +131,7 @@ RefreshIssueTable_Controller_ = {
 
     var Search = new IssueSearch(Table.getMeta('filter').jql);
     Search.setOrderBy()
-      .setFields(Table.getMeta('headerValues'))
+      .setFields(Table.getMeta('headerFields'))
       .setMaxResults(Table.getMeta('maxResults') || 1000)
       .setStartAt(0)
       .search()
