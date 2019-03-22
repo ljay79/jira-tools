@@ -220,39 +220,6 @@ function getFilter(filterId) {
 }
 
 /**
- * @desc Fetch all active users and groups for dialog selection.
- * @param {boolean} minimal  Returning data includes only minimal info (displayName,name[,active])
- * @return {object} Object({"users":[{<arrayOfObjects}], "groups":[{arrayOfObjects}]})
- */
-function fetchUsersAndGroups(minimal) {
-  var minimal = minimal || true,
-    result = {
-      "users": [],
-      "groups": findGroup('%', minimal)
-    };
-
-  result.users = findUser('%', minimal).filter(function (user) {
-    return user.active !== false;
-  });
-
-  // Jira Server Issue workaround (https://jira.atlassian.com/browse/JRASERVER-29069)
-  if (result.users.length == 0 && getCfg_('server_type') == 'server') {
-    // try it again with custom query param apparently working like %
-    result.users = findUser('.', minimal).filter(function (user) {
-      return user.active !== false;
-    });
-  }
-
-  result.users.sort(function (a, b) { return (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0); });
-
-  if (result.users.length == 0) {
-    SpreadsheetApp.getActiveSpreadsheet().toast("No users were found. Check your JIRA permission.", "Error", 10);
-  }
-
-  return result;
-}
-
-/**
  * @desc Helper to convert indiv. jira field/property objects 
  *       into simple objects for using as cell data.
  * @param attrib {string}
