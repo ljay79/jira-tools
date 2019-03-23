@@ -110,11 +110,23 @@ button.pika-button {
       var valid   = false;
       var timeout = null;
       var alert   = document.getElementById('response-message');
+      var input   = Array.prototype.slice.call(frmWorklog.elements).filter(function(el){ return el.nodeName === 'INPUT'; });
       var action  = frmWorklog.querySelector('[type=submit]');
       var search  = $("#search");
-      
+
+      function hideAlert(){
+        if(timeout) timeout = clearTimeout(timeout);
+        alert.style.display = 'none';
+      }
+
+      function showAlert(text, type, time) {
+        alert.innerText = text;
+        alert.style.backgroundColor = type ? 'rgb(139,195,74)' : 'rgb(213,0,0)';
+        alert.style.display = 'block';
+        if (time) timeout = setTimeout(hideAlert,time);
+      }
+
       function onInitWorklog(response) {
-        console.log(response);
         search.removeClass('is-loading').attr("placeholder", "start typing ...");
         search.autocomplete({
           titleKey: 'value',
@@ -137,11 +149,16 @@ button.pika-button {
         }).on('selected.xdsoft',function(e, el) {
           frmWorklog.wlUser.value = el.name;
           frmWorklog.wlAuthorName.value = el.displayName;
+          inputValidatyHandler();
         });
       }
 
       function formSubmitHandler(event) {
         if (event) event.preventDefault();
+
+        hideAlert();
+
+        if (!valid) return;
 
         var formData = {
           wlAuthorU: frmWorklog.wlUser.value,
@@ -159,12 +176,26 @@ button.pika-button {
         google.script.host.close();
       }
 
-      google.script.run
-        .withSuccessHandler(onInitWorklog)
-        .callbackGetAllUsers();
+      /**
+       * @desc Validate input before submit.
+       * Not much yet, but unify handling with other dialogs.
+       * @return void
+       */
+      function inputValidatyHandler() {
+        valid = frmWorklog.wlUser.value.length > 1;
 
-      frmWorklog.addEventListener('submit', formSubmitHandler);
-      
+        action.disabled = valid ? false : 'disabled';
+      }
+
+      /**
+       * We do allow user to enter username without autocomplete selection.
+       * For this purpose we need to sync the entered value in the search field
+       * with the hidden data fields, which are used for the callback.
+       */
+      function syncHiddenFields() {
+        frmWorklog.wlUser.value = frmWorklog.wlAuthorName.value = search.val();
+      }
+
       var pickerFrom = new Pikaday({
         field: frmWorklog.wlStartDate, 
         format: 'yyyy-MM-dd',
@@ -191,6 +222,16 @@ button.pika-button {
           return date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
         }
       });
+
+      google.script.run
+        .withSuccessHandler(onInitWorklog)
+        .callbackGetAllUsers();
+
+      // the order of (keyup) event binding matters
+      frmWorklog.addEventListener('submit', formSubmitHandler);
+      search.on('keyup', syncHiddenFields);
+      input.forEach(function(el){ $(el).on('keyup', inputValidatyHandler); });
+      window.addEventListener('load', inputValidatyHandler);
     </script>
 </body>
 </html>
