@@ -39,10 +39,9 @@ function onInstall(e) {
  * @OnlyCurrentDoc
  */
 function addMenu() {
-
   var menu = SpreadsheetApp.getUi().createAddonMenu()
     .addItem('List issues from filter', 'menuInsertIssueFromFilter')
-    .addItem('Create time report', 'dialogTimesheet')
+    .addItem('Create time report', 'menuCreateTimeReport')
     .addSeparator()
     .addItem('Refresh IssueTable', 'menuRefreshIssueTable')
     .addItem('Update formulas in active sheet', 'recalcCustomFunctions')

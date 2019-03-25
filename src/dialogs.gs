@@ -111,28 +111,6 @@ function dialogAbout() {
 /* Dialog: About - END */
 
 
-/* Dialog: Worklog */
-
-/**
- * @desc Dialog to create worklog based on user/group selection
- */
-function dialogTimesheet() {
-  if (!hasSettings(true)) return;
-
-  var dialog = getDialog('dialogTimesheet');
-
-  dialog
-    .setWidth(420)
-    .setHeight(360)
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-
-  debug.log('Processed: %s', dialog);
-
-  SpreadsheetApp.getUi().showModalDialog(dialog, 'Create time report');
-}
-
-/* Dialog: Worklog - END */
-
 /* Sidebar: Quick Menu */
 
 /**

@@ -264,7 +264,7 @@ Therefore i do use already pagination where ever possible to fetch as many data 
 Current existing limitations by this Add-On:
 * "List issues from filter" is limited to a total amount of **10.000** issues to be listed per request
   * To comply with Atlassians policy, it does internally fetch only *50* records per page which can result in quite some delay when dealing with too many issues.
-* Listing of Jira users and groups (within dialogs) is limited to **100** user/group records
+* Listing of Jira users (within dialogs) is limited to **1000** user records
 * "Time Report" is limited to report max **1.000** worklogs per Jira issue (max **1.000** issues) per Time sheet
 * All data processing however is bound to run within Google's maximum execution time of **5 minutes**.
 
