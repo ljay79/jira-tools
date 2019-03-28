@@ -42,13 +42,13 @@ function dialogSettings() {
   var dialog = getDialog('dialogSettings', getServerCfg());
 
   dialog
-    .setWidth(360)
+    .setWidth(510)
     .setHeight(500)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   debug.log('Processed: %s', dialog);
 
-  SpreadsheetApp.getUi().showModalDialog(dialog, 'Jira Server Settings');
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'Settings');
 }
 
 /**
