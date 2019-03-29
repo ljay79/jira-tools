@@ -51,22 +51,6 @@ function dialogSettings() {
   SpreadsheetApp.getUi().showModalDialog(dialog, 'Settings');
 }
 
-/**
- * @desc Helper for our Settings Dialogs HTML.
- * @return {object} 
- */
-function getServerCfg() {
-  return {
-    available: getCfg_('available'),
-    url: getCfg_('jira_url'),
-    username: getCfg_('jira_username'),
-    password: getCfg_('jira_password'),
-    workhours: UserStorage.getValue('workhours'),
-    dspuseras_name: UserStorage.getValue('dspuseras_name'),
-    dspdurationas: UserStorage.getValue('dspdurationas')
-  };
-}
-
 /* Dialog: Settings - END */
 
 /**

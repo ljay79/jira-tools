@@ -96,6 +96,24 @@ function initDefaults() {
 }
 
 /**
+ * @desc Helper for our Settings Dialogs HTML.
+ * @return {object} 
+ */
+function getServerCfg() {
+  return {
+    available: getCfg_('available'),
+    url: getCfg_('jira_url'),
+    username: getCfg_('jira_username'),
+    password: getCfg_('jira_password'),
+    custom_fn_enabled: getCfg_('custom_fn_enabled') || 0,
+    workhours: UserStorage.getValue('workhours'),
+    dspuseras_name: UserStorage.getValue('dspuseras_name'),
+    dspdurationas: UserStorage.getValue('dspdurationas')
+  };
+}
+
+
+/**
  * @desc Save Jira server settings, provided in dialog form and perform 
  *     a connection test to Jira api.
  * @param jsonFormData {object}  JSON Form object of all form values
@@ -107,6 +125,7 @@ function saveSettings(jsonFormData) {
   setCfg_('jira_url', url);
   setCfg_('jira_username', jsonFormData.jira_username);
   setCfg_('jira_password', jsonFormData.jira_password);
+  setCfg_('custom_fn_enabled', (jsonFormData.custom_fn_enabled == 'on') ? 1 : 0);
   UserStorage.setValue('workhours', jsonFormData.ts_workhours);
   UserStorage.setValue('dspuseras_name', parseInt(jsonFormData.ts_dspuseras_name));
   UserStorage.setValue('dspdurationas', jsonFormData.ts_dspdurationas);

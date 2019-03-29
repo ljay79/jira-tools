@@ -5,82 +5,11 @@
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/custom.css">
     <style>
-    .error-container { display: none; margin-bottom: 10px; padding: 5px 10px; text-align: center; color: #fff; }
-    .block2x2 { width:43%; }
-    .block2x2.left { margin-right:20px; float:left; }
-    fieldset .block2x2 { display: inline-block; width:46%; }
-
-.toggle {
-  position: relative;
-  display: block;
-  width: 40px;
-  height: 20px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transform: translate3d(0, 0, 0);
-}
-.toggle:before {
-  content: "";
-  position: relative;
-  top: 3px;
-  left: 3px;
-  width: 34px;
-  height: 14px;
-  display: block;
-  background: #9A9999;
-  border-radius: 8px;
-  transition: background 0.2s ease;
-}
-.toggle span {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 20px;
-  height: 20px;
-  display: block;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 3px 8px rgba(154, 153, 153, 0.5);
-  transition: all 0.2s ease;
-}
-.toggle span:before {
-  content: "";
-  position: absolute;
-  display: block;
-  margin: -18px;
-  width: 56px;
-  height: 56px;
-  background: rgba(71, 135, 237, 0.5);
-  border-radius: 50%;
-  transform: scale(0);
-  opacity: 1;
-  pointer-events: none;
-}
-
-#cbx:checked + .toggle:before {
-  background: #6dbfff;
-}
-#cbx:checked + .toggle span {
-  background: #4787ed;
-  transform: translateX(20px);
-  transition: all 0.2s cubic-bezier(0.8, 0.4, 0.3, 1.25), background 0.15s ease;
-  box-shadow: 0 3px 8px rgba(71, 135, 237, 0.2);
-}
-#cbx:checked + .toggle span:before {
-  transform: scale(1);
-  opacity: 0;
-  transition: all 0.4s ease;
-}
-
-.toggle-center {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-</style>
-
-</head>
+    body { position:relative; }
+    </style>
+  </head>
   <body>
     <div id="response-message" class="error-container" role="dialog"></div>
 
@@ -147,7 +76,7 @@
         <legend>Custom Functions</legend>
         <div class="form-group block" style="position:relative">
             <div class="toggle-center">
-              <input type="checkbox" id="cbx" style="display:none"/>
+              <input type="checkbox" id="cbx" name="custom_fn_enabled" value="on" style="display:none"<? if (custom_fn_enabled == 1) { ?> checked="checked"<? } ?> />
               <label for="cbx" class="toggle"><span></span></label> 
             </div>
             <span style="margin-left: 45px; line-height: 20px;">
@@ -157,18 +86,27 @@
       </fieldset>
       
       <div class="block">
-        <button type="submit" class="action" disabled>Save</button>
+        <button type="submit" class="action" id="save" disabled>Save</button>
         <button type="button" onclick="google.script.host.close()">Cancel</button>
       </div>
     </form>
+
+<dialog class="modal">
+  <p>Be careful when sharing this spreadsheet. Anyone who can edit it will be able to
+  use the custom functions and import Jira data using your account.</p>
+  <button type="button" class="action">Confirm</button>
+  <button type="button" class="cancel">Cancel</button>
+</dialog>
+
 <script>
       // The code in this function runs when the page is loaded.
-      var valid   = false;
-      var setup   = document.forms['settings'];
-      var input   = Array.prototype.slice.call(setup.elements).filter(function(el){ return el.nodeName === 'INPUT'; });
-      var alert   = document.getElementById('response-message');
-      var action  = document.querySelector('[type=submit]');
-      var timeout = null;
+      var valid    = false;
+      var setup    = document.forms['settings'];
+      var input    = Array.prototype.slice.call(setup.elements).filter(function(el){ return el.nodeName === 'INPUT'; });
+      var alert    = document.getElementById('response-message');
+      var customFn = document.querySelector('#cbx');
+      var action   = document.querySelector('#save');
+      var timeout  = null;
 
       function hideAlert(){
         if(timeout) timeout = clearTimeout(timeout);
@@ -230,6 +168,20 @@
         if(this.value.indexOf('https://') == -1) {
           showAlert('Please use HTTPS for secure connection to your JIRA instance. URL must start with "https://".', false, 8000);
         }
+      });
+
+      // checkbox toggle custom functions on/off with confirmation dialog
+      var dialog = document.querySelector('dialog');
+      dialog.querySelector('button[class="action"]').addEventListener('click', function() {
+        dialog.classList.remove('open');
+      });
+      dialog.querySelector('button[class="cancel"]').addEventListener('click', function() {
+        customFn.checked = false;
+        dialog.classList.remove('open');
+      });
+      customFn.addEventListener('change', function() {
+        if (this.checked !== true) return;
+        dialog.classList.add('open');
       });
     </script>
   </body>
