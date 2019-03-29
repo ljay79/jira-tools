@@ -80,7 +80,7 @@ function JST_getTotalForSearchResult(JQL) {
 }
 
 /**
- * (Mini)Search for Jira issues using JQL.
+ * (Mini) Search for Jira issues using JQL.
  *
  * @param {"status = Done"} JQL    A well-formed Jira JQL query (https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries).
  * @param {"summary,status"} Fields    Jira issue field IDs. e.g.: "key,summary,status"
