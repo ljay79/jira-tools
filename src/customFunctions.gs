@@ -16,6 +16,8 @@ function recalcCustomFunctions() {
  * @customfunction
  */
 function JST_EPICLABEL(TicketId) {
+  customFunctionAllowed();
+
   var request   = new Request();
   var response  = {};
 
@@ -54,6 +56,8 @@ function JST_EPICLABEL(TicketId) {
  * @customfunction
  */
 function JST_getTotalForSearchResult(JQL) {
+  customFunctionAllowed();
+
   if (undefined == JQL || JQL == '') {
     throw new Error("{JQL} can not be empty.");
   }
@@ -90,6 +94,8 @@ function JST_getTotalForSearchResult(JQL) {
  * @customfunction
  */
 function JST_search(JQL, Fields, Limit, StartAt) {
+  customFunctionAllowed();
+
   // - checks - 
   if (undefined == JQL || JQL == '') {
     throw new Error("{JQL} can not be empty.");
@@ -170,7 +176,22 @@ function JST_search(JQL, Fields, Limit, StartAt) {
  * @customfunction
  */
 function JST_formatDuration(Seconds) {
+  customFunctionAllowed();
+
   Seconds = parseInt(Seconds) || 0;
 
   return formatTimeDiff(Seconds);
+}
+
+/**
+ * @desc Check if custom function is enabled by user otherwise throws new Error.
+ * @throws Error
+ * @return Void
+ */
+function customFunctionAllowed() {
+  var custom_fn_enabled = getCfg_('custom_fn_enabled');
+
+  if(custom_fn_enabled === undefined || custom_fn_enabled == 0) {
+    throw new Error("You need to enable custom functions. Open 'Add-ons > Project Aid for Jira > Settings' and toggle 'Custom Functions' to enabled.");
+  }
 }
