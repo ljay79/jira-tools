@@ -71,7 +71,11 @@ function JST_getTotalForSearchResult(JQL) {
     return parseInt(response.respData.total || 0);
   } else {
     var msg = response.respData.errorMessages ? (response.respData.errorMessages.join(",") || response.respData.errorMessages) : response;
-    throw new Error("[" + response.statusCode + "] - " + JSON.stringify(msg) + " - JQL: " + JQL);
+    msg = JSON.stringify(msg);
+    if (response.statusCode == 401) {
+      msg = msg + ' for Jira user [' + getCfg_('jira_username') + ']';
+    }
+    throw new Error("[" + response.statusCode + "] - " + msg + " - JQL: " + JQL);
   }
 }
 
@@ -150,6 +154,9 @@ function JST_search(JQL, Fields, Limit, StartAt) {
 
   } else {
     var msg = (response.respData && response.respData.errorMessages) ? response.respData.errorMessages.join("\n") : JSON.stringify(response);
+    if (response.statusCode == 401) {
+      msg = msg + ' for Jira user [' + getCfg_('jira_username') + ']';
+    }
     throw new Error("[" + response.statusCode + "] - " + msg);
   }
 }
