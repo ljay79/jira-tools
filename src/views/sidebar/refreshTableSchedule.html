@@ -248,7 +248,7 @@ a.feedback-link, a.feedback-link:active, a.feedback-link:visited
         google.script.run
           .withSuccessHandler(onResponse)
           .withFailureHandler(onResponse)
-          .cbRefreshIssueTable_refreshTable(event.data);
+          .callbackRefreshIssueTable_refreshTable(event.data);
       }
 
       function onReloadSidebar(response) {
@@ -289,7 +289,7 @@ a.feedback-link, a.feedback-link:active, a.feedback-link:visited
       }
 
       function leaveFeedback() {
-        google.script.run.cbFeedback_getDialog();
+        google.script.run.callbackFeedback_getDialog();
       }
 
       /*
@@ -310,7 +310,7 @@ a.feedback-link, a.feedback-link:active, a.feedback-link:visited
           google.script.run
             .withSuccessHandler(handleActiveSheet)
             .withFailureHandler(showError)
-            .cbRefreshIssueTable_getResetSidebar();
+            .callbackRefreshIssueTable_getResetSidebar();
           poll();
         }, interval);
       }
@@ -322,9 +322,9 @@ a.feedback-link, a.feedback-link:active, a.feedback-link:visited
        */
       function showError(error) {
         if (error.hasOwnProperty('message')) {
-          console.error('cbRefreshIssueTable_getResetSidebar caused [%s]; Info:%s', error.message, error);
+          console.error('callbackRefreshIssueTable_getResetSidebar caused [%s]; Info:%s', error.message, error);
         } else {
-          console.error('cbRefreshIssueTable_getResetSidebar caused Error: %s', error);
+          console.error('callbackRefreshIssueTable_getResetSidebar caused Error: %s', error);
         }
 
         if (++pollError == 5) {
@@ -353,7 +353,7 @@ a.feedback-link, a.feedback-link:active, a.feedback-link:visited
           // call google and fetch updated sidebar content (reload)
           google.script.run
             .withSuccessHandler(onReloadSidebar)
-            .cbRefreshIssueTable_initSidebar();
+            .callbackRefreshIssueTable_initSidebar();
         }
       }
     </script>

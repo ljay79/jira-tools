@@ -79,7 +79,7 @@ InsertIssueTable_Controller_ = {
         columns = jsonFormData['columns'] || jiraColumnDefault,
         response = {status: false, message: ''};
 
-    var Renderer, attributes = {
+    var attributes = {
       filter : jsonFormData['filter_id'] ? getFilter(parseInt(jsonFormData['filter_id'])) : {},
       maxResults : parseInt(jsonFormData['maxResults']) || 10000,
       issues : {},
@@ -106,7 +106,7 @@ InsertIssueTable_Controller_ = {
       } else {
         attributes.issues = resp.data;
 
-        var Table = new IssueTable_(attributes);
+        var Renderer, Table = new IssueTable_(attributes);
         if (Renderer = Table.render()) {
           // toast with status message
           var msg = "Finished inserting " + Renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
@@ -199,10 +199,9 @@ InsertIssueTable_Controller_ = {
  */
 function TriggerPruneIssueTableIndex_(e) {
   debug.time('[TriggerPruneIssueTableIndex_]');
-  debug.log('[TriggerPruneIssueTableIndex_] - e.changeType: %s', e.changeType);
 
   if (e.changeType !== 'REMOVE_GRID') {
-    debug.log('[TriggerPruneIssueTableIndex_] changeType [%s] not monitored. Skip.', e.changeType);
+    //debug.log('[TriggerPruneIssueTableIndex_] changeType [%s] not monitored. Skip.', e.changeType);
     debug.timeEnd('[TriggerPruneIssueTableIndex_]');
     return;
   }
