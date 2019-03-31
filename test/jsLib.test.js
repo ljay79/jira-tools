@@ -94,20 +94,6 @@ test('convertArrayToObj_', () => {
   expect(obj1.key3).toEqual(myarray[2]);
 })
 
-
-/**
- * @desc Converts time difference into human readable format.
- *       Returns difference in %d %h %m %s
- *
- *       Sample call: formatTimeDiff(183599000) returns '2d 2h 59m 59s'
- *                or: formatTimeDiff(new Date('2017-08-03T12:59:59'), new Date('2017-08-01T10:00:00')) return '2d 2h 59m 59s'
- *
- * @param {Integer|Date}   Either the time difference in seconds as integer, 
- *                         or two Date() objects.
- * @param {Date}           Optional Date() object to compare with first param Date()
- * @return {String}
- */
-  
 test('formatTimeDiff returns human readable time difference', () => {
   var originalWorkhours = UserStorage.getValue('workhours');
   /* use all 3 arguments manually */
@@ -155,4 +141,15 @@ test('formatTimeDiff returns human readable time difference', () => {
 
   // reset
   UserStorage.setValue('workhours', originalWorkhours);
+});
+
+test('formatWorkhours returns human readable time difference', () => {
+  expect(jsLib.formatWorkhours(5400)).toBe(1.5);
+  expect(jsLib.formatWorkhours(new Date('2019-01-01T08:30:00'), new Date('2019-01-01T10:00:00'))).toBe(1.5);
+  
+  expect(jsLib.formatWorkhours((60*60*3)+(60*45))).toBe(3.75);
+  expect(jsLib.formatWorkhours(new Date('2019-01-01T12:00:00'), new Date('2019-01-01T15:45:00'))).toBe(3.75);
+  
+  expect(jsLib.formatWorkhours((60*60*16)+(60*30))).toBe(16.5);
+  expect(jsLib.formatWorkhours(new Date('2019-01-01T12:00:00'), new Date('2019-01-02T04:30:00'))).toBe(16.5);
 });

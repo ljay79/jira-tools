@@ -254,8 +254,8 @@ function formatTimeDiff() {
 /**
  * @desc Converts time difference or seconds passed into (working-)hours.
  *
- *       Sample call: formatTimeDiff(5400) returns '1.5' (hours)
- *                or: formatTimeDiff(new Date('2017-08-01T08:30:00'), new Date('2017-08-01T10:00:00')) return '1.5'
+ *       Sample call: formatWorkhours(5400) returns '1.5' (hours)
+ *                or: formatWorkhours(new Date('2017-08-01T08:30:00'), new Date('2017-08-01T10:00:00')) return '1.5'
  *
  * @param {Integer|Date}   Either the time difference in seconds as integer, 
  *                         or 2 Date objects (from - to).
