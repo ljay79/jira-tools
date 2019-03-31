@@ -1,3 +1,7 @@
+// Node required code block
+const UserStorage = require('src/models/gas/UserStorage.gs');
+// End of Node required code block
+
 /**
  * @desc Extend Object src with obj2
  * @param src {object}
@@ -194,7 +198,7 @@ if (!Array.prototype.fill) {
  * @desc Converts time difference into human readable format.
  *       Returns difference in %d %h %m %s
  *
- *       Sample call: formatTimeDiff(183599000) returns '2d 2h 59m 59s'
+ *       Sample call: formatTimeDiff(68399) returns '2d 2h 59m 59s'
  *                or: formatTimeDiff(new Date('2017-08-03T12:59:59'), new Date('2017-08-01T10:00:00')) return '2d 2h 59m 59s'
  *
  * @param {Integer|Date}   Either the time difference in seconds as integer, 
@@ -373,6 +377,8 @@ module.exports = {
   getSheetById: getSheetById,
   _sortKeysByRef: _sortKeysByRef,
   splitCommaList_: splitCommaList_,
-  convertArrayToObj_: convertArrayToObj_
+  convertArrayToObj_: convertArrayToObj_,
+  formatTimeDiff: formatTimeDiff,
+  formatWorkhours: formatWorkhours
 };
 // End of Node required code block
