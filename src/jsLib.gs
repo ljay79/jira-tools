@@ -379,6 +379,8 @@ module.exports = {
   splitCommaList_: splitCommaList_,
   convertArrayToObj_: convertArrayToObj_,
   formatTimeDiff: formatTimeDiff,
-  formatWorkhours: formatWorkhours
+  formatWorkhours: formatWorkhours,
+  trimChar: trimChar,
+  removeFromArray: removeFromArray
 };
 // End of Node required code block

@@ -153,3 +153,55 @@ test('formatWorkhours returns human readable time difference', () => {
   expect(jsLib.formatWorkhours((60*60*16)+(60*30))).toBe(16.5);
   expect(jsLib.formatWorkhours(new Date('2019-01-01T12:00:00'), new Date('2019-01-02T04:30:00'))).toBe(16.5);
 });
+
+test('trimChar - Trim a character from string', () => {
+  expect(jsLib.trimChar('http://www.example.com/', '/')).toBe('http://www.example.com');
+  expect(jsLib.trimChar('%search%', '%')).toBe('search');
+  expect(jsLib.trimChar('%%%searc%h%', '%')).toBe('searc%h');
+  expect(jsLib.trimChar('%/s-e/a@r_c\h%', '%/')).toBe('s-e/a@r_c\h');
+});
+
+test('_sortKeysByRef - Sorts array of keys in the same order as the keys/properties of a reference object.', () => {
+  var referenceObj = {
+    c: 'C',
+    b: 'B',
+    a: 'A',
+    d: 'D',
+    e: 'E'
+  };
+
+  // test 1
+  var unsortedObj = ['c', 'a', 'b'];
+  var expected = ['c', 'b', 'a'];
+  var result = jsLib._sortKeysByRef(unsortedObj, referenceObj);
+  expect(result).toEqual(expected);
+  
+  // test 2
+  var unsortedObj = ['c', 'd', 'b'];
+  var expected = ['c', 'b', 'd'];
+  var result = jsLib._sortKeysByRef(unsortedObj, referenceObj);
+  expect(result).toEqual(expected);
+  
+  // test 3
+  var unsortedObj = ['x', 'y', 'd', 'klm', 'a', 'e', 'b', 'xx'];
+  var expected = ['b', 'a', 'd', 'e', 'x', 'y', 'klm', 'xx'];
+  var result = jsLib._sortKeysByRef(unsortedObj, referenceObj);
+  expect(result).toEqual(expected);
+});
+
+test('removeFromArray - Removing a specific element from an array', () => {
+  var arrayIn = ['a', 'b', 'c'];
+  var arrayExpected = ['a', 'c'];
+  jsLib.removeFromArray(arrayIn, 'b')
+  expect(arrayIn).toEqual(arrayExpected);
+  
+  var arrayIn = ['sample1', 'foo', 'bar'];
+  var arrayExpected = ['foo', 'bar'];
+  jsLib.removeFromArray(arrayIn, 'sample1')
+  expect(arrayIn).toEqual(arrayExpected);
+  
+  var arrayIn = ['sample1', 'foo', 'bar'];
+  var arrayExpected = ['sample1', 'foo', 'bar'];
+  jsLib.removeFromArray(arrayIn, 'not-existing')
+  expect(arrayIn).toEqual(arrayExpected);
+});
