@@ -440,7 +440,7 @@ IssueFields = (function () {
 
 
   /**
-   * Processes the data on all fields returned from the JITA API
+   * Processes the data on all fields returned from the JIRA API
    * @param respData JSON returned from JIRA call
    */
   function processFieldResponse_(respData) {

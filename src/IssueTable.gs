@@ -127,7 +127,7 @@ function IssueTable(sheet, initRange, data) {
             break;
           case (key.hasOwnProperty('epic') && key.epic === true):
             if (key.value != 'n/a') {
-              if (EpicField.isUsable()) {
+              if (customFunctionsEnabled_() && EpicField.isUsable()) {
                 key.value = '=HYPERLINK("' + key.link + '"; JST_EPICLABEL("' + key.value + '"))';
               } else {
                 key.value = '=HYPERLINK("' + key.link + '"; "' + key.value + '")';

@@ -195,10 +195,17 @@ function JST_formatDuration(Seconds) {
  * @return Void
  */
 function customFunctionAllowed_() {
-  var custom_fn_enabled = getCfg_('custom_fn_enabled');
-  if (custom_fn_enabled != 1) {
-    throw new Error("You need to enable custom functions. Open 'Add-ons > Project Aid for Jira > Settings' and toggle 'Custom Functions' to enabled.");
+  if (!customFunctionsEnabled_()) {
+    throw new Error("The document owner (you) must enable custom functions. Open 'Add-ons > Project Aid for Jira > Settings' and toggle 'Custom Functions' to enabled. If you are not the document owner, ask him to enable custom functions.");
   }
+}
+
+/**
+ * @desc Check wether custom functions are enabled or not.
+ * @return {boolean}
+ */
+function customFunctionsEnabled_() {
+  return (getCfg_('custom_fn_enabled') == 1);
 }
 
 
