@@ -106,10 +106,10 @@ InsertIssueTable_Controller_ = {
       } else {
         attributes.issues = resp.data;
 
-        var Renderer, Table = new IssueTable_(attributes);
-        if (Renderer = Table.render()) {
+        var renderer, Table = new IssueTable_(attributes);
+        if (renderer = Table.render()) {
           // toast with status message
-          var msg = "Finished inserting " + Renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
+          var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
               + " total found records.";
           SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
           debug.log(msg);
