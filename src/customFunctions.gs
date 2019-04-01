@@ -1,3 +1,9 @@
+// Node required code blockconst 
+const getCfg_ = require("./settings.gs").getCfg_;
+const setCfg_ = require("./settings.gs").setCfg_;
+
+// End of Node required code block
+
 /**
  * @desc Forces trigger to re-calculate all custom functions / formulars in the active sheet.
  *       No official function for this, but this trick does it.
@@ -16,7 +22,7 @@ function recalcCustomFunctions() {
  * @customfunction
  */
 function JST_EPICLABEL(TicketId) {
-  customFunctionAllowed();
+  customFunctionAllowed_();
 
   var request   = new Request();
   var response  = {};
@@ -56,7 +62,7 @@ function JST_EPICLABEL(TicketId) {
  * @customfunction
  */
 function JST_getTotalForSearchResult(JQL) {
-  customFunctionAllowed();
+  customFunctionAllowed_();
 
   if (undefined == JQL || JQL == '') {
     throw new Error("{JQL} can not be empty.");
@@ -94,7 +100,7 @@ function JST_getTotalForSearchResult(JQL) {
  * @customfunction
  */
 function JST_search(JQL, Fields, Limit, StartAt) {
-  customFunctionAllowed();
+  customFunctionAllowed_();
 
   // - checks - 
   if (undefined == JQL || JQL == '') {
@@ -176,7 +182,7 @@ function JST_search(JQL, Fields, Limit, StartAt) {
  * @customfunction
  */
 function JST_formatDuration(Seconds) {
-  customFunctionAllowed();
+  customFunctionAllowed_();
 
   Seconds = parseInt(Seconds) || 0;
 
@@ -188,10 +194,16 @@ function JST_formatDuration(Seconds) {
  * @throws Error
  * @return Void
  */
-function customFunctionAllowed() {
+function customFunctionAllowed_() {
   var custom_fn_enabled = getCfg_('custom_fn_enabled');
-
-  if(custom_fn_enabled === undefined || custom_fn_enabled == 0) {
+  if(!custom_fn_enabled) {
     throw new Error("You need to enable custom functions. Open 'Add-ons > Project Aid for Jira > Settings' and toggle 'Custom Functions' to enabled.");
   }
 }
+
+
+// Node required code block
+module.exports = {
+  customFunctionAllowed_: customFunctionAllowed_
+};
+// End of Node required code block
