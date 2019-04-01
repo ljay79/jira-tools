@@ -144,6 +144,12 @@ a.feedback-link, a.feedback-link:active, a.feedback-link:visited
 	justify-content: flex-end;
 }
 
+.create-box {
+    border-bottom: 1px solid grey;
+    padding: 20px;
+    text-align: center;
+}
+
 .issuetable {
 	font-size: 13px;
 	font-weight: 400;
@@ -152,7 +158,6 @@ a.feedback-link, a.feedback-link:active, a.feedback-link:visited
 	padding: 10px 20px;
 	position: relative;
 }
-
 .issuetable .name {
 	font-size: 14px;
 	font-weight: 500;
@@ -165,7 +170,6 @@ a.feedback-link, a.feedback-link:active, a.feedback-link:visited
     /* Schedule button appears disabled, feature coming soon */
     opacity: .5
 }
-
 .issuetable .schedule-setup {
     border: 1px solid grey;
     padding: 10px;
@@ -179,6 +183,11 @@ a.feedback-link, a.feedback-link:active, a.feedback-link:visited
 </head>
 <body>
   <div class="sidebar branding-below">
+
+    <div class="block actions create-box">
+      <button class="green">Create new IssueTable</button>
+    </div>
+
     <div class="loader">Loading ...</div>
 
     <div id="table-container"></div>
@@ -211,8 +220,8 @@ a.feedback-link, a.feedback-link:active, a.feedback-link:visited
       Coming soon ...
     </div>
     <div class="block actions">
-      <button class="share" disabled>Refresh</button>
-      <button class="action" disabled>Schedule</button>
+      <button class="green" disabled>Refresh</button>
+      <button class="blue" disabled>Schedule</button>
     </div>
   </div>
   <!-- END: Template //-->
@@ -275,8 +284,8 @@ a.feedback-link, a.feedback-link:active, a.feedback-link:visited
           divTable.prop('data-table-id', tableMeta.tableId).prop('data-sheet-id', tableMeta.sheetId).show();
 
           // enable action buttons
-          divTable.find('.actions > :button.share').prop('disabled', false).click(tableMeta, refreshTable);
-          divTable.find('.actions > :button.action')
+          divTable.find('.actions > :button.green').prop('disabled', false).click(tableMeta, refreshTable);
+          divTable.find('.actions > :button.blue')
             .prop('disabled', false)
             .click(tableMeta, function (event) {
               var scheduleContainer = $(this).parent().parent().find('.schedule-setup').toggle();
@@ -291,6 +300,14 @@ a.feedback-link, a.feedback-link:active, a.feedback-link:visited
       function leaveFeedback() {
         google.script.run.callbackFeedback_getDialog();
       }
+      
+      // create IssueTable
+      $('.create-box > :button.green').click(function() {
+        console.log('click');
+        google.script.run
+          .withFailureHandler(showError)
+          .menuInsertIssueFromFilter();
+      });
 
       /*
        * Polling for sheet switches or change in IssueTable index of current sheet.
@@ -305,7 +322,7 @@ a.feedback-link, a.feedback-link:active, a.feedback-link:visited
        * in which case we update the sidebar
        */
       function poll(interval) {
-        interval = interval || 1500;
+        interval = interval || 2000;
         setTimeout(function () {
           google.script.run
             .withSuccessHandler(handleActiveSheet)
