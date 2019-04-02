@@ -4,46 +4,7 @@
 <base target="_top">
 <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700">
-<style>
-/* @TODO: extract into static css, assets and use S3 (see add-on logo storage */
-:root {
-    --docs-material-font-family: Roboto, Helvetica, Arial, sans-serif;
-    --docs-material-header-font-family: var(--docs-material-font-family);
-    --docs-material-font-weight-normal: 400;
-    --docs-material-font-weight-bold: 500;
-    --docs-material-font-size-normal: 14px;
-    --docs-material-font-size-9: 9px;
-    --docs-material-font-size-11: 11px;
-    --docs-material-font-size-12: 12px;
-    --docs-material-font-size-22: 22px;
-}
-
-html, body, html * {
-	/*font-family: 'Roboto-Light', 'Roboto-Medium', 'Roboto-Bold', 'Roboto', Helvetica, Arial, sans-serif;*/
-	font-family: Roboto, Helvetica, Arial, sans-serif;
-	font-size: 13px;
-	color: black;
-	font-weight: normal;
-}
-
-a {
-	color: inherit;
-}
-
-fieldset legend {
-	font-weight: 700;
-	padding: 4px 8px 0px 8px;
-}
-
-fieldset.block p {
-	margin-top: 0;
-}
-
-textarea {
-	width: 100%;
-	height: 100px;
-}
-</style>
+<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/custom.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
@@ -86,7 +47,7 @@ textarea {
         google.script.run
           .withSuccessHandler(onResponse)
           .withFailureHandler(onResponse)
-          .cbFeedback_sendFeedback(this);
+          .callbackFeedback_sendFeedback(this);
       }
 
       function inputValidatyHandler() {

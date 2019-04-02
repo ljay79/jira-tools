@@ -6,7 +6,7 @@
  * @desc Wrapper: Callback handler for opening the Feedback dialog
  * @return {object} Object({status: [boolean], message: [string|null]})
  */
-function cbFeedback_getDialog() {
+function callbackFeedback_getDialog() {
   return Feedback_Controller_.callbackOpenDialog();
 }
 
@@ -15,7 +15,7 @@ function cbFeedback_getDialog() {
  * @param {object} Json formatted form data
  * @return {object} Object({status: [boolean]})
  */
-function cbFeedback_sendFeedback(jsonFormData) {
+function callbackFeedback_sendFeedback(jsonFormData) {
   return Feedback_Controller_.sendFeedback(jsonFormData);
 }
 
