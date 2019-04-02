@@ -1,4 +1,3 @@
-
 /**
  * @file Contains controller class and dialog/callback method for inserting issue tables from jira filter.
  */
