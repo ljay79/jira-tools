@@ -1,0 +1,273 @@
+/*!
+ * jQuery Autocomplete plugin v1.2.8
+ * @homepage http://xdsoft.net/jqplugins/autocomplete/
+ * @license MIT - MIT-LICENSE.txt
+ * (c) 2014, Chupurnov Valeriy <chupurnov@gmail.com>
+ */
+.xdsoft_autocomplete,
+.xdsoft_autocomplete div,
+.xdsoft_autocomplete span{
+/*	-moz-box-sizing: border-box !important;
+	box-sizing: border-box !important;*/
+}
+
+.xdsoft_autocomplete{
+display:inline;
+position:relative;
+word-spacing: normal;
+text-transform: none;
+text-indent: 0px;
+text-shadow: none;
+text-align: start;
+}
+
+.xdsoft_autocomplete .xdsoft_input{
+	position:relative;
+	z-index:2;
+}
+.xdsoft_autocomplete .xdsoft_autocomplete_dropdown{
+	position:absolute;
+	border: 1px solid #ccc;
+	border-top-color: #d9d9d9;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+	-webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+	cursor: default;
+	display:none;
+	z-index: 1001;
+	margin-top:-1px;
+	background-color:#fff;
+	min-width:100%;
+	overflow:auto;
+}
+.xdsoft_autocomplete .xdsoft_autocomplete_hint{
+	position:absolute;
+	z-index:1;
+	color:#ccc !important;
+	-webkit-text-fill-color:#ccc !important;
+	text-fill-color:#ccc  !important;
+	overflow:hidden !important;
+	white-space: pre  !important;
+}
+
+.xdsoft_autocomplete .xdsoft_autocomplete_hint span{
+	color:transparent;
+	opacity: 0.0;
+}
+
+.xdsoft_autocomplete .xdsoft_autocomplete_dropdown > .xdsoft_autocomplete_copyright{
+	color:#ddd;
+	font-size:10px;
+	text-decoration:none;
+	right:5px;
+	position:absolute;
+	margin-top:-15px;
+	z-index:1002;
+}
+.xdsoft_autocomplete .xdsoft_autocomplete_dropdown > div{
+	background:#fff;
+	white-space: nowrap;
+	cursor: pointer;
+	line-height: 1.5em;
+	padding: 2px 0px 2px 0px;
+}
+.xdsoft_autocomplete .xdsoft_autocomplete_dropdown > div.active{
+	background: #0097CF;
+	color: #FFFFFF;
+}
+
+/*!
+ * Project Aid for Jira
+ * @version v0.0.1
+ * @license GNU GENERAL PUBLIC LICENSE v3.
+ * @copyright 2017-2019, Jens Rosemeier. All rights reserved.
+ * @link https://github.com/ljay79/jira-tools
+ */
+:root {
+    --docs-material-font-family: Roboto, Helvetica, Arial, sans-serif;
+    --docs-material-header-font-family: var(--docs-material-font-family);
+    --docs-material-font-weight-normal: 400;
+    --docs-material-font-weight-bold: 500;
+    --docs-material-font-size-normal: 14px;
+    --docs-material-font-size-9: 9px;
+    --docs-material-font-size-11: 11px;
+    --docs-material-font-size-12: 12px;
+    --docs-material-font-size-22: 22px;
+}
+
+html, body {
+	/*font-family: 'Roboto-Light', 'Roboto-Medium', 'Roboto-Bold', 'Roboto', Helvetica, Arial, sans-serif;*/
+	font-family: Roboto, Helvetica, Arial, sans-serif;
+	font-size: 13px;
+	color: black;
+	font-weight: normal;
+}
+
+fieldset {
+    margin: 0;
+    padding-block-start: 0.35em;
+    padding-inline-start: 0.75em;
+    padding-inline-end: 0.75em;
+    padding-block-end: 0.625em;
+    border: 1px solid #ebebeb;
+}
+
+a, a:active, a:visited {
+  background-image: none;
+  border: 1px solid transparent !important;
+  border-radius: 4px;
+  box-shadow: none;
+  box-sizing: border-box;
+  font-family: var(--docs-material-header-font-family, Roboto, Helvetica, Arial, sans-serif);
+  font-weight: var(--docs-material-font-weight-bold, 500);
+  font-size: 14px;
+  height: 36px;
+  letter-spacing: 0.25px;
+  line-height: 16px;
+  padding: 9px 24px 11px 24px;
+  color: #188038;
+  display: inline-block;
+}
+
+a.feedback-link, a.feedback-link:active, a.feedback-link:visited
+{
+  border-radius: 4px;
+  font-family: var(--docs-material-header-font-family, Roboto, Helvetica, Arial, sans-serif);
+  font-weight: var(--docs-material-font-weight-bold, 500);
+  font-size: 14px;
+    height: auto;
+  letter-spacing: 0.25px;
+    line-height: normal;
+  padding: 0;
+  color: #188038;
+  display: inline-block;
+}
+
+.loader, .loader:after {
+  border-radius: 50%;
+  width: 5em;
+  height: 5em;
+}
+
+.loader {
+  margin: 60px auto;
+  font-size: 10px;
+  position: relative;
+  text-indent: -9999em;
+  border-top: .7em solid rgba(24, 158, 26, 0.2);
+  border-right: .7em solid rgba(24, 158, 26, 0.2);
+  border-bottom: .7em solid rgba(24, 158, 26, 0.2);
+  border-left: .7em solid #189e1a;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-animation: load8 1.1s infinite linear;
+  animation: load8 1.1s infinite linear;
+}
+
+.error-container { display: none; margin-bottom: 16px; padding: 5px 10px; text-align: center; color: #fff; }
+.is-loading { animation: blink .5s infinite; }
+@keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+
+@-webkit-keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+.sidebar {
+  padding: 0;
+}
+
+.branding-below {
+  bottom: 46px;
+  top: 0;
+}
+
+.sidebar.bottom {
+  font-size: 12px;
+  padding: 12px;
+}
+
+.sidebar.bottom a.feedback-link {
+    float: right;
+}
+
+#box-tip {
+  margin: 10px;
+  padding: 15px;
+  background-color: #e6f4ea;
+  border-radius: 8px;
+  color: #188038;
+}
+
+#box-tip h4 {
+  color: #188038;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 10px;
+}
+
+#box-tip p {
+  color: #188038;
+  font-size: 12px;
+  letter-spacing: .3px;
+  line-height: normal;
+}
+
+#box-tip .tip-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.create-box {
+    border-bottom: 1px solid grey;
+    padding: 20px;
+    text-align: center;
+}
+
+.issuetable {
+  font-size: 13px;
+  font-weight: 400;
+  border-bottom: 1px solid #ddd;
+  cursor: default;
+  padding: 10px 20px;
+  position: relative;
+}
+
+.issuetable .name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.issuetable .actions {
+    margin-top: 10px;
+}
+
+.issuetable .actions .action {
+    /* Schedule button appears disabled, feature coming soon */
+    opacity: .5
+}
+
+.issuetable .schedule-setup {
+    border: 1px solid grey;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: aliceblue;
+    display: none;
+    font-style: italic;
+}
