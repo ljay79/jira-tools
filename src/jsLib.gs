@@ -1,3 +1,7 @@
+// Node required code block
+const UserStorage = require('src/models/gas/UserStorage.gs');
+// End of Node required code block
+
 /**
  * @desc Extend Object src with obj2
  * @param src {object}
@@ -47,7 +51,7 @@ function reverse(string) {
 function buildUrl(url, parameters) {
   var qs = "";
   for (var key in parameters) {
-    if (!parameters.hasOwnProperty(key)) continue;
+	if (!parameters.hasOwnProperty(key)) continue;
     var value = parameters[key];
     qs += encodeURIComponent(key) + "=" + encodeURIComponent(value) + "&";
   }
@@ -194,7 +198,7 @@ if (!Array.prototype.fill) {
  * @desc Converts time difference into human readable format.
  *       Returns difference in %d %h %m %s
  *
- *       Sample call: formatTimeDiff(183599000) returns '2d 2h 59m 59s'
+ *       Sample call: formatTimeDiff(68399) returns '2d 2h 59m 59s'
  *                or: formatTimeDiff(new Date('2017-08-03T12:59:59'), new Date('2017-08-01T10:00:00')) return '2d 2h 59m 59s'
  *
  * @param {Integer|Date}   Either the time difference in seconds as integer, 
@@ -203,23 +207,28 @@ if (!Array.prototype.fill) {
  * @return {String}
  */
 function formatTimeDiff() {
-  var delta, response = '';
-  if (arguments.length == 1) {
+  var delta, response = '', workhoursInSeconds = 24;
+  workhoursInSeconds = parseFloat(UserStorage.getValue('workhours')) * 3600;
+
+  if(arguments.length == 1) {
     // delta passed to convert
     delta = arguments[0];
-  } else if (arguments.length == 2) {
+  } else if (arguments.length == 2 || arguments.length == 3) {
     // get total seconds between the times
     if (arguments[1] > arguments[0]) {
       delta = Math.abs(arguments[1] - arguments[0]) / 1000;
     } else {
       delta = Math.abs(arguments[0] - arguments[1]) / 1000;
     }
+    if (arguments.length == 3) {
+      // 3rd argument is optional work hours override as integer in hours
+      workhoursInSeconds = parseFloat(arguments[2]) * 3600;
+    }
   } else {
-    throw 'formatTime() accepts 1 or 2 arguments.';
+    throw 'formatTime() accepts 1 or 2(3) arguments.';
   }
 
   // calculate (and subtract) whole days (workday=8h)
-  var workhoursInSeconds = parseFloat(UserStorage.getValue('workhours')) * 3600;
   var days = Math.floor(delta / workhoursInSeconds);
   delta -= days * workhoursInSeconds;
 
@@ -240,13 +249,13 @@ function formatTimeDiff() {
   response += seconds > 0 ? seconds + 's ' : '';
 
   return response.trim();
-};
+}
 
 /**
  * @desc Converts time difference or seconds passed into (working-)hours.
  *
- *       Sample call: formatTimeDiff(5400) returns '1.5' (hours)
- *                or: formatTimeDiff(new Date('2017-08-01T08:30:00'), new Date('2017-08-01T10:00:00')) return '1.5'
+ *       Sample call: formatWorkhours(5400) returns '1.5' (hours)
+ *                or: formatWorkhours(new Date('2017-08-01T08:30:00'), new Date('2017-08-01T10:00:00')) return '1.5'
  *
  * @param {Integer|Date}   Either the time difference in seconds as integer, 
  *                         or 2 Date objects (from - to).
@@ -284,6 +293,7 @@ function formatWorkhours() {
 function _sortKeysByRef(usortObject, referenceObject) {
   var _sortedObject = Object.keys(referenceObject).filter(function (n) {
     var found = usortObject.indexOf(n) > -1;
+    //@TODO: the delete of undefined returned by removeFromArray() makes no sense?
     if (found) delete removeFromArray(usortObject, n);
     return found;
   });
@@ -296,7 +306,7 @@ function _sortKeysByRef(usortObject, referenceObject) {
  * 
  * @param {Array} array    Array to remove element from
  * @param {String|Number} element    Element to remove from array
- * @return {Array}
+ * @return void
  */
 function removeFromArray(array, element) {
   const index = array.indexOf(element);
@@ -343,6 +353,18 @@ function convertArrayToObj_(arrayInput, keyFunction) {
   return objectToReturn;
 }
 
+/**
+ * @TODO: Move to appropiate file (not jiraCommand.gs, jsLib.gs, but where?) Get a sheet from current active Spreadsheet by ID passed.
+ * @param {int|string} id The sheet id to get a Sheet for.
+ * @return {undefined|Sheet}
+ */
+function getSheetById(id) {
+  id = (typeof id === 'string') ? parseInt(id) : id;
+  return SpreadsheetApp.getActive().getSheets().filter(function (s) {
+    return s.getSheetId() === id;
+  })[0];
+}
+
 
 // Node required code block
 module.exports = {
@@ -352,7 +374,13 @@ module.exports = {
   copyObject: copyObject,
   reverse: reverse,
   camelize: camelize,
+  getSheetById: getSheetById,
+  _sortKeysByRef: _sortKeysByRef,
   splitCommaList_: splitCommaList_,
-  convertArrayToObj_: convertArrayToObj_
+  convertArrayToObj_: convertArrayToObj_,
+  formatTimeDiff: formatTimeDiff,
+  formatWorkhours: formatWorkhours,
+  trimChar: trimChar,
+  removeFromArray: removeFromArray
 };
 // End of Node required code block
