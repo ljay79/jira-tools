@@ -16,8 +16,6 @@ IssueFields = (function () {
 
   var SupportedTypes = [EpicField.EPIC_KEY, 'string', 'number', 'datetime', 'date', 'option', 'array|option', 'array|string', 'user', 'array|user', 'group', 'array|group', 'version', 'array|version'];
 
-
-
   /**
    * Cached in memory copy of all fields in Jira
    */
@@ -277,6 +275,7 @@ IssueFields = (function () {
       reporter: 'Reporter',
       environment: 'Environment',
       fixVersions: 'Fix Version',
+      versions: 'Affects Version/s',
       duedate: 'Due',
       resolutiondate: 'Resolved',
       created: 'Created',
@@ -285,9 +284,10 @@ IssueFields = (function () {
       timespent: 'Time spent',
       timeestimate: 'Remaining Estimate', // remaining
       timeoriginalestimate: 'Original estimate',
-      aggregatetimespent: 'Aggregate Time Spent',
-      aggregatetimeestimate: 'Aggregate Time Estimate',
-      aggregateprogress: 'Aggregate Progress',
+      aggregatetimeoriginalestimate: 'Σ Original Estimate',
+      aggregatetimespent: 'Σ Time Spent',
+      aggregatetimeestimate: 'Σ Remaining Estimate',
+      aggregateprogress: 'Σ Progress',
       progress: 'Progress',
       lastViewed: 'Last Viewed',
       votes: 'Votes',
@@ -296,6 +296,12 @@ IssueFields = (function () {
       //subtasks:[{"id":"33351","key":"FF24-229","self":"...atlassian.net/rest/api/2/issue/33351","fields":{"summary":"QA - Feedback","status":{"self":"....atlassian.net/rest/api/2/status/6","description":"The issue is considered finished, the resolution is correct. Issues which are closed can be reopened.","iconUrl":"https://dyhltd.atlassian.net/images/icons/statuses/closed.png","name":"Closed","id":"6","statusCategory":{"self":"https://dyhltd.atlassian.net/rest/api/2/statuscategory/3","id":3,"key":"done","colorName":"green","name":"Done"}},"priority":{"self":"https://dyhltd.atlassian.net/rest/api/2/priority/1","iconUrl":"https://dyhltd.atlassian.net/images/icons/priorities/highest.svg","name":"Highest","id":"1"},"issuetype":{"self":"https://dyhltd.atlassian.net/rest/api/2/issuetype/10003","id":"10003","description":"The sub-task of the issue","iconUrl":"https://dyhltd.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype","name":"Sub-task","subtask":true,"avatarId":10316}}}]
       //versions: [{"self": "https://dyhltd.atlassian.net/rest/api/2/version/14021","id": "14021","description": "","name": "Loan - Release v2.0.17","archived": false,"released": true,"releaseDate": "2018-03-21"}]
       //aggregatetimeoriginalestimate: 288000
+      //comment => "comment": {"comments": [{"self": "https://xxx.atlassian.net/rest/api/2/issue/32204/comment/35625","id": "35625","author": {},"body": "message text\r\n\r\n","updateAuthor": {},"created": "2017-08-16T16:39:14.516+0200","updated": "2017-08-16T16:39:14.516+0200","jsdPublic": true}, {"self": "https://xxx.atlassian.net/rest/api/2/issue/32204/comment/35626","id": "35626","author": {},"body": "lorem ispum","updateAuthor": {},"created": "2017-08-16T16:40:49.629+0200","updated": "2017-08-16T16:40:49.629+0200","jsdPublic": true}, {..}, {..}],"maxResults": 4,"total": 4,"startAt": 0}
+      //issuelinks: [{"id": "29701","self": "https://xxx.atlassian.net/rest/api/2/issueLink/29701","type": {"id": "10201","name": "Problem/Incident","inward": "is caused by","outward": "causes","self": "https://xxx.atlassian.net/rest/api/2/issueLinkType/10201"},"inwardIssue": {"id": "30911","key": "BO-22","self": "https://xxx.atlassian.net/rest/api/2/issue/30911","fields": {"summary": "Change of Invoice biller for all Shops","status": {..},"priority": {..},"issuetype": {..}}}}]
+      //worklog: {"startAt": 0,"maxResults": 20,"total": 1,"worklogs": [{"self": "https://xxx.atlassian.net/rest/api/2/issue/20704/worklog/19801","author": {..},"updateAuthor": {..},"comment": "","created": "2016-12-02T15:42:35.659+0100","updated": "2016-12-02T15:42:35.659+0100","started": "2016-12-02T15:42:00.000+0100","timeSpent": "30m","timeSpentSeconds": 1800,"id": "19801","issueId": "20704"}]}
+      //security
+      //subtasks
+      //timetracking: {"remainingEstimate": "0m","timeSpent": "30m","remainingEstimateSeconds": 0,"timeSpentSeconds": 1800}
     }
   }
 

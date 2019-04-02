@@ -470,6 +470,7 @@ function unifyIssueAttrib(attrib, data) {
       case 'timeoriginalestimate':
       case 'aggregatetimespent':
       case 'aggregatetimeestimate':
+      case 'aggregatetimeoriginalestimate':
       case 'remainingEstimate':
         resp = {
           value: (UserStorage.getValue('dspdurationas') == "w") ? formatTimeDiff(parseInt(data.fields[attrib]) || 0) : parseInt(data.fields[attrib]) || 0
