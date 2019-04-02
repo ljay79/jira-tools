@@ -65,39 +65,6 @@ function dialogRefreshTicketsIds() {
   refreshTickets();
 }
 
-/* Dialog: Import Issues */
-
-/**
- * @desc Dialog to choose issues filter
- */
-function dialogIssueFromFilter() {
-  if (!hasSettings(true)) return;
-
-  var customFields = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_SEARCH);
-  var userColumns = UserStorage.getValue('userColumns') || [];
-  var dialog = getDialog('dialogIssuesFromFilter', {
-    columns: IssueFields.getBuiltInJiraFields(),
-    customFields: customFields,
-    userColumns: userColumns.length > 0 ? userColumns : jiraColumnDefault
-  });
-
-  // try to adjust height depending on amount of jira fields to show
-  var rowH = 32;
-  var height = 424;
-  height += (Math.ceil(Object.keys(IssueFields.getBuiltInJiraFields()).length % 4) * rowH);
-  height += (Math.ceil(Object.keys(customFields).length % 4) * rowH);
-
-  dialog
-    .setWidth(600)
-    .setHeight(height)
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-
-  debug.log('Processed: %s', dialog);
-
-  SpreadsheetApp.getUi().showModalDialog(dialog, 'List Jira issues from filter');
-}
-
-/* Dialog: Import Issues - END */
 
 /* Dialog: About */
 

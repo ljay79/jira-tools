@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700">
+<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/custom.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+  <div class="sidebar branding-below">
+
+    <div class="block actions create-box">
+      <button class="green">Create new IssueTable</button>
+    </div>
+
+    <div class="loader">Loading ...</div>
+
+    <div id="table-container"></div>
+
+    <div id="box-tip">
+      <h4>Explore Tips</h4>
+      <p>
+        You do not have any Jira "IssueTable" in your current sheet(s).<br />
+        Menu: Add-ons > Project Aid for Jira > List issues from filter
+      </p>
+      <div class="tip-footer">
+        <a href="https://github.com/ljay79/jira-tools/tree/master#refresh-issuetable">Read more</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar bottom">
+    <a href="#" class="feedback-link">Leave feedback</a>
+    <span class="gray">Project Aid for Jira v<?= buildNumber ?></span>
+  </div>
+
+  <!-- BGN: Template of HTML elements for an individual IssueTable //-->
+  <div id="table-element-template" class="issuetable" style="display: none">
+    <div class="descr">
+      <span class="name">Table: Filter 01 - Lorem ipsum</span><br />
+      <span class="location">Tabellenblatt89!A1:F23</span><br />
+      <span class="updated">Updated: &gt;<span class="time-elapsed"></span></span>
+    </div>
+    <div class="schedule-setup">
+      Coming soon ...
+    </div>
+    <div class="block actions">
+      <button class="green" disabled>Refresh</button>
+      <button class="blue" disabled>Schedule</button>
+    </div>
+  </div>
+  <!-- END: Template //-->
+
+  <script>
+      var box_tip = $('#box-tip');
+      var loading = $('.loader');
+      var issueTableContainer = $('#table-container');
+
+      var issueTableContainer = $('#table-container');
+      $('a.feedback-link').each(function() {
+        $(this).click(function(event){
+          event.preventDefault();
+          leaveFeedback();
+        });
+      });
+
+      /**
+       * @desc Perform callback to refresh specific IssueTable in active Sheet.
+       * @param {Event} event    jQuery event, usually click on a button
+       */
+      function refreshTable(event) {
+        var button = $(this);
+        button.prop('disabled', true);
+
+        function onResponse(response) {
+          var done = response.status === true;
+          if (done) {
+            button.prop('disabled', false);
+          }
+        }
+
+        google.script.run
+          .withSuccessHandler(onResponse)
+          .withFailureHandler(onResponse)
+          .callbackRefreshIssueTable_refreshTable(event.data);
+      }
+
+      function onReloadSidebar(response) {
+        loading.removeClass('loader').hide();
+
+        var table_element_tpl = $('#table-element-template');
+
+        issueTableContainer.empty();
+        if (response.tables.length > 0) {
+          box_tip.hide();
+        } else {
+          box_tip.show();
+        }
+
+        response.tables.forEach(function (tableMeta) {
+          var tableName = tableMeta.name;
+          var tableLocation = tableMeta.sheetName + '!' + tableMeta.rangeA1;
+          var updatedElapsed = tableMeta.timeElapsedFormatted || '';
+
+          var divTable = table_element_tpl.clone().removeAttr('id');
+          divTable.find('.descr > .name').html(tableName);
+          divTable.find('.descr > .location').html(tableLocation);
+          divTable.find('.descr > .updated > .time-elapsed').html(updatedElapsed);
+          divTable.prop('data-table-id', tableMeta.tableId).prop('data-sheet-id', tableMeta.sheetId).show();
+
+          // enable action buttons
+          divTable.find('.actions > :button.green').prop('disabled', false).click(tableMeta, refreshTable);
+          divTable.find('.actions > :button.blue')
+            .prop('disabled', false)
+            .click(tableMeta, function (event) {
+              var scheduleContainer = $(this).parent().parent().find('.schedule-setup').toggle();
+            });
+
+          divTable.appendTo(issueTableContainer);
+        });
+
+        window.dispatchEvent(new Event('load'));
+      }
+
+      function leaveFeedback() {
+        google.script.run.callbackFeedback_getDialog();
+      }
+
+      // create IssueTable
+      $('.create-box > :button.green').click(function() {
+        var that = this;
+        google.script.run
+          .withSuccessHandler(function() {
+            that.disabled = false;
+          })
+          .withFailureHandler(showError)
+          .menuInsertIssueFromFilter();
+        that.disabled = true;
+      });
+
+      /*
+       * Polling for sheet switches or change in IssueTable index of current sheet.
+       */
+      var pollError = 0;
+      $(function () {
+        poll();
+      });
+
+      /**
+       * Poll every 1.5 second to check for changes
+       * in which case we update the sidebar
+       */
+      function poll(interval) {
+        interval = interval || 2000;
+        setTimeout(function () {
+          google.script.run
+            .withSuccessHandler(handleActiveSheet)
+            .withFailureHandler(showError)
+            .callbackRefreshIssueTable_getResetSidebar();
+          poll();
+        }, interval);
+      }
+
+      /**
+       * @desc Show error message to user in form of an Alert.
+       *       We do this only, every 5th error. Details are logged to users console.
+       * @param {mixed} error
+       */
+      function showError(error) {
+        if (error.hasOwnProperty('message')) {
+          console.error('callbackRefreshIssueTable_getResetSidebar caused [%s]; Info:%s', error.message, error);
+        } else {
+          console.error('callbackRefreshIssueTable_getResetSidebar caused Error: %s', error);
+        }
+
+        if (++pollError == 5) {
+          alert("Error in sidebar!\n\n" + error);
+          pollError = 0;
+        }
+      }
+
+      /*
+       * each poll's response is compared to below 2 values, 
+       * then we decide, if a sidebar refresh/reset is necessary
+       */
+      var currentActiveSheetId = null;
+      var currentActiveCellValue = null;
+
+      /**
+       * @desc Handle poll response and react for sidebar changes.
+       * @param {object} response    Response object {sheetId:<number>, currentActiveCellValue:<string>}
+       * @return void
+       */
+      function handleActiveSheet(response) {
+        if (currentActiveSheetId != response.sheetId || response.currentActiveCellValue != currentActiveCellValue) {
+          // current active sheet changed OR the cell value/active cell changed
+          currentActiveSheetId = response.sheetId;
+          currentActiveCellValue = response.currentActiveCellValue;
+          // call google and fetch updated sidebar content (reload)
+          google.script.run
+            .withSuccessHandler(onReloadSidebar)
+            .callbackRefreshIssueTable_initSidebar();
+        }
+      }
+    </script>
+</body>
+</html>

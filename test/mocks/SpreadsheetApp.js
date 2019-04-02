@@ -1,3 +1,4 @@
+global.Spreadsheet = require('./Spreadsheet');
 
 var ADDONMENU = {
   addItem : jest.fn().mockImplementation(()=> ADDONMENU),
@@ -10,30 +11,19 @@ var UI = {
   showModalDialog : jest.fn()
 }
 
-var SPREADSHEET = {
-  getActiveSheet: jest.fn()
-}
-var SHEET = {
-  getActiveRange: jest.fn()
-}
-
-var SHEETRANGE = {
-  getValues: jest.fn()
-}
-
 var SpreadsheetApp = {
   getUi: jest.fn().mockImplementation(() => UI ),
-  getActiveSpreadsheet: jest.fn().mockImplementation(() => SPREADSHEET ),
+  getActive: jest.fn().mockImplementation(() => Spreadsheet ),
+  getActiveSpreadsheet: jest.fn().mockImplementation(() => Spreadsheet ),
   resetMocks: function() {
     mocks = [
       [SpreadsheetApp.getUi,UI],
+      [SpreadsheetApp.getActive, Spreadsheet],
+      [SpreadsheetApp.getActiveSpreadsheet, Spreadsheet],
       [UI.createAddonMenu,ADDONMENU],
       [ADDONMENU.addItem,ADDONMENU],
       [ADDONMENU.addSeparator,ADDONMENU],
-      [ADDONMENU.addToUi,ADDONMENU],
-      [SpreadsheetApp.getActiveSpreadsheet,SPREADSHEET],
-      [SPREADSHEET.getActiveSheet, SHEET],
-      [SHEET.getActiveRange, SHEETRANGE]
+      [ADDONMENU.addToUi,ADDONMENU]
     ];
     mocks.forEach((pair)=> {
       pair[0].mockReset();

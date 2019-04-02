@@ -1,3 +1,5 @@
+//@TODO: rename this filename, its not appropiate as it has not only jira related utilities - JRo
+
 // Node required code block
 const Request = require('./jiraApi.gs');
 const debug = require('./debug.gs').debug;
@@ -21,6 +23,25 @@ var CELLTYPE_TEXT = 20;  // Jira ticket id is within text ("lorem ipsum JIRA-123
  */
 function getTicketSheet() {
   return SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+}
+
+/**
+ * Takes a google spreadsheet sheet id and converts it into a save string 
+ * which can be used as a objects property key.
+ * 
+ * @param {object|int|string} sheetId    Optional; The original google sheetId
+ * @param {boolean} revert    If TRUE, an previous generated sheetId is converted back
+ * @return {string}
+ */
+function sheetIdPropertySafe(sheetId, revert) {
+  if (true === revert) {
+    sheetId = sheetId.replace(/sid\_/g, '');
+  } else {
+    sheetId = sheetId || getTicketSheet().getSheetId();
+    sheetId = 'sid_' + ((typeof sheetId === 'string') ? sheetId : JSON.stringify(sheetId));
+  }
+
+  return sheetId;
 }
 
 /**
@@ -195,8 +216,21 @@ function getMyFilters(includeFavourites) {
  */
 function getFilter(filterId) {
   var method = "filter",
-    filter = {},
-    request = new Request();
+      filter = {
+        // obj template
+        id : null,
+        name : null,
+        description : null,
+        owner: {
+          name : null,
+          displayName : null,
+          active : null
+        },
+        jql : null,
+        searchUrl : null,
+        favourite : null
+      },
+      request = new Request();
 
   var ok = function (responseData, httpResponse, statusCode) {
     // Check the data is valid and the Jira fields exist
@@ -588,7 +622,8 @@ function getIssue(issueKey, fields) {
 module.exports = {
   getIssue: getIssue,
   unifyIssueAttrib: unifyIssueAttrib,
-  getTicketSheet: getTicketSheet
+  getTicketSheet: getTicketSheet,
+  sheetIdPropertySafe: sheetIdPropertySafe
 };
 
 // End of Node required code block

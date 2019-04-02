@@ -2,6 +2,7 @@ jiraApiMock = require('./mocks/mockJiraApi.js');
 const getCfg_ = require("../src/settings.gs").getCfg_;
 const setCfg_ = require("../src/settings.gs").setCfg_;
 const UserStorage = require("src/models/gas/UserStorage.gs");
+const jiraCommon = require('../src/jiraCommon.gs');
 
 test("Call to retrieve an issues status", function() {
     jiraApiMock.resetMocks();
@@ -118,3 +119,36 @@ function initJiraDummyConfig() {
   EpicField.setLinkKey("customfield_epic_link");
   EpicField.setLabelKey("customfield_epic_label");
 }
+
+test("Receiving proper sheet id's from mock", () => {
+  SpreadsheetApp.resetMocks();
+
+  var sheetIdA = jiraCommon.getTicketSheet().getSheetId();
+  var sheetIdB = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getSheetId();
+  expect(sheetIdA).toBe(sheetIdB);
+
+  SpreadsheetApp.resetMocks();
+});
+
+test('sheetIdPropertySafe() generates property safe string from an sheet id', () => {
+  SpreadsheetApp.resetMocks();
+
+  var result = '';
+  var sheetId = jiraCommon.getTicketSheet().getSheetId();
+  var expectedId = 'sid_' + sheetId;
+
+  result = jiraCommon.sheetIdPropertySafe(sheetId);
+  expect(result).toBe(expectedId);
+
+  result = jiraCommon.sheetIdPropertySafe();
+  expect(result).toBe(expectedId);
+
+  // shall be same on multiple calls within runtime
+  var id1 = jiraCommon.sheetIdPropertySafe();
+  var id2 = jiraCommon.sheetIdPropertySafe();
+  var id3 = jiraCommon.sheetIdPropertySafe();
+  expect(id1).toBe(id2);
+  expect(id2).toBe(id3);
+
+  SpreadsheetApp.resetMocks();
+});
