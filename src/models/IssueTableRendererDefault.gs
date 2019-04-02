@@ -74,10 +74,10 @@ function IssueTableRendererDefault_(IssueTable) {
 
     issues = IssueTable.getIssues();
     if (typeof issues !== 'object') {
-      throw new Error("{IssueTable.getIissues()} must return an array but returned " + (typeof issues) + ".");
+      throw new Error("{IssueTable.getIssues()} must return an array but returned " + (typeof issues) + ".");
     }
     if (!issues[0].hasOwnProperty('fields')) {
-      throw new ReferenceError("{IssueTable.getIissues()} did not return a valid Jira issues response object. [" + issues + "]");
+      throw new ReferenceError("{IssueTable.getIssues()} did not return a valid Jira issues response object. [" + issues + "]");
     }
 
     var sheetId = sheetIdPropertySafe(IssueTable.getSheetId(), true);
@@ -167,6 +167,7 @@ function IssueTableRendererDefault_(IssueTable) {
       .setFontWeights([formats]);
 
     info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
+    info.headers = values;
 
     SpreadsheetApp.flush();
 
@@ -251,14 +252,6 @@ function IssueTableRendererDefault_(IssueTable) {
    */
   that.getInfo = function () {
     return info;
-  };
-
-  /**
-   * @desc Return array of header values
-   * @return {Array}
-   */
-  that.getHeaders = function () {
-    return headers;
   };
 
   /**

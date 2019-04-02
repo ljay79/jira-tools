@@ -13,7 +13,7 @@ function menuRefreshIssueTable() {
  * @desc Wrapper: Sidebar callback handler for initialization of sidebar content
  * @return {object} Object({status: [boolean], tables: [object]})
  */
-function cbRefreshIssueTable_initSidebar() {
+function callbackRefreshIssueTable_initSidebar() {
   return RefreshIssueTable_Controller_.callbackInitSidebar();
 }
 
@@ -22,7 +22,7 @@ function cbRefreshIssueTable_initSidebar() {
  * @param {object} tableMetaData Object with IssueTable meta data
  * @return {object} Object({status: [boolean]})
  */
-function cbRefreshIssueTable_refreshTable(tableMetaData) {
+function callbackRefreshIssueTable_refreshTable(tableMetaData) {
   return RefreshIssueTable_Controller_.callbackRefreshTable(tableMetaData);
 }
 
@@ -30,7 +30,7 @@ function cbRefreshIssueTable_refreshTable(tableMetaData) {
  * @desc Wrapper: Sidebar callback handler to check if sidebar content should be refreshed. Ie: When user switches sheet.
  * @return {object} Object({sheetId: [string], currentActiveCellValue: [string]})
  */
-function cbRefreshIssueTable_getResetSidebar() {
+function callbackRefreshIssueTable_getResetSidebar() {
   var response = {
     sheetId : sheetIdPropertySafe(),
     currentActiveCellValue : getTicketSheet().getActiveCell().getValue()
@@ -131,7 +131,7 @@ RefreshIssueTable_Controller_ = {
 
     var Search = new IssueSearch(Table.getMeta('filter').jql);
     Search.setOrderBy()
-      .setFields(Table.getMeta('headerValues'))
+      .setFields(Table.getMeta('headerFields'))
       .setMaxResults(Table.getMeta('maxResults') || 1000)
       .setStartAt(0)
       .search()
@@ -148,9 +148,9 @@ RefreshIssueTable_Controller_ = {
 // Node required code block
 module.exports = {
   menuRefreshIssueTable : menuRefreshIssueTable,
-  cbRefreshIssueTable_initSidebar : cbRefreshIssueTable_initSidebar,
-  cbRefreshIssueTable_refreshTable : cbRefreshIssueTable_refreshTable,
-  cbRefreshIssueTable_getResetSidebar : cbRefreshIssueTable_getResetSidebar,
+  callbackRefreshIssueTable_initSidebar : callbackRefreshIssueTable_initSidebar,
+  callbackRefreshIssueTable_refreshTable : callbackRefreshIssueTable_refreshTable,
+  callbackRefreshIssueTable_getResetSidebar : callbackRefreshIssueTable_getResetSidebar,
   RefreshIssueTable_Controller_ : RefreshIssueTable_Controller_
 }
 // End of Node required code block

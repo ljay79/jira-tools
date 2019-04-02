@@ -1,48 +1,3 @@
-/* ######## DEV- WIP - Testing #################### */
-
-/*
- * Inserting a new IssueTable from a Jira saved filter. Inserting at current active cell in active sheet
- */
-function TESTinsertTableFromFilter() {
-  debug.log('TESTinsertTableFromFilter()');
-
-  var ok = function (resp, status, errorMessage) {
-    var renderer, attributes = {
-      filter : getFilter(14406),
-      issues : resp.data,
-      sheet : getTicketSheet(),
-      renderer : IssueTableRendererDefault_,
-      maxResults: Search.getMaxResults()
-    };
-
-    var table = new IssueTable_(attributes);
-    if (renderer = table.render()) {
-      // toast with status message
-      var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
-          + " total found records.";
-      SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
-      debug.log(msg);
-
-      // add table to index
-      IssueTableIndex_.addTable(table);
-      console.log('renderer.info: %s', renderer.getInfo());
-      console.log('==>> Table Meta: %s', table.getMeta());
-    }
-  };
-
-  var Search = new IssueSearch("status = Done");
-  Search.setOrderBy()
-    .setFields(['key', 'summary', 'status'])
-    .setMaxResults(5)
-    .setStartAt(0)
-    .search()
-    .withSuccessHandler(ok)
-  ;
-}
-
-
-/* ######## ------------------ #################### */
-
 /**
  * @file Contains controller class and dialog/callback method for inserting issue tables from jira filter.
  */
@@ -123,10 +78,11 @@ InsertIssueTable_Controller_ = {
         columns = jsonFormData['columns'] || jiraColumnDefault,
         response = {status: false, message: ''};
 
-    var Renderer, attributes = {
+    var attributes = {
       filter : jsonFormData['filter_id'] ? getFilter(parseInt(jsonFormData['filter_id'])) : {},
       maxResults : parseInt(jsonFormData['maxResults']) || 10000,
       issues : {},
+      columns : columns,
       sheet : getTicketSheet(),
       renderer : IssueTableRendererDefault_
     };
@@ -149,10 +105,10 @@ InsertIssueTable_Controller_ = {
       } else {
         attributes.issues = resp.data;
 
-        var Table = new IssueTable_(attributes);
-        if (Renderer = Table.render()) {
+        var renderer, Table = new IssueTable_(attributes);
+        if (renderer = Table.render()) {
           // toast with status message
-          var msg = "Finished inserting " + Renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
+          var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
               + " total found records.";
           SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
           debug.log(msg);
@@ -242,10 +198,9 @@ InsertIssueTable_Controller_ = {
  */
 function TriggerPruneIssueTableIndex_(e) {
   debug.time('[TriggerPruneIssueTableIndex_]');
-  debug.log('[TriggerPruneIssueTableIndex_] - e.changeType: %s', e.changeType);
 
   if (e.changeType !== 'REMOVE_GRID') {
-    debug.log('[TriggerPruneIssueTableIndex_] changeType [%s] not monitored. Skip.', e.changeType);
+    //debug.log('[TriggerPruneIssueTableIndex_] changeType [%s] not monitored. Skip.', e.changeType);
     debug.timeEnd('[TriggerPruneIssueTableIndex_]');
     return;
   }

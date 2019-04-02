@@ -27,7 +27,8 @@ function IssueTable_(attributes) {
         rangeCoord : null,               // sample: {row: {from: 1, to: 10}, col: {from: 1, to: 5}}
         rangeName : null,                // sample: 's2_tbl_rA1F4'
         headerRowOffset : 0,             // sample: 1
-        headerValues : [],               // sample: [Summary,Key,Status,Epic]
+        headerFields : [],               // sample: [summary,key,status,epic,priotiry]
+        headerValues : [],               // sample: [Summary,Key,Status,Epic,P]
         filter: {id: 0, jql: null},      // sample: {id: 1234, jql: 'status = Done and project in ("JST")'}
         maxResults : null,               // sample: 10
         renderer: null,                  // sample: IssueTableRendererDefault_
@@ -65,6 +66,10 @@ function IssueTable_(attributes) {
         throw new ReferenceError("{attributes.issues} must be an object. Jira api response object of type issues.");
       }
 
+      if (!attributes.hasOwnProperty('columns') || typeof attributes.issues !== 'object') {
+        throw new ReferenceError("{attributes.columns} must be an array. Jira field names used as table header.");
+      }
+
       if (!attributes.hasOwnProperty('sheet') || typeof attributes.sheet !== 'object') {
         throw new ReferenceError("{attributes.sheet} must be an object of type 'Sheet'.");
       }
@@ -81,6 +86,7 @@ function IssueTable_(attributes) {
         jql : attributes.filter.jql
       });
       that.setIssues(attributes.issues).setRenderer(attributes.renderer);
+      that.setMeta('headerFields', attributes.columns);
 
       if (attributes.filter.hasOwnProperty('name')) {
         that.setMeta('name', attributes.filter.name);
@@ -248,7 +254,7 @@ function IssueTable_(attributes) {
     // store render info to IssueTable meta data
     var renderInfo = renderer.getInfo();
     metaData.headerRowOffset = renderInfo.headerRowOffset;
-    metaData.headerValues = renderer.getHeaders();
+    metaData.headerValues = renderInfo.headers;
 
     // setting range info
     setRange(renderInfo.oRangeA1.from + ':' + renderInfo.oRangeA1.to);

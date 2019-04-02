@@ -130,6 +130,8 @@ Additionally you can configure many different types of custom Jira field, which 
 ### Refresh IssueTable
 “Add-ons" > “Project Aid for Jira” > "Refresh IssueTable"
 
+YouTube: [Watch this feature on YouTube](https://youtu.be/9TWuvRhx7Fw)
+
 A "IssueTable" we call all data tables which you inserted with the menu "List issues from filter".
 This will open a sidebar, listing all your IssueTables in the current sheet.
 Each of these tables can then be refreshed / updated through a signle click on the button "Refresh".
@@ -138,6 +140,8 @@ It will call your Jira instance with the same details as the first time and upda
 
 ### Update Jira Issues
 “Add-ons" > “Project Aid for Jira” > "Update Jira Issues"
+
+YouTube: [Watch this feature on YouTube](https://youtu.be/1SAkH9SrVhs)
 
 Allows you to update values in multiple Jira issues from the values in your spreadsheet.
 This feature allows you to select an area of your spreadsheet with header rows and each row below it corresponding to an issue.
