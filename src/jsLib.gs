@@ -51,7 +51,7 @@ function reverse(string) {
 function buildUrl(url, parameters) {
   var qs = "";
   for (var key in parameters) {
-	if (!parameters.hasOwnProperty(key)) continue;
+    if (!parameters.hasOwnProperty(key)) continue;
     var value = parameters[key];
     qs += encodeURIComponent(key) + "=" + encodeURIComponent(value) + "&";
   }

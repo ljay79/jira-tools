@@ -42,29 +42,13 @@ function dialogSettings() {
   var dialog = getDialog('dialogSettings', getServerCfg());
 
   dialog
-    .setWidth(360)
+    .setWidth(510)
     .setHeight(500)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
   debug.log('Processed: %s', dialog);
 
-  SpreadsheetApp.getUi().showModalDialog(dialog, 'Jira Server Settings');
-}
-
-/**
- * @desc Helper for our Settings Dialogs HTML.
- * @return {object} 
- */
-function getServerCfg() {
-  return {
-    available: getCfg_('available'),
-    url: getCfg_('jira_url'),
-    username: getCfg_('jira_username'),
-    password: getCfg_('jira_password'),
-    workhours: UserStorage.getValue('workhours'),
-    dspuseras_name: UserStorage.getValue('dspuseras_name'),
-    dspdurationas: UserStorage.getValue('dspdurationas')
-  };
+  SpreadsheetApp.getUi().showModalDialog(dialog, 'Settings');
 }
 
 /* Dialog: Settings - END */

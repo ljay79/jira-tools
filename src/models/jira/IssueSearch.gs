@@ -6,8 +6,9 @@ const EpicField = require("src/models/jira/EpicField.gs");
 // End of Node required code block
 
 /**
- * @desc Class 'IssueSearch' API abstraction with pagination handling. Performs a JQL POST search request to JIRA Rest API.
- * @param searchQuery {String} JQL Query statement
+ * @desc Class 'IssueSearch' API abstraction with pagination handling.
+ *       Performs a JQL POST search request to JIRA Rest API.
+ * @param searchQuery {String}    JQL Query statement
  */
 function IssueSearch(searchQuery) {
   var fields = ['key'],
