@@ -126,6 +126,16 @@ textarea {
 }
 
 a, a:active, a:visited {
+  font-family: var(--docs-material-header-font-family, Roboto, Helvetica, Arial, sans-serif);
+  font-weight: var(--docs-material-font-weight-bold, 500);
+  height: 36px;
+  letter-spacing: 0.25px;
+  line-height: 16px;
+  color: #188038;
+  display: inline-block;
+}
+
+.tip-footer a, .tip-footer a:active, .tip-footer a:visited {
   background-image: none;
   border: 1px solid transparent !important;
   border-radius: 4px;
@@ -292,4 +302,18 @@ fieldset p a:visited {
     background-color: aliceblue;
     display: none;
     font-style: italic;
+}
+
+.block2x2 {
+	  width:43%;
+}
+
+.block2x2.left {
+	  margin-right:20px;
+	  float:left;
+}
+
+fieldset .block2x2 {
+	  display: inline-block;
+	  width:46%;
 }
