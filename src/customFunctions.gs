@@ -1,3 +1,9 @@
+// Node required code blockconst 
+const getCfg_ = require("./settings.gs").getCfg_;
+const setCfg_ = require("./settings.gs").setCfg_;
+
+// End of Node required code block
+
 /**
  * @desc Forces trigger to re-calculate all custom functions / formulars in the active sheet.
  *       No official function for this, but this trick does it.
@@ -16,6 +22,8 @@ function recalcCustomFunctions() {
  * @customfunction
  */
 function JST_EPICLABEL(TicketId) {
+  customFunctionAllowed_();
+
   var request   = new Request();
   var response  = {};
 
@@ -54,6 +62,8 @@ function JST_EPICLABEL(TicketId) {
  * @customfunction
  */
 function JST_getTotalForSearchResult(JQL) {
+  customFunctionAllowed_();
+
   if (undefined == JQL || JQL == '') {
     throw new Error("{JQL} can not be empty.");
   }
@@ -80,7 +90,7 @@ function JST_getTotalForSearchResult(JQL) {
 }
 
 /**
- * (Mini)Search for Jira issues using JQL.
+ * (Mini) Search for Jira issues using JQL.
  *
  * @param {"status = Done"} JQL    A well-formed Jira JQL query (https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries).
  * @param {"summary,status"} Fields    Jira issue field IDs. e.g.: "key,summary,status"
@@ -90,6 +100,8 @@ function JST_getTotalForSearchResult(JQL) {
  * @customfunction
  */
 function JST_search(JQL, Fields, Limit, StartAt) {
+  customFunctionAllowed_();
+
   // - checks - 
   if (undefined == JQL || JQL == '') {
     throw new Error("{JQL} can not be empty.");
@@ -170,7 +182,35 @@ function JST_search(JQL, Fields, Limit, StartAt) {
  * @customfunction
  */
 function JST_formatDuration(Seconds) {
+  customFunctionAllowed_();
+
   Seconds = parseInt(Seconds) || 0;
 
   return formatTimeDiff(Seconds);
 }
+
+/**
+ * @desc Check if custom function is enabled by user otherwise throws new Error.
+ * @throws Error
+ * @return Void
+ */
+function customFunctionAllowed_() {
+  if (!customFunctionsEnabled_()) {
+    throw new Error("The document owner (you) must enable custom functions. Open 'Add-ons > Project Aid for Jira > Settings' and toggle 'Custom Functions' to enabled. If you are not the document owner, ask him to enable custom functions.");
+  }
+}
+
+/**
+ * @desc Check wether custom functions are enabled or not.
+ * @return {boolean}
+ */
+function customFunctionsEnabled_() {
+  return (getCfg_('custom_fn_enabled') == 1);
+}
+
+
+// Node required code block
+module.exports = {
+  customFunctionAllowed_: customFunctionAllowed_
+};
+// End of Node required code block

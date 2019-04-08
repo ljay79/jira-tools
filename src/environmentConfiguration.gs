@@ -7,7 +7,7 @@ var environmentConfiguration = {
   "description": "Local development environment",
   "debugEnabled": true,
   "features": {}
-}
+};
 
 // Node required code block
 module.exports = environmentConfiguration;
