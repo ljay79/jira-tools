@@ -17,7 +17,7 @@ var UserStorage = {
     try {
       return this._getAppStorage().getValue(key);
     } catch (e) {
-      debug.error(e);
+      console.error(e);
       throw new Error("There was a problem fetching your settings from the Google Service. Please try again later.");
     }
   },
