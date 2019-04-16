@@ -112,6 +112,13 @@ RefreshIssueTable_Controller_ = {
       var renderer;
       Table.setIssues(resp.data);
 
+      // clear outdated IssueTable in sheet
+      var sheet = getSheetById(sheetId);
+      if (typeof sheet === 'object') {
+        var range = sheet.getParent().getRangeByName(Table.getMeta('rangeName'));
+        range.clear();
+      }
+
       if (renderer = Table.render()) {
         // toast with status message
         var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
