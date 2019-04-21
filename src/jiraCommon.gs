@@ -152,10 +152,9 @@ function grepJiraCell(cellValue) {
 
 /**
  * @desc Request users own (and favourite) filters and return an object of main props.
- * @param {boolean} includeFavourites  Include users favourite filters or not
  * @return {object} Object({[id]:{name:{string}, self:{string}, favourite:{boolean}, owner:{string}, viewUrl:{string}}})
  */
-function getMyFilters(includeFavourites) {
+function getMyFilters() {
   var filters = { list: [], error: '' };
 
   var ok = function (responseData, httpResponse, statusCode) {
@@ -202,7 +201,7 @@ function getMyFilters(includeFavourites) {
 
   var request = new Request();
 
-  request.call("myFilters", { includeFavourites: (includeFavourites ? 'true' : 'false') })
+  request.call("myFilters")
     .withSuccessHandler(ok)
     .withFailureHandler(error);
 

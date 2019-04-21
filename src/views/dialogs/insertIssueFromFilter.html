@@ -157,7 +157,7 @@
 
       google.script.run
         .withSuccessHandler(onInitFilter)
-        .getMyFilters(true);
+        .getMyFilters();
 
       filter.addEventListener('submit', formSubmitHandler);
       input.forEach(function(el){ el.addEventListener('change', inputValidatyHandler); });
