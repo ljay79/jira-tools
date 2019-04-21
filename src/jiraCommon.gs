@@ -311,7 +311,7 @@ function unifyIssueAttrib(attrib, data) {
             resp.value = data.fields[attrib] || '';
             break;
           case 'option':
-            resp.value = data.fields[attrib].value || 'n/a';
+            resp.value = data.fields[attrib] ? data.fields[attrib].value : 'n/a';
             break;
           case 'array|option':
             resp.value = '';
