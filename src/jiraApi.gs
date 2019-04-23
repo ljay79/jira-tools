@@ -24,7 +24,7 @@ var restMethods = {
     'filter'        : {method: '/filter/{filterId}'},
     //'search': {method: '/search', queryparams: {jql:'', fields: [], properties: [], maxResults: 100, validateQuery: 'strict'}} // GET
     'search'        : {method: '/search'}, // POST
-    'myFilters'     : {method: '/filter'},
+    'myFilters'     : {method: '/filter/my', queryparams: {includeFavourites: 'true'}},
 
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'%'}},
     'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
@@ -39,7 +39,8 @@ var restMethods = {
     'worklogOfIssue': {method: '/issue/{issueIdOrKey}/worklog'},
     'filter'        : {method: '/filter/{filterId}'},
     'search'        : {method: '/search'}, // POST
-    'myFilters'     : {method: '/filter'},
+    // server api doesnt support /filter/my
+    'myFilters'     : {method: '/filter/favourite', queryparams: {includeFavourites: 'true'}},
 
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'%'}},
     'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
