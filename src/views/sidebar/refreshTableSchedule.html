@@ -43,12 +43,12 @@
       <span class="location">Tabellenblatt89!A1:F23</span><br />
       <span class="updated">Updated: &gt;<span class="time-elapsed"></span></span>
     </div>
-    <div class="schedule-setup">
+    <!-- <div class="schedule-setup">
       Coming soon ...
-    </div>
+    </div> -->
     <div class="block actions">
       <button class="green" disabled>Refresh</button>
-      <button class="blue" disabled>Schedule</button>
+      <!-- <button class="blue" disabled>Schedule</button> -->
     </div>
   </div>
   <!-- END: Template //-->
@@ -112,11 +112,11 @@
 
           // enable action buttons
           divTable.find('.actions > :button.green').prop('disabled', false).click(tableMeta, refreshTable);
-          divTable.find('.actions > :button.blue')
+          /*divTable.find('.actions > :button.blue')
             .prop('disabled', false)
             .click(tableMeta, function (event) {
               var scheduleContainer = $(this).parent().parent().find('.schedule-setup').toggle();
-            });
+            });*/
 
           divTable.appendTo(issueTableContainer);
         });
