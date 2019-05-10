@@ -388,14 +388,16 @@ function unifyIssueAttrib(attrib, data) {
       case 'status':
         resp = {
           value: data.fields.status.name || 'n/a',
-          color: data.fields.status.statusCategory.colorName || 'black',
-          format: '@[' + (data.fields.status.statusCategory.colorName || 'black') + ']'
+          // #206
+          //color: data.fields.status.statusCategory.colorName || 'black',
+          //format: '@[' + (data.fields.status.statusCategory.colorName || 'black') + ']'
         };
         break;
       case 'resolution':
         resp = {
           value: data.fields.resolution.name,
-          format: '@[green]'
+          // #206
+          //format: '@[green]'
         };
         break;
       case 'key':
