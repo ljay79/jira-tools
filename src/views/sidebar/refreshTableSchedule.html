@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/custom.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
@@ -52,13 +53,24 @@
     </div>
   </div>
   <!-- END: Template //-->
+  <!-- BGN: Template of HTML elements for an individual IssueTable //-->
+  <div id="filter-warning-template" class="tooltip" style="display: none">
+    <span class="material-icons orange600">info</span>
+    <div class="tooltiptext tooltip-bottom">
+      <h4>Filter has changed!</h4>
+      <p>The JQL of that Jira filter has changed. <a class="view-filter" href="#">View in Jira</a></p>
+    </div>
+  </div>
+  <!-- END: Template //-->
 
   <script>
       var box_tip = $('#box-tip');
       var loading = $('.loader');
       var issueTableContainer = $('#table-container');
+      var table_element_tpl = $('#table-element-template');
+      var warning_tpl = $('#filter-warning-template');
+      var pollingSuspended = false;
 
-      var issueTableContainer = $('#table-container');
       $('a.feedback-link').each(function() {
         $(this).click(function(event){
           event.preventDefault();
@@ -72,13 +84,31 @@
        */
       function refreshTable(event) {
         var button = $(this);
+        var buttonPosTop = (button.closest('.issuetable').position().top + 10);
+        pollingSuspended = true;
         button.prop('disabled', true);
+        // remove possible old tooltip
+        $('.tooltip').remove();
 
         function onResponse(response) {
           var done = response.status === true;
           if (done) {
             button.prop('disabled', false);
+            // has filter been modified?
+            if (response.filterModified) {
+              var divInfo = warning_tpl.clone().removeAttr('id');
+              divInfo.css('top', buttonPosTop + 'px');
+              if (response.filter.viewUrl && response.filter.viewUrl != '') {
+                divInfo.find('a.view-filter').attr('href', response.filter.viewUrl);
+              } else {
+                divInfo.find('a.view-filter').remove();
+              }
+
+              issueTableContainer.before(divInfo);
+              divInfo.show();
+            }
           }
+          pollingSuspended = false;
         }
 
         google.script.run
@@ -89,10 +119,8 @@
 
       function onReloadSidebar(response) {
         loading.removeClass('loader').hide();
-
-        var table_element_tpl = $('#table-element-template');
-
         issueTableContainer.empty();
+
         if (response.tables.length > 0) {
           box_tip.hide();
         } else {
@@ -122,6 +150,7 @@
         });
 
         window.dispatchEvent(new Event('load'));
+        pollingSuspended = false;
       }
 
       function leaveFeedback() {
@@ -155,10 +184,12 @@
       function poll(interval) {
         interval = interval || 2000;
         setTimeout(function () {
-          google.script.run
-            .withSuccessHandler(handleActiveSheet)
-            .withFailureHandler(showError)
-            .callbackRefreshIssueTable_getResetSidebar();
+          if (!pollingSuspended) {
+            google.script.run
+              .withSuccessHandler(handleActiveSheet)
+              .withFailureHandler(showError)
+              .callbackRefreshIssueTable_getResetSidebar();
+          }
           poll();
         }, interval);
       }
@@ -199,6 +230,7 @@
           currentActiveSheetId = response.sheetId;
           currentActiveCellValue = response.currentActiveCellValue;
           // call google and fetch updated sidebar content (reload)
+          pollingSuspended = true;
           google.script.run
             .withSuccessHandler(onReloadSidebar)
             .callbackRefreshIssueTable_initSidebar();
