@@ -101,7 +101,9 @@ RefreshIssueTable_Controller_ = {
     debug.log(this.name + '.callbackRefreshTable() <= %s', tableMetaData);
 
     var response = {
-      status : false
+      status : false,
+      filterModified: false,
+      filter: {}
     };
 
     // Get table from Meta
@@ -136,6 +138,21 @@ RefreshIssueTable_Controller_ = {
       return response;
     }
 
+    // check for changed filter JQL
+    var Filter = new JiraFilter(Table.getMeta('filter'));
+    if (Filter.update().isModified()) {
+      var filterObj = Filter.getFilter();
+      response.filterModified = true;
+      response.filter = filterObj;
+      // update filter details in stored IssueTable
+      Table.setMeta('filter', {
+        id : filterObj.id,
+        name : filterObj.name,
+        jql : filterObj.jql
+      })
+    }
+
+    // perform search to update IssueTable
     var Search = new IssueSearch(Table.getMeta('filter').jql);
     Search.setOrderBy()
       .setFields(Table.getMeta('headerFields'))

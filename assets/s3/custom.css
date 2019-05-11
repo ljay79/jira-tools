@@ -383,3 +383,61 @@ fieldset .block2x2 {
   top: 0;
   left: 0;
 }
+
+/* Tooltip - Filter changed warning in Refresh sidebar */
+.material-icons.orange600 { color: #FB8C00; }
+
+/* Tooltip container */
+.tooltip {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  z-index: 2;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 210px;
+  padding: 10px;
+  background-color: #e6f4ea;
+  border-radius: 8px;
+  color: #188038;
+  position: absolute;
+  z-index: 1;
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.tooltiptext h4 {
+  color: #188038;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+  line-height: 28px;
+}
+.tooltiptext p {
+  color: #188038;
+  font-size: 12px;
+  letter-spacing: .3px;
+  line-height: normal;
+  margin: 0;
+}
+.tooltiptext a {
+  height: auto;
+}
+.tooltip-top {
+  bottom: 60%;
+  left: 0%;
+  margin-left: 0px;
+}
+.tooltip-bottom {
+    top: 75%;
+    right: 0%;
+    margin-left: 0px;
+}
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
