@@ -43,7 +43,7 @@ function IssueTableRendererDefault_(IssueTable) {
   var that = this, // clear encapsulation of scope's
     sheet, initRange,
     epicField = UserStorage.getValue('jst_epic'),
-    issues = [], headers = [],
+    issues = [], selectedFields = [], headers = [],
     rowIndex = 0, numColumns = 0,
     info = {
       totalInserted : 0,
@@ -76,6 +76,9 @@ function IssueTableRendererDefault_(IssueTable) {
     if (typeof issues !== 'object') {
       throw new Error("{IssueTable.getIssues()} must return an array but returned " + (typeof issues) + ".");
     }
+
+    selectedFields = IssueTable.getMeta('headerFields');
+
     if (!issues[0].hasOwnProperty('fields')) {
       throw new ReferenceError("{IssueTable.getIssues()} did not return a valid Jira issues response object. [" + issues + "]");
     }
@@ -261,8 +264,17 @@ function IssueTableRendererDefault_(IssueTable) {
    */
   prepareHeaderValues = function () {
     // prep headers
-    for ( var k in issues[0].fields) {
-      headers.push(k);
+    if (null !== selectedFields) {
+      // selected fields are set from fitlers selected columns
+      for ( var k in selectedFields) {
+        if (selectedFields.hasOwnProperty(k)) 
+          headers.push(selectedFields[k]);
+      }
+    } else {
+      // from first issue in result
+      for ( var k in issues[0].fields) {
+        headers.push(k);
+      }
     }
 
     // sort fields based on defined order in IssueFields.getBuiltInJiraFields()
