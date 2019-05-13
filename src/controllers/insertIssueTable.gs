@@ -87,10 +87,10 @@ InsertIssueTable_Controller_ = {
       renderer : IssueTableRendererDefault_
     };
 
-    UserStorage.setValue('userColumns', columns); // store for re-use by user
+    UserStorage.setValue('userColumns', attributes.columns); // store for re-use by user
 
     var ok = function (resp, status, errorMessage) {
-      debug.log(this.name + '.ok() resp(len): %s; s: %s; msg: %s', resp.data.length, status, errorMessage);
+      debug.log(that.name + '.ok() resp(len): %s; s: %s; msg: %s', resp.data.length, status, errorMessage);
 
       if (status !== 200) {
         // Something funky is up with the JSON response.
@@ -136,7 +136,7 @@ InsertIssueTable_Controller_ = {
     var Search = new IssueSearch(attributes.filter.jql);
     Search
       // .setOrderBy()
-      .setFields(columns)
+      .setFields(attributes.columns)
       .setMaxResults(attributes.maxResults)
       .setStartAt(startAt)
       .search()      
