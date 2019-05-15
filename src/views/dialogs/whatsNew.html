@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700">
+<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/custom.css?v=b134">
+<style>
+.changelog_box {
+  overflow-y: scroll;
+  height: 235px;
+  margin-bottom: 20px;
+}
+.changelog_box ul {
+  margin: 0;
+}
+
+body > fieldset.block:first-child {
+  max-height: 100px;
+  overflow: hidden;
+}
+</style>
+</head>
+<body>
+    <fieldset class="block">
+      <legend>What's New?</legend>
+      <p>Here you find the latest updates and changes in your current version of "Project Aid for Jira v<?= buildNumber ?>".</p>
+      <p>Further details, discussions, roadmap and bug reporting you may find on our Github project page: <a href="https://github.com/ljay79/jira-tools/blob/master/README.md">https://github.com/ljay79/jira-tools/</a></p>
+    </fieldset>
+    
+    <div class="block changelog_box">
+      <fieldset class="block">
+        <legend>UPCOMING</legend>
+        <ul>
+          <li>
+          By 1st June 2019, this Add-On will require you to use your Jira E-Mail + API Token to enable the Add-On's features.
+          <br/>
+          Read here, how to use API Token: <a href="https://github.com/ljay79/jira-tools/blob/master/README.md#b-atlassian-api-token">Email + API Token help</a>
+          </li>
+        </ul>
+      </fieldset>
+      <fieldset class="block">
+        <legend>v1.3.5</legend>
+        <ul>
+          <li>Introduce new "What's New?" dialog</li>
+          <li>Remove "Feedback" feature, not useful enough compared to required added auth requirements</li>
+        </ul>
+      </fieldset>
+      <fieldset class="block">
+        <legend>v1.3.4</legend>
+        <ul>
+          <li>#205; fix handling of IssueTable header definition from filter fields</li>
+          <li>fix that vs this, use consistent access to attributes.columns</li>
+        </ul>
+      </fieldset>
+      <fieldset class="block">
+        <legend>v1.3.3</legend>
+        <ul>
+          <li>#206; remove coloring for status and resolution; keep it clean and consistent</li>
+          <li>#208; improve Refresh table handling, check updated JQL, show notice</li>
+          <li>hide IssueTable scheduled refresh button - feature has no roadmap yet</li>
+        </ul>
+      </fieldset>
+      <fieldset class="block">
+        <legend>v1.3.2</legend>
+        <ul>
+          <li>#202 - unify getFilter api call - should give favorite and non favorite filters</li>
+          <li>fix for undefined value property in options custom field</li>
+        </ul>
+      </fieldset>
+      <fieldset class="block">
+        <legend>v1.3.1</legend>
+        <ul>
+          <li>#198; clear outdated IssueTable before inserting refreshed data</li>
+        </ul>
+      </fieldset>
+      <fieldset class="block">
+        <legend>v1.3.0</legend>
+        <ul>
+          <li>New feature "Refresh IssueTable", allows simple update of existing Issue Tables</li>
+          <li>custom functions are optionally now, must be enabled via "Settings" first with hint regarding user auth scope</li>
+          <li>Fix issue #187</li>
+          <li>Added support for Jira system fields versions (#187) and aggregatetimeoriginalestimate ("Affects Version/s" and "Σ Original Estimate")</li>
+          <li>updating style</li>
+          <li>adding new YouTube videos / update README</li>
+        </ul>
+      </fieldset>
+    </div>
+
+    <div class="block actions">
+      <button type="button" onclick="google.script.host.close()">Close</button>
+    </div>
+</body>
+</html>

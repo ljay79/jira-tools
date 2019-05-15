@@ -10,7 +10,7 @@
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
-var BUILD = '1.3.4';
+var BUILD = '1.3.5';
 
 /** 
  * Add a nice menu option for the users.
@@ -40,6 +40,7 @@ function onInstall(e) {
  */
 function addMenu() {
   var menu = SpreadsheetApp.getUi().createAddonMenu()
+    .addItem('Whats New?', 'menuWhatsNew')
     .addItem('List issues from filter', 'menuInsertIssueFromFilter')
     .addItem('Create time report', 'menuCreateTimeReport')
     .addSeparator()
