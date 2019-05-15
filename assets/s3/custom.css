@@ -128,7 +128,6 @@ textarea {
 a, a:active, a:visited {
   font-family: var(--docs-material-header-font-family, Roboto, Helvetica, Arial, sans-serif);
   font-weight: var(--docs-material-font-weight-bold, 500);
-  height: 36px;
   letter-spacing: 0.25px;
   line-height: 16px;
   color: #188038;
@@ -152,7 +151,8 @@ a, a:active, a:visited {
   display: inline-block;
 }
 
-a.feedback-link, a.feedback-link:active, a.feedback-link:visited
+a.feedback-link, a.feedback-link:active, a.feedback-link:visited, /* obsolete since v1.3.5 */
+a.whatsnew, a.whatsnew:active, a.whatsnew:visited
 {
   border-radius: 4px;
   font-family: var(--docs-material-header-font-family, Roboto, Helvetica, Arial, sans-serif);
@@ -235,7 +235,8 @@ fieldset p a:visited {
   padding: 12px;
 }
 
-.sidebar.bottom a.feedback-link {
+.sidebar.bottom a.feedback-link, /* obsolete since v1.3.5 */
+.sidebar.bottom a.whatsnew {
     float: right;
 }
 
