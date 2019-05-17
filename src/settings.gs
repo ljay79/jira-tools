@@ -101,6 +101,7 @@ function initDefaults() {
  */
 function getServerCfg() {
   return {
+    buildNumber: BUILD,
     available: getCfg_('available'),
     url: getCfg_('jira_url'),
     username: getCfg_('jira_username'),

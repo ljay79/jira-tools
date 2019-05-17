@@ -129,7 +129,7 @@ a, a:active, a:visited {
   font-family: var(--docs-material-header-font-family, Roboto, Helvetica, Arial, sans-serif);
   font-weight: var(--docs-material-font-weight-bold, 500);
   letter-spacing: 0.25px;
-  line-height: 16px;
+  line-height: 16px; /* to be removed asap! */
   color: #188038;
   display: inline-block;
 }
