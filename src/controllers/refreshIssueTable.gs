@@ -59,7 +59,7 @@ RefreshIssueTable_Controller_ = {
       .setTitle('Refresh IssueTable')
       .setSandboxMode(HtmlService.SandboxMode.IFRAME)
     ;
-    
+
     SpreadsheetApp.getUi().showSidebar(html);
   },
 
