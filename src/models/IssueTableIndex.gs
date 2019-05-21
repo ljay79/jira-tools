@@ -192,7 +192,8 @@ IssueTableIndex_ = {
           namedRange = sheet.getParent().getRangeByName(tableJson.rangeName);
 
           // check passed coordinates are within current table range
-          if (column >= namedRange.getColumn() && column <= namedRange.getLastColumn() && row >= namedRange.getRow()
+          if (namedRange != null && column >= namedRange.getColumn() 
+              && column <= namedRange.getLastColumn() && row >= namedRange.getRow()
               && row <= namedRange.getLastRow()) {
             // found it ..
             return respond(new IssueTable_({
