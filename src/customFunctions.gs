@@ -1,7 +1,6 @@
 // Node required code blockconst 
 const getCfg_ = require("./settings.gs").getCfg_;
 const setCfg_ = require("./settings.gs").setCfg_;
-
 // End of Node required code block
 
 /**
