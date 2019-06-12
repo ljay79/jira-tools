@@ -267,8 +267,9 @@ function IssueTableRendererDefault_(IssueTable) {
     if (null !== selectedFields) {
       // selected fields are set from fitlers selected columns
       for ( var k in selectedFields) {
-        if (selectedFields.hasOwnProperty(k)) 
+        if (selectedFields.hasOwnProperty(k) && EpicField.EPIC_KEY != selectedFields[k]) { 
           headers.push(selectedFields[k]);
+        }
       }
     } else {
       // from first issue in result

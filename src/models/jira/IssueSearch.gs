@@ -36,9 +36,10 @@ function IssueSearch(searchQuery) {
     if (aFields.constructor == Array) {
       fields = aFields;
       // has custom Epic field 'jst_epic'?
-      if (fields.indexOf(EpicField.EPIC_KEY) > -1) {
+      if (fields.indexOf(EpicField.EPIC_KEY) > -1) { // Found
         if (EpicField.isUsable()) {
-          fields.push(EpicField.getLinkKey());
+          var _link_key = EpicField.getLinkKey();
+          if (fields.indexOf(_link_key) == -1) fields.push(_link_key);
         }
       }
     } else {

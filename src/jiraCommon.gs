@@ -395,7 +395,7 @@ function unifyIssueAttrib(attrib, data) {
         break;
       case 'resolution':
         resp = {
-          value: data.fields.resolution.name || '',
+          value: data.fields.resolution ? (data.fields.resolution.name || '') : '',
           // #206
           //format: '@[green]'
         };
