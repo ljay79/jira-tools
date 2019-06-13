@@ -6,7 +6,7 @@ const extend = require('./jsLib.gs').extend;
 //*** All UI Dialogs for this add-on ***//
 
 /**
- * @desc Jira Settings Dialog preprocessor
+ * @desc Jira Dialog preprocessor
  * @param file {string}  Filename
  * @param values {object}
  * @return {HtmlOutput}
@@ -34,6 +34,7 @@ function getDialog(file, values) {
 /* Dialog: Settings */
 
 /**
+ * @deprecated
  * @desc Jira Settings Dialog constructor
  */
 function dialogSettings() {

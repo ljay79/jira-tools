@@ -115,6 +115,7 @@ function getServerCfg() {
 
 
 /**
+ * @deprecated
  * @desc Save Jira server settings, provided in dialog form and perform 
  *     a connection test to Jira api.
  * @param jsonFormData {object}  JSON Form object of all form values

@@ -69,7 +69,8 @@ var httpErrorCodes = {
 };
 
 /**
- * Test JIRA API connection with provided settings.
+ * @desc Test JIRA API connection with provided settings.
+ * @TODO Doesnt test authentification yet
  * @return {object}  Object({status:[boolean], response:[string]})
  */
 function testConnection() {
