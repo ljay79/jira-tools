@@ -26,7 +26,8 @@ var restMethods = {
     'search'        : {method: '/search'}, // POST
     'myFilters'     : {method: '/filter/my', queryparams: {includeFavourites: 'true'}},
 
-    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'%'}},
+    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:''}},
+    'userSearchV2'  : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, query:''}},
     'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
     'field'         : {method: '/field'}
   },
@@ -42,7 +43,7 @@ var restMethods = {
     // server api doesnt support /filter/my
     'myFilters'     : {method: '/filter/favourite', queryparams: {includeFavourites: 'true'}},
 
-    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'%'}},
+    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'.'}},
     'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
     'field'         : {method: '/field'}
   }
@@ -172,6 +173,7 @@ function Request() {
    * @return {this}    Allows chaining
    */
   this.call = function(method, data, fetchArgs) {
+    console.info('data: %s', data);
     if( !hasSettings(false) ) {
       // check if server settings are available
       responseData = {errorMessages: ['Internal Error! No Jira Settings.']};

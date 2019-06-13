@@ -54,14 +54,22 @@ TimeReport_Controller_ = {
       message : null
     };
 
-    result = findUser('%', true, maxResults).filter(function (user) {
+    result = findUser('', true, maxResults).filter(function (user) {
       return user.active !== false;
     });
 
     // Jira Server Issue workaround (https://jira.atlassian.com/browse/JRASERVER-29069)
     if (result.length == 0 && getCfg_('server_type') == 'server') {
-      // try it again with custom query param apparently working like %
+      // try it again with custom query param apparently working like %,+,*,.
       result = findUser('.', true, maxResults).filter(function (user) {
+        return user.active !== false;
+      });
+    }
+    
+    // workaround 2 as the param val appears to change
+    if (result.length == 0) {
+      // try it again with custom query param apparently working like %,+,*,.
+      result = findUser('', true, maxResults, 'userSearchV2').filter(function (user) {
         return user.active !== false;
       });
     }
