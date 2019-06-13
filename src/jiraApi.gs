@@ -26,6 +26,7 @@ var restMethods = {
     'search'        : {method: '/search'}, // POST
     'myFilters'     : {method: '/filter/my', queryparams: {includeFavourites: 'true'}},
 
+    // https://SITENAME.atlassian.net/rest/api/2/user/search?startAt=0&maxResults=1000&query=
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:''}},
     'userSearchV2'  : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, query:''}},
     'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
