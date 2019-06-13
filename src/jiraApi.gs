@@ -174,7 +174,6 @@ function Request() {
    * @return {this}    Allows chaining
    */
   this.call = function(method, data, fetchArgs) {
-    console.info('data: %s', data);
     if( !hasSettings(false) ) {
       // check if server settings are available
       responseData = {errorMessages: ['Internal Error! No Jira Settings.']};
