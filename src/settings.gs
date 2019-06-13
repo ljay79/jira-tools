@@ -99,7 +99,7 @@ function initDefaults() {
  * @desc Helper for our Settings Dialogs HTML.
  * @return {object} 
  */
-function getServerCfg() {
+function getAddonConfig_() {
   return {
     buildNumber: BUILD,
     available: getCfg_('available'),

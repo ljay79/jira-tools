@@ -39,7 +39,7 @@ Settings_Controller_ = {
     debug.log(this.name + '.sidebar()');
     initDefaults();
 
-    var sidebar = getDialog('views/sidebar/settings', getServerCfg());
+    var sidebar = getDialog('views/sidebar/settings', getAddonConfig_());
 
     debug.log('Processed: %s', sidebar);
 
