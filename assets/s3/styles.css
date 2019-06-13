@@ -82,6 +82,48 @@ text-align: start;
  * @copyright 2017-2019, Jens Rosemeier. All rights reserved.
  * @link https://github.com/ljay79/jira-tools
  */
+ 
+/* Polyfill Dialog (see: https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.0/dialog-polyfill.css) */
+dialog {
+  position: absolute;
+  left: 0; right: 0;
+  width: -moz-fit-content;
+  width: -webkit-fit-content;
+  width: fit-content;
+  height: -moz-fit-content;
+  height: -webkit-fit-content;
+  height: fit-content;
+  margin: auto;
+  border: solid;
+  padding: 1em;
+  background: white;
+  color: black;
+  display: block;
+}
+
+dialog:not([open]) {
+  display: none;
+}
+
+dialog + .backdrop {
+  position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background: rgba(0,0,0,0.1);
+}
+
+._dialog_overlay {
+  position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
+}
+
+dialog.fixed {
+  position: fixed;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+ 
+/* *** Styles *** */
+
 :root {
     --docs-material-font-family: Roboto, Helvetica, Arial, sans-serif;
     --docs-material-header-font-family: var(--docs-material-font-family);
@@ -327,72 +369,6 @@ fieldset .block2x2 {
 	  width:46%;
 }
 
-.toggle {
-  position: relative;
-  display: block;
-  width: 40px;
-  height: 20px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transform: translate3d(0, 0, 0);
-}
-.toggle:before {
-  content: "";
-  position: relative;
-  top: 3px;
-  left: 3px;
-  width: 34px;
-  height: 14px;
-  display: block;
-  background: #9A9999;
-  border-radius: 8px;
-  transition: background 0.2s ease;
-}
-.toggle span {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 20px;
-  height: 20px;
-  display: block;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 3px 8px rgba(154, 153, 153, 0.5);
-  transition: all 0.2s ease;
-}
-.toggle span:before {
-  content: "";
-  position: absolute;
-  display: block;
-  margin: -18px;
-  width: 56px;
-  height: 56px;
-  background: rgba(71, 135, 237, 0.5);
-  border-radius: 50%;
-  transform: scale(0);
-  opacity: 1;
-  pointer-events: none;
-}
-#cbx:checked + .toggle:before {
-  background: #6dbfff;
-}
-#cbx:checked + .toggle span {
-  background: #4787ed;
-  transform: translateX(20px);
-  transition: all 0.2s cubic-bezier(0.8, 0.4, 0.3, 1.25), background 0.15s ease;
-  box-shadow: 0 3px 8px rgba(71, 135, 237, 0.2);
-}
-#cbx:checked + .toggle span:before {
-  transform: scale(1);
-  opacity: 0;
-  transition: all 0.4s ease;
-}
-.toggle-center {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
 /* Tooltip - Filter changed warning in Refresh sidebar */
 .material-icons.orange600 { color: #FB8C00; }
 
@@ -452,6 +428,20 @@ fieldset .block2x2 {
 }
 
 .message-container { display: none; padding: 5px 10px; text-align: center; color: #fff; }
+
+/* MDL Modal Dialog */
+dialog {
+  z-index: 9000;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+}
+/* dialog in sidebar */
+.mdl-js .mdl-dialog {
+  width: 90%;
+}
+.dialog-background {
+  background-color: rgba(0, 0, 0, 0.1);
+}
 
 /* ------------------------------------------- */
 /* override material.blue-green.min.css styles */
@@ -519,11 +509,6 @@ fieldset .block2x2 {
   top: -10px;
   color: #3c4043;
   letter-spacing: .8px;
-}
-
-.mdl-switch__label {
-  padding-right: 20px;
-  display: block;
 }
 
 /* ----------------------------------------------- */

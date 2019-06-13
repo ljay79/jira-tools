@@ -94,6 +94,8 @@ Settings_Controller_ = {
 // Node required code block
 module.exports = {
   menuSettings : menuSettings,
+  callbackSettings_saveAccess: callbackSettings_saveAccess,
+  callbackSettings_saveOptions: callbackSettings_saveOptions,
   Settings_Controller_ : Settings_Controller_
 }
 // End of Node required code block
