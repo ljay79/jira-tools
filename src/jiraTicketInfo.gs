@@ -12,7 +12,7 @@ function refreshTickets() {
 
   // Show the user a friendly message
   Browser.msgBox("Jira Tickets",
-                 "Updating all Jira tickets in this sheet.\\nDepending on amount of data in this sheet, the process may take a while.", 
+                 "Updating all Jira ticket IDs in this sheet (\"KEY-123 [Done]\").\\nDepending on amount of data in this sheet, the process may take a while.", 
                  Browser.Buttons.OK);
 
   var ok = function(responseData, httpResponse, statusCode){

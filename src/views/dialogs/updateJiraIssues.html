@@ -31,16 +31,29 @@
 
 <body>
   <form name="issue-update" action="" method="post">
-    <p>This is BETA functionality</p>
+    <p>
+      This is <strong>BETA</strong> functionality.
+      <a target="_blank" href="https://github.com/ljay79/jira-tools#update-jira-issues">Read more</a>
+      <br/>
+      Supported Jira fields which can be updated is very limited still. (Follow feature progress on <a target="_blank" href="https://github.com/ljay79/jira-tools/labels/Update-Jira-Issue">GitHub.com</a>)
+    </p>
+
     <div class="block field-list">
       <h2>Configure columns and Jira fields</h2>
       <div class="titles">
         <span class="headerTitle">Columns</span>
         <span class="jiraFieldTitle">Jira Field</span>
       </div>
-      <? 
-        for (var headerName in headerFields ) { 
+
+      <?
+      if(Object.keys(headerFields).length == 0) { 
         ?>
+        <p><i>Select an area of your sheet with a header row and each row below it corresponding to an issue.</i></p>
+        <?
+      }
+
+      for (var headerName in headerFields ) { 
+      ?>
       <div class="item">
         <input class="headerSelect" title="should this column be imported" type="checkbox" id="column-<?= headerName ?>"
           name="columns[]" value="<?= headerFields[headerName] ?>" checked="checked">
@@ -65,7 +78,7 @@
     </div>
     <div class="block">
       <button type="submit" class="action">Update Jira Issues</button>
-      <button type="button" onclick="google.script.host.close()">Cancel</button>
+      <button type="button" onclick="google.script.host.close()">Close</button>
       <div id="response-message" class="error-container" role="dialog"></div>
     </div>
     <div id="results" class="block field-list">
@@ -74,7 +87,6 @@
 
   <script>
     /* global google */
-
     var timeout = null;
     var alert = document.getElementById('response-message');
     var issueForm = document.forms['issue-update'];
@@ -83,7 +95,6 @@
     $('input.headerSelect').click(function () {
       $(this).parent().toggleClass('not-imported', !this.checked);
     })
-
 
     function hideAlert() {
       if (timeout) timeout = clearTimeout(timeout);
@@ -146,8 +157,11 @@
       } else {
         statusMessage = "See below for error(s)";
       }
+
       showAlert(statusMessage, !hasErrors && result.status , 10000);
+
       $('#results').empty();
+
       if (hasErrors) {
         $('#results').append('<h2 class="error">' + result.errors.length + ' Error(s)</h2>');
         for (var i = 0; i < result.errors.length; i++) {

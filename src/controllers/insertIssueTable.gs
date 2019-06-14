@@ -6,6 +6,7 @@
  * @desc Wrapper: Dialog to choose issues filter
  */
 function menuInsertIssueFromFilter() {
+  RefreshIssueTable_Controller_.sidebar();
   InsertIssueTable_Controller_.dialogOpen();
 }
 

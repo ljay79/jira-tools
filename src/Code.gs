@@ -10,7 +10,7 @@
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
-var BUILD = '1.3.6';
+var BUILD = '1.4.0';
 
 /** 
  * Add a nice menu option for the users.
@@ -41,19 +41,19 @@ function onInstall(e) {
 function addMenu() {
   var menu = SpreadsheetApp.getUi().createAddonMenu()
     .addItem('Whats New?', 'menuWhatsNew')
-    .addItem('List issues from filter', 'menuInsertIssueFromFilter')
-    .addItem('Create time report', 'menuCreateTimeReport')
     .addSeparator()
+    .addItem('Create IssueTable from filter', 'menuInsertIssueFromFilter')
     .addItem('Refresh IssueTable', 'menuRefreshIssueTable')
+    .addItem('Create time report', 'menuCreateTimeReport')
+    .addItem('Update Jira Issues', 'menuUpdateJiraIssues')
+    .addSeparator()
     .addItem('Update formulas in active sheet', 'recalcCustomFunctions')
-    .addItem('Update issue key status "KEY-123 [Done]"', 'dialogRefreshTicketsIds')
-    .addItem('Jira field map', 'menuJiraFieldMap')
+    .addItem('Update issue key status...', 'dialogRefreshTicketsIds')
+    .addItem('Show Jira field map', 'menuJiraFieldMap')
     .addSeparator()
     .addItem('Settings', 'menuSettings')
     .addItem('Configure custom fields', 'menuCustomFields')
     .addItem('About', 'dialogAbout')
-    .addSeparator()
-    .addItem('Update Jira Issues (BETA)', 'menuUpdateJiraIssues')
     .addToUi();
 }
 
