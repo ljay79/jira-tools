@@ -531,6 +531,9 @@ dialog {
 .mdl-js fieldset.input-switch {
   padding-bottom: 50px;
 }
+.mdl-js fieldset.input-switch > .mdl-switch {
+  width: calc(100% - 20px);
+}
 
 .mdl-js div.block.actions {
   float: right;

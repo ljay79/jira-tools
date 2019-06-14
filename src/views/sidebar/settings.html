@@ -99,8 +99,7 @@
 				<form id="options" action="" method="post">
 					<fieldset class="input-switch">
 						<legend>Custom Functions</legend>
-						<label class="mdl-switch mdl-js-switch mdl-js-ripple-effect"
-							for="switch-1">
+						<label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">
 						    <input type="checkbox" id="switch-1" name="custom_fn_enabled" class="mdl-switch__input" 
 						      value="on"<? if (custom_fn_enabled == 1) { ?> checked="checked" <? } ?> >
 						    <span class="mdl-switch__label">Custom functions use the
@@ -155,6 +154,16 @@
 							</label>
 						</div>
 					</fieldset>
+                    
+                    <fieldset class="input-switch">
+						<legend>Add comment on update</legend>
+						<label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-2">
+						    <input type="checkbox" id="switch-2" name="issue_update_comment" class="mdl-switch__input" 
+						      value="on"<? if (issue_update_comment == 1) { ?> checked="checked" <? } ?> >
+						    <span class="mdl-switch__label">Adding a comment to the updated Jira issue when using "Update Jira Issues" ("<i>Updated by Project Aid for Jira</i>").</span>
+						</label>
+					</fieldset>
+					<br />
 
 					<div class="block actions">
 						<button type="submit" class="green" id="options--save" disabled>Save</button>

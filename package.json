@@ -1,6 +1,6 @@
 {
   "name": "jira-sheet-tools",
-  "version": "1.1.0",
+  "version": "1.4.0",
   "description": "Work with JIRA within Google Sheets",
   "author": "Jens Rosemeier <github@jens79.de>",
   "license": "GPL-3.0-or-later",

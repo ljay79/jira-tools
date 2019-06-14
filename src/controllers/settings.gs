@@ -85,6 +85,7 @@ Settings_Controller_ = {
     UserStorage.setValue('workhours', jsonFormData.ts_workhours);
     UserStorage.setValue('dspuseras_name', parseInt(jsonFormData.ts_dspuseras_name));
     UserStorage.setValue('dspdurationas', jsonFormData.ts_dspdurationas);
+    UserStorage.setValue('issue_update_comment', (jsonFormData.issue_update_comment == 'on') ? 1 : 0);
 
     return {status: true, message: 'Options successfully saved.'};
   }
