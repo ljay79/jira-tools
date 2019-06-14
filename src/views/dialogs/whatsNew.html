@@ -25,21 +25,31 @@ body > fieldset.block:first-child {
     <fieldset class="block">
       <legend>What's New?</legend>
       <p>Here you find the latest updates and changes in your current version of "Project Aid for Jira v<?= buildNumber ?>".</p>
-      <p>Further details, discussions, roadmap and bug reporting you may find on our Github project page: <a href="https://github.com/ljay79/jira-tools/blob/master/README.md">https://github.com/ljay79/jira-tools/</a></p>
+      <p>Further details, discussions, roadmap and bug reporting you may find on our Github project page: <a target="_blank" href="https://github.com/ljay79/jira-tools/blob/master/README.md">https://github.com/ljay79/jira-tools/</a></p>
     </fieldset>
     
     <div class="block changelog_box">
       <fieldset class="block">
-        <legend>UPCOMING</legend>
+        <legend>Important!</legend>
         <ul>
           <li>
           By 1st June 2019, this Add-On will require you to use your Jira E-Mail + API Token to enable the Add-On's features.
           <br/>
-          Read here, how to use API Token: <a href="https://github.com/ljay79/jira-tools/blob/master/README.md#b-atlassian-api-token">Email + API Token help</a>
+          Read here, how to use API Token: <a target="_blank" href="https://github.com/ljay79/jira-tools/blob/master/README.md#b-atlassian-api-token">Email + API Token help</a>
           </li>
         </ul>
       </fieldset>
 
+      <fieldset class="block">
+        <legend>v1.4.0</legend>
+        <ul>
+          <li>#212; Refactoring settings dialog into sidebar + UI/UX tweaks</li>
+          <li>#212; fix API /user/search for getting all users in Timereport dialog</li>
+          <li>#218 adding new option to turn on/off system comment when updating jira issues</li>
+          <li>Minor BugFixes</li>
+          <li>Read full <a target="_blank" href="https://github.com/ljay79/jira-tools/releases/tag/v1.4.0">Changelog</a></li>
+        </ul>
+      </fieldset>
       <fieldset class="block">
         <legend>v1.3.6</legend>
         <ul>
@@ -47,6 +57,7 @@ body > fieldset.block:first-child {
           <li>#213; Fix: do not add custom internal epic key "jst_epic" to list of headers</li>
           <li>Fix weak validation; "TypeError: Method "getColumn" of null can not be called</li>
           <li>Fix: data.fields.resolution might not exist</li>
+          <li>Read full <a target="_blank" href="https://github.com/ljay79/jira-tools/releases/tag/v1.3.6">Changelog</a></li>
         </ul>
       </fieldset>
       <fieldset class="block">

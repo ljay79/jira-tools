@@ -6,7 +6,7 @@ const extend = require('./jsLib.gs').extend;
 //*** All UI Dialogs for this add-on ***//
 
 /**
- * @desc Jira Settings Dialog preprocessor
+ * @desc Jira Dialog preprocessor
  * @param file {string}  Filename
  * @param values {object}
  * @return {HtmlOutput}
@@ -31,27 +31,6 @@ function getDialog(file, values) {
   }
 }
 
-/* Dialog: Settings */
-
-/**
- * @desc Jira Settings Dialog constructor
- */
-function dialogSettings() {
-  initDefaults();
-
-  var dialog = getDialog('dialogSettings', getServerCfg());
-
-  dialog
-    .setWidth(510)
-    .setHeight(500)
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-
-  debug.log('Processed: %s', dialog);
-
-  SpreadsheetApp.getUi().showModalDialog(dialog, 'Settings');
-}
-
-/* Dialog: Settings - END */
 
 /**
  * @desc Fetch all Jira Issue IDs from active sheet and update their status.

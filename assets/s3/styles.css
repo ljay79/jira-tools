@@ -77,11 +77,53 @@ text-align: start;
 
 /*!
  * Project Aid for Jira
- * @version v0.0.1
+ * @version v1.4.0
  * @license GNU GENERAL PUBLIC LICENSE v3.
  * @copyright 2017-2019, Jens Rosemeier. All rights reserved.
  * @link https://github.com/ljay79/jira-tools
  */
+ 
+/* Polyfill Dialog (see: https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.0/dialog-polyfill.css) */
+dialog {
+  position: absolute;
+  left: 0; right: 0;
+  width: -moz-fit-content;
+  width: -webkit-fit-content;
+  width: fit-content;
+  height: -moz-fit-content;
+  height: -webkit-fit-content;
+  height: fit-content;
+  margin: auto;
+  border: solid;
+  padding: 1em;
+  background: white;
+  color: black;
+  display: block;
+}
+
+dialog:not([open]) {
+  display: none;
+}
+
+dialog + .backdrop {
+  position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background: rgba(0,0,0,0.1);
+}
+
+._dialog_overlay {
+  position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
+}
+
+dialog.fixed {
+  position: fixed;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+ 
+/* *** Styles *** */
+
 :root {
     --docs-material-font-family: Roboto, Helvetica, Arial, sans-serif;
     --docs-material-header-font-family: var(--docs-material-font-family);
@@ -97,7 +139,7 @@ text-align: start;
 html, body {
 	/*font-family: 'Roboto-Light', 'Roboto-Medium', 'Roboto-Bold', 'Roboto', Helvetica, Arial, sans-serif;*/
 	font-family: Roboto, Helvetica, Arial, sans-serif;
-	font-size: 13px;
+	font-size: 14px;
 	color: black;
 	font-weight: normal;
 }
@@ -305,6 +347,14 @@ fieldset p a:visited {
     font-style: italic;
 }
 
+form > div.block {
+  padding: 10px;
+}
+
+.block + .block {
+  margin-top: 20px;
+}
+
 .block2x2 {
 	  width:43%;
 }
@@ -317,72 +367,6 @@ fieldset p a:visited {
 fieldset .block2x2 {
 	  display: inline-block;
 	  width:46%;
-}
-
-.toggle {
-  position: relative;
-  display: block;
-  width: 40px;
-  height: 20px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transform: translate3d(0, 0, 0);
-}
-.toggle:before {
-  content: "";
-  position: relative;
-  top: 3px;
-  left: 3px;
-  width: 34px;
-  height: 14px;
-  display: block;
-  background: #9A9999;
-  border-radius: 8px;
-  transition: background 0.2s ease;
-}
-.toggle span {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 20px;
-  height: 20px;
-  display: block;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 3px 8px rgba(154, 153, 153, 0.5);
-  transition: all 0.2s ease;
-}
-.toggle span:before {
-  content: "";
-  position: absolute;
-  display: block;
-  margin: -18px;
-  width: 56px;
-  height: 56px;
-  background: rgba(71, 135, 237, 0.5);
-  border-radius: 50%;
-  transform: scale(0);
-  opacity: 1;
-  pointer-events: none;
-}
-#cbx:checked + .toggle:before {
-  background: #6dbfff;
-}
-#cbx:checked + .toggle span {
-  background: #4787ed;
-  transform: translateX(20px);
-  transition: all 0.2s cubic-bezier(0.8, 0.4, 0.3, 1.25), background 0.15s ease;
-  box-shadow: 0 3px 8px rgba(71, 135, 237, 0.2);
-}
-#cbx:checked + .toggle span:before {
-  transform: scale(1);
-  opacity: 0;
-  transition: all 0.4s ease;
-}
-.toggle-center {
-  position: absolute;
-  top: 0;
-  left: 0;
 }
 
 /* Tooltip - Filter changed warning in Refresh sidebar */
@@ -442,3 +426,120 @@ fieldset .block2x2 {
   visibility: visible;
   opacity: 1;
 }
+
+.message-container { display: none; padding: 5px 10px; text-align: center; color: #fff; }
+
+/* MDL Modal Dialog */
+dialog {
+  z-index: 9000;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+}
+/* dialog in sidebar */
+.mdl-js .mdl-dialog {
+  width: 90%;
+}
+.dialog-background {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* ------------------------------------------- */
+/* override material.blue-green.min.css styles */
+.mdl-tabs__tab-bar.numTabs2 > a {
+  width: 50%;
+}
+.mdl-tabs__tab-barnumTabs3 > a {
+  width: 33%;
+}
+
+.mdl-tabs__tab .mdl-tabs__ripple-container .mdl-ripple {
+  background: #5f6368;
+}
+
+.mdl-tabs.is-upgraded .mdl-tabs__tab.is-active {
+  color: #188038;
+}
+.mdl-tabs.is-upgraded .mdl-tabs__tab.is-active:after {
+  background: #188038;
+}
+
+.mdl-tabs__tab-bar > a,
+.mdl-tabs__tab-bar > a:hover,
+.mdl-tabs__tab-bar > a:active,
+.mdl-tabs__tab-bar > a:visited {
+  line-height: 48px; /*required due to: custom.css -> a, a:active, a:visited {} */
+  text-decoration: inherit;
+}
+
+.mdl-textfield,
+.mdl-textfield__label,
+.mdl-textfield__input,
+.mdl-switch__label,
+.mdl-radio__label {
+  font-size: 14px;
+}
+
+.mdl-textfield {
+  width: 100%;
+  padding: 10px 0 0 0;
+}
+.mdl-textfield__label {
+  top: 14px;
+  margin: 10px 0;
+}
+.mdl-textfield__label:after {
+  bottom: 0;
+}
+
+.mdl-textfield__input {
+  color: #3c4043;
+  width: 94%;
+  margin: 10px 0;
+  padding: 8px;
+  border: 1px solid rgba(0,0,0,.12);
+}
+.mdl-textfield__input:placeholder,
+.mdl-textfield__input:-ms-input-placeholder {
+  color: #c5c5c5;
+}
+
+.mdl-textfield.is-dirty .mdl-textfield__label,
+.mdl-textfield.has-placeholder .mdl-textfield__label {
+  visibility: visible;
+  top: -10px;
+  color: #3c4043;
+  letter-spacing: .8px;
+}
+
+/* ----------------------------------------------- */
+/* override some old styles for new sidebar layout */
+.mdl-js fieldset {
+  padding: 10px;
+  border: none;
+}
+.mdl-js legend {
+  color: #3c4043;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  padding: 10px 10px 0 0;
+}
+.mdl-js fieldset div.block p {
+  font-size: 13px;
+}
+
+.mdl-js fieldset.input-switch {
+  padding-bottom: 50px;
+}
+.mdl-js fieldset.input-switch > .mdl-switch {
+  width: calc(100% - 20px);
+}
+
+.mdl-js div.block.actions {
+  float: right;
+}
+
+.mdl-tabs__panel #box-tip {
+  margin-top: 40px;
+}
+/* --- */

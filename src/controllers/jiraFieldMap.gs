@@ -19,12 +19,12 @@ function menuJiraFieldMap() {
     sidebarFieldMap_(fieldMap);
   };
 
-  var error = function(msg) {
+  var error = function(msg, httpResp, status) {
     Browser.msgBox(msg, Browser.Buttons.OK);
     debug.error(msg + " httpResp: %s", httpResp);
   };
 
-  IssueFields.getAllFields(ok,error);
+  IssueFields.getAllFields(ok, error);
 }
 
 

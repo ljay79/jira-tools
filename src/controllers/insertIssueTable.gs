@@ -6,6 +6,7 @@
  * @desc Wrapper: Dialog to choose issues filter
  */
 function menuInsertIssueFromFilter() {
+  RefreshIssueTable_Controller_.sidebar();
   InsertIssueTable_Controller_.dialogOpen();
 }
 
@@ -257,6 +258,10 @@ function TriggerIssueTableModification_(e) {
         'Changes in this issue table may prevent "Refresh IssueTable".',
         ui.ButtonSet.OK);
     }
+    
+    try {
+      clearOldWarnings_();
+    } catch(e){}
 
   } else {
     debug.log('[TriggerIssueTableModification_] DONT show warning: %ss elapsed from %s', (timeNow - lastWarningTime)/1000, warningSuspendSeconds/1000);

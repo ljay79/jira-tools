@@ -26,6 +26,11 @@ No manual status update copy&paste anymore.
 
 [Development](#development)
 
+[Contributing](#contributing)
+
+[Thanks](#thanks)
+
+
 # Install / Get started
 * Open up your chrome browser
 * Open or create a Google Sheet
@@ -549,3 +554,11 @@ git commit
 git push
 ```
 
+# Contributing
+Please [create a new GitHub issue](https://github.com/ljay79/jira-tools/issues/new) for any feature requests, bugs, or documentation improvements.
+
+Where possible, please also [submit a pull request](https://help.github.com/en/articles/creating-a-pull-request-from-a-fork) for the change.
+
+# Thanks
+I'd like to thank [Daniel Kulbe](https://github.com/DanielKulbe) who provided a lot of the initial UI development and [Paul Lemon](https://github.com/paul-lemon/) for extensive contribution to the development environment as well as the BETA functionality for "Update Jira issues".
+Also thanks to all contributors that extended "Project Aif for Jira" with new functionality.
