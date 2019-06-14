@@ -1,10 +1,11 @@
 // Node required code block
 const Request = require('../src/jiraApi.gs');
+const UserStorage = require('src/models/gas/UserStorage.gs');
 const IssueFields = require('src/models/jira/IssueFields.gs');
 const unifyIssueAttrib = require('./jiraCommon.gs').unifyIssueAttrib;
-const debug = require("./debug.gs").debug;
-const extend = require("./jsLib.gs").extend;
-const splitCommaList_ = require("./jsLib.gs").splitCommaList_;
+const debug = require('./debug.gs').debug;
+const extend = require('./jsLib.gs').extend;
+const splitCommaList_ = require('./jsLib.gs').splitCommaList_;
 const IssueTransitioner = require('./jiraIssueStatusUpdates/issueTransitioner.gs');
 // End of Node required code block
 
@@ -225,6 +226,7 @@ function getMatchingJiraFields(headerRow) {
  */
 function updateIssueinJira(issueData, callback) {
   debug.log("updateIssueinJira called issueData=" + issueData);
+
   var method = "issueUpdate";
   var request = new Request();
   var ok = function (responseData, httpResponse, statusCode) {
@@ -251,29 +253,36 @@ function updateIssueinJira(issueData, callback) {
       var message = jiraErrorMessage;
       callback(issueData.key, false, message);
     }
-
   };
+
   var payload = {
     issueIdOrKey: issueData.key,
-    update: {
+    update: {}
+  };
+
+  if (1 == UserStorage.getValue('issue_update_comment')) {
+    payload.update = {
       comment: [{
         add: {
           body: "Updated by [Project Aid for Jira|https://github.com/ljay79/jira-tools]"
         }
       }]
-    }
+    };
   }
+
   if (issueData.fields != null) {
     payload.fields = issueData.fields;
   }
+
   if (issueData.update != null) {
     extend(payload.update, issueData.update);
   }
+
   request.call(method, payload);
   request.withSuccessHandler(ok);
   request.withFailureHandler(error);
-  return (request.getResponse().success === true);
 
+  return (request.getResponse().success === true);
 }
 
 // Node required code block

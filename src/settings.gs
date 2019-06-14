@@ -86,6 +86,9 @@ function initDefaults() {
   if (null == UserStorage.getValue('dspdurationas'))
     UserStorage.setValue('dspdurationas', "w");
 
+  if (null == UserStorage.getValue('issue_update_comment'))
+    UserStorage.setValue('issue_update_comment', 1);
+
   // Jira onDemand or Server
   var server_type = getCfg_('server_type');
   if (server_type == null) server_type = 'onDemand';
@@ -99,7 +102,7 @@ function initDefaults() {
  * @desc Helper for our Settings Dialogs HTML.
  * @return {object} 
  */
-function getServerCfg() {
+function getAddonConfig_() {
   return {
     buildNumber: BUILD,
     available: getCfg_('available'),
@@ -109,7 +112,8 @@ function getServerCfg() {
     custom_fn_enabled: getCfg_('custom_fn_enabled') || 0,
     workhours: UserStorage.getValue('workhours'),
     dspuseras_name: UserStorage.getValue('dspuseras_name'),
-    dspdurationas: UserStorage.getValue('dspdurationas')
+    dspdurationas: UserStorage.getValue('dspdurationas'),
+    issue_update_comment: UserStorage.getValue('issue_update_comment') || 0
   };
 }
 

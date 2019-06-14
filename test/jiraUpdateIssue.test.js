@@ -1,9 +1,10 @@
-
-jiraApiMock = require('./mocks/mockJiraApi.js');
-IssueFields = require('src/models/jira/IssueFields.gs');
+var jiraApiMock = require('./mocks/mockJiraApi.js');
+const UserStorage = require('src/models/gas/UserStorage.gs');
+const IssueFields = require('src/models/jira/IssueFields.gs');
 
 beforeAll(() => {
-  //set the cached field list
+  UserStorage.setValue('issue_update_comment', 1);
+  // set the cached field list
   IssueFields.setAllFields_(jiraFieldList);
 });
 
@@ -142,13 +143,9 @@ const jiraFieldList = [
     name: "Priority",
     custom: false
   }
-]
-
-
+];
 
 describe('processing list of Jira Issues with status transition', () => {
-
-
   const updateJiraIssues = require('../src/jiraUpdateIssue.gs').updateJiraIssues;
 
   // mock the transitioning code
@@ -187,7 +184,6 @@ describe('processing list of Jira Issues with status transition', () => {
   });
 
   test("only the status is changed but a comment should still be added to the issue", () => {
-
     jiraApiMock.setAllResponsesSuccesfull(204);
     var result = updateJiraIssues({ status: 1, Key: 0 }, [["PBI-1", "DONE"]]);
     expect(mockTransitionFunction.mock.calls.length).toBe(2);
@@ -206,7 +202,6 @@ describe('processing list of Jira Issues with status transition', () => {
   });
 
   test("Error handling", () => {
-
     mockTransitionFunction.mockClear();
     mockTransitionFunction.mockImplementationOnce(function () {
       return { success: false, errors: ["an error"] };
@@ -231,16 +226,14 @@ describe('processing list of Jira Issues with status transition', () => {
 });
 
 describe('processing list of Jira Issues', () => {
-
   const updateJiraIssues = require('../src/jiraUpdateIssue.gs').updateJiraIssues;
+
   test("no records to update", () => {
     var result = updateJiraIssues({}, []);
     expect(result.rowsUpdated).toBe(0);
     expect(result.status).toBe(false);
     expect(result.finished).toBe(true);
     expect(result.message).not.toBeNull();
-
-
 
     var result = updateJiraIssues({ columnA: 1, Key: 0 }, []);
     expect(result.rowsUpdated).toBe(0);
@@ -273,7 +266,6 @@ describe('processing list of Jira Issues', () => {
     expect(jiraApiMock.call.mock.calls[0][0]).toBe("issueUpdate");
     expect(jiraApiMock.call.mock.calls[0][1].fields["priority"]).not.toBeDefined();
 
-
     var result = updateJiraIssues({ columnA: 2, priority: 1, Key: 0 }, [["PBI-1", "P1", "column A value"]]);
     expect(result.message).not.toBeNull();
     expect(result.rowsUpdated).toBe(1);
@@ -285,7 +277,6 @@ describe('processing list of Jira Issues', () => {
     expect(jiraApiMock.call.mock.calls[1][1].fields["priority"]).toEqual({ name: "P1" });
   });
 
-
   test("Update two issues", () => {
     jiraApiMock.setAllResponsesSuccesfull(204);
     var result = updateJiraIssues({ columnA: 1, Key: 0 }, [["PBI-1", "column A value"], ["PBI-2", "column A value 2"]]);
@@ -296,7 +287,6 @@ describe('processing list of Jira Issues', () => {
     expect(result.finished).toBe(true);
     expect(jiraApiMock.call.mock.calls.length).toBe(result.rowsUpdated);
   });
-
 
   test("Update multiple issues where two have no valid JIRA Issue Key", () => {
     jiraApiMock.setAllResponsesSuccesfull(204);
@@ -344,9 +334,7 @@ describe('processing list of Jira Issues', () => {
     expect(result.finished).toBe(true);
     expect(jiraApiMock.call.mock.calls.length).toBe(2);
   });
-
 });
-
 
 describe("Packing data from a spreadsheet row ready for Jira API", () => {
   const packageRowForUpdate = require('../src/jiraUpdateIssue.gs').packageRowForUpdate;
@@ -386,7 +374,6 @@ describe("Packing data from a spreadsheet row ready for Jira API", () => {
     expect(Object.keys(result.fields).length).toBe(1);
     expect(result.update).not.toBeDefined();
     expect(result.fields.timetracking).not.toBeDefined();
-
   });
 
   test("Null value for a key", () => {
@@ -398,12 +385,9 @@ describe("Packing data from a spreadsheet row ready for Jira API", () => {
     expect(result).not.toBeNull();
     expect(result.key).toBeNull();
 
-
     var result = packageRowForUpdate({ columnA: 1, columnB: 3 }, [null, "column A value", "should be ignored", "column B value"]);
     expect(result).not.toBeNull();
     expect(result.key).toBeNull();
-
-
   });
 
   test("Put time estimates in format for JIRA", () => {
@@ -411,10 +395,10 @@ describe("Packing data from a spreadsheet row ready for Jira API", () => {
       { "Original Estimate": 1, Key: 0 },
       ["PBI-1", "1d",]
     );
-    /*schemaType: "string",
-    key: "timeoriginalestimate",
-    name: "Original Estimate",
-    custom: false*/
+    /*
+     * schemaType: "string", key: "timeoriginalestimate", name: "Original
+     * Estimate", custom: false
+     */
     expect(result.key).toBe("PBI-1");
     expect(result.fields).toBeDefined();
     expect(result.fields.timeoriginalestimate).not.toBeDefined();
@@ -422,27 +406,22 @@ describe("Packing data from a spreadsheet row ready for Jira API", () => {
     expect(result.fields.timetracking.originalEstimate).toBeDefined();
     expect(result.fields.timetracking.originalEstimate).toBe("1d");
     /*
-    "timetracking": {
-      "originalEstimate": "10",
-      "remainingEstimate": "5"
-    },
-    */
-
+     * "timetracking": { "originalEstimate": "10", "remainingEstimate": "5" },
+     */
     var result = packageRowForUpdate(
       { "Original Estimate": 1, Key: 0 },
       ["PBI-1", "",]
     );
-    /*schemaType: "string",
-    key: "timeoriginalestimate",
-    name: "Original Estimate",
-    custom: false*/
+    /*
+     * schemaType: "string", key: "timeoriginalestimate", name: "Original
+     * Estimate", custom: false
+     */
     expect(result.key).toBe("PBI-1");
     expect(result.fields).toBeDefined();
     expect(result.fields.timeoriginalestimate).not.toBeDefined();
     expect(result.fields.timetracking).toBeDefined();
     expect(result.fields.timetracking.originalEstimate).toBeDefined();
     expect(result.fields.timetracking.originalEstimate).toBeNull();
-
 
     var result = packageRowForUpdate(
       { "Remaining Estimate": 1, Key: 0 },
@@ -469,7 +448,6 @@ describe("Packing data from a spreadsheet row ready for Jira API", () => {
     expect(result.fields.timetracking.originalEstimate).toBe("2d");
   });
 
-
   test("packing a row with Components and Fix Versions in the payload", () => {
     var result = packageRowForUpdate({ "My custom field": 1, Key: 0, "Components": 2 }, ["PBI-1", "column A value", "x,y,z"]);
     expect(result).not.toBeNull();
@@ -481,7 +459,6 @@ describe("Packing data from a spreadsheet row ready for Jira API", () => {
     expect(result.update.components.length).toBe(1);
     expect(result.update.components[0]).toEqual({ "set": [{ "name": "x" }, { "name": "y" }, { "name": "z" }] });
     expect(Object.keys(result.fields).length).toBe(1);
-
 
     var result = packageRowForUpdate({ "My custom field": 1, Key: 0, "Components": 2 }, ["PBI-1", "column A value", ""]);
     expect(result).not.toBeNull();
@@ -495,9 +472,7 @@ describe("Packing data from a spreadsheet row ready for Jira API", () => {
     expect(Object.keys(result.fields).length).toBe(1);
   });
 }
-)
-
-
+);
 
 test("Posting Individual Issues to Jira - Not Found Error", () => {
 
@@ -535,7 +510,6 @@ test("Posting Individual Issues to Jira - Not Found Error", () => {
   expect(mockCallback.mock.calls[0][1]).toBe(false);
   expect(mockCallback.mock.calls[0][2]).toBe("PBI-1 Not found");
 });
-
 
 test("Posting Individual Issues to Jira - Error with data passed to field", () => {
 
@@ -600,9 +574,9 @@ describe("Converting data from spreadsheet cells to Jira format - field by field
     const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
     var jiraFieldToUse = jiraFieldList[0];
     expect(jiraFieldToUse.schemaType).toBe("string"); // just in case the test data gets re-ordered
-    expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string 
-    expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe("1223"); // just pass it a string 
-    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(""); // just pass it a string 
+    expect(formatFieldValueForJira(jiraFieldToUse, "PB-1")).toBe("PB-1"); // just pass it a string
+    expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe("1223"); // just pass it a string
+    expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(""); // just pass it a string
   })
 
   test("Format empty number fields for JIRA", () => {
@@ -614,8 +588,6 @@ describe("Converting data from spreadsheet cells to Jira format - field by field
     expect(formatFieldValueForJira(jiraFieldToUse, "1223")).toBe("1223"); // just pass it a string
     expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null); // null required to clear a number field
   })
-
-
 
   test("Date Time fields for JIRA", () => {
     const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
@@ -649,7 +621,6 @@ describe("Converting data from spreadsheet cells to Jira format - field by field
     expect(formatFieldValueForJira(jiraFieldToUse, ",GNS-Metapod, Test")).toEqual(["GNS-Metapod", "Test"]);
     expect(formatFieldValueForJira(jiraFieldToUse, ",GNS-Metapod,, Test")).toEqual(["GNS-Metapod", "Test"]);
 
-
     // bug https://github.com/ljay79/jira-tools/issues/173
     var fieldList = [{
       key: 'customfield_11121',
@@ -663,7 +634,6 @@ describe("Converting data from spreadsheet cells to Jira format - field by field
     expect(formatFieldValueForJira(fieldList[0], "GNS-Metapod")).toEqual(["GNS-Metapod"]);
     expect(formatFieldValueForJira(fieldList[0], "GNS-Metapod,Test")).toEqual(["GNS-Metapod", "Test"]);
     expect(formatFieldValueForJira(fieldList[0], "GNS-Metapod, Test")).toEqual(["GNS-Metapod", "Test"]);
-
   });
 
   test("Sending users to JIRA", () => {
@@ -672,9 +642,7 @@ describe("Converting data from spreadsheet cells to Jira format - field by field
     expect(jiraFieldToUse.schemaType).toBe("user"); // just in case the test data gets re-ordered
     expect(formatFieldValueForJira(jiraFieldToUse, "")).toBe(null);
     expect(formatFieldValueForJira(jiraFieldToUse, "plemon")).toEqual({ name: "plemon" });
-
   });
-
 
   test("Sending prioirty values to JIRA", () => {
     const formatFieldValueForJira = require('../src/jiraUpdateIssue.gs').formatFieldValueForJira;
@@ -684,7 +652,6 @@ describe("Converting data from spreadsheet cells to Jira format - field by field
     expect(formatFieldValueForJira(jiraFieldToUse, "P1")).toEqual({ name: "P1" });
   });
 });
-
 
 test("Including fields and/or items in the update ", () => {
   const updateIssueinJira = require('../src/jiraUpdateIssue.gs').updateIssueinJira;
