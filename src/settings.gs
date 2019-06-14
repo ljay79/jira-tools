@@ -101,6 +101,7 @@ function initDefaults() {
  */
 function getServerCfg() {
   return {
+    buildNumber: BUILD,
     available: getCfg_('available'),
     url: getCfg_('jira_url'),
     username: getCfg_('jira_username'),
@@ -112,30 +113,6 @@ function getServerCfg() {
   };
 }
 
-
-/**
- * @desc Save Jira server settings, provided in dialog form and perform 
- *     a connection test to Jira api.
- * @param jsonFormData {object}  JSON Form object of all form values
- * @return {object} Object({status: [boolean], response: [string]})
- */
-function saveSettings(jsonFormData) {
-  var url = trimChar(jsonFormData.jira_url, "/");
-  setCfg_('available', false);
-  setCfg_('jira_url', url);
-  setCfg_('jira_username', jsonFormData.jira_username);
-  setCfg_('jira_password', jsonFormData.jira_password);
-  setCfg_('custom_fn_enabled', (jsonFormData.custom_fn_enabled == 'on') ? 1 : 0);
-  UserStorage.setValue('workhours', jsonFormData.ts_workhours);
-  UserStorage.setValue('dspuseras_name', parseInt(jsonFormData.ts_dspuseras_name));
-  UserStorage.setValue('dspdurationas', jsonFormData.ts_dspdurationas);
-
-  var test = testConnection();
-
-  setCfg_('server_type', (url.indexOf('atlassian.net') == -1) ? 'server' : 'onDemand');
-
-  return {status: test.status, message: test.response};
-}
 
 /**
  * Delete entire user properties - for testing only

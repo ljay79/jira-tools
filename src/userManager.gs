@@ -9,14 +9,16 @@
  * @param usernameTerm {string}  A query string used to search username, name or e-mail address
  * @param {boolean} minimal  Def:FALSE; Returning data only includes minimal info (displayName,name[,active])
  * @param {integer} maxResults  Def:100; sets max user records fetched from Jira api
+ * @param {string} methodOverride  Dev:null, workarround api method name ie: "userSearchV2"
  * @return {Array}
  */
-function findUser(usernameTerm, minimal, maxResults) {
-  var method = 'userSearch', 
-      usernameTerm = usernameTerm || '%',
+function findUser(usernameTerm, minimal, maxResults, methodOverride) {
+  var _method = 'userSearch', 
+      method = methodOverride || _method,
+      usernameTerm = usernameTerm || '',
       minimal = minimal || false,
       maxResults = maxResults || 100,
-      users = [];
+      users = [], reqData = {};
 
   /**
    * @desc OnSuccess handler
@@ -55,7 +57,19 @@ function findUser(usernameTerm, minimal, maxResults) {
 
   var request = new Request();
 
-  request.call(method, {username: usernameTerm, maxResults: maxResults})
+  if (methodOverride) {
+    reqData = {
+      'query': usernameTerm,
+      'maxResults': maxResults
+    };
+  } else {
+    reqData = {
+      'username': usernameTerm,
+      'maxResults': maxResults
+    };
+  }
+
+  request.call(method, reqData)
     .withSuccessHandler(ok)
     .withFailureHandler(error);
 

@@ -49,7 +49,7 @@ function addMenu() {
     .addItem('Update issue key status "KEY-123 [Done]"', 'dialogRefreshTicketsIds')
     .addItem('Jira field map', 'menuJiraFieldMap')
     .addSeparator()
-    .addItem('Settings', 'dialogSettings')
+    .addItem('Settings', 'menuSettings')
     .addItem('Configure custom fields', 'menuCustomFields')
     .addItem('About', 'dialogAbout')
     .addSeparator()

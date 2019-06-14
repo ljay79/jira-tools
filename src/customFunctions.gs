@@ -258,8 +258,11 @@ function customFunctionsSuspended_() {
     timeUntil.setTime(_timeUntil);
   }
 
-  if (timeUntil.getSeconds() > (now.getSeconds()+5)) {
-    var _delay_seconds = timeUntil.getSeconds() - now.getSeconds();
+  var timeUntilSeconds = Math.round(timeUntil.getTime() / 1000);
+  var nowSeconds       = Math.round(now.getTime() / 1000);
+
+  if (timeUntilSeconds > (nowSeconds+3)) {
+    var _delay_seconds = timeUntilSeconds - nowSeconds;
     var _msg = "Suspension of custom functions for about " + _delay_seconds + " seconds because of to many errors! Please correct all your custom function calls in this document and wait before re-trying.";
     console.info("customFunctionsSuspended_():" + _msg + " Now: %s < Until: %s", now.toString(), timeUntil.toString());
     //@TODO: throw new Error(_msg); // NOT YET ACTIVE
@@ -269,8 +272,7 @@ function customFunctionsSuspended_() {
   if (count >= 100) {
     // set suspension +300s
     console.info('customFunctionsSuspended_(): ... setting 300s suspension!');
-    now.setSeconds(now.getSeconds() + 300);
-    docProps.put(key_time, now.getTime());
+    docProps.put(key_time, now.getTime() + (300*1000));
 
     // reset error counter
     docProps.put(key_count, 0);
@@ -278,14 +280,12 @@ function customFunctionsSuspended_() {
   } else if (count >= 25 && count < 30) {
     // set suspension +300s
     console.info('customFunctionsSuspended_(): ... setting 60s suspension!');
-    now.setSeconds(now.getSeconds() + 60);
-    docProps.put(key_time, now.getTime());
+    docProps.put(key_time, now.getTime() + (60*1000));
 
   } else if (count >= 10 && count < 15) {
     // set suspension +30s
     console.info('customFunctionsSuspended_(): ... setting 30s suspension!');
-    now.setSeconds(now.getSeconds() + 30);
-    docProps.put(key_time, now.getTime());
+    docProps.put(key_time, now.getTime() + (30*1000));
   }
 }
 

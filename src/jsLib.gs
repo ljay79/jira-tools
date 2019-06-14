@@ -365,6 +365,28 @@ function getSheetById(id) {
   })[0];
 }
 
+/**
+ * @desc Clearing old/obsolete warnings previously set by "TriggerIssueTableModification_()" 
+ * @returns void
+ */
+function clearOldWarnings_() {
+  var prop = PropertiesService.getUserProperties();
+  var all_props = prop.getProperties();
+  var now = new Date();
+  var nowSeconds = Math.round(now.getTime() / 1000);
+
+  for( var key in all_props) {
+    if (all_props.hasOwnProperty(key)) {
+      if (key.indexOf('jst.warning') == 0) {
+        var time = Math.round(all_props[key] / 1000);
+        if ((nowSeconds - time) > 86400) {
+          // warning is older than a day, remove them
+          UserStorage.removeValue(key.replace('jst.', ''));
+        }
+      }
+    }
+  }
+}
 
 // Node required code block
 module.exports = {
@@ -381,6 +403,7 @@ module.exports = {
   formatTimeDiff: formatTimeDiff,
   formatWorkhours: formatWorkhours,
   trimChar: trimChar,
-  removeFromArray: removeFromArray
+  removeFromArray: removeFromArray,
+  clearOldWarnings_: clearOldWarnings_
 };
 // End of Node required code block
