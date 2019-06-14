@@ -134,7 +134,7 @@ gulp.task('un-google', function (done) {
  */
 gulp.task('copy-changed-pulled-code', function (done) {
   var stream = gulp
-    .src(["dist/pull/**/*.gs", "dist/pull/**/.*","!dist/pull/environmentConfiguration.gs"])
+    .src(["dist/pull/**/*.html", "dist/pull/**/*.gs", "dist/pull/**/*.json", "dist/pull/**/.*","!dist/pull/environmentConfiguration.gs"])
     .pipe(changed('src'))
     .pipe(gulp.dest('src'));
 
