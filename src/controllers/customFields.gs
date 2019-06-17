@@ -1,7 +1,3 @@
-/** 
- * Controller file for setting and reading the users selects custom fields 
- */
-
 // Node required code block
 const debug = require("src/debug.gs").debug;
 const EpicField = require("src/models/jira/EpicField.gs");
@@ -10,7 +6,10 @@ const IssueFields = require("src/models/jira/IssueFields.gs");
 // End of Node required code block
 
 
-/* Dialog: Custom Fields */
+/** 
+ * Controller file for setting and reading the users selects custom fields 
+ */
+
 
 /**
  * @desc Dialog to configure Jira custom fields
@@ -29,8 +28,6 @@ function menuCustomFields() {
 
   SpreadsheetApp.getUi().showModalDialog(dialog, 'Configure Custom Fields');
 }
-
-/* Dialog: Custom Fields - END */
 
 /**
  * @desc Dialog Helper to retrieve list of all available Jira Custom Fields from api.
@@ -87,10 +84,9 @@ function sortCustomFields_(a, b) {
  */
 function callbackSaveCustomFields(jsonFormData) {
   UserStorage.setValue('favoriteCustomFields', jsonFormData.favoriteCustomFields);
-  debug.log("Saved favoriteCustomFields: %s", jsonFormData.favoriteCustomFields);
+  debug.log("Saved favoriteCustomFields: %s", JSON.stringify(jsonFormData.favoriteCustomFields));
   return { status: true, message: 'Ok' };
 }
-
 
 // Node required code block
 module.exports = { callbackFetchCustomFields: callbackFetchCustomFields }
