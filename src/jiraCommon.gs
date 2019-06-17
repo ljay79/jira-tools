@@ -343,9 +343,15 @@ function unifyIssueAttrib(attrib, data) {
             }
             break;
           case 'user':
+            // @TODO: type 'user', 'array|user', 'group',... require some refractoring - to much duplicated logic and code
+
+            // regular user object or custom fields userobject like "Profields"
+            // {"value": {"directoryId": <number>,"emailAddress": "<string>", "active": <bool>, "username": "<string>", "key": "<string>","avatarUrls": {},"displayName": "<string>"}}
+            var _value = data.fields[attrib] ? (data.fields[attrib].hasOwnProperty('value') ? data.fields[attrib].value : data.fields[attrib]) : {};
+            var _user = extend({displayName:'', avatarUrls:[]}, _value);
             resp = {
-              value: (UserStorage.getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
-              avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
+              value: (UserStorage.getValue('dspuseras_name') == 1 ? _user.displayName : (_user.name || _user.username)) || 'Unknown',
+              avatarUrls: _user.avatarUrls['24x24'] || ''
             };
             break;
           case 'array|user':
