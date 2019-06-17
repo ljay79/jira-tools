@@ -221,6 +221,11 @@ function TriggerIssueTableModification_(e) {
   debug.time('[TriggerIssueTableModification_]');
   debug.log('[TriggerIssueTableModification_] - e:  %s', JSON.stringify(e));
 
+  if (e && e.authMode == ScriptApp.AuthMode.NONE) {
+    debug.timeEnd('[TriggerIssueTableModification_]');
+    return;
+  }
+
   var IssueTable = IssueTableIndex_.getTableByCoord(e.range.getSheet().getSheetId(), e.range);
   if (!IssueTable) {
     debug.timeEnd('[TriggerIssueTableModification_]');
