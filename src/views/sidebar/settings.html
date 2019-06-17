@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/add-ons1.min.css?v=b140">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.blue-green.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/styles.min.css?v=b140">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.0/dialog-polyfill.min.js"></script>
+<script src="https://storage.googleapis.com/code.getmdl.io/1.3.0/material.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+
+	<div id="response-message" class="message-container" role="dialog"></div>
+
+	<div class="sidebar branding-below">
+
+		<!-- MDL Tab Container -->
+		<div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+			<!-- Tab Bars -->
+			<div class="mdl-tabs__tab-bar numTabs2">
+				<a href="#jira-access-panel" class="mdl-tabs__tab is-active">Jira Access</a>
+				<a href="#addon-options-panel" class="mdl-tabs__tab">Add-on Options</a>
+			</div>
+
+			<!-- MDL tab panels, is-active to denote currently active -->
+			<div class="mdl-tabs__panel is-active" id="jira-access-panel">
+
+				<form id="access" action="" method="post">
+					<fieldset class="">
+						<legend>General</legend>
+						<div class="block">
+							<div class="mdl-textfield mdl-js-textfield">
+								<input type="text" id="jira-url" name="jira_url"
+									class="mdl-textfield__input" value="<?= url ?>"
+									placeholder="https://<My-Jira-Domain>/">
+								<label class="mdl-textfield__label" for="jira-url">Jira URL</label>
+							</div>
+							<span class="inline grey">(ie: https://mysite.atlassian.net/)</span>
+						</div>
+						<div class="block">
+							<div class="mdl-textfield mdl-js-textfield">
+								<input type="text" id="jira-username" name="jira_username"
+									class="mdl-textfield__input" value="<?= username ?>"
+									placeholder="">
+								<label class="mdl-textfield__label" for="jira-username">Username or Email</label>
+							</div>
+						</div>
+						<div class="block">
+							<div class="mdl-textfield mdl-js-textfield">
+								<input type="password" id="jira-password" name="jira_password"
+									class="mdl-textfield__input" value="<?= password ?>"
+									placeholder="">
+								<label class="mdl-textfield__label" for="jira-password">Password or API token</label>
+							</div>
+						</div>
+					</fieldset>
+
+					<div class="block actions">
+						<button type="submit" class="green" id="access--save" disabled>Save</button>
+					</div>
+				</form>
+
+				<br />
+
+				<div id="box-tip">
+					<h4>Explore Tips</h4>
+					<p>
+						Jira Cloud:<br />Atlassian email + API token. <a
+							href="https://confluence.atlassian.com/cloud/api-tokens-938839638.html">Get
+							API token</a>
+					</p>
+					<p>
+						Jira Server:<br />Your username or email + password.
+					</p>
+					<div class="tip-footer">
+						<a
+							href="https://github.com/ljay79/jira-tools/blob/master/README.md#setup-connection-to-jira">Read
+							more</a>
+					</div>
+				</div>
+
+			</div>
+			<!-- END #jira-access-panel -->
+
+			<!-- MDL Tab panel 2 -->
+			<div class="mdl-tabs__panel" id="addon-options-panel">
+
+				<dialog class="mdl-dialog">
+					<p>Be careful when sharing this spreadsheet. Anyone who can edit
+						it will be able to use the custom functions and import Jira data
+						using your account.</p>
+					<button type="button" class="action">Confirm</button>
+					<button type="button" class="cancel">Cancel</button>
+				</dialog>
+
+				<form id="options" action="" method="post">
+					<fieldset class="input-switch">
+						<legend>Custom Functions</legend>
+						<label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">
+						    <input type="checkbox" id="switch-1" name="custom_fn_enabled" class="mdl-switch__input" 
+						      value="on"<? if (custom_fn_enabled == 1) { ?> checked="checked" <? } ?> >
+						    <span class="mdl-switch__label">Custom functions use the
+								document owner's configured site and Jira credentials to query
+								Jira.</span>
+						</label>
+					</fieldset>
+					<br />
+
+					<fieldset class="">
+						<legend>Time Sheet</legend>
+						<div class="block">
+							<div class="mdl-textfield mdl-js-textfield">
+								<input type="number" id="ts-workhours" name="ts_workhours"
+									class="mdl-textfield__input" min="1" step="1"
+									value="<?= workhours ?>" placeholder="number of hours">
+								<label class="mdl-textfield__label" for="ts-workhours">Working hours per day</label>
+							</div>
+						</div>
+					</fieldset>
+
+					<fieldset class="">
+						<legend>Display User as</legend>
+						<div class="block">
+							<label class="mdl-radio mdl-js-radio" for="ts-dspuseras_name">
+								<input type="radio" id="ts-dspuseras_name" name="ts_dspuseras_name" class="mdl-radio__button" 
+                                    value="1"<? if (dspuseras_name == 1) { ?> checked="checked"<? } ?> >
+							    <span class="mdl-radio__label">First-/Lastname</span>
+							</label>
+							<br />
+							<label class="mdl-radio mdl-js-radio" for="ts-dspuseras_user">
+							    <input type="radio" id="ts-dspuseras_user" name="ts_dspuseras_name" class="mdl-radio__button" 
+                                    value="0"<? if (dspuseras_name == 0) { ?> checked="checked"<? } ?> >
+                                <span class="mdl-radio__label">Username</span>
+							</label>
+						</div>
+					</fieldset>
+
+					<fieldset class="">
+						<legend>Show Duration as</legend>
+						<div class="block">
+							<label class="mdl-radio mdl-js-radio" for="ts-dspdurationas_sec">
+								<input type="radio" id="ts-dspdurationas_sec" name="ts_dspdurationas" class="mdl-radio__button" 
+								    value="s"<? if (dspdurationas == "s") { ?> checked="checked"<? } ?> >
+						        <span class="mdl-radio__label">In Seconds (1h = "3600")</span>
+							</label>
+							<br />
+							<label class="mdl-radio mdl-js-radio" for="ts-dspdurationas_time">
+							    <input type="radio" id="ts-dspdurationas_time" name="ts_dspdurationas" class="mdl-radio__button" 
+							        value="w"<? if (dspdurationas == "w") { ?> checked="checked"<? } ?> >
+						        <span class="mdl-radio__label">As Worktime ("2d 3h 35m 30s")</span>
+							</label>
+						</div>
+					</fieldset>
+                    
+                    <fieldset class="input-switch">
+						<legend>Add comment on update</legend>
+						<label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-2">
+						    <input type="checkbox" id="switch-2" name="issue_update_comment" class="mdl-switch__input" 
+						      value="on"<? if (issue_update_comment == 1) { ?> checked="checked" <? } ?> >
+						    <span class="mdl-switch__label">Adding a comment to the updated Jira issue when using "Update Jira Issues" ("<i>Updated by Project Aid for Jira</i>").</span>
+						</label>
+					</fieldset>
+					<br />
+
+					<div class="block actions">
+						<button type="submit" class="green" id="options--save" disabled>Save</button>
+					</div>
+				</form>
+
+			</div>
+			<!-- END #addon-options-panel -->
+
+		</div>
+		<!-- class="sidebar branding-below" //-->
+	</div>
+	<!-- MDL Tab Container -->
+
+	<div class="sidebar bottom">
+		<a href="#" class="whatsnew">What's New?</a> <span class="gray">Project
+			Aid for Jira v<?= buildNumber ?>
+		</span>
+	</div>
+
+<script>
+/* response messages */
+var message = document.getElementById('response-message');
+var timeout = null;
+
+function hideMessage() {
+  if (timeout)
+    timeout = clearTimeout(timeout);
+  message.style.display = 'none';
+}
+
+function showMessage(text, error, time) {
+  _moveMessageBox();
+  message.innerText = text;
+  message.style.backgroundColor = error ? 'rgb(213,0,0)' : 'rgb(139,195,74)';
+  message.style.display = 'block';
+  if (time)
+    timeout = setTimeout(hideMessage, time);
+}
+/* --- */
+
+/* whats new */
+$('a.whatsnew').each(function() {
+  $(this).click(function(event) {
+    event.preventDefault();
+    google.script.run.menuWhatsNew();
+  });
+});
+
+/* Forms */
+var valid = false;
+var frmAccess = document.forms['access'];
+var frmOptions = document.forms['options'];
+var actionAccess = document.querySelector('#access--save');
+var actionOptions = document.querySelector('#options--save');
+var inputAccess = Array.prototype.slice.call(frmAccess.elements).filter(function(el) {return el.nodeName === 'INPUT';});
+var inputOptions = Array.prototype.slice.call(frmOptions.elements).filter(function(el) {return el.nodeName === 'INPUT';});
+
+/**
+ * @desc moving single message box to current shown form near action button
+ */
+function _moveMessageBox() {
+  var movedEl = $(message);
+  if ($(frmAccess).is(':visible')) {
+    $(actionAccess).parent().before(movedEl);
+  }
+  if ($(frmOptions).is(':visible')) {
+    $(actionOptions).parent().before(movedEl);
+  }
+}
+
+function inputValidatyHandler(elements, action) {
+  var validaty = true;
+  elements.forEach(function(el) {
+    switch (el.name) {
+    case 'jira_url':
+      validaty = validaty && (el.value.indexOf('https://') !== -1);
+      break;
+    default:
+      validaty = validaty
+          && (validaty = el.nodeName !== 'INPUT' || el.value.length > 0);
+      break;
+    }
+    return validaty;
+  });
+  valid = validaty;
+  action.disabled = valid ? false : 'disabled';
+}
+
+function onResponse(response) {
+  var done = response.status === true;
+  hideMessage();
+  showMessage(response.message, !done, 10000);
+  // if (done) ...
+}
+
+// init listeners on forms
+frmAccess.addEventListener('submit', function(e) {
+  if (e)
+    event.preventDefault();
+
+  hideMessage();
+
+  if (!valid)
+    return;
+
+  showMessage('saving ...', false, 1500);
+
+  google.script.run.withSuccessHandler(onResponse).withFailureHandler(
+      onResponse).callbackSettings_saveAccess(this);
+});
+frmOptions.addEventListener('submit', function(e) {
+  if (e)
+    event.preventDefault();
+
+  hideMessage();
+
+  if (!valid)
+    return;
+
+  showMessage('saving ...', false, 1500);
+
+  google.script.run.withSuccessHandler(onResponse).withFailureHandler(
+      onResponse).callbackSettings_saveOptions(this);
+});
+
+inputAccess.forEach(function(el) {
+  el.addEventListener('keyup', inputValidatyHandler.bind(null, inputAccess, actionAccess));
+});
+inputOptions.forEach(function(el) {
+  el.addEventListener('keyup', inputValidatyHandler.bind(null, inputOptions, actionOptions));
+});
+window.addEventListener('load', inputValidatyHandler(inputAccess, actionAccess));
+window.addEventListener('load', inputValidatyHandler(inputOptions, actionOptions));
+
+// deprecation notice
+document
+    .getElementById('jira-url')
+    .addEventListener(
+        'focusout',
+        function(e) {
+          if (this.value.indexOf('https://') == -1) {
+            showMessage('Please use HTTPS for secure connection to your JIRA instance. URL must start with "https://".', true, 8000);
+          }
+        });
+
+// checkbox toggle custom functions on/off with confirmation dialog
+var customFnToggle = $('#switch-1');
+var dialog = document.querySelector('dialog');
+var sidebar = $('.sidebar');
+
+// "Confirm" button
+dialog.querySelector('button[class="action"]').addEventListener('click', function() {
+  dialog.close();
+  sidebar.removeClass('dialog-background');
+  inputValidatyHandler(inputOptions, actionOptions);
+});
+// "Cancel" button
+dialog.querySelector('button[class="cancel"]').addEventListener('click', function() {
+  customFnToggle.parent('label')[0].MaterialSwitch.off();
+  dialog.close();
+  sidebar.removeClass('dialog-background');
+  inputValidatyHandler(inputOptions, actionOptions);
+});
+
+customFnToggle.change(function() {
+  if (!$(this).is(':checked'))
+    return;
+
+  dialog.show();
+  actionOptions.disabled = 'disabled';
+  sidebar.addClass('dialog-background');
+});
+</script>
+</body>
+</html>

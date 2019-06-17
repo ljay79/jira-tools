@@ -32,7 +32,7 @@ function menuUpdateJiraIssues() {
     .setHeight(360)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
-  SpreadsheetApp.getUi().showModalDialog(dialog, 'Update Jira Issues (BETA)');
+  SpreadsheetApp.getUi().showModalDialog(dialog, '(BETA) Update Jira Issues');
 }
 
 /**

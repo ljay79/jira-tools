@@ -86,6 +86,9 @@ function initDefaults() {
   if (null == UserStorage.getValue('dspdurationas'))
     UserStorage.setValue('dspdurationas', "w");
 
+  if (null == UserStorage.getValue('issue_update_comment'))
+    UserStorage.setValue('issue_update_comment', 1);
+
   // Jira onDemand or Server
   var server_type = getCfg_('server_type');
   if (server_type == null) server_type = 'onDemand';
@@ -99,8 +102,9 @@ function initDefaults() {
  * @desc Helper for our Settings Dialogs HTML.
  * @return {object} 
  */
-function getServerCfg() {
+function getAddonConfig_() {
   return {
+    buildNumber: BUILD,
     available: getCfg_('available'),
     url: getCfg_('jira_url'),
     username: getCfg_('jira_username'),
@@ -108,34 +112,11 @@ function getServerCfg() {
     custom_fn_enabled: getCfg_('custom_fn_enabled') || 0,
     workhours: UserStorage.getValue('workhours'),
     dspuseras_name: UserStorage.getValue('dspuseras_name'),
-    dspdurationas: UserStorage.getValue('dspdurationas')
+    dspdurationas: UserStorage.getValue('dspdurationas'),
+    issue_update_comment: UserStorage.getValue('issue_update_comment') || 0
   };
 }
 
-
-/**
- * @desc Save Jira server settings, provided in dialog form and perform 
- *     a connection test to Jira api.
- * @param jsonFormData {object}  JSON Form object of all form values
- * @return {object} Object({status: [boolean], response: [string]})
- */
-function saveSettings(jsonFormData) {
-  var url = trimChar(jsonFormData.jira_url, "/");
-  setCfg_('available', false);
-  setCfg_('jira_url', url);
-  setCfg_('jira_username', jsonFormData.jira_username);
-  setCfg_('jira_password', jsonFormData.jira_password);
-  setCfg_('custom_fn_enabled', (jsonFormData.custom_fn_enabled == 'on') ? 1 : 0);
-  UserStorage.setValue('workhours', jsonFormData.ts_workhours);
-  UserStorage.setValue('dspuseras_name', parseInt(jsonFormData.ts_dspuseras_name));
-  UserStorage.setValue('dspdurationas', jsonFormData.ts_dspdurationas);
-
-  var test = testConnection();
-
-  setCfg_('server_type', (url.indexOf('atlassian.net') == -1) ? 'server' : 'onDemand');
-
-  return {status: test.status, message: test.response};
-}
 
 /**
  * Delete entire user properties - for testing only

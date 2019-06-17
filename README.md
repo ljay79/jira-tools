@@ -26,6 +26,11 @@ No manual status update copy&paste anymore.
 
 [Development](#development)
 
+[Contributing](#contributing)
+
+[Thanks](#thanks)
+
+
 # Install / Get started
 * Open up your chrome browser
 * Open or create a Google Sheet
@@ -47,10 +52,6 @@ In fact, this add-on does not execute anything while the sheet is closed or not 
 
 `Connect to an external service`
 Required for establishing connection to the Jira RESTful API to fetch your Jira issue details when requested.
-
-`Send email as you`
-Send email that appears to have been sent by you (e.g., from your email address).
-This is necessary only when you submit our Feedback form inside the Add-on.
 
 `Publish this application as a web app or a service that may share your data`
 Implied when publishing this add-on as a google sheet add-on.
@@ -553,3 +554,11 @@ git commit
 git push
 ```
 
+# Contributing
+Please [create a new GitHub issue](https://github.com/ljay79/jira-tools/issues/new) for any feature requests, bugs, or documentation improvements.
+
+Where possible, please also [submit a pull request](https://help.github.com/en/articles/creating-a-pull-request-from-a-fork) for the change.
+
+# Thanks
+I'd like to thank [Daniel Kulbe](https://github.com/DanielKulbe) who provided a lot of the initial UI development and [Paul Lemon](https://github.com/paul-lemon/) for extensive contribution to the development environment as well as the BETA functionality for "Update Jira issues".
+Also thanks to all contributors that extended "Project Aif for Jira" with new functionality.

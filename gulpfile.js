@@ -133,10 +133,14 @@ gulp.task('un-google', function (done) {
  * the src folder
  */
 gulp.task('copy-changed-pulled-code', function (done) {
-  return gulp
-    .src(["dist/pull/**/*", "dist/pull/**/.*","!dist/pull/environmentConfiguration.gs"])
+  var stream = gulp
+    .src(["dist/pull/**/*.html", "dist/pull/**/*.gs", "dist/pull/**/*.json", "dist/pull/**/.*","!dist/pull/environmentConfiguration.gs"])
     .pipe(changed('src'))
-    .pipe(gulp.dest('src'))
+    .pipe(gulp.dest('src'));
+
+  stream.on('end', function () {
+    done();
+  });
 });
 
 gulp.task('lint', (done) => {

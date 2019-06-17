@@ -395,7 +395,7 @@ function unifyIssueAttrib(attrib, data) {
         break;
       case 'resolution':
         resp = {
-          value: data.fields.resolution.name || '',
+          value: data.fields.resolution ? (data.fields.resolution.name || '') : '',
           // #206
           //format: '@[green]'
         };
@@ -421,6 +421,7 @@ function unifyIssueAttrib(attrib, data) {
       case 'assignee':
       case 'creator':
       case 'reporter':
+        // see: https://ecosystem.atlassian.net/browse/ACJIRA-1510
         if (data.fields[attrib] != null && data.fields[attrib] != undefined) {
           resp = {
             value: (UserStorage.getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',

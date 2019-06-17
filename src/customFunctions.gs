@@ -1,7 +1,6 @@
 // Node required code blockconst 
 const getCfg_ = require("./settings.gs").getCfg_;
 const setCfg_ = require("./settings.gs").setCfg_;
-
 // End of Node required code block
 
 /**
@@ -28,12 +27,12 @@ function JST_EPICLABEL(TicketId) {
   var response  = {};
 
   if(TicketId == '') {
-    throw new Error("{TicketId} can not be empty.");
+    throw new CustomFunctionErrorException("{TicketId} can not be empty.");
   }
 
   if(!EpicField.isUsable()) {
     debug.error("epicField seems not be configured: %s", EpicField.getJson());
-    throw new Error("Please configure your Jira Epic field first. Go to 'Project Aid for Jira' -> 'Configure custom fields'");
+    throw new CustomFunctionErrorException("Please configure your Jira Epic field first. Go to 'Project Aid for Jira' -> 'Configure custom fields'");
   }
 
   response = request.call('issueStatus', {
@@ -50,7 +49,7 @@ function JST_EPICLABEL(TicketId) {
     return value;
   } else {
     debug.error("In JST_EPICLABEL; Response %s", response);
-    throw new Error(response.respData.errorMessages.join(",") || response.respData.errorMessages);
+    throw new CustomFunctionErrorException(response.respData.errorMessages.join(",") || response.respData.errorMessages);
   }
 }
 
@@ -85,7 +84,7 @@ function JST_getTotalForSearchResult(JQL) {
     if (response.statusCode == 401) {
       msg = msg + ' for Jira user [' + getCfg_('jira_username') + ']';
     }
-    throw new Error("[" + response.statusCode + "] - " + msg + " - JQL: " + JQL);
+    throw new CustomFunctionErrorException("[" + response.statusCode + "] - " + msg + " - JQL: " + JQL);
   }
 }
 
@@ -104,18 +103,18 @@ function JST_search(JQL, Fields, Limit, StartAt) {
 
   // - checks - 
   if (undefined == JQL || JQL == '') {
-    throw new Error("{JQL} can not be empty.");
+    throw new CustomFunctionErrorException("{JQL} can not be empty.");
   }
 
   if (undefined == Fields || Fields == '') {
-    throw new Error("{Fields} can not be empty.");
+    throw new CustomFunctionErrorException("{Fields} can not be empty.");
   } else if(typeof Fields !== 'string') {
-    throw new Error("{Fields} must be a string. A comma separated list of JIRA field names.");
+    throw new CustomFunctionErrorException("{Fields} must be a string. A comma separated list of JIRA field names.");
   }
 
   Limit = parseInt(Limit) || 1;
   if (Limit > 100) {
-    throw new Error("{Limit} must be between 1 and 100.");
+    throw new CustomFunctionErrorException("{Limit} must be between 1 and 100.");
   }
   
   StartAt = parseInt(StartAt) || 0;
@@ -169,7 +168,7 @@ function JST_search(JQL, Fields, Limit, StartAt) {
     if (response.statusCode == 401) {
       msg = msg + ' for Jira user [' + getCfg_('jira_username') + ']';
     }
-    throw new Error("[" + response.statusCode + "] - " + msg);
+    throw new CustomFunctionErrorException("[" + response.statusCode + "] - " + msg);
   }
 }
 
@@ -198,6 +197,9 @@ function customFunctionAllowed_() {
   if (!customFunctionsEnabled_()) {
     throw new Error("The document owner (you) must enable custom functions. Open 'Add-ons > Project Aid for Jira > Settings' and toggle 'Custom Functions' to enabled. If you are not the document owner, ask him to enable custom functions.");
   }
+
+  // no return value; throws Error is feature is suspended
+  customFunctionsSuspended_();
 }
 
 /**
@@ -206,6 +208,85 @@ function customFunctionAllowed_() {
  */
 function customFunctionsEnabled_() {
   return (getCfg_('custom_fn_enabled') == 1);
+}
+
+
+/**
+ * @desc Custom Error Exception handler. Does same as Error just implemented a error counter.
+ */
+function CustomFunctionErrorException(message) {
+  this.message = message;
+  this._countHandler();
+
+  // Use V8's native method if available, otherwise fallback
+  if ("captureStackTrace" in Error)
+      Error.captureStackTrace(this, CustomFunctionErrorException);
+  else
+      this.stack = (new Error()).stack;
+}
+
+CustomFunctionErrorException.prototype = Object.create(Error.prototype);
+CustomFunctionErrorException.prototype.name = "JST_Error";
+CustomFunctionErrorException.prototype.constructor = CustomFunctionErrorException;
+CustomFunctionErrorException.prototype._countHandler = function() {
+  var docProps = CacheService.getDocumentCache();
+  var key = 'CUSTOM_FUNCTIONS_ERROR_COUNT';
+  var count = docProps.get(key) || 0;
+  docProps.put(key, ++count, 60*60);
+};
+
+
+/**
+ * @TODO: Not activated yet - soft launch with logging before lauching such critical code
+ * @desc Check for CustomFunctions Error count and decide to suspend any further calls for a while or not.
+ * @throws Error
+ * @return void
+ */
+function customFunctionsSuspended_() {
+  var docProps   = CacheService.getDocumentCache();
+  var key_count = 'CUSTOM_FUNCTIONS_ERROR_COUNT';
+  var key_time  = 'CUSTOM_FUNCTIONS_ERROR_TIME';
+  var count     = docProps.get(key_count) || 0;
+  var now       = new Date();
+  var _timeUntil = docProps.get(key_time);
+  var timeUntil = new Date();
+
+  console.info('customFunctionsSuspended_(): Counter is at: %s', count);
+
+  if (_timeUntil != null) {
+    // suspension time is set, convert to Date object
+    timeUntil.setTime(_timeUntil);
+  }
+
+  var timeUntilSeconds = Math.round(timeUntil.getTime() / 1000);
+  var nowSeconds       = Math.round(now.getTime() / 1000);
+
+  if (timeUntilSeconds > (nowSeconds+3)) {
+    var _delay_seconds = timeUntilSeconds - nowSeconds;
+    var _msg = "Suspension of custom functions for about " + _delay_seconds + " seconds because of to many errors! Please correct all your custom function calls in this document and wait before re-trying.";
+    console.info("customFunctionsSuspended_():" + _msg + " Now: %s < Until: %s", now.toString(), timeUntil.toString());
+    //@TODO: throw new Error(_msg); // NOT YET ACTIVE
+  }
+
+  // else
+  if (count >= 100) {
+    // set suspension +300s
+    console.info('customFunctionsSuspended_(): ... setting 300s suspension!');
+    docProps.put(key_time, now.getTime() + (300*1000));
+
+    // reset error counter
+    docProps.put(key_count, 0);
+
+  } else if (count >= 25 && count < 30) {
+    // set suspension +300s
+    console.info('customFunctionsSuspended_(): ... setting 60s suspension!');
+    docProps.put(key_time, now.getTime() + (60*1000));
+
+  } else if (count >= 10 && count < 15) {
+    // set suspension +30s
+    console.info('customFunctionsSuspended_(): ... setting 30s suspension!');
+    docProps.put(key_time, now.getTime() + (30*1000));
+  }
 }
 
 

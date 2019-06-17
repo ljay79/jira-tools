@@ -124,6 +124,7 @@ InsertIssueTable_Controller_ = {
           
           // force sidebar update (refreshTableSchedule)
           UserStorage.setValue('refreshIssueTableforceSidebarReset', true);
+          RefreshIssueTable_Controller_.sidebar();
         }
       }
     };
@@ -220,6 +221,11 @@ function TriggerIssueTableModification_(e) {
   debug.time('[TriggerIssueTableModification_]');
   debug.log('[TriggerIssueTableModification_] - e:  %s', JSON.stringify(e));
 
+  if (e && e.authMode == ScriptApp.AuthMode.NONE) {
+    debug.timeEnd('[TriggerIssueTableModification_]');
+    return;
+  }
+
   var IssueTable = IssueTableIndex_.getTableByCoord(e.range.getSheet().getSheetId(), e.range);
   if (!IssueTable) {
     debug.timeEnd('[TriggerIssueTableModification_]');
@@ -257,6 +263,10 @@ function TriggerIssueTableModification_(e) {
         'Changes in this issue table may prevent "Refresh IssueTable".',
         ui.ButtonSet.OK);
     }
+    
+    try {
+      clearOldWarnings_();
+    } catch(e){}
 
   } else {
     debug.log('[TriggerIssueTableModification_] DONT show warning: %ss elapsed from %s', (timeNow - lastWarningTime)/1000, warningSuspendSeconds/1000);

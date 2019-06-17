@@ -26,7 +26,9 @@ var restMethods = {
     'search'        : {method: '/search'}, // POST
     'myFilters'     : {method: '/filter/my', queryparams: {includeFavourites: 'true'}},
 
-    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'%'}},
+    // https://SITENAME.atlassian.net/rest/api/2/user/search?startAt=0&maxResults=1000&query=
+    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:''}},
+    'userSearchV2'  : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, query:''}},
     'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
     'field'         : {method: '/field'}
   },
@@ -42,7 +44,7 @@ var restMethods = {
     // server api doesnt support /filter/my
     'myFilters'     : {method: '/filter/favourite', queryparams: {includeFavourites: 'true'}},
 
-    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'%'}},
+    'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'.'}},
     'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
     'field'         : {method: '/field'}
   }
@@ -69,7 +71,8 @@ var httpErrorCodes = {
 };
 
 /**
- * Test JIRA API connection with provided settings.
+ * @desc Test JIRA API connection with provided settings.
+ * @TODO Doesnt test authentification yet
  * @return {object}  Object({status:[boolean], response:[string]})
  */
 function testConnection() {

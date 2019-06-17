@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/custom.css?b133">
+<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/custom.css?v=b134">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
@@ -16,7 +16,7 @@
       <button class="green">Create new IssueTable</button>
     </div>
 
-    <div class="loader">Loading ...</div>
+    <div class="loader" id="loader">Loading ...</div>
 
     <div id="table-container"></div>
 
@@ -27,13 +27,13 @@
         Menu: Add-ons > Project Aid for Jira > List issues from filter
       </p>
       <div class="tip-footer">
-        <a href="https://github.com/ljay79/jira-tools/tree/master#refresh-issuetable">Read more</a>
+        <a target="_blank" href="https://github.com/ljay79/jira-tools/tree/master#refresh-issuetable">Read more</a>
       </div>
     </div>
   </div>
 
   <div class="sidebar bottom">
-    <a href="#" class="feedback-link">Leave feedback</a>
+    <a href="#" class="whatsnew">What's New?</a>
     <span class="gray">Project Aid for Jira v<?= buildNumber ?></span>
   </div>
 
@@ -58,23 +58,23 @@
     <span class="material-icons orange600">info</span>
     <div class="tooltiptext tooltip-bottom">
       <h4>Filter has changed!</h4>
-      <p>The JQL of that Jira filter has changed. <a class="view-filter" href="#">View in Jira</a></p>
+      <p>The JQL of that Jira filter has changed. <a target="_blank" class="view-filter" href="#">View in Jira</a></p>
     </div>
   </div>
   <!-- END: Template //-->
 
   <script>
       var box_tip = $('#box-tip');
-      var loading = $('.loader');
+      var loading = $('#loader');
       var issueTableContainer = $('#table-container');
       var table_element_tpl = $('#table-element-template');
       var warning_tpl = $('#filter-warning-template');
       var pollingSuspended = false;
 
-      $('a.feedback-link').each(function() {
+      $('a.whatsnew').each(function() {
         $(this).click(function(event){
           event.preventDefault();
-          leaveFeedback();
+          google.script.run.menuWhatsNew();
         });
       });
 
@@ -118,7 +118,6 @@
       }
 
       function onReloadSidebar(response) {
-        loading.removeClass('loader').hide();
         issueTableContainer.empty();
 
         if (response.tables.length > 0) {
@@ -153,10 +152,6 @@
         pollingSuspended = false;
       }
 
-      function leaveFeedback() {
-        google.script.run.callbackFeedback_getDialog();
-      }
-
       // create IssueTable
       $('.create-box > :button.green').click(function() {
         var that = this;
@@ -178,7 +173,7 @@
       });
 
       /**
-       * Poll every 1.5 second to check for changes
+       * Poll every 2.0 second to check for changes
        * in which case we update the sidebar
        */
       function poll(interval) {
@@ -225,6 +220,7 @@
        * @return void
        */
       function handleActiveSheet(response) {
+        loading.hide();
         if (currentActiveSheetId != response.sheetId || response.currentActiveCellValue != currentActiveCellValue) {
           // current active sheet changed OR the cell value/active cell changed
           currentActiveSheetId = response.sheetId;
