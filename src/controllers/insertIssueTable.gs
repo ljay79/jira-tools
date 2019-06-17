@@ -6,7 +6,6 @@
  * @desc Wrapper: Dialog to choose issues filter
  */
 function menuInsertIssueFromFilter() {
-  RefreshIssueTable_Controller_.sidebar();
   InsertIssueTable_Controller_.dialogOpen();
 }
 
@@ -125,6 +124,7 @@ InsertIssueTable_Controller_ = {
           
           // force sidebar update (refreshTableSchedule)
           UserStorage.setValue('refreshIssueTableforceSidebarReset', true);
+          RefreshIssueTable_Controller_.sidebar();
         }
       }
     };

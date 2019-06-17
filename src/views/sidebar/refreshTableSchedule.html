@@ -16,7 +16,7 @@
       <button class="green">Create new IssueTable</button>
     </div>
 
-    <div class="loader">Loading ...</div>
+    <div class="loader" id="loader">Loading ...</div>
 
     <div id="table-container"></div>
 
@@ -65,7 +65,7 @@
 
   <script>
       var box_tip = $('#box-tip');
-      var loading = $('.loader');
+      var loading = $('#loader');
       var issueTableContainer = $('#table-container');
       var table_element_tpl = $('#table-element-template');
       var warning_tpl = $('#filter-warning-template');
@@ -118,7 +118,6 @@
       }
 
       function onReloadSidebar(response) {
-        loading.removeClass('loader').hide();
         issueTableContainer.empty();
 
         if (response.tables.length > 0) {
@@ -174,7 +173,7 @@
       });
 
       /**
-       * Poll every 1.5 second to check for changes
+       * Poll every 2.0 second to check for changes
        * in which case we update the sidebar
        */
       function poll(interval) {
@@ -221,6 +220,7 @@
        * @return void
        */
       function handleActiveSheet(response) {
+        loading.hide();
         if (currentActiveSheetId != response.sheetId || response.currentActiveCellValue != currentActiveCellValue) {
           // current active sheet changed OR the cell value/active cell changed
           currentActiveSheetId = response.sheetId;
