@@ -44,16 +44,20 @@ Explanation of the different privileges, this add-on will ask your permission fo
 Required to change and add Jira issue information within the active sheet.
 
 `Display and run third-party web content in prompts and sidebars inside Google applications`
+> https://www.googleapis.com/auth/script.container.ui
 Implied when using CSS style sheets from google (gstatic.com) within any dialog window and when executing Jira API requests.
 
 `Allow this application to run when you are not present`
-Fault. This permission is actually not used at all, but triggered by yet unknown word within the code. Will hopefully be not necessary in a sonner release.
-In fact, this add-on does not execute anything while the sheet is closed or not implicitly requested by the user.
+> https://www.googleapis.com/auth/script.scriptapp
+Used for automations / triggers. Ie: Check automatically for outdated issue tables meta data in a sheet.
+Triggers is also used to monitor changes in IssueTables to warn you before overwriting them unintended.
 
 `Connect to an external service`
+> https://www.googleapis.com/auth/script.external_request
 Required for establishing connection to the Jira RESTful API to fetch your Jira issue details when requested.
 
 `Publish this application as a web app or a service that may share your data`
+> https://www.googleapis.com/auth/script.webapp.deploy
 Implied when publishing this add-on as a google sheet add-on.
 NO data is shared with any third-party other then your google sheet and the used Jira instance.
 
