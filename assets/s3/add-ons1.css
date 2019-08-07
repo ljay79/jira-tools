@@ -416,3 +416,28 @@ input + input {
 .form-group label + textarea {
   display: block;
 }
+
+/* unset add-ons1 styles for material-design-lite */
+input.mdl-textfield__input {
+  height: inherit; */
+  background: 0 0;
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,.12);
+  color: inherit;
+  box-sizing: border-box;
+  font-size: 13px;
+  font-family: "Helvetica","Arial",sans-serif;
+  font-weight: normal;
+  margin: 0;
+  padding: 4px 0;
+  color: #000;
+}
+
+.getmdl-select .mdl-menu__container .mdl-menu .mdl-menu__item {
+  font-size: 13px;
+  padding: 0 10px;
+  height: 24px;
+  line-height: 24px;
+}
+
+/* --- */

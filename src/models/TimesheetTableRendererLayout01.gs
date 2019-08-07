@@ -1,153 +1,13 @@
-/* Worklog Sheet Table(s) */
-/*function test() {
-  createWorklog({
-    'wlAuthorName': 'Jens Rosemeier',
-    'wlAuthorU'  : 'jrosemeier',
-    'wlStartDate': '2017-07-30',
-    'wlEndDate'  : '2017-08-05'
-  });
-}*/
+// Node required code block
 
+// End of Node required code block
 
 /**
- * @desc Form handler for dialogWorklog. Fetch worklog data and create table.
- * @param jsonFormData {object}  JSON Form object of all form values
- * @return void
+ * @file Contains class for rendering jira timesheet tables
  */
-function createWorklog(jsonFormData) {
-  jsonFormData = jsonFormData || {
-    wlAuthorName: undefined,
-    wlAuthorU  : undefined,
-    wlAuthorG  : undefined,
-    wlStartDate: undefined,
-    wlEndDate  : undefined,
-    wlTimeFormat: 1
-  };
-  var response = {status: false, response: ''},
-      wlQuery = '', 
-      wlDateTo = new Date(),
-      wlDateFrom = new Date();
-
-  // filter dates - defaults
-  wlDateFrom.setDate(wlDateTo.getDate() - 7); // from = now() - 7 days
-
-  // from dialog
-  if( jsonFormData.wlStartDate ) {
-    wlDateFrom = new Date(jsonFormData.wlStartDate);
-  }
-  if( jsonFormData.wlEndDate ) {
-    wlDateTo = new Date(jsonFormData.wlEndDate);
-  }
-    
-  var _d = wlDateFrom;
-  if( Date.parse(_d) > Date.parse(wlDateTo) ) {
-    wlDateFrom = wlDateTo;
-    wlDateTo   = _d;
-  }
-  wlQuery += 'worklogDate>="' + wlDateFrom.toISOString().substring(0, 10) +'" ' + 
-    'AND worklogDate<="' + wlDateTo.toISOString().substring(0, 10) + '"';
-
-  if(jsonFormData.wlAuthorG) {
-    wlQuery += ' AND worklogAuthor in membersOf("' + jsonFormData.wlAuthorG + '")';
-  } else {
-    wlQuery += ' AND worklogAuthor="' + jsonFormData.wlAuthorU + '"';
-  }
-  
-  var authorName = jsonFormData.wlAuthorName ? jsonFormData.wlAuthorName : (
-    jsonFormData.wlAuthorG ? jsonFormData.wlAuthorG : jsonFormData.wlAuthorU
-  );
-  
-  /* Get all affected jira issues */
-
-  /* OnSucess, start prepping Timesheet Table and perform subsequent api searches for all worklogs per individual jira issue */
-  var onSuccess = function(resp, status, errorMessage) {
-    debug.log('Issue with worklogs founds: %s !', resp.data.length);
-    debug.log('%s %s %s', JSON.stringify(resp), status, errorMessage);
-
-    if(resp.data.length == 0) {
-      Browser.msgBox("Jira Worklog",
-                     "Apparently there are no issues with worklogs available for \"" + authorName + "\" in the requested time period.", 
-                     Browser.Buttons.OK);
-      return;
-    }
-
-    // prep new TimesheetTable then request actual worklogs
-    var timeSheetTable = new TimesheetTable1({
-      periodFrom: wlDateFrom,
-      periodTo:   wlDateTo
-    });
-    timeSheetTable.setWorktimeFormat( (parseInt(jsonFormData.wlTimeFormat)==1 ? formatTimeDiff : formatWorkhours) );
-    timeSheetTable.addHeader(authorName, 'Time Sheet');
-
-    // foreach jira issue, fetch worklogs and fill sheet row
-    (resp.data || []).forEach(function(issue, index) {
-      debug.log('============= (data || []).forEach() ================='); 
-      debug.log('issue= icon:%s; key:%s; summary:%s; priority:%s ', 
-        unifyIssueAttrib('issuetype', issue),
-        unifyIssueAttrib('key', issue),
-        unifyIssueAttrib('summary', issue),
-        unifyIssueAttrib('priority', issue)
-      );
-
-      // perform worklog request
-      var request = new Request();
-      request.call('worklogOfIssue',{issueIdOrKey: issue.id})
-        .withFailureHandler(function(resp, httpResp, status) {
-          debug.error("Failed to retrieve worklogs for issue with status [%s]!\\n" + resp.errorMessages.join("\\n") + "Response: %s", status, resp);
-
-          // add issue to time report highlighted and with error message as cell note
-          issue.cellNote = {
-              message: resp.errorMessages.join("\\n"), 
-              color: 'red'
-          };
-          timeSheetTable.addRow(issue, []);
-        })
-        .withSuccessHandler(function(resp, httpResp, status) {
-          // we have all logs here for 1 jira issue
-          if(!resp) { return; }
-
-          // get only the data we need and safe sme bytes
-          var worklogs = resp.worklogs.filter(function(wlog) { // get only logs for user we searched for
-            // remove some unused props
-            if(wlog.updateAuthor) wlog.updateAuthor = undefined;
-            if(wlog.author.avatarUrls) wlog.author.avatarUrls = undefined;
-
-            //@TODO: make compatible with worklogs of groups ( memberOf("") )
-            return wlog.author.name === jsonFormData.wlAuthorU;
-          });
-
-          timeSheetTable.addRow(issue, worklogs);
-
-        }); // END: withSuccessHandler()
-      //END: request.call('worklogOfIssue') 
-    });//END: (resp.data || []).forEach()
-
-    // add table footer
-    timeSheetTable.addFooter();
-  }; //END: onSuccess()
-
-  var onFailure = function(resp, status , errorMessage) {
-    debug.error('worklog::onFailure: resp:%s status:%s msg:%s', resp, status, errorMessage);
-    Browser.msgBox("Jira Worklog",
-                   "Failure during request to Jira server.\\nStatus:" + (status||-1) + " \\nMessage:'" + errorMessage + "'", 
-                   Browser.Buttons.OK);
-  };
-
-  // Search API returns max 20 worklogs per issue - we have to get worklog 
-  // indiv. per issue later in iterated requests - see onSuccess handler
-  var search = new IssueSearch(wlQuery);
-  search.setOrderBy('created', 'DESC')
-        .setFields(['id','key','issuetype','priority','status','summary']);
-
-  search.search()
-    .withSuccessHandler(onSuccess)
-    .withFailureHandler(onFailure)
-  ;
-}
-
 
 /**
- * @desc
+ * @desc Creates a new TimesheetTableRenderer_ instance (Default), which is used to insert an timesheet table.
  * @param options {object}  
  *        {
  *          sheet: <active sheet to use for inserting table>,
@@ -156,34 +16,40 @@ function createWorklog(jsonFormData) {
  *          periodInterval: Interval to list period in columns ('day', 'week')
  *          periodFormat: Date format to use for period column headers
  *        }
- * @return {TimesheetTable1}
+ * @return {TimesheetTableRendererLayout01_}
+ * @constructor
  */
-function TimesheetTable1(options) {
-  var sheet, initRange, currentRowIdx = 0, numIssueRows = 0,
-      dataRowFields = ['issuetype', 'key', 'summary', 'priority'],
-      numColumns = 0,
-      periodCfg = {
-        'from'    : null,
-        'to'      : null,
-        'interval': 'day',
-        'format'  : "EEE\n d/MMM"
-      },
-      periodTotals = {}, rowTimesTpl = {},
-      worklogFormatFn = formatTimeDiff;
+function TimesheetTableRendererLayout01_(options) {
+  var that = this, // clear encapsulation of scope's
+    name = 'TimesheetTableRendererLayout01_',
+    sheet, initRange, currentRowIdx = 0, numIssueRows = 0,
+    dataRowFields = ['issuetype', 'key', 'summary', 'priority'],
+    numColumns = 0,
+    periodCfg = {
+      'from'    : null,
+      'to'      : null,
+      'interval': 'day',
+      'format'  : "EEE\n d/MMM"
+    },
+    periodTotals = {}, rowTimesTpl = {},
+    worklogFormatFn = formatTimeDiff;
 
   /**
    * @desc Initialization, validation
+   * @throws Error,ReferenceError
+   * @throws ReferenceError
    */
-  this.init = function(options) {
+  init = function() {
+    debug.log('Init() of %s', that.name);
     sheet         = options.sheet ? options.sheet : getTicketSheet();
     initRange     = sheet.getActiveCell();
     currentRowIdx = initRange.getRow(), currentColIdx = initRange.getColumn();
 
     if ( !options.periodFrom || !isDate(options.periodFrom)) {
-      throw '{periodFrom} in options has to be defined of type Date().';
+      throw new Error('{periodFrom} in options has to be defined of type Date().');
     }
     if ( !options.periodTo || !isDate(options.periodTo)) {
-      throw '{periodTo} in options has to be defined of type Date().';
+      throw new Error('{periodTo} in options has to be defined of type Date().');
     }
 
     periodCfg.from = options.periodFrom;
@@ -207,14 +73,20 @@ function TimesheetTable1(options) {
     // number of columns our table with consist of
     numColumns = dataRowFields.length + Object.keys(periodTotals).length + 1; // count = data cols + periods + 1 row total
   };
+  
+  init();
+
+  /* -------- */
 
   /**
    * @desc Set function to be passed on every worklog time spent. For formatting of time.
    * @param fn {Function}
    * @return {this}    Allow chaining
    */
-  this.setWorktimeFormat = function(fn) {
+  that.setWorktimeFormat = function(fn) {
     worklogFormatFn = fn || formatTimeDiff;
+    
+    return that;
   };
 
   /**
@@ -223,7 +95,7 @@ function TimesheetTable1(options) {
    * @param title {String}     Table title; default:'Time Sheet'
    * @return {this}    Allow chaining
    */
-  this.addHeader = function(author, title) {
+  that.addHeader = function(author, title) {
     title = title || 'Time Sheet';
 
     var values = Array(numColumns-1).fill(''); // empty row of values
@@ -275,14 +147,14 @@ function TimesheetTable1(options) {
     
     SpreadsheetApp.flush();
 
-    return this;
+    return that;
   };
 
   /**
    * @desc Add Table footer
    * @return {this}    Allow chaining
    */
-  this.addFooter = function() {
+  that.addFooter = function() {
     var values = Array(dataRowFields.length-1).fill('');
         values.unshift('Total (' + numIssueRows + ' issues):');
     var formats     = Array(numColumns).fill('bold'),
@@ -320,7 +192,7 @@ function TimesheetTable1(options) {
       sheet.setColumnWidth(c, 70);
     }
 
-    return this;
+    return that;
   }
   
   /**
@@ -329,7 +201,7 @@ function TimesheetTable1(options) {
    * @param worklogs {ArrayOfObjects}    Array of JSON objects from Jira worklog search response
    * @return {this}    Allow chaining
    */
-  this.addRow = function(issue, worklogs) {
+  that.addRow = function(issue, worklogs) {
     var rowTimes    = JSON.parse(JSON.stringify(rowTimesTpl)), // bad, but we want a clone and not a reference
         rowTotal    = 0,
         values      = [],
@@ -402,9 +274,13 @@ function TimesheetTable1(options) {
 
     SpreadsheetApp.flush();
 
-    return this;
+    return that;
   };
 
-    
-  this.init(options);
 }
+
+// Node required code block
+module.exports = {
+  TimesheetTableRendererLayout01_: TimesheetTableRendererLayout01_
+}
+// End of Node required code block
