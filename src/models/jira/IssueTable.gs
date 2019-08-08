@@ -3,7 +3,7 @@ const extend = require('../../jsLib.gs').extend;
 const getSheetById = require('../../jsLib.gs').getSheetById;
 const sheetIdPropertySafe = require('../../jiraCommon.gs').sheetIdPropertySafe;
 var SpreadsheetTriggers_ = require('../SpreadsheetTriggers.gs').SpreadsheetTriggers_;
-var IssueTableRendererDefault_ = require('../IssueTableRendererDefault.gs').IssueTableRendererDefault_;
+var IssueTableRendererDefault_ = require('../renderer/IssueTableRendererDefault.gs').IssueTableRendererDefault_;
 // End of Node required code block
 
 /**
