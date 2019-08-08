@@ -20,8 +20,9 @@
  * @constructor
  */
 function TimesheetTableRendererLayout01_(options) {
+  this.name = 'TimesheetTableRendererLayout01_';
+  this.timezone = SpreadsheetApp.getActive().getSpreadsheetTimeZone();
   var that = this, // clear encapsulation of scope's
-    name = 'TimesheetTableRendererLayout01_',
     sheet, initRange, currentRowIdx = 0, numIssueRows = 0,
     dataRowFields = ['issuetype', 'key', 'summary', 'priority'],
     numColumns = 0,
@@ -40,7 +41,7 @@ function TimesheetTableRendererLayout01_(options) {
    * @throws ReferenceError
    */
   init = function() {
-    debug.log('Init() of %s', that.name);
+    debug.log(this.name + '.Init()');
     sheet         = options.sheet ? options.sheet : getTicketSheet();
     initRange     = sheet.getActiveCell();
     currentRowIdx = initRange.getRow(), currentColIdx = initRange.getColumn();
@@ -73,7 +74,7 @@ function TimesheetTableRendererLayout01_(options) {
     // number of columns our table with consist of
     numColumns = dataRowFields.length + Object.keys(periodTotals).length + 1; // count = data cols + periods + 1 row total
   };
-  
+
   init();
 
   /* -------- */
@@ -83,10 +84,11 @@ function TimesheetTableRendererLayout01_(options) {
    * @param fn {Function}
    * @return {this}    Allow chaining
    */
-  that.setWorktimeFormat = function(fn) {
+  this.setWorktimeFormat = function(fn) {
+    debug.log(this.name + '.setWorktimeFormat()');
     worklogFormatFn = fn || formatTimeDiff;
     
-    return that;
+    return this;
   };
 
   /**
@@ -95,7 +97,8 @@ function TimesheetTableRendererLayout01_(options) {
    * @param title {String}     Table title; default:'Time Sheet'
    * @return {this}    Allow chaining
    */
-  that.addHeader = function(author, title) {
+  this.addHeader = function(author, title) {
+    debug.log(this.name + '.addHeader()');
     title = title || 'Time Sheet';
 
     var values = Array(numColumns-1).fill(''); // empty row of values
@@ -118,11 +121,10 @@ function TimesheetTableRendererLayout01_(options) {
     // 2. row - sub title
     values = Array(dataRowFields.length-1).fill('');
     values.unshift('Summary for "' + author + '"');
+    
     // attach period head lines
-    var _tz = SpreadsheetApp.getActive().getSpreadsheetTimeZone();
-
     for(var key in periodTotals) {
-      values.push( Utilities.formatDate(new Date(key + 'T00:00:00.000+0000'), _tz, periodCfg.format) );
+      values.push( Utilities.formatDate(new Date(key + 'T00:00:00.000+0000'), this.timezone, periodCfg.format) );
     }
     values.push('Total');
 
@@ -137,7 +139,8 @@ function TimesheetTableRendererLayout01_(options) {
       .setFontWeights([ formats ]);
 
     // all period and total columns to be centered
-    sheet.getRange(currentRowIdx-1, currentColIdx+dataRowFields.length-1, 1, values.length-dataRowFields.length+1).setHorizontalAlignment("center");
+    sheet.getRange(currentRowIdx-1, currentColIdx+dataRowFields.length-1, 1, values.length-dataRowFields.length+1)
+      .setHorizontalAlignment("center");
 
     // set cell widths
     sheet.setColumnWidth(currentColIdx, 30);
@@ -147,14 +150,15 @@ function TimesheetTableRendererLayout01_(options) {
     
     SpreadsheetApp.flush();
 
-    return that;
+    return this;
   };
 
   /**
    * @desc Add Table footer
    * @return {this}    Allow chaining
    */
-  that.addFooter = function() {
+  this.addFooter = function() {
+    debug.log(this.name + '.addFooter()');
     var values = Array(dataRowFields.length-1).fill('');
         values.unshift('Total (' + numIssueRows + ' issues):');
     var formats     = Array(numColumns).fill('bold'),
@@ -192,7 +196,7 @@ function TimesheetTableRendererLayout01_(options) {
       sheet.setColumnWidth(c, 70);
     }
 
-    return that;
+    return this;
   }
   
   /**
@@ -201,7 +205,8 @@ function TimesheetTableRendererLayout01_(options) {
    * @param worklogs {ArrayOfObjects}    Array of JSON objects from Jira worklog search response
    * @return {this}    Allow chaining
    */
-  that.addRow = function(issue, worklogs) {
+  this.addRow = function(issue, worklogs) {
+    debug.log(this.name + '.addRow()');
     var rowTimes    = JSON.parse(JSON.stringify(rowTimesTpl)), // bad, but we want a clone and not a reference
         rowTotal    = 0,
         values      = [],
@@ -237,7 +242,7 @@ function TimesheetTableRendererLayout01_(options) {
 
       values.push(_val);
     });
-    
+
     // add timespent to overall period totals
     for(var key in rowTimes) {
       rowTotal += rowTimes[key];
@@ -274,7 +279,16 @@ function TimesheetTableRendererLayout01_(options) {
 
     SpreadsheetApp.flush();
 
-    return that;
+    return this;
+  };
+
+  /**
+   * @desc onComplete - post creation activity like content sorting.
+   * @return {this}    Allow chaining
+   */
+  this.onComplete = function() {
+    debug.log(this.name + '.onComplete()');
+    return this;
   };
 
 }

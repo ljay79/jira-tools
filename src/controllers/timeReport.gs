@@ -226,6 +226,7 @@ TimeReport_Controller_ = {
 
       // add table footer
       timeSheetRenderer.addFooter();
+      timeSheetRenderer.onComplete();
     }; //END: onSuccess()
 
     var onFailure = function(resp, status , errorMessage) {
