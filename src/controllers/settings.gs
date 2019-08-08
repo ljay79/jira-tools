@@ -79,7 +79,7 @@ Settings_Controller_ = {
    * @return {object} Object({status: [boolean], response: [string]})
    */
   callbackSaveOptions : function (jsonFormData) {
-    debug.log(this.name + '.callbackSaveOptions()');
+    debug.log(this.name + '.callbackSaveOptions(%s)', JSON.stringify(jsonFormData));
 
     setCfg_('custom_fn_enabled', (jsonFormData.custom_fn_enabled == 'on') ? 1 : 0);
     UserStorage.setValue('workhours', jsonFormData.ts_workhours);

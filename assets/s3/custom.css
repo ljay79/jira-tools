@@ -12,13 +12,13 @@
 }
 
 .xdsoft_autocomplete{
-display:inline;
-position:relative;
-word-spacing: normal;
-text-transform: none;
-text-indent: 0px;
-text-shadow: none;
-text-align: start;
+  display:inline;
+  position:relative;
+  word-spacing: normal;
+  text-transform: none;
+  text-indent: 0px;
+  text-shadow: none;
+  text-align: start;
 }
 
 .xdsoft_autocomplete .xdsoft_input{
@@ -237,7 +237,7 @@ fieldset p a:visited {
 
 .sidebar.bottom a.feedback-link, /* obsolete since v1.3.5 */
 .sidebar.bottom a.whatsnew {
-    float: right;
+  float: right;
 }
 
 #box-tip {
@@ -268,9 +268,9 @@ fieldset p a:visited {
 }
 
 .create-box {
-    border-bottom: 1px solid grey;
-    padding: 20px;
-    text-align: center;
+  border-bottom: 1px solid grey;
+  padding: 20px;
+  text-align: center;
 }
 
 .issuetable {
@@ -288,35 +288,35 @@ fieldset p a:visited {
 }
 
 .issuetable .actions {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 .issuetable .actions .action {
-    /* Schedule button appears disabled, feature coming soon */
-    opacity: .5
+  /* Schedule button appears disabled, feature coming soon */
+  opacity: .5
 }
 
 .issuetable .schedule-setup {
-    border: 1px solid grey;
-    padding: 10px;
-    margin: 10px 0;
-    background-color: aliceblue;
-    display: none;
-    font-style: italic;
+  border: 1px solid grey;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: aliceblue;
+  display: none;
+  font-style: italic;
 }
 
 .block2x2 {
-	  width:43%;
+  width:43%;
 }
 
 .block2x2.left {
-	  margin-right:20px;
-	  float:left;
+  margin-right:20px;
+  float:left;
 }
 
 fieldset .block2x2 {
-	  display: inline-block;
-	  width:46%;
+  display: inline-block;
+  width:46%;
 }
 
 .toggle {
@@ -442,3 +442,19 @@ fieldset .block2x2 {
   visibility: visible;
   opacity: 1;
 }
+
+/*!
+ * @homepage https://github.com/CreativeIT/getmdl-select
+ * @license MIT - MIT-LICENSE.txt
+ */
+.getmdl-select{outline:none}
+.getmdl-select .mdl-textfield__input{cursor:pointer}
+.getmdl-select .selected{background-color:#ddd}
+.getmdl-select .mdl-icon-toggle__label{float:right;margin-top:-30px;color:rgba(0,0,0,0.4);transform:rotate(0);transition:transform 0.3s}
+.getmdl-select.is-focused .mdl-icon-toggle__label{color:#3f51b5;transform:rotate(180deg)}
+.getmdl-select .mdl-menu__container{width:100% !important;margin-top:2px}
+.getmdl-select .mdl-menu__container .mdl-menu{width:100%}
+.getmdl-select .mdl-menu__container .mdl-menu .mdl-menu__item{font-size:16px}
+.getmdl-select__fix-height .mdl-menu__container .mdl-menu{overflow-y:auto;max-height:288px !important}
+.getmdl-select__fix-height .mdl-menu.mdl-menu--top-left{bottom:auto;top:0}
+

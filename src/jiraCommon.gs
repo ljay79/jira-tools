@@ -520,6 +520,7 @@ function unifyIssueAttrib(attrib, data) {
         };
         break;
       case 'user':
+      case 'author':
         resp = {
           displayName: data.displayName + (data.active == true ? '' : ' (X)'),
           name: data.name,
