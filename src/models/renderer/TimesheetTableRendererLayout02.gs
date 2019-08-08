@@ -7,15 +7,14 @@
  */
 
 /**
- * @desc Creates a new TimesheetTableRenderer_ instance (Default), which is used to insert an timesheet table.
- * @param options {object}  
- *        {
- *          sheet: <active sheet to use for inserting table>,
- *          periodFrom: Date object of period starting date
- *          periodTo:   Date object of period end date
- *          periodInterval: Interval to list period in columns ('day', 'week')
- *          periodFormat: Date format to use for period column headers
- *        }
+ * @desc Creates a new TimesheetTableRenderer_ instance (Default), which is used
+ *       to insert an timesheet table.
+ * @param options
+ *          {object} { sheet: <active sheet to use for inserting table>,
+ *          periodFrom: Date object of period starting date periodTo: Date
+ *          object of period end date periodInterval: Interval to list period in
+ *          columns ('day', 'week') periodFormat: Date format to use for period
+ *          column headers }
  * @return {TimesheetTableRendererLayout02_}
  * @constructor
  */
@@ -43,32 +42,36 @@ function TimesheetTableRendererLayout02_(options) {
    */
   init = function() {
     debug.log(this.name + '.init()');
-    sheet         = options.sheet ? options.sheet : getTicketSheet();
-    initRange     = sheet.getActiveCell();
+    sheet = options.sheet ? options.sheet : getTicketSheet();
+    initRange = sheet.getActiveCell();
     currentRowIdx = initRange.getRow(), currentColIdx = initRange.getColumn();
-    numColumns    = 7; // number of columns our table with consist of
+    numColumns = 7; // number of columns our table with consist of
 
-    if ( !options.periodFrom || !isDate(options.periodFrom)) {
-      throw new Error('{periodFrom} in options has to be defined of type Date().');
+    if (!options.periodFrom || !isDate(options.periodFrom)) {
+      throw new Error(
+          '{periodFrom} in options has to be defined of type Date().');
     }
-    if ( !options.periodTo || !isDate(options.periodTo)) {
+    if (!options.periodTo || !isDate(options.periodTo)) {
       throw new Error('{periodTo} in options has to be defined of type Date().');
     }
 
     periodCfg.from = options.periodFrom;
     periodCfg.to = options.periodTo;
 
-    if ( options.periodInterval && (options.periodInterval === 'day' || options.periodInterval === 'week')) {
+    if (options.periodInterval
+        && (options.periodInterval === 'day' || options.periodInterval === 'week')) {
       periodCfg.interval = options.periodInterval;
     }
-    periodCfg.format = (options.periodFormat === 'week') ? "'w'w ''yy" : periodCfg.format;
+    periodCfg.format = (options.periodFormat === 'week') ? "'w'w ''yy"
+        : periodCfg.format;
 
     // periods and their sub totals
     var _dateIdx = periodCfg.from, _period;
-    while(_dateIdx <= periodCfg.to) {
+    while (_dateIdx <= periodCfg.to) {
       periodTotals[Utilities.formatDate(_dateIdx, 'UTC', 'yyyy-MM-dd')] = 0; // init total seconds of work
       // add 1 day or 1 week to date
-      _dateIdx = new Date(_dateIdx.setTime(_dateIdx.getTime() + (periodCfg.interval == 'week' ? 7 : 1) * 86400000));
+      _dateIdx = new Date(_dateIdx.setTime(_dateIdx.getTime()
+          + (periodCfg.interval == 'week' ? 7 : 1) * 86400000));
     }
     // set row times tpl
     rowTimesTpl = JSON.parse(JSON.stringify(periodTotals));
@@ -79,9 +82,11 @@ function TimesheetTableRendererLayout02_(options) {
   /* -------- */
 
   /**
-   * @desc Set function to be passed on every worklog time spent. For formatting of time.
-   * @param fn {Function}
-   * @return {this}    Allow chaining
+   * @desc Set function to be passed on every worklog time spent. For formatting
+   *       of time.
+   * @param fn
+   *          {Function}
+   * @return {this} Allow chaining
    */
   this.setWorktimeFormat = function(fn) {
     debug.log(this.name + '.setWorktimeFormat()');
@@ -92,9 +97,11 @@ function TimesheetTableRendererLayout02_(options) {
 
   /**
    * @desc Header of table (2 lines)
-   * @param authorName {String}    Name of author we searched worklogs for
-   * @param title {String}     Table title; default:'Time Sheet'
-   * @return {this}    Allow chaining
+   * @param authorName
+   *          {String} Name of author we searched worklogs for
+   * @param title
+   *          {String} Table title; default:'Time Sheet'
+   * @return {this} Allow chaining
    */
   this.addHeader = function(authorName, title) {
     debug.log(this.name + '.addHeader()');
@@ -118,22 +125,26 @@ function TimesheetTableRendererLayout02_(options) {
       .setFontWeights([ formats ]);
 
     // "Type"+"Priority" column to be centered
-    sheet.getRange(currentRowIdx-1, currentColIdx+1, 1, 1).setHorizontalAlignment('center');
-    sheet.getRange(currentRowIdx-1, currentColIdx+4, 1, 1).setHorizontalAlignment('center');
+    sheet.getRange(currentRowIdx - 1, currentColIdx + 1, 1, 1)
+        .setHorizontalAlignment('center');
+    sheet.getRange(currentRowIdx - 1, currentColIdx + 4, 1, 1)
+        .setHorizontalAlignment('center');
 
     // "Date"+"Effort" col align right
-    sheet.getRange(currentRowIdx-1, currentColIdx, 1, 1).setHorizontalAlignment('right');
-    sheet.getRange(currentRowIdx-1, currentColIdx+values.length-1, 1, 1).setHorizontalAlignment('right');
+    sheet.getRange(currentRowIdx - 1, currentColIdx, 1, 1)
+        .setHorizontalAlignment('right');
+    sheet.getRange(currentRowIdx - 1, currentColIdx + values.length - 1, 1, 1)
+        .setHorizontalAlignment('right');
 
     // set cell widths
     sheet.setColumnWidth(currentColIdx, 100);
-    sheet.setColumnWidth(currentColIdx+1, 35);
-    sheet.setColumnWidth(currentColIdx+2, 80);
-    sheet.setColumnWidth(currentColIdx+3, 240);
-    sheet.setColumnWidth(currentColIdx+4, 20);
-    sheet.setColumnWidth(currentColIdx+5, 120);
-    sheet.setColumnWidth(currentColIdx+6, 100);
-    
+    sheet.setColumnWidth(currentColIdx + 1, 35);
+    sheet.setColumnWidth(currentColIdx + 2, 80);
+    sheet.setColumnWidth(currentColIdx + 3, 240);
+    sheet.setColumnWidth(currentColIdx + 4, 20);
+    sheet.setColumnWidth(currentColIdx + 5, 120);
+    sheet.setColumnWidth(currentColIdx + 6, 100);
+
     SpreadsheetApp.flush();
 
     return this;
@@ -141,7 +152,7 @@ function TimesheetTableRendererLayout02_(options) {
 
   /**
    * @desc Add Table footer
-   * @return {this}    Allow chaining
+   * @return {this} Allow chaining
    */
   this.addFooter = function() {
     debug.log(this.name + '.addFooter()');
@@ -150,11 +161,14 @@ function TimesheetTableRendererLayout02_(options) {
   }
 
   /**
-   * @desc Add individual timesheet/worklog row to table.
-   *       Called for each single issue. Does add multiple rows per issue depending on worklogs.
-   * @param issue {Object}    JSON response object of an jira issue
-   * @param worklogs {ArrayOfObjects}    Array of JSON objects from Jira worklog search response
-   * @return {this}    Allow chaining
+   * @desc Add individual timesheet/worklog row to table. Called for each single
+   *       issue. Does add multiple rows per issue depending on worklogs.
+   * @param issue
+   *          {Object} JSON response object of an jira issue
+   * @param worklogs
+   *          {ArrayOfObjects} Array of JSON objects from Jira worklog search
+   *          response
+   * @return {this} Allow chaining
    */
   this.addRow = function(issue, worklogs) {
     debug.log(this.name + '.addRow()');
@@ -168,13 +182,14 @@ function TimesheetTableRendererLayout02_(options) {
 
     // add timespent to issues period totals
     worklogs.filter(function(worklog) {
-      var _period = Utilities.formatDate(new Date(worklog.started), 'UTC', 'yyyy-MM-dd');
-      if( rowTimes[_period] === undefined ) {
+      var _period = Utilities.formatDate(new Date(worklog.started), 'UTC',
+          'yyyy-MM-dd');
+      if (rowTimes[_period] === undefined) {
         // not interested in this period
         return false;
       }
 
-      if( dataRows[_period] == undefined ) {
+      if (dataRows[_period] == undefined) {
         dataRows[_period] = 0;
       }
 
@@ -184,36 +199,37 @@ function TimesheetTableRendererLayout02_(options) {
     });
 
     // for each period we calculated we generate a row with issue details
-    for( var sumPeriod in dataRows ) {
+    for ( var sumPeriod in dataRows) {
       values = []; // row cell calues
       // date/period in first cell
-      var _humanPeriodStr = Utilities.formatDate(new Date(sumPeriod + 'T00:00:00.000+0000'), this.timezone, periodCfg.format)
+      var _humanPeriodStr = Utilities.formatDate(new Date(sumPeriod
+          + 'T00:00:00.000+0000'), this.timezone, periodCfg.format)
       values.push(_humanPeriodStr);
 
       // add jira issue data to first columns with some custom cell formatters
       dataRowFields.forEach(function(field) {
         var _val = unifyIssueAttrib(field, issue);
         switch (field) {
-          case 'issuetype':
-          case 'priority':
-            _val = '=IMAGE("' + _val.iconUrl + '"; 4; 16; 16)';
-            break;
-          case 'key':
-            _val = '=HYPERLINK("' + _val.link + '";"' + _val.value + '")';
-            break;
-          case 'author':
-            _val = author;
-            break;
-          default:
-            _val = _val.value;
-            break;
+        case 'issuetype':
+        case 'priority':
+          _val = '=IMAGE("' + _val.iconUrl + '"; 4; 16; 16)';
+          break;
+        case 'key':
+          _val = '=HYPERLINK("' + _val.link + '";"' + _val.value + '")';
+          break;
+        case 'author':
+          _val = author;
+          break;
+        default:
+          _val = _val.value;
+          break;
         }
 
         values.push(_val);
       });
 
       // time spent / effort in last cell
-      values.push( worklogFormatFn(dataRows[sumPeriod]) );
+      values.push(worklogFormatFn(dataRows[sumPeriod]));
 
       range = sheet.getRange(currentRowIdx++, currentColIdx, 1, values.length);
       range.clearContent()
@@ -226,7 +242,8 @@ function TimesheetTableRendererLayout02_(options) {
       
       if (issue.cellNote) {
         // cell of summary text; add note and change color
-        range.getCell(1, 4).setNote(issue.cellNote.message||'').setFontColor(issue.cellNote.color);
+        range.getCell(1, 4).setNote(issue.cellNote.message || '').setFontColor(
+            issue.cellNote.color);
       }
 
       ++numIssueRows;
@@ -236,38 +253,42 @@ function TimesheetTableRendererLayout02_(options) {
 
     return this;
   };
-  
+
   /**
    * @desc onComplete - post creation activity like content sorting.
-   * @return {this}    Allow chaining
+   * @return {this} Allow chaining
    */
   this.onComplete = function() {
     debug.log(this.name + '.onComplete()');
 
     var _dataRowStart = initRange.getRow() + 1;
     var _dataColStart = initRange.getColumn();
-    var _dataRowEnd   = currentRowIdx - 1;
-    var _dataColEnd   = _dataColStart + values.length -1;
+    var _dataRowEnd = currentRowIdx - 1;
+    var _dataColEnd = _dataColStart + values.length - 1;
 
-    var range = sheet.getRange(_dataRowStart, _dataColStart, _dataRowEnd-_dataRowStart, _dataColEnd-_dataColStart);
+    var range = sheet.getRange(_dataRowStart, _dataColStart, _dataRowEnd
+        - _dataRowStart, _dataColEnd - _dataColStart);
     range.sort(_dataColStart);
 
     // "Type"+"Priority" column to be centered
-    sheet.getRange(_dataRowStart, _dataColStart+1, _dataRowEnd-_dataRowStart+1, 1).setHorizontalAlignment('center');
-    sheet.getRange(_dataRowStart, _dataColStart+4, _dataRowEnd-_dataRowStart+1, 1).setHorizontalAlignment('center');
+    sheet.getRange(_dataRowStart, _dataColStart + 1,
+        _dataRowEnd - _dataRowStart + 1, 1).setHorizontalAlignment('center');
+    sheet.getRange(_dataRowStart, _dataColStart + 4,
+        _dataRowEnd - _dataRowStart + 1, 1).setHorizontalAlignment('center');
 
     // "Date"+"Effort" col align right
-    sheet.getRange(_dataRowStart, _dataColStart, _dataRowEnd-_dataRowStart+1, 1).setHorizontalAlignment('right');
-    sheet.getRange(_dataRowStart, _dataColEnd, _dataRowEnd-_dataRowStart+1, 1).setHorizontalAlignment('right');
+    sheet.getRange(_dataRowStart, _dataColStart,
+        _dataRowEnd - _dataRowStart + 1, 1).setHorizontalAlignment('right');
+    sheet.getRange(_dataRowStart, _dataColEnd, _dataRowEnd - _dataRowStart + 1,
+        1).setHorizontalAlignment('right');
 
     return this;
   };
 
 }
 
-
 // Node required code block
 module.exports = {
-  TimesheetTableRendererLayout02_: TimesheetTableRendererLayout02_
+  TimesheetTableRendererLayout02_ : TimesheetTableRendererLayout02_
 }
 // End of Node required code block
