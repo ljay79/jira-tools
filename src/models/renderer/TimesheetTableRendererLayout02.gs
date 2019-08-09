@@ -261,26 +261,23 @@ function TimesheetTableRendererLayout02_(options) {
   this.onComplete = function() {
     debug.log(this.name + '.onComplete()');
 
-    var _dataRowStart = initRange.getRow() + 1;
-    var _dataColStart = initRange.getColumn();
-    var _dataRowEnd = currentRowIdx - 1;
-    var _dataColEnd = _dataColStart + values.length - 1;
+    var _dataRowStart = initRange.getRow() + 1,
+      _dataColStart = initRange.getColumn(),
+      _dataRowEnd = currentRowIdx - 1,
+      _dataColEnd = _dataColStart + values.length - 1,
+      _numRows    = _dataRowEnd - _dataRowStart + 1,
+      _numCols    = _dataColEnd - _dataColStart + 1;
 
-    var range = sheet.getRange(_dataRowStart, _dataColStart, _dataRowEnd
-        - _dataRowStart, _dataColEnd - _dataColStart);
-    range.sort(_dataColStart);
+    // sort ASC by 1st columns ("Date")
+    sheet.getRange(_dataRowStart, _dataColStart, _numRows, _numCols).sort(_dataColStart);
 
     // "Type"+"Priority" column to be centered
-    sheet.getRange(_dataRowStart, _dataColStart + 1,
-        _dataRowEnd - _dataRowStart + 1, 1).setHorizontalAlignment('center');
-    sheet.getRange(_dataRowStart, _dataColStart + 4,
-        _dataRowEnd - _dataRowStart + 1, 1).setHorizontalAlignment('center');
+    sheet.getRange(_dataRowStart, _dataColStart + 1, _numRows, 1).setHorizontalAlignment('center');
+    sheet.getRange(_dataRowStart, _dataColStart + 4, _numRows, 1).setHorizontalAlignment('center');
 
     // "Date"+"Effort" col align right
-    sheet.getRange(_dataRowStart, _dataColStart,
-        _dataRowEnd - _dataRowStart + 1, 1).setHorizontalAlignment('right');
-    sheet.getRange(_dataRowStart, _dataColEnd, _dataRowEnd - _dataRowStart + 1,
-        1).setHorizontalAlignment('right');
+    sheet.getRange(_dataRowStart, _dataColStart, _numRows, 1).setHorizontalAlignment('right');
+    sheet.getRange(_dataRowStart, _dataColEnd, _numRows, 1).setHorizontalAlignment('right');
 
     return this;
   };
