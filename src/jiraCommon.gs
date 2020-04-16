@@ -263,6 +263,9 @@ function unifyIssueAttrib(attrib, data) {
   var resp = { value: '' };
   // TODO: We should remove this try catch - needs alot of testing though to get to that.
   try { // no error handling, always return a valid object
+    
+    var _dataEmailAdressPriv = data.emailAddress || ''; 
+    _dataEmailAdressPriv = _dataEmailAdressPriv.replace(/(.*@)([a-z]{0,3}).*/, "$1$2***");
 
     // custom fields first
     if (attrib.substring(0, 12) == 'customfield_') {
@@ -346,17 +349,24 @@ function unifyIssueAttrib(attrib, data) {
             // @TODO: type 'user', 'array|user', 'group',... require some refractoring - to much duplicated logic and code
 
             // regular user object or custom fields userobject like "Profields"
-            // {"value": {"directoryId": <number>,"emailAddress": "<string>", "active": <bool>, "username": "<string>", "key": "<string>","avatarUrls": {},"displayName": "<string>"}}
+            // {"value": {"directoryId": <number>,"emailAddress": "<string>", "active": <bool>, "accountId": "<string>", "key": "<string>","avatarUrls": {},"displayName": "<string>"}}
             var _value = data.fields[attrib] ? (data.fields[attrib].hasOwnProperty('value') ? data.fields[attrib].value : data.fields[attrib]) : {};
-            var _user = extend({displayName:'', avatarUrls:[]}, _value);
+            var _user = extend({
+              displayName: '',
+              avatarUrls: [],
+              emailAddress: null,
+              accountId: null
+            }, _value);
+
             resp = {
-              value: (UserStorage.getValue('dspuseras_name') == 1 ? _user.displayName : (_user.name || _user.username)) || 'Unknown',
-              avatarUrls: _user.avatarUrls['24x24'] || ''
+              value: _user.displayName || 'Unknown',
+              avatarUrls: _user.avatarUrls['24x24'] || '',
+              accountId: _user.accountId
             };
             break;
           case 'array|user':
             resp.value = data.fields[attrib].map(function (el) {
-              return ((UserStorage.getValue('dspuseras_name') == 1 ? el.displayName : el.name) || 'Unknown');
+              return (el.displayName || 'Unknown');
             }).join(', ');
             break;
           case 'group':
@@ -430,14 +440,14 @@ function unifyIssueAttrib(attrib, data) {
         // see: https://ecosystem.atlassian.net/browse/ACJIRA-1510
         if (data.fields[attrib] != null && data.fields[attrib] != undefined) {
           resp = {
-            value: (UserStorage.getValue('dspuseras_name') == 1 ? data.fields[attrib].displayName : data.fields[attrib].name) || 'Unknown',
+            value: data.fields[attrib].displayName || 'Unknown',
             avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
           };
         } else {
           resp = {
             value:"",
             avatarUrls: ""
-          }
+          };
         }
         break;
       case 'priority':
@@ -523,8 +533,9 @@ function unifyIssueAttrib(attrib, data) {
       case 'author':
         resp = {
           displayName: data.displayName + (data.active == true ? '' : ' (X)'),
-          name: data.name,
+          name: _dataEmailAdressPriv,
           emailAddress: data.emailAddress,
+          accountId: data.accountId || null,
           active: data.active,
           value: data.displayName,
           format: "@"
@@ -542,7 +553,8 @@ function unifyIssueAttrib(attrib, data) {
       case 'userMin':
         resp = {
           displayName: data.displayName + (data.active == true ? '' : ' (X)'),
-          name: data.name,
+          name: _dataEmailAdressPriv,
+          accountId: data.accountId,
           active: data.active,
         };
         break;

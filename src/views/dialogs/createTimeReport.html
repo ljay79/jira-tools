@@ -64,7 +64,7 @@ button.pika-button {
       <legend>Select User</legend>
 
       <div class="block">
-        <input type="hidden" name="wlUser" id="wlUser" value="">
+        <input type="hidden" name="wlAuthorAccountId" id="wlAuthorAccountId" value="">
         <input type="hidden" name="wlAuthorName" id="wlAuthorName" value="">
         <input type="text" id="search" placeholder="Loading ..." class="block is-loading" style="width: 298px">
       </div>
@@ -164,7 +164,7 @@ button.pika-button {
               title + '</div>';
           }
         }).on('selected.xdsoft',function(e, el) {
-          frmWorklog.wlUser.value = el.name;
+          frmWorklog.wlAuthorAccountId.value = el.accountId;
           frmWorklog.wlAuthorName.value = el.displayName;
           inputValidatyHandler();
         });
@@ -183,7 +183,7 @@ button.pika-button {
         if (!valid) return;
 
         var formData = {
-          wlAuthorU: frmWorklog.wlUser.value,
+          wlAuthorAccountId: frmWorklog.wlAuthorAccountId.value,
           wlAuthorName: frmWorklog.wlAuthorName.value,
           wlStartDate: frmWorklog.wlStartDate.value,
           wlEndDate: frmWorklog.wlEndDate.value,
@@ -205,18 +205,18 @@ button.pika-button {
        * @return void
        */
       function inputValidatyHandler() {
-        valid = frmWorklog.wlUser.value.length > 1;
+        valid = frmWorklog.wlAuthorAccountId.value.length > 1;
 
         action.disabled = valid ? false : 'disabled';
       }
 
       /**
-       * We do allow user to enter username without autocomplete selection.
+       * We do allow user to enter user's accountId without autocomplete selection.
        * For this purpose we need to sync the entered value in the search field
        * with the hidden data fields, which are used for the callback.
        */
       function syncHiddenFields() {
-        frmWorklog.wlUser.value = frmWorklog.wlAuthorName.value = search.val();
+        frmWorklog.wlAuthorAccountId.value = frmWorklog.wlAuthorName.value = search.val();
       }
 
       var pickerFrom = new Pikaday({

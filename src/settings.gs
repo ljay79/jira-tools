@@ -80,9 +80,6 @@ function initDefaults() {
   if (null == UserStorage.getValue('workhours'))
     UserStorage.setValue('workhours', 8);
 
-  if (null == UserStorage.getValue('dspuseras_name'))
-    UserStorage.setValue('dspuseras_name', 1);
-
   if (null == UserStorage.getValue('dspdurationas'))
     UserStorage.setValue('dspdurationas', "w");
 
@@ -111,7 +108,6 @@ function getAddonConfig_() {
     password: getCfg_('jira_password'),
     custom_fn_enabled: getCfg_('custom_fn_enabled') || 0,
     workhours: UserStorage.getValue('workhours'),
-    dspuseras_name: UserStorage.getValue('dspuseras_name'),
     dspdurationas: UserStorage.getValue('dspdurationas'),
     issue_update_comment: UserStorage.getValue('issue_update_comment') || 0
   };

@@ -161,6 +161,8 @@ function JST_search(JQL, Fields, Limit, StartAt) {
       results.push( rowValues );
     }//END:i
 
+    StorageCounter.log();
+    
     return results;
 
   } else {

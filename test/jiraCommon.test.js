@@ -23,8 +23,8 @@ test("unifyIssueAttrib ", () => {
       environment: "An environment",
       assignee: null,
       reporter: {
-        "name": "abcd1234",
         "key": "plemon",
+        "accountId": "557000:xxxxxxxx-xxxx-41ef-a3f5-0fdfxxxx0000",
         "emailAddress": "Paul.Lemon@gmail.com",
         "avatarUrls": {
           "48x48": "https://jira/useravatar?avatarId=10182",
@@ -83,7 +83,7 @@ test("unifyIssueAttrib ", () => {
   expect(unifyIssueAttrib("environment",testIssue).value).toBe("An environment");
   expect(unifyIssueAttrib("duedate",testIssue).value).toBe("");
   expect(unifyIssueAttrib("assignee",testIssue).value).toBe("");
-  expect(unifyIssueAttrib("reporter",testIssue).value).toBe("abcd1234");
+  expect(unifyIssueAttrib("reporter",testIssue).value).toBe("Lemon, Paul");
   var epicResult = unifyIssueAttrib("customfield_epic_link",testIssue);
   expect(epicResult.value).toBe("EPC-22");
   expect(epicResult.link).toBe("https://jiraserver/browse/EPC-22");

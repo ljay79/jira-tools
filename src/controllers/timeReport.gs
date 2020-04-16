@@ -86,8 +86,8 @@ TimeReport_Controller_ = {
 
     result.sort(function (a, b) {
       // as we go over each user anyway, we extend it same time with our autocomplete value
-      a.value = a.displayName + ' (' + a.name + ')';
-      b.value = b.displayName + ' (' + b.name + ')';
+      a.value = a.displayName + ( (a.name.length > 0) ? ' (' + a.name + ')' : '' );
+      b.value = b.displayName + ( (b.name.length > 0) ? ' (' + b.name + ')' : '' );
       return (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0);
     });
 
@@ -114,7 +114,7 @@ TimeReport_Controller_ = {
     debug.log(this.name + '.createTimesheet(%s)', JSON.stringify(jsonFormData));
     jsonFormData = jsonFormData || {
       wlAuthorName: undefined,
-      wlAuthorU  : undefined,
+      wlAuthorAccountId : undefined,
       wlAuthorG  : undefined,
       wlStartDate: undefined,
       wlEndDate  : undefined,
@@ -149,11 +149,11 @@ TimeReport_Controller_ = {
     if(jsonFormData.wlAuthorG) {
       wlQuery += ' AND worklogAuthor in membersOf("' + jsonFormData.wlAuthorG + '")';
     } else {
-      wlQuery += ' AND worklogAuthor="' + jsonFormData.wlAuthorU + '"';
+      wlQuery += ' AND worklogAuthor="' + jsonFormData.wlAuthorAccountId + '"';
     }
 
     var authorName = jsonFormData.wlAuthorName ? jsonFormData.wlAuthorName : (
-      jsonFormData.wlAuthorG ? jsonFormData.wlAuthorG : jsonFormData.wlAuthorU
+      jsonFormData.wlAuthorG ? jsonFormData.wlAuthorG : jsonFormData.wlAuthorAccountId
     );
 
     if (jsonFormData.wlLayout == '') {
@@ -215,7 +215,7 @@ TimeReport_Controller_ = {
               if(wlog.author.avatarUrls) wlog.author.avatarUrls = undefined;
 
               //@TODO: make compatible with worklogs of groups ( memberOf("") )
-              return wlog.author.name === jsonFormData.wlAuthorU;
+              return wlog.author.accountId === jsonFormData.wlAuthorAccountId;
             });
 
             timeSheetRenderer.addRow(issue, worklogs);

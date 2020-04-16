@@ -23,7 +23,7 @@ function JiraFilter(argument) {
   var filter = {
       owner: {
         displayName: '', 
-        name: ''
+        accountId: ''
       }, 
       jql: '',  
       name: '', 
@@ -106,18 +106,18 @@ function JiraFilter(argument) {
    */
   var onSuccess = function (resp, httpResp, status) {
     debug.log('Filter:onSuccess: [%s] %s - %s', status, resp, httpResp);
-    var compareOriginalFilterObj = JSON.stringify([filter.name,filter.jql]);
+    var compareOriginalFilterObj = JSON.stringify([filter.name, filter.jql]);
 
     try {
       filter.jql = resp.jql;
       filter.name = resp.name;
       filter.owner.displayName = resp.owner.displayName;
-      filter.owner.name = resp.owner.name;
+      filter.owner.accountId = resp.owner.accountId;
       filter.viewUrl = resp.viewUrl;
       filter.favourite = (resp.favourite == 'true');
 
       // filter data changes?
-      var compareFilterObj = JSON.stringify([filter.name,filter.jql]);
+      var compareFilterObj = JSON.stringify([filter.name, filter.jql]);
       if (compareOriginalFilterObj != compareFilterObj) {
         modified = true;
       }
