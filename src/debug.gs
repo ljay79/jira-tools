@@ -81,6 +81,29 @@ function toggleDebugging(formData) {
 }
 
 
+/* -- temp for debugging quota limitations -- */
+StorageCounter = {
+  _values: {
+    properties: {get: 0, set: 0},
+    cache: {get: 0, set: 0}
+  },
+  _cache: CacheService.getUserCache(),
+
+  increase: function(type, method) {
+    try {
+      this._values[type][method]++;
+      this._cache.putAll(_values);
+    } catch (e) {}
+  },
+
+  log: function() {
+    _values = this._cache.getAll(['properties', 'cache']);
+    console.info("StorageCounter: %s", _values);    
+  },
+
+}
+
+
 // Node required code block
 module.exports = { debug: debug, toggleDebugging: toggleDebugging }
 // End of Node required code block

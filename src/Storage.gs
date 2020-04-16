@@ -71,6 +71,7 @@ Storage_.prototype.getValue = function(key, optSkipMemoryCheck) {
   }
 
   // Check cache.
+  StorageCounter.increase('cache', 'get');
   if (this.cache_ && (jsonValue = this.cache_.get(prefixedKey))) {
     value = JSON.parse(jsonValue);
     this.memory_[key] = value;
@@ -81,6 +82,7 @@ Storage_.prototype.getValue = function(key, optSkipMemoryCheck) {
   }
 
   // Check properties.
+  StorageCounter.increase('properties', 'get');
   if (jsonValue = this.properties_.getProperty(prefixedKey)) {
     if (this.cache_) {
       this.cache_.put(prefixedKey,
@@ -109,6 +111,8 @@ Storage_.prototype.getValue = function(key, optSkipMemoryCheck) {
 Storage_.prototype.setValue = function(key, value) {
   var prefixedKey = this.getPrefixedKey_(key);
   var jsonValue = JSON.stringify(value);
+  StorageCounter.increase('cache', 'set');
+  StorageCounter.increase('properties', 'set');
   this.properties_.setProperty(prefixedKey, jsonValue);
   if (this.cache_) {
     this.cache_.put(prefixedKey, jsonValue,

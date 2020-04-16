@@ -563,6 +563,10 @@ Please [create a new GitHub issue](https://github.com/ljay79/jira-tools/issues/n
 
 Where possible, please also [submit a pull request](https://help.github.com/en/articles/creating-a-pull-request-from-a-fork) for the change.
 
+# Donations
+
+I work on that add-on in my own spare time. If you've found thos add-on useful and would like to help feed me and fund continued development and new features, please [donate via PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RV7DLH9BT9K88&source=url).
+
 # Thanks
 I'd like to thank [Daniel Kulbe](https://github.com/DanielKulbe) who provided a lot of the initial UI development and [Paul Lemon](https://github.com/paul-lemon/) for extensive contribution to the development environment as well as the BETA functionality for "Update Jira issues".
 Also thanks to all contributors that extended "Project Aif for Jira" with new functionality.

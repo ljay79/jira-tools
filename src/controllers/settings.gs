@@ -83,7 +83,6 @@ Settings_Controller_ = {
 
     setCfg_('custom_fn_enabled', (jsonFormData.custom_fn_enabled == 'on') ? 1 : 0);
     UserStorage.setValue('workhours', jsonFormData.ts_workhours);
-    UserStorage.setValue('dspuseras_name', parseInt(jsonFormData.ts_dspuseras_name));
     UserStorage.setValue('dspdurationas', jsonFormData.ts_dspdurationas);
     UserStorage.setValue('issue_update_comment', (jsonFormData.issue_update_comment == 'on') ? 1 : 0);
 

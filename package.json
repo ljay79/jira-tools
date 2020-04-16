@@ -17,7 +17,7 @@
     "@types/google-apps-script": "^0.0.35"
   },
   "devDependencies": {
-    "@google/clasp": "^2.1.0",
+    "@google/clasp": "^2.3.0",
     "del": "3.x",
     "directory-exists": "latest",
     "eslint-config-google": "^0.13.0",
