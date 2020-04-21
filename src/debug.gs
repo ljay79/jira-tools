@@ -19,6 +19,7 @@ debug = (function () {
     log_methods = ['log', 'info', 'warn', 'error', 'time', 'timeEnd'],
 
     idx = log_methods.length;
+
   while (--idx >= 0) {
     (function (idx, method) {
       that[method] = function () {
@@ -87,7 +88,20 @@ StorageCounter = {
     properties: {get: 0, set: 0},
     cache: {get: 0, set: 0}
   },
-  _cache: CacheService.getUserCache(),
+
+  _cache: (function () {
+    var _userCache;
+    try {
+      _userCache = CacheService.getUserCache();
+    } catch(e) {
+      _userCache = {
+          putAll: function(){},
+          getAll: function(){}
+      };
+    }
+
+    return _userCache;
+  })(),
 
   increase: function(type, method) {
     try {
@@ -99,9 +113,9 @@ StorageCounter = {
   log: function() {
     _values = this._cache.getAll(['properties', 'cache']);
     console.info("StorageCounter: %s", _values);    
-  },
+  }
 
-}
+};
 
 
 // Node required code block
