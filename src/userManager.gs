@@ -34,6 +34,7 @@ function findUser(usernameTerm, minimal, maxResults, methodOverride) {
       var user;
       for(var i=0; i<resp.length; i++) {
         user = unifyIssueAttrib((minimal ? 'userMin' : 'user'), resp[i]);
+        user.usernameOrAccountId = (user.accountId && user.accountId.length > 0) ? user.accountId : user.name;
         users.push(user);
       }
     } else {

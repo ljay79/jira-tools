@@ -64,7 +64,7 @@ button.pika-button {
       <legend>Select User</legend>
 
       <div class="block">
-        <input type="hidden" name="wlAuthorAccountId" id="wlAuthorAccountId" value="">
+        <input type="hidden" name="wlAuthorUsernameOrAccountId" id="wlAuthorUsernameOrAccountId" value="">
         <input type="hidden" name="wlAuthorName" id="wlAuthorName" value="">
         <input type="text" id="search" placeholder="Loading ..." class="block is-loading" style="width: 298px">
       </div>
@@ -164,7 +164,7 @@ button.pika-button {
               title + '</div>';
           }
         }).on('selected.xdsoft',function(e, el) {
-          frmWorklog.wlAuthorAccountId.value = el.accountId;
+          frmWorklog.wlAuthorUsernameOrAccountId.value = el.usernameOrAccountId;
           frmWorklog.wlAuthorName.value = el.displayName;
           inputValidatyHandler();
         });
@@ -183,7 +183,7 @@ button.pika-button {
         if (!valid) return;
 
         var formData = {
-          wlAuthorAccountId: frmWorklog.wlAuthorAccountId.value,
+          wlAuthorUsernameOrAccountId: frmWorklog.wlAuthorUsernameOrAccountId.value,
           wlAuthorName: frmWorklog.wlAuthorName.value,
           wlStartDate: frmWorklog.wlStartDate.value,
           wlEndDate: frmWorklog.wlEndDate.value,
@@ -205,7 +205,7 @@ button.pika-button {
        * @return void
        */
       function inputValidatyHandler() {
-        valid = frmWorklog.wlAuthorAccountId.value.length > 1;
+        valid = frmWorklog.wlAuthorUsernameOrAccountId.value.length > 1;
 
         action.disabled = valid ? false : 'disabled';
       }
@@ -216,7 +216,7 @@ button.pika-button {
        * with the hidden data fields, which are used for the callback.
        */
       function syncHiddenFields() {
-        frmWorklog.wlAuthorAccountId.value = frmWorklog.wlAuthorName.value = search.val();
+        frmWorklog.wlAuthorUsernameOrAccountId.value = frmWorklog.wlAuthorName.value = search.val();
       }
 
       var pickerFrom = new Pikaday({

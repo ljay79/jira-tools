@@ -22,7 +22,8 @@ function JiraFilter(argument) {
   var that = this; // clear encapsulation of scope's
   var filter = {
       owner: {
-        displayName: '', 
+        displayName: '',
+        name: '',
         accountId: ''
       }, 
       jql: '',  
@@ -112,7 +113,8 @@ function JiraFilter(argument) {
       filter.jql = resp.jql;
       filter.name = resp.name;
       filter.owner.displayName = resp.owner.displayName;
-      filter.owner.accountId = resp.owner.accountId;
+      filter.owner.name = resp.owner.name || '';
+      filter.owner.accountId = resp.owner.accountId || '';
       filter.viewUrl = resp.viewUrl;
       filter.favourite = (resp.favourite == 'true');
 
