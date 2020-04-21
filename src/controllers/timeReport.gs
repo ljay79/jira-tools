@@ -88,6 +88,7 @@ TimeReport_Controller_ = {
       // as we go over each user anyway, we extend it same time with our autocomplete value
       a.value = a.displayName + ( (a.name.length > 0) ? ' (' + a.name + ')' : '' );
       b.value = b.displayName + ( (b.name.length > 0) ? ' (' + b.name + ')' : '' );
+
       return (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0);
     });
 
@@ -114,7 +115,7 @@ TimeReport_Controller_ = {
     debug.log(this.name + '.createTimesheet(%s)', JSON.stringify(jsonFormData));
     jsonFormData = jsonFormData || {
       wlAuthorName: undefined,
-      wlAuthorAccountId : undefined,
+      wlAuthorUsernameOrAccountId : undefined,
       wlAuthorG  : undefined,
       wlStartDate: undefined,
       wlEndDate  : undefined,
@@ -149,11 +150,11 @@ TimeReport_Controller_ = {
     if(jsonFormData.wlAuthorG) {
       wlQuery += ' AND worklogAuthor in membersOf("' + jsonFormData.wlAuthorG + '")';
     } else {
-      wlQuery += ' AND worklogAuthor="' + jsonFormData.wlAuthorAccountId + '"';
+      wlQuery += ' AND worklogAuthor="' + jsonFormData.wlAuthorUsernameOrAccountId + '"';
     }
 
     var authorName = jsonFormData.wlAuthorName ? jsonFormData.wlAuthorName : (
-      jsonFormData.wlAuthorG ? jsonFormData.wlAuthorG : jsonFormData.wlAuthorAccountId
+      jsonFormData.wlAuthorG ? jsonFormData.wlAuthorG : jsonFormData.wlAuthorUsernameOrAccountId
     );
 
     if (jsonFormData.wlLayout == '') {
@@ -208,14 +209,16 @@ TimeReport_Controller_ = {
             // we have all logs here for 1 jira issue
             if(!resp) { return; }
 
-            // get only the data we need and safe sme bytes
+            // get only the data we need and safe some bytes
             var worklogs = resp.worklogs.filter(function(wlog) { // get only logs for user we searched for
               // remove some unused props
               if(wlog.updateAuthor) wlog.updateAuthor = undefined;
               if(wlog.author.avatarUrls) wlog.author.avatarUrls = undefined;
 
               //@TODO: make compatible with worklogs of groups ( memberOf("") )
-              return wlog.author.accountId === jsonFormData.wlAuthorAccountId;
+              var foundA = (wlog.author.accountId === jsonFormData.wlAuthorUsernameOrAccountId);
+              var foundB = (wlog.author.name === jsonFormData.wlAuthorUsernameOrAccountId);
+              return (foundA || foundB);
             });
 
             timeSheetRenderer.addRow(issue, worklogs);

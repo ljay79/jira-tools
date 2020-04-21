@@ -264,8 +264,8 @@ function unifyIssueAttrib(attrib, data) {
   // TODO: We should remove this try catch - needs alot of testing though to get to that.
   try { // no error handling, always return a valid object
     
-    var _dataEmailAdressPriv = data.emailAddress || ''; 
-    _dataEmailAdressPriv = _dataEmailAdressPriv.replace(/(.*@)([a-z]{0,3}).*/, "$1$2***");
+//    var _dataEmailAdressPriv = data.emailAddress || ''; 
+//    _dataEmailAdressPriv = _dataEmailAdressPriv.replace(/(.*@)([a-z]{0,3}).*/, "$1$2***");
 
     // custom fields first
     if (attrib.substring(0, 12) == 'customfield_') {
@@ -355,13 +355,15 @@ function unifyIssueAttrib(attrib, data) {
               displayName: '',
               avatarUrls: [],
               emailAddress: null,
+              name: null,
               accountId: null
             }, _value);
 
             resp = {
               value: _user.displayName || 'Unknown',
               avatarUrls: _user.avatarUrls['24x24'] || '',
-              accountId: _user.accountId
+              accountId: _user.accountId,
+              name: (_user.name || _user.username) || null
             };
             break;
           case 'array|user':
@@ -437,16 +439,14 @@ function unifyIssueAttrib(attrib, data) {
       case 'assignee':
       case 'creator':
       case 'reporter':
-        // see: https://ecosystem.atlassian.net/browse/ACJIRA-1510
+        resp = {
+          value: '',
+          avatarUrls: ''
+        };
         if (data.fields[attrib] != null && data.fields[attrib] != undefined) {
           resp = {
             value: data.fields[attrib].displayName || 'Unknown',
             avatarUrls: data.fields[attrib].avatarUrls['24x24'] || ''
-          };
-        } else {
-          resp = {
-            value:"",
-            avatarUrls: ""
           };
         }
         break;
@@ -533,7 +533,7 @@ function unifyIssueAttrib(attrib, data) {
       case 'author':
         resp = {
           displayName: data.displayName + (data.active == true ? '' : ' (X)'),
-          name: _dataEmailAdressPriv,
+          name: data.name || null,
           emailAddress: data.emailAddress,
           accountId: data.accountId || null,
           active: data.active,
@@ -553,8 +553,8 @@ function unifyIssueAttrib(attrib, data) {
       case 'userMin':
         resp = {
           displayName: data.displayName + (data.active == true ? '' : ' (X)'),
-          name: _dataEmailAdressPriv,
-          accountId: data.accountId,
+          name: data.name || '',
+          accountId: data.accountId || '',
           active: data.active,
         };
         break;
