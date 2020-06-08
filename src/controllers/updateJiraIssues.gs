@@ -2,14 +2,13 @@
 /* Dialog: Update Fields in Jira Issues from Spreadsheet */
 
 
- // Node required code block
-
- const hasSettings = require("src/settings.gs").hasSettings;
- const getDialog = require("src/dialogs.gs").getDialog;
- const extend = require("src/jsLib.gs").extend;
- const getTicketSheet = require("src/jiraCommon.gs").getTicketSheet;
- const IssueFields = require('src/models/jira/IssueFields.gs')
- // End of Node required code block
+// Node required code block
+const hasSettings = require("src/settings.gs").hasSettings;
+const getDialog = require("src/dialogs.gs").getDialog;
+const extend = require("src/jsLib.gs").extend;
+const getTicketSheet = require("src/jiraCommon.gs").getTicketSheet;
+const IssueFields = require('src/models/jira/IssueFields.gs')
+// End of Node required code block
 
 /**
  * Menu action to show the dialog for updating jira issues
