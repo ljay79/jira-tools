@@ -46,6 +46,7 @@ function JST_EPICLABEL(TicketId) {
   if(response.statusCode === 200 && response.respData && response.respData.fields) {
     var value = response.respData.fields[EpicField.getLabelKey()];
     if ( value === undefined || value == '') value = TicketId;
+    StorageCounter.log();
     return value;
   } else {
     debug.error("In JST_EPICLABEL; Response %s", response);
@@ -77,6 +78,7 @@ function JST_getTotalForSearchResult(JQL) {
   response = request.call('search', data, {'method' : 'post'}).getResponse();
   if(response.statusCode === 200 && response.respData && response.respData.total >= 0) {
     debug.log("JST_getTotalForSearchResult [%s]: response: %s", response.statusCode, response);
+    StorageCounter.log();
     return parseInt(response.respData.total || 0);
   } else {
     var msg = response.respData.errorMessages ? (response.respData.errorMessages.join(",") || response.respData.errorMessages) : response;
@@ -289,6 +291,8 @@ function customFunctionsSuspended_() {
     console.info('customFunctionsSuspended_(): ... setting 30s suspension!');
     docProps.put(key_time, now.getTime() + (30*1000));
   }
+  
+  StorageCounter.log();
 }
 
 

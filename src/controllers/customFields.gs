@@ -85,6 +85,7 @@ function sortCustomFields_(a, b) {
 function callbackSaveCustomFields(jsonFormData) {
   UserStorage.setValue('favoriteCustomFields', jsonFormData.favoriteCustomFields);
   debug.log("Saved favoriteCustomFields: %s", JSON.stringify(jsonFormData.favoriteCustomFields));
+  StorageCounter.log();
   return { status: true, message: 'Ok' };
 }
 
