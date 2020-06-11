@@ -2,6 +2,7 @@ jiraApiMock = require('./mocks/mockJiraApi.js');
 const getCfg_ = require("../src/settings.gs").getCfg_;
 const setCfg_ = require("../src/settings.gs").setCfg_;
 const UserStorage = require("src/models/gas/UserStorage.gs");
+const CustomFields = require("src/models/jira/CustomFields.gs");
 const jiraCommon = require('../src/jiraCommon.gs');
 
 test("Call to retrieve an issues status", function() {
@@ -53,40 +54,42 @@ test("unifyIssueAttrib ", () => {
       ],
       versions: []
     }
-  }
+  };
+
   initJiraDummyConfig();
   expect(EpicField.isUsable()).toBeTruthy();
   expect(getCfg_('jira_url')).toBe("https://jiraserver");
-  UserStorage.setValue(
-    "favoriteCustomFields",
-    [
-      { key: "customfield_custom1", name: "Custom 1", type: "number", customType: "none" },
-      { key: "customfield_custom2", name: "Custom 2", schemaType: "string", customType: "none"  },
-      { key: "customfield_custom3", name: "Custom 3", schemaType: "option", customType: "none"  },
-      { key: "customfield_stringArray", name: "String Array", schemaType: "array|string", customType: "none"  },
-      { key: "customfield_stringArray2", name: "String Array", schemaType: "array|string", customType: "none"  },
-      { key: "customfield_stringArray3", name: "String Array", schemaType: "array|string", customType: "none"  },
-      { key: "customfield_stringArray4", name: "String Array", schemaType: "array|string", customType: "none"  },
-      { key: "customfield_versions", name: "Version Array", schemaType: "array|versions", customType: "none"  },
-      { key: "customfield_emptyversions", name: "Empty Version Array", schemaType: "array|versions", customType: "none"  },
-      { key: "customfield_version_released", name: "Version", schemaType: "versions", customType: "none"  },
-      { key: "customfield_version_unreleased", name: "Version", schemaType: "versions", customType: "none"  },
-      { key: "customfield_sprints", name: "Sprints", schemaType: "array|string", customType: "none"  }
 
-    ]
-  );
+  CustomFields.save([
+	  { key: "customfield_custom1", name: "Custom 1", type: "number", customType: "none" },
+	  { key: "customfield_custom2", name: "Custom 2", schemaType: "string", customType: "none"  },
+	  { key: "customfield_custom3", name: "Custom 3", schemaType: "option", customType: "none"  },
+	  { key: "customfield_stringArray", name: "String Array", schemaType: "array|string", customType: "none"  },
+	  { key: "customfield_stringArray2", name: "String Array", schemaType: "array|string", customType: "none"  },
+	  { key: "customfield_stringArray3", name: "String Array", schemaType: "array|string", customType: "none"  },
+	  { key: "customfield_stringArray4", name: "String Array", schemaType: "array|string", customType: "none"  },
+	  { key: "customfield_versions", name: "Version Array", schemaType: "array|versions", customType: "none"  },
+	  { key: "customfield_emptyversions", name: "Empty Version Array", schemaType: "array|versions", customType: "none"  },
+	  { key: "customfield_version_released", name: "Version", schemaType: "versions", customType: "none"  },
+	  { key: "customfield_version_unreleased", name: "Version", schemaType: "versions", customType: "none"  },
+	  { key: "customfield_sprints", name: "Sprints", schemaType: "array|string", customType: "none"  }
+  ]);
+
   var debug = require("../src/debug.gs").debug;
   debug.enable(true);
-  var debugErrorSpy = jest.spyOn(debug,'error');
+  var debugErrorSpy = jest.spyOn(debug, 'error');
+
   expect(unifyIssueAttrib("summary",testIssue).value).toBe("A summary");
   expect(unifyIssueAttrib("description",testIssue).value).toBe("This is the description");
   expect(unifyIssueAttrib("environment",testIssue).value).toBe("An environment");
   expect(unifyIssueAttrib("duedate",testIssue).value).toBe("");
   expect(unifyIssueAttrib("assignee",testIssue).value).toBe("");
   expect(unifyIssueAttrib("reporter",testIssue).value).toBe("Lemon, Paul");
-  var epicResult = unifyIssueAttrib("customfield_epic_link",testIssue);
+
+  var epicResult = unifyIssueAttrib("customfield_epic_link", testIssue);
   expect(epicResult.value).toBe("EPC-22");
   expect(epicResult.link).toBe("https://jiraserver/browse/EPC-22");
+
   expect(unifyIssueAttrib("customfield_custom1",testIssue).value).toBe(22);
   expect(unifyIssueAttrib("customfield_custom1",testIssue).format).toBe("0");
   expect(unifyIssueAttrib("customfield_custom2",testIssue).value).toBe("hello");

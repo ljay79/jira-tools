@@ -84,6 +84,8 @@ function toggleDebugging(formData) {
 
 /* -- temp for debugging quota limitations -- */
 StorageCounter = {
+  _id: '_storageCounter',
+
   _values: {
     properties: {get: 0, set: 0},
     cache: {get: 0, set: 0}
@@ -106,18 +108,17 @@ StorageCounter = {
   increase: function(type, method) {
     try {
       this._values[type][method]++;
-      this._cache.putAll(_values);
+      this._cache.put(this._id, JSON.stringify(this._values));
     } catch (e) {}
   },
 
   log: function() {
-    _values = this._cache.getAll(['properties', 'cache']);
-    console.info("StorageCounter: %s", _values);    
+    console.info("StorageCounter: %o", JSON.parse(this._cache.get(this._id)));
   }
 
 };
 
 
 // Node required code block
-module.exports = { debug: debug, toggleDebugging: toggleDebugging }
+module.exports = { debug: debug, toggleDebugging: toggleDebugging, StorageCounter: StorageCounter }
 // End of Node required code block

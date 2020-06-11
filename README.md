@@ -509,10 +509,16 @@ Ran all test suites.
 npm test -- --listTests
 ```
 
-- exec specific test
+- exec specific testfile
 
 ```sh
 npm test ./test/jiraApi.test.js
+```
+
+- exec a single specific test from test file
+
+```sh
+npm test -- -i ./test/jiraCommon.test.js -t "unifyIssueAttrib"
 ```
 
 - see unit test coverage
