@@ -2,6 +2,7 @@
 const debug = require("src/debug.gs").debug;
 const EpicField = require("src/models/jira/EpicField.gs");
 const UserStorage = require("src/models/gas/UserStorage.gs");
+const CustomFields = require("src/models/jira/CustomFields.gs");
 const IssueFields = require("src/models/jira/IssueFields.gs");
 // End of Node required code block
 
@@ -17,7 +18,7 @@ const IssueFields = require("src/models/jira/IssueFields.gs");
 function menuCustomFields() {
   if (!hasSettings(true)) return;
 
-  var dialog = getDialog('views/dialogs/customFields', { favoriteCustomFields: (UserStorage.getValue('favoriteCustomFields') || []) });
+  var dialog = getDialog('views/dialogs/customFields', { favoriteCustomFields: CustomFields.load() });
 
   dialog
     .setWidth(480)
@@ -83,9 +84,7 @@ function sortCustomFields_(a, b) {
  * @return {object} Object({status: [boolean], response: [string]})
  */
 function callbackSaveCustomFields(jsonFormData) {
-  UserStorage.setValue('favoriteCustomFields', jsonFormData.favoriteCustomFields);
-  debug.log("Saved favoriteCustomFields: %s", JSON.stringify(jsonFormData.favoriteCustomFields));
-  StorageCounter.log();
+  CustomFields.save(jsonFormData.favoriteCustomFields);
   return { status: true, message: 'Ok' };
 }
 

@@ -7,6 +7,7 @@ SpreadsheetApp = require('test/mocks/SpreadsheetApp');
 const getValues = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getActiveRange().getValues;
 global.environmentConfiguration = require('src/environmentConfiguration.gs');
 const UserStorage = require("src/models/gas/UserStorage.gs");
+const CustomFields = require("src/models/jira/CustomFields.gs");
 HtmlService = require('test/mocks/HtmlService');
 global.EpicField = require("src/models/jira/EpicField.gs");
 global.Browser = require('test/mocks/Browser');
@@ -41,18 +42,16 @@ test("menuUpdateJiraIssues", () => {
   });
   // no values selected in the spreadsheet
   getValues.mockImplementationOnce(() => []);
-  // mock some user selected field properties 
-  PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
-    return JSON.stringify([
-      {key:"custom1",name:"Custom 1", type:"string", customType:"xxx"},
-      {key:"custom2",name:"Custom 2", type:"string", customType:"xyz"}
-    ]  
-    );
-  });
+  // mock some user selected field properties
+  CustomFields.save([
+    {key:"custom1", name:"Custom 1", type:"string", customType:"xxx"},
+    {key:"custom2", name:"Custom 2", type:"string", customType:"xyz"}
+  ]);
   menuUpdateJiraIssues();
   expect(settingsMock.hasSettings).toBeCalled();
   expect(dialogCode.getDialog).toBeCalled();
   expect(dialogCode.getDialog.mock.calls[0][0]).toBe('views/dialogs/updateJiraIssues');
+
   var params = dialogCode.getDialog.mock.calls[0][1];
   expect(params.headerFields).toBeDefined();
   expect(params.headerFields).toEqual({});

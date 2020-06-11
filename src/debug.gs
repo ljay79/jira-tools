@@ -120,5 +120,5 @@ StorageCounter = {
 
 
 // Node required code block
-module.exports = { debug: debug, toggleDebugging: toggleDebugging }
+module.exports = { debug: debug, toggleDebugging: toggleDebugging, StorageCounter: StorageCounter }
 // End of Node required code block

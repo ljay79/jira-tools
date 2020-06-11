@@ -7,6 +7,7 @@
 const Request = require('src/jiraApi.gs');
 const EpicField = require("src/models/jira/EpicField.gs");
 const UserStorage = require("src/models/gas/UserStorage.gs");
+const CustomFields = require("src/models/jira/CustomFields.gs");
 const extend = require("src/jsLib.gs").extend;
 const camelize = require('src/jsLib.gs').camelize;
 const convertArrayToObj_ = require('src/jsLib.gs').convertArrayToObj_;
@@ -182,7 +183,7 @@ IssueFields = (function () {
   function getAvailableCustomFields(format) {
     format = format || CUSTOMFIELD_FORMAT_RAW;
 
-    var customFields = UserStorage.getValue('favoriteCustomFields') || [];
+    var customFields = CustomFields.load();
     customFields = validateCustomFields_(customFields);
 
     var fieldsFormatted = {};
@@ -218,7 +219,6 @@ IssueFields = (function () {
   function validateCustomFields_(customFields) {
     var schemaUpdated = false;
     var customTypeUpdateNeeded = false;
-
     customFields.forEach(function (field) {
       // using attribute schemaType conistently across the code base
       // however a user may have an object stored with attribute "type" in their preferences
@@ -253,7 +253,7 @@ IssueFields = (function () {
     }
 
     if (schemaUpdated) {
-      UserStorage.setValue('favoriteCustomFields', customFields);
+      CustomFields.save(customFields);
     }
     return customFields;
   }
@@ -514,5 +514,3 @@ IssueFields = (function () {
 // Node required code block
 module.exports = IssueFields;
 // End of Node required code block
-
-
