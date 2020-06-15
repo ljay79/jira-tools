@@ -19,18 +19,19 @@ var CustomFields = {
     if (_length > _limit) {
       for(_i=0; _i<_length; _i++) {
         _chunk = data.splice(0, _limit);
-        UserStorage.setValue('favoriteCustomFields_' + _i, JSON.stringify(_chunk));
+        UserStorage.setValue('favoriteFields_' + _i, JSON.stringify(_chunk));
         _length -= _limit - 1;
         _chunkLen++;
-        debug.log("Saved CustomFields chunks[%d]: %s", _chunk.length, _chunk);
+        debug.log("Saved favorite custom fields chunks[%d]: %s", _chunk.length, _chunk);
       }
 
     } else {
-      UserStorage.setValue('favoriteCustomFields', JSON.stringify(data));
-      debug.log("Saved CustomFields[%d]: %s", _length, JSON.stringify(data));
+      UserStorage.setValue('favoriteFields', JSON.stringify(data));
+      debug.log("Saved favorite custom fields[%d]: %s", _length, JSON.stringify(data));
     }
 
-    UserStorage.setValue('favoriteCustomFields_length', _chunkLen);
+    UserStorage.setValue('favoriteFields_length', _chunkLen);
+    this.fields = data;
 
     StorageCounter.log();
   },
@@ -44,21 +45,23 @@ var CustomFields = {
 
   _loadFromStorage: function() {
     var customFields = [];
-    var _chunkLen = UserStorage.getValue('favoriteCustomFields_length') || 0;
-    var _data = [], data = UserStorage.getValue('favoriteCustomFields') || '[]';
+    var _chunkLen = UserStorage.getValue('favoriteFields_length') || 0;
+    var _data = [], data = UserStorage.getValue('favoriteFields') || '[]';
 
     if (_chunkLen == 0) {
       customFields = JSON.parse(data);
-      debug.log("Loaded CustomFields[%d]: %s", customFields.length, JSON.stringify(customFields));
+      debug.log("Loaded favorite custom fields[%d]: %s", customFields.length, JSON.stringify(customFields));
     } else {
       var _i = 0;
       for(_i=0; _i<_chunkLen; _i++) {
-        _data = JSON.parse(UserStorage.getValue('favoriteCustomFields_' + _i) || '[]');
-        customFields.push.apply(customFields, _data);
-        debug.log("Loaded CustomFields chunks[%d]: %s", _data.length, JSON.stringify(_data));
+        _data = JSON.parse(UserStorage.getValue('favoriteFields_' + _i) || '[]');
+        if (_data.length > 0) {
+          customFields.push.apply(customFields, _data);
+          debug.log("Loaded favorite custom fields chunks[%d]: %s", _data.length, JSON.stringify(_data));
+        }
       }
     }
-    
+
     StorageCounter.log();
 
     return customFields;
@@ -72,5 +75,5 @@ var CustomFields = {
 
 
 // Node required code block
-module.exports = CustomFields
+module.exports = CustomFields;
 // End of Node required code block
