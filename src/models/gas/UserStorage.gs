@@ -46,7 +46,7 @@ var UserStorage = {
   _getAppStorage: function() {
     if (!this._appStorage) {
       // https://developers.google.com/apps-script/guides/services/quotas
-      this._appStorage = new Storage_('jst', PropertiesService.getUserProperties()||{});
+      this._appStorage = new Storage_('jst', PropertiesService.getUserProperties()||{}, CacheService.getUserCache());
     }
     return this._appStorage;
   },

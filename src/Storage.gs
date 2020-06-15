@@ -22,14 +22,14 @@
  * related information.
  * @param {string} prefix The prefix to use for keys in the properties and
  *     cache.
- * @param {PropertiesService.Properties} properties The properties instance to
- *     use.
+ * @param {PropertiesService.Properties} optProperties The optional properties
+ *     instance to use.
  * @param {CacheService.Cache} [optCache] The optional cache instance to use.
  * @constructor
  */
-function Storage_(prefix, properties, optCache) {
+function Storage_(prefix, optProperties, optCache) {
   this.prefix_ = prefix;
-  this.properties_ = properties;
+  this.properties_ = optProperties;
   this.cache_ = optCache;
   this.memory_ = {};
 }
@@ -62,7 +62,7 @@ Storage_.prototype.getValue = function(key, optSkipMemoryCheck) {
 
   if (!optSkipMemoryCheck) {
     // Check in-memory cache.
-    if (value = this.memory_[key]) {
+    if (value = this.memory_[prefixedKey]) {
       if (value === Storage_.CACHE_NULL_VALUE) {
         return null;
       }
@@ -71,31 +71,32 @@ Storage_.prototype.getValue = function(key, optSkipMemoryCheck) {
   }
 
   // Check cache.
-  StorageCounter.increase('cache', 'get');
   if (this.cache_ && (jsonValue = this.cache_.get(prefixedKey))) {
     value = JSON.parse(jsonValue);
-    this.memory_[key] = value;
+    this.memory_[prefixedKey] = value;
     if (value === Storage_.CACHE_NULL_VALUE) {
       return null;
     }
+    StorageCounter.increase('cache', 'get');
     return value;
   }
 
   // Check properties.
-  StorageCounter.increase('properties', 'get');
-  if (jsonValue = this.properties_.getProperty(prefixedKey)) {
+  if (this.properties_ &&
+      (jsonValue = this.properties_.getProperty(prefixedKey))) {
     if (this.cache_) {
       this.cache_.put(prefixedKey,
           jsonValue, Storage_.CACHE_EXPIRATION_TIME_SECONDS);
     }
     value = JSON.parse(jsonValue);
-    this.memory_[key] = value;
+    this.memory_[prefixedKey] = value;
+    StorageCounter.increase('properties', 'get');
     return value;
   }
 
   // Not found. Store a special null value in the memory and cache to reduce
   // hits on the PropertiesService.
-  this.memory_[key] = Storage_.CACHE_NULL_VALUE;
+  this.memory_[prefixedKey] = Storage_.CACHE_NULL_VALUE;
   if (this.cache_) {
     this.cache_.put(prefixedKey, JSON.stringify(Storage_.CACHE_NULL_VALUE),
         Storage_.CACHE_EXPIRATION_TIME_SECONDS);
@@ -111,14 +112,17 @@ Storage_.prototype.getValue = function(key, optSkipMemoryCheck) {
 Storage_.prototype.setValue = function(key, value) {
   var prefixedKey = this.getPrefixedKey_(key);
   var jsonValue = JSON.stringify(value);
-  StorageCounter.increase('cache', 'set');
-  StorageCounter.increase('properties', 'set');
-  this.properties_.setProperty(prefixedKey, jsonValue);
+  
+  if (this.properties_) {
+    StorageCounter.increase('properties', 'set');
+    this.properties_.setProperty(prefixedKey, jsonValue);
+  }
   if (this.cache_) {
+    StorageCounter.increase('cache', 'set');
     this.cache_.put(prefixedKey, jsonValue,
         Storage_.CACHE_EXPIRATION_TIME_SECONDS);
   }
-  this.memory_[key] = value;
+  this.memory_[prefixedKey] = value;
 };
 
 /**
@@ -127,11 +131,39 @@ Storage_.prototype.setValue = function(key, value) {
  */
 Storage_.prototype.removeValue = function(key) {
   var prefixedKey = this.getPrefixedKey_(key);
-  this.properties_.deleteProperty(prefixedKey);
+  this.removeValueWithPrefixedKey_(prefixedKey);
+};
+
+/**
+ * Resets the storage, removing all stored data.
+ * @param {string} key The key.
+ */
+Storage_.prototype.reset = function() {
+  var prefix = this.getPrefixedKey_();
+  var prefixedKeys = Object.keys(this.memory_);
+  if (this.properties_) {
+    var props = this.properties_.getProperties();
+    prefixedKeys = Object.keys(props).filter(function(prefixedKey) {
+      return prefixedKey === prefix || prefixedKey.indexOf(prefix + '.') === 0;
+    });
+  }
+  for (var i = 0; i < prefixedKeys.length; i++) {
+    this.removeValueWithPrefixedKey_(prefixedKeys[i]);
+  };
+};
+
+/**
+ * Removes a stored value.
+ * @param {string} prefixedKey The key.
+ */
+Storage_.prototype.removeValueWithPrefixedKey_ = function(prefixedKey) {
+  if (this.properties_) {
+    this.properties_.deleteProperty(prefixedKey);
+  }
   if (this.cache_) {
     this.cache_.remove(prefixedKey);
   }
-  delete this.memory_[key];
+  delete this.memory_[prefixedKey];
 };
 
 /**
