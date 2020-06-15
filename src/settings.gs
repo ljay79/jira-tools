@@ -91,6 +91,12 @@ function initDefaults() {
   if (server_type == null) server_type = 'onDemand';
   setCfg_('server_type', server_type);
 
+  // migrate from 1.4.4 to <
+  var _cfields = UserStorage.getValue('favoriteCustomFields') || [];
+  debug.info('Migrated custom fields from: %o', _cfields);
+  CustomFields.save(_cfields);
+  debug.info('Migrated custom fields to  : %o', CustomFields.load());
+
   // set done
   UserStorage.setValue('defaults_initialized', 'true');
 }
