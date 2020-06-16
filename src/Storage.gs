@@ -141,6 +141,7 @@ Storage_.prototype.removeValue = function(key) {
 Storage_.prototype.reset = function() {
   var prefix = this.getPrefixedKey_();
   var prefixedKeys = Object.keys(this.memory_);
+
   if (this.properties_) {
     var props = this.properties_.getProperties();
     prefixedKeys = Object.keys(props).filter(function(prefixedKey) {

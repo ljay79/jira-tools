@@ -2,6 +2,7 @@
 const BUILD = require("./Code.gs").BUILD;
 const Storage_ = require("./Storage.gs").Storage_;
 const UserStorage = require("src/models/gas/UserStorage.gs");
+const CustomFields = require("src/models/jira/CustomFields.gs");
 // End of Node required code block
 
 

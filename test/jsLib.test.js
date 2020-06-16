@@ -1,5 +1,6 @@
 jsLib = require('src/jsLib.gs');
 const UserStorage = require('src/models/gas/UserStorage.gs');
+const CustomFields = require("src/models/jira/CustomFields.gs");
 
 test('jsLib - buildUrl() accepts multiple ways of passing parameters', () => {
   var result = jsLib.buildUrl('https://www.example.org', {});
