@@ -1,5 +1,6 @@
 var jiraApiMock = require('./mocks/mockJiraApi.js');
 const UserStorage = require('src/models/gas/UserStorage.gs');
+const CustomFields = require("src/models/jira/CustomFields.gs");
 const IssueFields = require('src/models/jira/IssueFields.gs');
 
 beforeAll(() => {

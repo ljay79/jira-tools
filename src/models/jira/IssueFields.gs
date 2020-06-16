@@ -219,6 +219,7 @@ IssueFields = (function () {
   function validateCustomFields_(customFields) {
     var schemaUpdated = false;
     var customTypeUpdateNeeded = false;
+
     customFields.forEach(function (field) {
       // using attribute schemaType conistently across the code base
       // however a user may have an object stored with attribute "type" in their preferences

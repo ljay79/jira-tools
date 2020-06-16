@@ -2,6 +2,7 @@
 const BUILD = require("./Code.gs").BUILD;
 const Storage_ = require("./Storage.gs").Storage_;
 const UserStorage = require("src/models/gas/UserStorage.gs");
+const CustomFields = require("src/models/jira/CustomFields.gs");
 // End of Node required code block
 
 
@@ -90,6 +91,12 @@ function initDefaults() {
   var server_type = getCfg_('server_type');
   if (server_type == null) server_type = 'onDemand';
   setCfg_('server_type', server_type);
+
+  // migrate from 1.4.4 to <
+  var _cfields = UserStorage.getValue('favoriteCustomFields') || [];
+  debug.info('Migrated custom fields from: %o', _cfields);
+  CustomFields.save(_cfields);
+  debug.info('Migrated custom fields to  : %o', CustomFields.load());
 
   // set done
   UserStorage.setValue('defaults_initialized', 'true');

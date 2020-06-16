@@ -1,13 +1,12 @@
 /**
  * Tests based on documentation here
  * https://developers.google.com/gsuite/add-ons/concepts/addon-authorization#editor_add-on_authorization
-
  */
-
 
 beforeEach(() => {
   SpreadsheetApp.resetMocks();
 });
+
 test('onOpen builds menu', () => {
   var onOpen = require('../src/Code.gs').onOpen;
   var e = {

@@ -5,6 +5,7 @@ debug = require("src/debug.gs").debug;
 PropertiesService = require('test/mocks/PropertiesService');
 global.environmentConfiguration = require('src/environmentConfiguration.gs');
 const UserStorage = require("src/models/gas/UserStorage.gs");
+const CustomFields = require("src/models/jira/CustomFields.gs");
 global.EpicField = require("src/models/jira/EpicField.gs");
 
 beforeEach(() =>  {

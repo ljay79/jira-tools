@@ -2,6 +2,7 @@
 /*
  * @see https://developers.google.com/apps-script/reference/properties/properties
  */
+
 var _userPropData = {};
 var _scriptPropData = {};
 var _documentPropData = {};
@@ -12,6 +13,7 @@ var _documentPropData = {};
 var UserProps = {
   getProperty: jest.fn().mockImplementation((key)=>  _userPropData[key]),
   setProperty: jest.fn().mockImplementation(function(key) { _userPropData[key] = data; }),
+  getProperties: jest.fn().mockImplementation(() => _userPropData ),
   deleteProperty: jest.fn().mockImplementation(function(key) { 
     _userPropData[key] = null; 
     delete _userPropData[key];

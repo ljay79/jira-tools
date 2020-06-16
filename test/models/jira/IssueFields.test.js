@@ -50,7 +50,6 @@ test("field validation", () => {
   var matchedField = IssueFields.getMatchingField("An unrecognised field");
   expect(matchedField).toBeNull();
 
-
   var matchedField = IssueFields.getMatchingField("custom1234");
   expect(matchedField).not.toBeNull();
   expect(matchedField.key).toBe("custom1234");
@@ -111,156 +110,154 @@ test("Set all JIRA fields", () => {
   IssueFields.setAllFields_({ a: "b" });
   expect(IssueFields.getAllFields()).toEqual({ a: "b" });
 });
+
 describe("Fetching all fields from JIRA", () => {
-test("Get all fields from Jira", () => {
-  var fieldList = [
-    {
-      schema: { type: "string" },
-      key: "xyz",
-      name: "XYZ field",
-      custom: false
-    },
-    {
-      schema: { type: "a custom field not recognised" },
-      key: "abc",
-      name: "ABC field",
-      custom: true
-    },
-    {
-      schema: { type: "string" },
-      id: "def",
-      name: "DEF field",
-      custom: true
-    }
-  ];
-  jiraApiMock.resetMocks();
-  jiraApiMock.setNextJiraResponse(200, "field", fieldList);
+  test("Get all fields from Jira", () => {
+    var fieldList = [
+      {
+        schema: { type: "string" },
+        key: "xyz",
+        name: "XYZ field",
+        custom: false
+      },
+      {
+        schema: { type: "a custom field not recognised" },
+        key: "abc",
+        name: "ABC field",
+        custom: true
+      },
+      {
+        schema: { type: "string" },
+        id: "def",
+        name: "DEF field",
+        custom: true
+      }
+    ];
+    jiraApiMock.resetMocks();
+    jiraApiMock.setNextJiraResponse(200, "field", fieldList);
 
-  const successCallBack = jest.fn();
-  const errorCallBack = jest.fn();
-  var result = IssueFields.getAllFields(successCallBack, errorCallBack);
-  expect(jiraApiMock.call.mock.calls.length).toBe(1);
-  expect(successCallBack.mock.calls.length).toBe(1);
-  expect(errorCallBack.mock.calls.length).toBe(0);
-  var fieldListReturned = successCallBack.mock.calls[0][0];
-  expect(fieldListReturned.length).toBe(3);
-  expect(fieldListReturned[0].key).toBe("abc");
-  expect(fieldListReturned[1].key).toBe("def");
-  expect(fieldListReturned[2].key).toBe("xyz");
-  expect(result).toBe(fieldListReturned);
-
-  // now check the cache
-  var result = IssueFields.getAllFields(successCallBack, errorCallBack);
-  expect(successCallBack.mock.calls.length).toBe(2);
-  expect(errorCallBack.mock.calls.length).toBe(0);
-  // no additional calls to JIRA API
-  expect(jiraApiMock.call.mock.calls.length).toBe(1);
-
-  successCallBack.mockClear();
-  errorCallBack.mockClear();
-  IssueFields.clearCache_();
-  jiraApiMock.withSuccessHandler.mockClear();
-  jiraApiMock.withFailureHandler.mockImplementationOnce((callback) => {
-    callback({ errorMessages: ["mocked error"] }, 404, false);
-    return jiraApiMock
+    const successCallBack = jest.fn();
+    const errorCallBack = jest.fn();
+    var result = IssueFields.getAllFields(successCallBack, errorCallBack);
+    expect(jiraApiMock.call.mock.calls.length).toBe(1);
+    expect(successCallBack.mock.calls.length).toBe(1);
+    expect(errorCallBack.mock.calls.length).toBe(0);
+    var fieldListReturned = successCallBack.mock.calls[0][0];
+    expect(fieldListReturned.length).toBe(3);
+    expect(fieldListReturned[0].key).toBe("abc");
+    expect(fieldListReturned[1].key).toBe("def");
+    expect(fieldListReturned[2].key).toBe("xyz");
+    expect(result).toBe(fieldListReturned);
+  
+    // now check the cache
+    var result = IssueFields.getAllFields(successCallBack, errorCallBack);
+    expect(successCallBack.mock.calls.length).toBe(2);
+    expect(errorCallBack.mock.calls.length).toBe(0);
+    // no additional calls to JIRA API
+    expect(jiraApiMock.call.mock.calls.length).toBe(1);
+  
+    successCallBack.mockClear();
+    errorCallBack.mockClear();
+    IssueFields.clearCache_();
+    jiraApiMock.withSuccessHandler.mockClear();
+    jiraApiMock.withFailureHandler.mockImplementationOnce((callback) => {
+      callback({ errorMessages: ["mocked error"] }, 404, false);
+      return jiraApiMock
+    });
+    var result = IssueFields.getAllFields(successCallBack, errorCallBack);
+    expect(successCallBack.mock.calls.length).toBe(0);
+    expect(errorCallBack.mock.calls.length).toBe(1);
+    expect(errorCallBack.mock.calls[0].length).toBe(3);
+    expect(errorCallBack.mock.calls[0][0]).toContain("mocked error");
+    expect(errorCallBack.mock.calls[0][1]).toBe(404);
+    expect(errorCallBack.mock.calls[0][2]).toBe(false);
+    expect(result.length).toBe(0);
   });
-  var result = IssueFields.getAllFields(successCallBack, errorCallBack);
-  expect(successCallBack.mock.calls.length).toBe(0);
-  expect(errorCallBack.mock.calls.length).toBe(1);
-  expect(errorCallBack.mock.calls[0].length).toBe(3);
-  expect(errorCallBack.mock.calls[0][0]).toContain("mocked error");
-  expect(errorCallBack.mock.calls[0][1]).toBe(404);
-  expect(errorCallBack.mock.calls[0][2]).toBe(false);
-  expect(result.length).toBe(0);
-});
 
-
-test("Get all custom fields from Jira", () => {
-  var fieldList = [
-    {
-      schema: { type: "string" },
-      key: "xyz",
-      name: "XYZ field",
-      custom: false
-    },
-    {
-      schema: { type: "a custom field not recognised" },
-      key: "abc",
-      name: "ABC field",
-      custom: true
-    },
-    {
-      schema: { type: "string" },
-      id: "def",
-      name: "DEF field",
-      custom: true
-    },
-    {
-      "id": "Epic_link_key",
-      "name": "Epic Link",
-      "custom": true,
-      "schema": {
-        "custom": ":gh-epic-link",
-        "type": "string",
-        "system": "description"
+  test("Get all custom fields from Jira", () => {
+    var fieldList = [
+      {
+        schema: { type: "string" },
+        key: "xyz",
+        name: "XYZ field",
+        custom: false
+      },
+      {
+        schema: { type: "a custom field not recognised" },
+        key: "abc",
+        name: "ABC field",
+        custom: true
+      },
+      {
+        schema: { type: "string" },
+        id: "def",
+        name: "DEF field",
+        custom: true
+      },
+      {
+        "id": "Epic_link_key",
+        "name": "Epic Link",
+        "custom": true,
+        "schema": {
+          "custom": ":gh-epic-link",
+          "type": "string",
+          "system": "description"
+        }
+      },
+      {
+        "id": "Epic_label_key",
+        "name": "Epic Label",
+        "custom": true,
+        "schema": {
+          "custom": ":gh-epic-label",
+          "type": "string",
+          "system": "description"
+        }
       }
-    },
-    {
-      "id": "Epic_label_key",
-      "name": "Epic Label",
-      "custom": true,
-      "schema": {
-        "custom": ":gh-epic-label",
-        "type": "string",
-        "system": "description"
-      }
-    }
-  ];
-  //set up
-  jiraApiMock.setNextJiraResponse(200, "field", fieldList);
-  const successCallBack = jest.fn();
-  const errorCallBack = jest.fn();
-
-  // execute
-  var result = IssueFields.getAllCustomFields(successCallBack, errorCallBack);
-  // verify call backs
-  expect(successCallBack.mock.calls.length).toBe(1);
-  expect(errorCallBack.mock.calls.length).toBe(0);
-  // verify results
-  var fieldListReturned = successCallBack.mock.calls[0][0];
-  expect(fieldListReturned.length).toBe(5);
-  expect(fieldListReturned[0].key).toBe("jst_epic");
-  expect(fieldListReturned[1].key).toBe("abc");
-  expect(fieldListReturned[2].key).toBe("def");
-  expect(result).toBe(fieldListReturned);
-
-});
-
-test("Error when fetching all custom fields from Jira", () => {
-
-  // when nothing is returned
-  jiraApiMock.setNextJiraResponse(500, "field", null);
-  const successCallBack = jest.fn();
-  const errorCallBack = jest.fn();
+    ];
+    //set up
+    jiraApiMock.setNextJiraResponse(200, "field", fieldList);
+    const successCallBack = jest.fn();
+    const errorCallBack = jest.fn();
   
-  // execute
-  var result = IssueFields.getAllCustomFields(successCallBack, errorCallBack);
-  // verify call backs
-  expect(successCallBack.mock.calls.length).toBe(0);
-  expect(errorCallBack.mock.calls.length).toBe(1);
+    // execute
+    var result = IssueFields.getAllCustomFields(successCallBack, errorCallBack);
+    // verify call backs
+    expect(successCallBack.mock.calls.length).toBe(1);
+    expect(errorCallBack.mock.calls.length).toBe(0);
+    // verify results
+    var fieldListReturned = successCallBack.mock.calls[0][0];
+    expect(fieldListReturned.length).toBe(5);
+    expect(fieldListReturned[0].key).toBe("jst_epic");
+    expect(fieldListReturned[1].key).toBe("abc");
+    expect(fieldListReturned[2].key).toBe("def");
+    expect(result).toBe(fieldListReturned);
+  });
 
-  //when unexpected message is returned
-  /* In response to error found in logs
-     TypeError: Funktion map in Objekt [object Object] nicht gefunden
-     at processFieldResponse_ (models/jira/IssueFields:363)
-   */
-  jiraApiMock.setNextJiraResponse(500, "field", "{msg:'some unexpected response'}");
+  test("Error when fetching all custom fields from Jira", () => {
+    // when nothing is returned
+    jiraApiMock.setNextJiraResponse(500, "field", null);
+    const successCallBack = jest.fn();
+    const errorCallBack = jest.fn();
+    
+    // execute
+    var result = IssueFields.getAllCustomFields(successCallBack, errorCallBack);
+    // verify call backs
+    expect(successCallBack.mock.calls.length).toBe(0);
+    expect(errorCallBack.mock.calls.length).toBe(1);
   
-  // execute
-  var result = IssueFields.getAllCustomFields(successCallBack, errorCallBack);
-  // verify call backs
-  expect(successCallBack.mock.calls.length).toBe(0);
-  expect(errorCallBack.mock.calls.length).toBe(2);
+    //when unexpected message is returned
+    /* In response to error found in logs
+       TypeError: Funktion map in Objekt [object Object] nicht gefunden
+       at processFieldResponse_ (models/jira/IssueFields:363)
+     */
+    jiraApiMock.setNextJiraResponse(500, "field", "{msg:'some unexpected response'}");
+    
+    // execute
+    var result = IssueFields.getAllCustomFields(successCallBack, errorCallBack);
+    // verify call backs
+    expect(successCallBack.mock.calls.length).toBe(0);
+    expect(errorCallBack.mock.calls.length).toBe(2);
   
   });
 });
@@ -313,26 +310,24 @@ describe("Checking custom field behaviour", () => {
   })
 
   // getting custom fields
-  test.skip("getCustomFields", () => {
-	  UserStorage.setValue(
-      "favoriteCustomFields",
-      [
-        { key: "customx", name: "Custom X", schemaType: "Type 1", customType: "1" },
-        { key: "customy", name: "Custom Y", schemaType: "Type 2", customType: "2" },
-        { key: "customz", name: "Custom Z", type: "Type 3", customType: "3" }
-      ]
-    );
+  test("getCustomFields", () => {
+    CustomFields.save([
+      { key: "customx", name: "Custom X", schemaType: "Type 1", customType: "1" },
+      { key: "customy", name: "Custom Y", schemaType: "Type 2", customType: "2" },
+      { key: "customz", name: "Custom Z", type: "Type 3", customType: "3" }
+    ]);
     var result = IssueFields.getAvailableCustomFields();
     expect(result.length).toBe(3);
     expect(result[0]).toEqual({ key: "customx", name: "Custom X", schemaType: "Type 1", customType: "1" });
+
     result = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_RAW);
     expect(result.length).toBe(3);
     expect(result).toEqual([
       { key: "customx", name: "Custom X", schemaType: "Type 1", customType: "1" },
       { key: "customy", name: "Custom Y", schemaType: "Type 2", customType: "2" },
       { key: "customz", name: "Custom Z", schemaType: "Type 3", customType: "3" }
-    ]
-    );
+    ]);
+
     result = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_SEARCH);
     expect(Object.keys(result).length).toBe(3);
     expect(result.customx).toBe("Custom X");
@@ -348,24 +343,30 @@ describe("Checking custom field behaviour", () => {
 
   test.skip("Fixes up schema if customType was not present", () => {
     // addition of customType to field schema may mean saved custom fields do not contain the correct data
-    
+    CustomFields.save([
+      {
+        schema: { type: "string" },
+        key: "xyz",
+        name: "XYZ field",
+        custom: false
+      }
+    ]);
+
     // mock the older format in the users prefences
-    PropertiesService.mockUserProps.getProperty.mockImplementationOnce(() => {
+    CacheService.mockUserCache.get.mockImplementationOnce(() => {
       return JSON.stringify([
         { key: "custom_sprint", name: "Sprint", schemaType: "array|string", supported: true },
         { key: "custom_string", name: "String", schemaType: "string", supported: true },
         { key: "custom_number", name: "Number", schemaType: "number", supported: true },
         { key: "custom_string2", name: "Number", schemaType: "number", supported: true },
-      ]
-      );
+      ]);
     });
 
-    
     jiraApiMock.setNextJiraResponse(200, "field", jiraApiFieldResponse);
 
     var favouriteCustomFields = IssueFields.getAvailableCustomFields();
     expect(jiraApiMock.call).toBeCalledTimes(1);
-    expect(PropertiesService.mockUserProps.getProperty).toBeCalledTimes(1);
+    expect(CacheService.mockUserCache.get).toBeCalledTimes(5);
     expect(favouriteCustomFields.length).toBe(4);
     expect(favouriteCustomFields[0].key).toBe("custom_sprint");
     expect(favouriteCustomFields[0].customType).toBe("gh-sprint");
