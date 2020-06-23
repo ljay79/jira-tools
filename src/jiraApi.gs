@@ -24,6 +24,7 @@ var restMethods = {
     'filter'        : {method: '/filter/{filterId}'},
     //'search': {method: '/search', queryparams: {jql:'', fields: [], properties: [], maxResults: 100, validateQuery: 'strict'}} // GET
     'search'        : {method: '/search'}, // POST
+    // https://developer.atlassian.com/cloud/jira/platform/rest/v2/#api-rest-api-2-filter-my-get
     'myFilters'     : {method: '/filter/my', queryparams: {includeFavourites: 'true'}},
 
     // https://SITENAME.atlassian.net/rest/api/2/user/search?startAt=0&maxResults=1000&query=
