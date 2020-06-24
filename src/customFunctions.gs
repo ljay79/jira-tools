@@ -202,7 +202,7 @@ function customFunctionAllowed_() {
     throw new Error("The document owner (you) must enable custom functions. Open 'Add-ons > Project Aid for Jira > Settings' and toggle 'Custom Functions' to enabled. If you are not the document owner, ask him to enable custom functions.");
   }
 
-  // no return value; throws Error is feature is suspended
+  // no return value; throws Error if feature is suspended
   customFunctionsSuspended_();
 }
 
@@ -241,7 +241,6 @@ CustomFunctionErrorException.prototype._countHandler = function() {
 
 
 /**
- * @TODO: Not activated yet - soft launch with logging before lauching such critical code
  * @desc Check for CustomFunctions Error count and decide to suspend any further calls for a while or not.
  * @throws Error
  * @return void
@@ -255,7 +254,7 @@ function customFunctionsSuspended_() {
   var _timeUntil = docProps.get(key_time);
   var timeUntil = new Date();
 
-  console.info('customFunctionsSuspended_(): Counter is at: %s', count);
+  debug.info('customFunctionsSuspended_(): Counter is at: %s', count);
 
   if (_timeUntil != null) {
     // suspension time is set, convert to Date object
@@ -268,14 +267,14 @@ function customFunctionsSuspended_() {
   if (timeUntilSeconds > (nowSeconds+3)) {
     var _delay_seconds = timeUntilSeconds - nowSeconds;
     var _msg = "Suspension of custom functions for about " + _delay_seconds + " seconds because of to many errors! Please correct all your custom function calls in this document and wait before re-trying.";
-    console.info("customFunctionsSuspended_():" + _msg + " Now: %s < Until: %s", now.toString(), timeUntil.toString());
-    //@TODO: throw new Error(_msg); // NOT YET ACTIVE
+    debug.warn("customFunctionsSuspended_():" + _msg + " Now: %s < Until: %s", now.toString(), timeUntil.toString());
+    throw new Error(_msg);
   }
 
   // else
   if (count >= 100) {
     // set suspension +300s
-    console.info('customFunctionsSuspended_(): ... setting 300s suspension!');
+    debug.info('customFunctionsSuspended_(): ... setting 300s suspension!');
     docProps.put(key_time, now.getTime() + (300*1000));
 
     // reset error counter
@@ -283,12 +282,12 @@ function customFunctionsSuspended_() {
 
   } else if (count >= 25 && count < 30) {
     // set suspension +300s
-    console.info('customFunctionsSuspended_(): ... setting 60s suspension!');
+    debug.info('customFunctionsSuspended_(): ... setting 60s suspension!');
     docProps.put(key_time, now.getTime() + (60*1000));
 
   } else if (count >= 10 && count < 15) {
     // set suspension +30s
-    console.info('customFunctionsSuspended_(): ... setting 30s suspension!');
+    debug.info('customFunctionsSuspended_(): ... setting 30s suspension!');
     docProps.put(key_time, now.getTime() + (30*1000));
   }
   

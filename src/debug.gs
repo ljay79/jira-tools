@@ -113,7 +113,7 @@ StorageCounter = {
   },
 
   log: function() {
-    console.info("StorageCounter: %o", JSON.parse(this._cache.get(this._id)));
+    debug.info("StorageCounter: %o", JSON.parse(this._cache.get(this._id)));
   }
 
 };

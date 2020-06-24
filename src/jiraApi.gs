@@ -24,7 +24,8 @@ var restMethods = {
     'filter'        : {method: '/filter/{filterId}'},
     //'search': {method: '/search', queryparams: {jql:'', fields: [], properties: [], maxResults: 100, validateQuery: 'strict'}} // GET
     'search'        : {method: '/search'}, // POST
-    'myFilters'     : {method: '/filter/my', queryparams: {includeFavourites: 'true'}},
+    // https://developer.atlassian.com/cloud/jira/platform/rest/v2/#api-rest-api-2-filter-search-get
+    'myFilters'     : {method: '/filter/search', queryparams: {expand: 'favourite,jql,owner', startAt:0, maxResults: 100, orderBy: 'IS_FAVOURITE'}},
 
     // https://SITENAME.atlassian.net/rest/api/2/user/search?startAt=0&maxResults=1000&query=
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:''}},

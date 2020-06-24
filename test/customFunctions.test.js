@@ -1,4 +1,3 @@
-CacheService = require('test/mocks/CacheService');
 const getCfg_ = require("../src/settings.gs").getCfg_;
 const setCfg_ = require("../src/settings.gs").setCfg_;
 const customFunctions = require('src/customFunctions.gs');
@@ -6,8 +5,8 @@ const customFunctions = require('src/customFunctions.gs');
 beforeEach(() =>  {
   jest.resetModules();
   CacheService.resetMocks();
+  CacheService.resetMockUserData();
 });
-
 
 test("customFunctionAllowed_ throws exceptions", () => {
   // custom_fn_enabled not defined
@@ -32,6 +31,7 @@ test("customFunctionsSuspended_ for 30 seconds", () => {
   var key_count = 'CUSTOM_FUNCTIONS_ERROR_COUNT';
   var key_time  = 'CUSTOM_FUNCTIONS_ERROR_TIME';
   var now       = new Date(), suspension = null, seconds = 0;
+
   // custom_fn_enabled enabled
   setCfg_('custom_fn_enabled', 1)
 
@@ -47,8 +47,7 @@ test("customFunctionsSuspended_ for 30 seconds", () => {
   expect(seconds).toBeGreaterThanOrEqual(30);
   expect(seconds).toBeLessThan(40);
 
-  // not yet
-  //expect(customFunctions.customFunctionAllowed_).toThrowError();
+  expect(customFunctions.customFunctionAllowed_).toThrowError();
 });
 
 test("customFunctionsSuspended_ for 60 seconds", () => {
@@ -56,13 +55,14 @@ test("customFunctionsSuspended_ for 60 seconds", () => {
   var key_count = 'CUSTOM_FUNCTIONS_ERROR_COUNT';
   var key_time  = 'CUSTOM_FUNCTIONS_ERROR_TIME';
   var now       = new Date(), suspension = null, seconds = 0;
+
   // custom_fn_enabled enabled
   setCfg_('custom_fn_enabled', 1)
 
   /* error count = >= 25 */
   docProps.put(key_count, 25, 60*60);
   now = new Date(); suspension = new Date();
-  
+
   expect(customFunctions.customFunctionAllowed_).not.toThrowError();
   // verify suspension time
   suspension.setTime( docProps.get(key_time) );
@@ -71,8 +71,7 @@ test("customFunctionsSuspended_ for 60 seconds", () => {
   expect(seconds).toBeGreaterThanOrEqual(60);
   expect(seconds).toBeLessThan(70);
 
-  // not yet
-  //expect(customFunctions.customFunctionAllowed_).toThrowError();
+  expect(customFunctions.customFunctionAllowed_).toThrowError();
 });
 
 test("customFunctionsSuspended_ for 300 seconds", () => {
