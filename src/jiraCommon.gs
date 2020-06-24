@@ -162,8 +162,13 @@ function getMyFilters() {
     debug.log("getMyFilters()->ok(): %s", responseData);
 
     if (responseData) {
+      /*
+       * responseData = array (server: api v2 /filter/favourite)
+       * responseData.values = array (cloud: api v2 /filter/search)
+       */
+      var values = responseData.values ? responseData.values : responseData;
       // add data to export
-      filters.list.push.apply(filters.list, responseData.map(function (filter) {
+      filters.list.push.apply(filters.list, values.map(function (filter) {
         return {
           id: parseInt(filter.id),
           name: filter.name,
