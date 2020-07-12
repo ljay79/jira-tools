@@ -190,7 +190,7 @@ test('a jira dashboard request is made correctly', () => {
   requestObj.call("dashboard", {})
   var result = requestObj.getResponse();
   expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
-  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/dashboard");
+  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/dashboard?filter=my");
   expect(result.statusCode).toBe(200);
   expect(result.respData).not.toBeNull();
   expect(result.respData.errorMessages).toBeUndefined();

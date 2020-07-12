@@ -66,9 +66,12 @@ Settings_Controller_ = {
     setCfg_('jira_username', jsonFormData.jira_username);
     setCfg_('jira_password', jsonFormData.jira_password);
 
-    var test = testConnection(); // doesnt test authentification yet
-
+    var test = this._testConnection(); // doesnt test authentification yet
     setCfg_('server_type', (url.indexOf('atlassian.net') == -1) ? 'server' : 'onDemand');
+
+    // fetch user profile and save current users jira name and accountId
+    var me = new MySelf();
+    me.fetch();
 
     return {status: test.status, message: test.response};
   },
@@ -87,6 +90,34 @@ Settings_Controller_ = {
     UserStorage.setValue('issue_update_comment', (jsonFormData.issue_update_comment == 'on') ? 1 : 0);
 
     return {status: true, message: 'Options successfully saved.'};
+  },
+  
+  /**
+   * @desc Test JIRA API connection with provided settings.
+   * @TODO Doesnt test authentification yet
+   * @return {object}  Object({status:[boolean], response:[string]})
+   */
+  _testConnection: function() {
+    var req = new Request, response;
+
+    var ok = function(responseData, httpResponse, statusCode) {
+      response = 'Connection successfully established.';
+      debug.log('%s to server [%s] %s', response, getCfg_('server_type'), getCfg_('jira_url'));
+      setCfg_('available', true);
+    };
+
+    var error = function(responseData, httpResponse, statusCode) {
+      response = 'Could not connect to Jira Server!';
+      response += httpErrorCodes[statusCode] ? '\n ('+statusCode+') ' + httpErrorCodes[statusCode] : '('+statusCode+')';
+      debug.warn('Server [%s] %s; Response: %s', getCfg_('server_type'), getCfg_('jira_url'), response);
+      setCfg_('available', false);
+    };
+
+    req.call('dashboard')
+      .withSuccessHandler(ok)
+      .withFailureHandler(error);
+
+    return {status: (getCfg_('available')==true), response: response};
   }
 
 }

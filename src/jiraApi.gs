@@ -15,7 +15,8 @@ const extend = require("./jsLib.gs").extend;
  */
 var restMethods = {
   'onDemand': {
-    'dashboard'     : '/dashboard',
+    'dashboard'     : {method: '/dashboard', queryparams: {filter: 'my'}},
+    'myself'        : {method: '/myself'},
     'issueStatus'   : {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
     'issueUpdate'   : {method: '/issue/{issueIdOrKey}', httpMethod: 'put'},
     'issueTransitions': {method: '/issue/{issueIdOrKey}/transitions'},
@@ -25,7 +26,7 @@ var restMethods = {
     //'search': {method: '/search', queryparams: {jql:'', fields: [], properties: [], maxResults: 100, validateQuery: 'strict'}} // GET
     'search'        : {method: '/search'}, // POST
     // https://developer.atlassian.com/cloud/jira/platform/rest/v2/#api-rest-api-2-filter-search-get
-    'myFilters'     : {method: '/filter/search', queryparams: {expand: 'favourite,jql,owner', startAt:0, maxResults: 100, orderBy: 'IS_FAVOURITE'}},
+    'myFilters'     : {method: '/filter/search', queryparams: {accountId: '', expand: 'favourite,jql,owner', startAt:0, maxResults: 100, orderBy: 'IS_FAVOURITE'}},
 
     // https://SITENAME.atlassian.net/rest/api/2/user/search?startAt=0&maxResults=1000&query=
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:''}},
@@ -34,7 +35,8 @@ var restMethods = {
     'field'         : {method: '/field'}
   },
   'server': {
-    'dashboard'     : '/dashboard',
+    'dashboard'     : {method: '/dashboard', queryparams: {filter: 'my'}},
+    'myself'        : {method: '/myself'},
     'issueStatus'   : {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
     'issueUpdate'   : {method: '/issue/{issueIdOrKey}', httpMethod: 'put'},
     'issueTransitionUpdate': {method: '/issue/{issueIdOrKey}/transitions', httpMethod: 'post'},
@@ -69,34 +71,6 @@ var httpErrorCodes = {
   504:  'Gateway Time-out',
   509:  'Bandwidth Limit Exceeded',
   510:  'Not Extended'
-};
-
-/**
- * @desc Test JIRA API connection with provided settings.
- * @TODO Doesnt test authentification yet
- * @return {object}  Object({status:[boolean], response:[string]})
- */
-function testConnection() {
-  var req = new Request, response;
-
-  var ok = function(responseData, httpResponse, statusCode) {
-    response = 'Connection successfully established.';
-    debug.log('%s to server [%s] %s', response, getCfg_('server_type'), getCfg_('jira_url'));
-    setCfg_('available', true);
-  };
-
-  var error = function(responseData, httpResponse, statusCode) {
-    response = 'Could not connect to Jira Server!';
-    response += httpErrorCodes[statusCode] ? '\n ('+statusCode+') ' + httpErrorCodes[statusCode] : '('+statusCode+')';
-    debug.warn('%s Server [%s] %s', response, getCfg_('server_type'), getCfg_('jira_url'));
-    setCfg_('available', false);
-  };
-
-  req.call('dashboard')
-    .withSuccessHandler(ok)
-    .withFailureHandler(error);
-
-  return {status: (getCfg_('available')==true), response: response};
 };
 
 /**

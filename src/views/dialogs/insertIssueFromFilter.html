@@ -3,6 +3,13 @@
   <head>
     <base target="_top">
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.blue-green.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/styles.min.css?v=b146">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.0/dialog-polyfill.min.js"></script>
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.3.0/material.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <style>
     .error-container { display: none; width: 50%; float: right; margin-bottom: 16px; padding: 5px 10px; text-align: center; color: #fff; }
     .filter-select { border: 1px solid #dfdfdf; height: 154px; overflow-y: auto; line-height: 28px; }
@@ -21,8 +28,18 @@
   <body>
     <form name="issue-filter" action="" method="post">
       <input type="hidden" name="filter_id" id="filter-id" value="" />
+
+      <div class="input-switch filter-my-only">
+        <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="only-my-filters">
+          <input type="checkbox" id="only-my-filters" name="only_my_filters" class="mdl-switch__input" 
+            value="1"<? if (only_my_filters == 1) { ?> checked="checked" <? } ?> >
+          <span class="mdl-switch__label">My filters only</span>
+        </label>
+      </div>
+
+      <!-- container to place filter selection element into -->
       <div class="block filter-select is-loading">loading filters ...</div>
-      
+
       <div class="block filter-cols">
         <label class="label">System Columns</label>
         <? for (var id in columns) { ?>
@@ -63,7 +80,8 @@
       var columns = input.filter(function(el){ return el.type === 'checkbox'; });
       var action  = filter.querySelector('[type=submit]');
       var filters = [];
-      
+      var toggleOnlyMyFilters = $('#only-my-filters');
+
       function hideAlert(){
         if(timeout) timeout = clearTimeout(timeout);
         alert.style.display = 'none';
@@ -135,12 +153,12 @@
         hideAlert();
         if (!valid) return;
         showAlert('inserting ...', 1);
-        
+
         var formData = {
           filter_id: filter.elements['filter_id'].value,
           columns: columns.filter(function(el){ return el.checked; }).map(function(el) { return el.value; })
         };
-        
+
         google.script.run
           .withSuccessHandler(onResponse)
           .withFailureHandler(onResponse)
@@ -150,10 +168,26 @@
       function onResponse(response) {
         var done = response.status === true;
         hideAlert();
-        
+
         if(done) google.script.host.close();
         showAlert(response.message, done, 10000);
       }
+
+      toggleOnlyMyFilters.change(function() {
+        var enabled = $(this).is(':checked');
+        console.log('enabled: %s', enabled);
+        // save setting
+        google.script.run
+          .withSuccessHandler(function(){
+            var filterBox = $('.filter-select');
+            filterBox.addClass('is-loading').html('loading filters ...');
+            
+            google.script.run
+              .withSuccessHandler(onInitFilter)
+              .getMyFilters();
+          })
+          .callbackUpdateCfgMyFilter(enabled);
+      });
 
       google.script.run
         .withSuccessHandler(onInitFilter)

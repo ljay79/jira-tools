@@ -98,6 +98,10 @@ function initDefaults() {
   CustomFields.save(_cfields);
   debug.info('Migrated custom fields to  : %o', CustomFields.load());
 
+  // migrate from 1.4.6
+  if (null == UserStorage.getValue('only_my_filters'))
+    UserStorage.setValue('only_my_filters', 1);
+
   // set done
   UserStorage.setValue('defaults_initialized', 'true');
 }

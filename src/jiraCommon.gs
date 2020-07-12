@@ -156,6 +156,7 @@ function grepJiraCell(cellValue) {
  */
 function getMyFilters() {
   var filters = { list: [], error: '' };
+  var only_my_filters = UserStorage.getValue('only_my_filters') || 0;
 
   var ok = function (responseData, httpResponse, statusCode) {
     // Check the data is valid and the Jira fields exist
@@ -205,8 +206,16 @@ function getMyFilters() {
   };
 
   var request = new Request();
+  var data = {
+    accountId: null
+  };
 
-  request.call("myFilters")
+  if (only_my_filters == 1) {
+    var myself = new MySelf();
+    data.accountId = myself.getAccountId();
+  }
+
+  request.call("myFilters", data)
     .withSuccessHandler(ok)
     .withFailureHandler(error);
 

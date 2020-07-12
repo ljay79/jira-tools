@@ -18,6 +18,16 @@ function callbackInsertIssueFromFilter(jsonFormData) {
 }
 
 /**
+ * @desc Dialog callback handler
+ * @param {integer} enabled
+ * @return void
+ */
+function callbackUpdateCfgMyFilter(enabled) {
+  debug.log('callbackUpdateCfgMyFilter(%s)', (0+enabled));
+  UserStorage.setValue('only_my_filters', 0 + enabled);
+}
+
+/**
  * Creates a new IssueTableIndex_ object, which is used to persist IssueTables and related information.
  */
 InsertIssueTable_Controller_ = {
@@ -41,10 +51,12 @@ InsertIssueTable_Controller_ = {
 
     var customFields = IssueFields.getAvailableCustomFields(IssueFields.CUSTOMFIELD_FORMAT_SEARCH);
     var userColumns = UserStorage.getValue('userColumns') || [];
+    var only_my_filters = UserStorage.getValue('only_my_filters');
     var dialog = getDialog('views/dialogs/insertIssueFromFilter', {
       columns : IssueFields.getBuiltInJiraFields(),
       customFields : customFields,
-      userColumns : userColumns.length > 0 ? userColumns : jiraColumnDefault
+      userColumns : userColumns.length > 0 ? userColumns : jiraColumnDefault,
+      only_my_filters: only_my_filters
     });
 
     // try to adjust height depending on amount of jira fields to show
