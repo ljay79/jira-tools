@@ -543,3 +543,7 @@ dialog {
   margin-top: 40px;
 }
 /* --- */
+
+div.filter-my-only {
+  margin-bottom: 10px;
+}
