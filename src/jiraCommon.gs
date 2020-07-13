@@ -206,13 +206,13 @@ function getMyFilters() {
   };
 
   var request = new Request();
-  var data = {
-    accountId: null
-  };
+  var data = {};
 
-  if (only_my_filters == 1) {
+  if (only_my_filters == 1 && getCfg_('server_type') == 'onDemand') {
     var myself = new MySelf();
-    data.accountId = myself.getAccountId();
+    data = {
+      accountId: myself.getAccountId()
+    };
   }
 
   request.call("myFilters", data)

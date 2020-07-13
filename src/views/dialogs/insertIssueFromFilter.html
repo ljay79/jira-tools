@@ -29,7 +29,7 @@
     <form name="issue-filter" action="" method="post">
       <input type="hidden" name="filter_id" id="filter-id" value="" />
 
-      <div class="input-switch filter-my-only">
+      <div class="input-switch filter-my-only" <? if(server_type == 'server') { ?> style="display:none;"<? } ?> >
         <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="only-my-filters">
           <input type="checkbox" id="only-my-filters" name="only_my_filters" class="mdl-switch__input" 
             value="1"<? if (only_my_filters == 1) { ?> checked="checked" <? } ?> >

@@ -56,7 +56,8 @@ InsertIssueTable_Controller_ = {
       columns : IssueFields.getBuiltInJiraFields(),
       customFields : customFields,
       userColumns : userColumns.length > 0 ? userColumns : jiraColumnDefault,
-      only_my_filters: only_my_filters
+      only_my_filters: only_my_filters,
+      server_type: getCfg_('server_type')
     });
 
     // try to adjust height depending on amount of jira fields to show

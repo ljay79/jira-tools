@@ -27,7 +27,6 @@ var restMethods = {
     'search'        : {method: '/search'}, // POST
     // https://developer.atlassian.com/cloud/jira/platform/rest/v2/#api-rest-api-2-filter-search-get
     'myFilters'     : {method: '/filter/search', queryparams: {accountId: '', expand: 'favourite,jql,owner', startAt:0, maxResults: 100, orderBy: 'IS_FAVOURITE'}},
-
     // https://SITENAME.atlassian.net/rest/api/2/user/search?startAt=0&maxResults=1000&query=
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:''}},
     'userSearchV2'  : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, query:''}},
@@ -45,8 +44,7 @@ var restMethods = {
     'filter'        : {method: '/filter/{filterId}'},
     'search'        : {method: '/search'}, // POST
     // server api doesnt support /filter/my
-    'myFilters'     : {method: '/filter/favourite', queryparams: {includeFavourites: 'true'}},
-
+    'myFilters'     : {method: '/filter/favourite'},
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'.'}},
     'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
     'field'         : {method: '/field'}
@@ -165,12 +163,11 @@ function Request() {
     var jiraMethodConfig = restMethods[server_type][method];
     httpMethod = "get";
     if (typeof jiraMethodConfig === 'object') {
-      jiraMethod = jiraMethodConfig.method ;
+      jiraMethod = jiraMethodConfig.method;
       jiraQueryParams =  jiraMethodConfig.queryparams;
       if (jiraMethodConfig['httpMethod'] != null) {
         httpMethod = jiraMethodConfig['httpMethod'];
       }
-  
     } else {
       jiraMethod = restMethods[server_type][method];
       jiraQueryParams = {};
