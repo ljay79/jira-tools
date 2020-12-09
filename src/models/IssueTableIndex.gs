@@ -282,12 +282,12 @@ IssueTableIndex_ = {
               - range.getColumn() + 1));
 
           // check for expected table header
-          _actualHeader = JSON.stringify(range.getValues()[0]).toLowerCase();
+          _actualHeader = JSON.stringify(range.getDisplayValues()[0]).toLowerCase();
           _expectedHeader = JSON.stringify(IssueTable.getMeta('headerValues')).toLowerCase();
           if (_actualHeader != _expectedHeader) {
             // IssueTable's header is not the same anymore, changed and therefor not matching index anymore
             removeFromIndex = true;
-            throw new Error('Found table header not matching expected ones.');
+            throw new Error('Found table header not matching expected ones. Expected: '+_expectedHeader+' <> Actual: '+_actualHeader+'');
           }
 
         } catch (e) {
