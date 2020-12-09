@@ -213,8 +213,8 @@ InsertIssueTable_Controller_ = {
 function TriggerPruneIssueTableIndex_(e) {
   debug.time('[TriggerPruneIssueTableIndex_]');
 
-  if (e.changeType !== 'REMOVE_GRID') {
-    //debug.log('[TriggerPruneIssueTableIndex_] changeType [%s] not monitored. Skip.', e.changeType);
+  if (e.changeType !== 'REMOVE_GRID' && e.changeType !== 'REMOVE_ROW' && e.changeType !== 'REMOVE_COLUMN') {
+    debug.log('[TriggerPruneIssueTableIndex_] changeType [%s] not monitored. Skip.', e.changeType);
     debug.timeEnd('[TriggerPruneIssueTableIndex_]');
     return;
   }

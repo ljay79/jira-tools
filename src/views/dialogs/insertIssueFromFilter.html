@@ -77,7 +77,7 @@
       var timeout = null;
       var alert   = document.getElementById('response-message');
       var input   = Array.prototype.slice.call(filter.elements).filter(function(el){ return el.nodeName === 'INPUT'; });
-      var columns = input.filter(function(el){ return el.type === 'checkbox'; });
+      var columns = input.filter(function(el){ return (el.type === 'checkbox' && el.name == 'columns[]'); });
       var action  = filter.querySelector('[type=submit]');
       var filters = [];
       var toggleOnlyMyFilters = $('#only-my-filters');

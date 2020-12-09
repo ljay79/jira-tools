@@ -335,7 +335,7 @@ IssueFields = (function () {
       label = labels[key];
     }
 
-    return label;
+    return label.toString();
   }
 
   function getReadonlyFields() {
