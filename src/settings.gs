@@ -106,7 +106,7 @@ function initDefaults() {
   // migrate to 1.4.9
   var _authtype = getCfg_('authType');
   if (_authtype == null)
-    setCfg_('authType', 'autht1');
+    setCfg_('authType', 'autht2');
 
   // set done
   UserStorage.setValue('defaults_initialized', 'true');
