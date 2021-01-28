@@ -53,8 +53,9 @@ function hasSettings(alert) {
   var url = getCfg_('jira_url');
   var username = getCfg_('jira_username');
   var password = getCfg_('jira_password');
+  var authType = getCfg_('authType');
 
-  if(available === undefined || !username || !password || !url) {
+  if(available === undefined || !password || !url || (!username && authType != 'autht3')) {
     if(alert) Browser.msgBox("Jira Error", 
                    "Please configure the Jira Settings first!\\n\\n" +
                    '"Add-ons -> Project Aid for Jira -> Settings"', Browser.Buttons.OK);
@@ -101,6 +102,11 @@ function initDefaults() {
   // migrate from 1.4.6
   if (null == UserStorage.getValue('only_my_filters'))
     UserStorage.setValue('only_my_filters', 1);
+    
+  // migrate to 1.4.9
+  var _authtype = getCfg_('authType');
+  if (_authtype == null)
+    setCfg_('authType', 'autht2');
 
   // set done
   UserStorage.setValue('defaults_initialized', 'true');
@@ -115,6 +121,7 @@ function getAddonConfig_() {
     buildNumber: BUILD,
     available: getCfg_('available'),
     url: getCfg_('jira_url'),
+    authType: getCfg_('authType') || 'auth1',
     username: getCfg_('jira_username'),
     password: getCfg_('jira_password'),
     custom_fn_enabled: getCfg_('custom_fn_enabled') || 0,

@@ -458,3 +458,12 @@ fieldset .block2x2 {
 .getmdl-select__fix-height .mdl-menu__container .mdl-menu{overflow-y:auto;max-height:288px !important}
 .getmdl-select__fix-height .mdl-menu.mdl-menu--top-left{bottom:auto;top:0}
 
+.fix-mdl-select .mdl-textfield__label {
+  top: 24px;
+}
+.fix-mdl-select .getmdl-select .mdl-icon-toggle__label {
+  margin-top: -42px;
+}
+.fix-mdl-select .mdl-textfield.is-focused .mdl-textfield__label:after {
+  width: 96%;
+}
