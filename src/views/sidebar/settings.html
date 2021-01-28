@@ -1,169 +1,226 @@
 <!DOCTYPE html>
 <html>
 <head>
-<base target="_top">
-<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/add-ons1.min.css?v=b143">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.blue-green.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700">
-<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/styles.min.css?v=b146">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.0/dialog-polyfill.min.js"></script>
-<script src="https://storage.googleapis.com/code.getmdl.io/1.3.0/material.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<base target="_top" />
+<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/add-ons1.min.css?v=b149" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.blue-green.min.css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/styles.min.css?v=b149" />
+<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/custom.min.css?v=b149" />
 </head>
 <body>
 
-	<div id="response-message" class="message-container" role="dialog"></div>
+    <div id="response-message" class="message-container" role="dialog"></div>
 
-	<div class="sidebar branding-below">
+    <div class="sidebar branding-below">
 
-		<!-- MDL Tab Container -->
-		<div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
-			<!-- Tab Bars -->
-			<div class="mdl-tabs__tab-bar numTabs2">
-				<a href="#jira-access-panel" class="mdl-tabs__tab is-active">Jira Access</a>
-				<a href="#addon-options-panel" class="mdl-tabs__tab">Add-on Options</a>
-			</div>
+        <!-- MDL Tab Container -->
+        <div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+            <!-- Tab Bars -->
+            <div class="mdl-tabs__tab-bar numTabs2">
+                <a href="#jira-access-panel" class="mdl-tabs__tab is-active">Jira Access</a>
+                <a href="#addon-options-panel" class="mdl-tabs__tab">Add-on Options</a>
+            </div>
 
-			<!-- MDL tab panels, is-active to denote currently active -->
-			<div class="mdl-tabs__panel is-active" id="jira-access-panel">
+            <!-- MDL tab panels, is-active to denote currently active -->
+            <div class="mdl-tabs__panel is-active" id="jira-access-panel">
 
-				<form id="access" action="" method="post">
-					<fieldset class="">
-						<legend>General</legend>
-						<div class="block">
-							<div class="mdl-textfield mdl-js-textfield">
-								<input type="text" id="jira-url" name="jira_url"
-									class="mdl-textfield__input" value="<?= url ?>"
-									placeholder="https://<My-Jira-Domain>/">
-								<label class="mdl-textfield__label" for="jira-url">Jira URL</label>
-							</div>
-							<span class="inline grey">(ie: https://mysite.atlassian.net/)</span>
-						</div>
-						<div class="block">
-							<div class="mdl-textfield mdl-js-textfield">
-								<input type="text" id="jira-username" name="jira_username"
-									class="mdl-textfield__input" value="<?= username ?>"
-									placeholder="">
-								<label class="mdl-textfield__label" for="jira-username">Username or Email</label>
-							</div>
-						</div>
-						<div class="block">
-							<div class="mdl-textfield mdl-js-textfield">
-								<input type="password" id="jira-password" name="jira_password"
-									class="mdl-textfield__input" value="<?= password ?>"
-									placeholder="">
-								<label class="mdl-textfield__label" for="jira-password">Password or API token</label>
-							</div>
-						</div>
-					</fieldset>
+                <form id="access" action="" method="post">
+                    <fieldset class="">
+                        <legend>General</legend>
+                        <div class="block">
+                            <div class="mdl-textfield mdl-js-textfield">
+                                <input type="text" id="jira-url" name="jira_url"
+                                    class="mdl-textfield__input" value="<?= url ?>"
+                                    placeholder="https://<My-Jira-Domain>/" required>
+                                <label class="mdl-textfield__label" for="jira-url">Jira URL</label>
+                            </div>
+                            <span class="inline grey">(ie: https://mysite.atlassian.net/)</span>
+                        </div>
+                    </fieldset>
+                    <style>
+                    .fix-mdl-select .mdl-textfield__label {
+                      top: 24px;
+                    }
+                    .fix-mdl-select .getmdl-select .mdl-icon-toggle__label {
+                      margin-top: -42px;
+                    }
+                    .fix-mdl-select .mdl-textfield.is-focused .mdl-textfield__label:after {
+                      width: 96%;
+                    }
+                    </style>
+                    <fieldset class="fix-mdl-select">
+                        <legend>Credentials</legend>
+                        <div class="block">
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
+                                <input type="text" value="" class="mdl-textfield__input" id="select-authtype" readonly>
+                                <input type="hidden" value="<?= authType ?>" name="authtype" required>
+                                <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
+                                <label for="sample6" class="mdl-textfield__label">Authentification method</label>
+                                <ul for="sample6" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                                    <li class="mdl-menu__item" data-val="autht1"<? if(authType == 'autht1') { ?> data-selected="true"<? } ?>>Username &amp; Password</li>
+                                    <li class="mdl-menu__item" data-val="autht2"<? if(authType == 'autht2') { ?> data-selected="true"<? } ?>>Email &amp; API Token</li>
+                                    <li class="mdl-menu__item" data-val="autht3"<? if(authType == 'autht3') { ?> data-selected="true"<? } ?>>Personal Access Token</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- auth type 1 (username + password) -->
+                        <div class="choice-fieldset autht1" style="display: none">
+                            <div class="block">
+                                <div class="mdl-textfield mdl-js-textfield">
+                                    <input type="text" id="at1-id" name="at1_username"
+                                        class="mdl-textfield__input" value="<?= username ?>" placeholder="">
+                                    <label class="mdl-textfield__label" for="at1-id">Username</label>
+                                </div>
+                            </div>
+                            <div class="block">
+                                <div class="mdl-textfield mdl-js-textfield">
+                                    <input type="password" id="at1-pwd" name="at1_password"
+                                        class="mdl-textfield__input" value="<?= password ?>" placeholder="">
+                                    <label class="mdl-textfield__label" for="at1-pwd">Password</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- auth type 2 (email + api token) -->
+                        <div class="choice-fieldset autht2" style="display: none">
+                            <div class="block">
+                                <div class="mdl-textfield mdl-js-textfield">
+                                    <input type="text" id="at2-id" name="at2_email"
+                                        class="mdl-textfield__input" value="<?= username ?>" placeholder="">
+                                    <label class="mdl-textfield__label" for="at2-id">Email</label>
+                                </div>
+                            </div>
+                            <div class="block">
+                                <div class="mdl-textfield mdl-js-textfield">
+                                    <input type="password" id="at2-pwd" name="at2_password"
+                                        class="mdl-textfield__input" value="<?= password ?>" placeholder="">
+                                    <label class="mdl-textfield__label" for="at2-pwd">API token</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- auth type 3 (personal access token) -->
+                        <div class="choice-fieldset autht3" style="display: none">
+                            <div class="block">
+                                <div class="mdl-textfield mdl-js-textfield">
+                                    <input type="password" id="at3-pwd" name="at3_token"
+                                        class="mdl-textfield__input" value="<?= password ?>" placeholder="">
+                                    <label class="mdl-textfield__label" for="at3-pwd">Personal Access Token</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </fieldset>
 
-					<div class="block actions">
-						<button type="submit" class="green" id="access--save" disabled>Save</button>
-					</div>
-				</form>
+                    <div class="block actions">
+                        <button type="submit" class="green" id="access--save" disabled>Save</button>
+                    </div>
+                </form>
 
-				<br />
+                <br />
 
-				<div id="box-tip">
-					<h4>Explore Tips</h4>
-					<p>
-						Jira Cloud:<br />
-						Atlassian email + API token. <a target="_blank" href="https://confluence.atlassian.com/cloud/api-tokens-938839638.html">Get API token</a>
-					</p>
-					<p>
-						Jira Server:<br />Your username or email + password.
-					</p>
-					<div class="tip-footer">
-						<a target="_blank" href="https://github.com/ljay79/jira-tools/blob/master/README.md#setup-connection-to-jira">Read more</a>
-					</div>
-				</div>
+                <div id="box-tip">
+                    <h4>Explore Tips</h4>
+                    <p>
+                        Jira Cloud:<br />
+                        Atlassian email + API token. <a target="_blank" href="https://confluence.atlassian.com/cloud/api-tokens-938839638.html">Get API token</a>
+                    </p>
+                    <p>
+                        Jira Server:<br />Your username or email + password.
+                    </p>
+                    <div class="tip-footer">
+                        <a target="_blank" href="https://github.com/ljay79/jira-tools/blob/master/README.md#setup-connection-to-jira">Read more</a>
+                    </div>
+                </div>
 
-			</div>
-			<!-- END #jira-access-panel -->
+            </div>
+            <!-- END #jira-access-panel -->
 
-			<!-- MDL Tab panel 2 -->
-			<div class="mdl-tabs__panel" id="addon-options-panel">
+            <!-- MDL Tab panel 2 -->
+            <div class="mdl-tabs__panel" id="addon-options-panel">
 
-				<dialog class="mdl-dialog">
-					<p>Be careful when sharing this spreadsheet. Anyone who can edit
-						it will be able to use the custom functions and import Jira data
-						using your account.</p>
-					<button type="button" class="action">Confirm</button>
-					<button type="button" class="cancel">Cancel</button>
-				</dialog>
+                <dialog class="mdl-dialog">
+                    <p>Be careful when sharing this spreadsheet. Anyone who can edit
+                        it will be able to use the custom functions and import Jira data
+                        using your account.</p>
+                    <button type="button" class="action">Confirm</button>
+                    <button type="button" class="cancel">Cancel</button>
+                </dialog>
 
-				<form id="options" action="" method="post">
-					<fieldset class="input-switch">
-						<legend>Custom Functions</legend>
-						<label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">
-						    <input type="checkbox" id="switch-1" name="custom_fn_enabled" class="mdl-switch__input" 
-						      value="on"<? if (custom_fn_enabled == 1) { ?> checked="checked" <? } ?> >
-						    <span class="mdl-switch__label">Custom functions use the
-								document owner's configured site and Jira credentials to query
-								Jira.</span>
-						</label>
-					</fieldset>
-					<br />
+                <form id="options" action="" method="post">
+                    <fieldset class="input-switch">
+                        <legend>Custom Functions</legend>
+                        <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">
+                            <input type="checkbox" id="switch-1" name="custom_fn_enabled" class="mdl-switch__input" 
+                              value="on"<? if (custom_fn_enabled == 1) { ?> checked="checked" <? } ?> >
+                            <span class="mdl-switch__label">Custom functions use the document owner's configured site and Jira credentials to query Jira.</span>
+                        </label>
+                    </fieldset>
+                    <br />
 
-					<fieldset class="">
-						<legend>Time Sheet</legend>
-						<div class="block">
-							<div class="mdl-textfield mdl-js-textfield">
-								<input type="number" id="ts-workhours" name="ts_workhours"
-									class="mdl-textfield__input" min="1" step="1"
-									value="<?= workhours ?>" placeholder="number of hours">
-								<label class="mdl-textfield__label" for="ts-workhours">Working hours per day</label>
-							</div>
-						</div>
-					</fieldset>
+                    <fieldset class="">
+                        <legend>Time Sheet</legend>
+                        <div class="block">
+                            <div class="mdl-textfield mdl-js-textfield">
+                                <input type="number" id="ts-workhours" name="ts_workhours"
+                                    class="mdl-textfield__input" min="1" step="1"
+                                    value="<?= workhours ?>" placeholder="number of hours">
+                                <label class="mdl-textfield__label" for="ts-workhours">Working hours per day</label>
+                            </div>
+                        </div>
+                    </fieldset>
 
-					<fieldset class="">
-						<legend>Show Duration as</legend>
-						<div class="block">
-							<label class="mdl-radio mdl-js-radio" for="ts-dspdurationas_sec">
-								<input type="radio" id="ts-dspdurationas_sec" name="ts_dspdurationas" class="mdl-radio__button" 
-								    value="s"<? if (dspdurationas == "s") { ?> checked="checked"<? } ?> >
-						        <span class="mdl-radio__label">In Seconds (1h = "3600")</span>
-							</label>
-							<br />
-							<label class="mdl-radio mdl-js-radio" for="ts-dspdurationas_time">
-							    <input type="radio" id="ts-dspdurationas_time" name="ts_dspdurationas" class="mdl-radio__button" 
-							        value="w"<? if (dspdurationas == "w") { ?> checked="checked"<? } ?> >
-						        <span class="mdl-radio__label">As Worktime ("2d 3h 35m 30s")</span>
-							</label>
-						</div>
-					</fieldset>
+                    <fieldset class="">
+                        <legend>Show Duration as</legend>
+                        <div class="block">
+                            <label class="mdl-radio mdl-js-radio" for="ts-dspdurationas_sec">
+                                <input type="radio" id="ts-dspdurationas_sec" name="ts_dspdurationas" class="mdl-radio__button" 
+                                    value="s"<? if (dspdurationas == "s") { ?> checked="checked"<? } ?> >
+                                <span class="mdl-radio__label">In Seconds (1h = "3600")</span>
+                            </label>
+                            <br />
+                            <label class="mdl-radio mdl-js-radio" for="ts-dspdurationas_time">
+                                <input type="radio" id="ts-dspdurationas_time" name="ts_dspdurationas" class="mdl-radio__button" 
+                                    value="w"<? if (dspdurationas == "w") { ?> checked="checked"<? } ?> >
+                                <span class="mdl-radio__label">As Worktime ("2d 3h 35m 30s")</span>
+                            </label>
+                        </div>
+                    </fieldset>
                     
                     <fieldset class="input-switch">
-						<legend>Add comment on update</legend>
-						<label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-2">
-						    <input type="checkbox" id="switch-2" name="issue_update_comment" class="mdl-switch__input" 
-						      value="on"<? if (issue_update_comment == 1) { ?> checked="checked" <? } ?> >
-						    <span class="mdl-switch__label">Adding a comment to the updated Jira issue when using "Update Jira Issues" ("<i>Updated by Project Aid for Jira</i>").</span>
-						</label>
-					</fieldset>
-					<br />
+                        <legend>Add comment on update</legend>
+                        <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-2">
+                            <input type="checkbox" id="switch-2" name="issue_update_comment" class="mdl-switch__input" 
+                              value="on"<? if (issue_update_comment == 1) { ?> checked="checked" <? } ?> >
+                            <span class="mdl-switch__label">Adding a comment to the updated Jira issue when using "Update Jira Issues" ("<i>Updated by Project Aid for Jira</i>").</span>
+                        </label>
+                    </fieldset>
+                    <br />
 
-					<div class="block actions">
-						<button type="submit" class="green" id="options--save" disabled>Save</button>
-					</div>
-				</form>
+                    <div class="block actions">
+                        <button type="submit" class="green" id="options--save" disabled>Save</button>
+                    </div>
+                </form>
 
-			</div>
-			<!-- END #addon-options-panel -->
+            </div>
+            <!-- END #addon-options-panel -->
 
-		</div>
-		<!-- class="sidebar branding-below" //-->
-	</div>
-	<!-- MDL Tab Container -->
+        </div>
+        <!-- class="sidebar branding-below" //-->
+    </div>
+    <!-- MDL Tab Container -->
 
-	<div class="sidebar bottom">
-		<a href="#" class="whatsnew">What's New?</a> <span class="gray">Project
-			Aid for Jira v<?= buildNumber ?>
-		</span>
-	</div>
+    <div class="sidebar bottom">
+        <a href="#" class="whatsnew">What's New?</a> <span class="gray">Project
+            Aid for Jira v<?= buildNumber ?>
+        </span>
+    </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.0/dialog-polyfill.min.js"></script>
+<script src="https://storage.googleapis.com/code.getmdl.io/1.3.0/material.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://s3.eu-central-1.amazonaws.com/jira-tools/custom.min.js?v=b149"></script>
 <script>
 /* response messages */
 var message = document.getElementById('response-message');
@@ -202,6 +259,13 @@ var actionOptions = document.querySelector('#options--save');
 var inputAccess = Array.prototype.slice.call(frmAccess.elements).filter(function(el) {return el.nodeName === 'INPUT';});
 var inputOptions = Array.prototype.slice.call(frmOptions.elements).filter(function(el) {return el.nodeName === 'INPUT';});
 
+// Auth type selection
+var authType = $('input[name=authtype]');
+$('#select-authtype').change(function() {
+  $('.choice-fieldset').hide();
+  $('.choice-fieldset.'  + authType.val()).show()
+});
+
 /**
  * @desc moving single message box to current shown form near action button
  */
@@ -219,13 +283,12 @@ function inputValidatyHandler(elements, action) {
   var validaty = true;
   elements.forEach(function(el) {
     switch (el.name) {
-    case 'jira_url':
-      validaty = validaty && (el.value.indexOf('https://') !== -1);
-      break;
-    default:
-      validaty = validaty
-          && (validaty = el.nodeName !== 'INPUT' || el.value.length > 0);
-      break;
+      case 'jira_url':
+        validaty = validaty && (el.value.indexOf('https://') !== -1);
+        break;
+      default:
+        validaty = validaty && (validaty = (el.nodeName !== 'INPUT' || (el.required ? el.value.length > 0 : true)));
+        break;
     }
     return validaty;
   });
@@ -252,9 +315,12 @@ frmAccess.addEventListener('submit', function(e) {
 
   showMessage('saving ...', false, 1500);
 
-  google.script.run.withSuccessHandler(onResponse).withFailureHandler(
-      onResponse).callbackSettings_saveAccess(this);
+  google.script.run
+    .withSuccessHandler(onResponse)
+    .withFailureHandler(onResponse)
+    .callbackSettings_saveAccess(this);
 });
+
 frmOptions.addEventListener('submit', function(e) {
   if (e)
     event.preventDefault();

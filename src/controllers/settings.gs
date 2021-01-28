@@ -60,14 +60,34 @@ Settings_Controller_ = {
   callbackSaveAccess : function (jsonFormData) {
     debug.log(this.name + '.callbackSaveSettings()');
 
+    var _uname = '',
+        _pwd = '';
+
+    switch(jsonFormData.authtype) {
+        case 'autht1': // username + password
+            _uname = jsonFormData.at1_username || '';
+            _pwd = jsonFormData.at1_password || '';
+            break;
+        case 'autht2': // email + api token
+        default:
+            _uname = jsonFormData.at2_email || '';
+            _pwd = jsonFormData.at2_password || '';
+            break;
+        case 'autht3': // personal access token
+            _pwd = jsonFormData.at3_token || '';
+            break;
+    }
+
     var url = trimChar(jsonFormData.jira_url, "/");
     setCfg_('available', false);
     setCfg_('jira_url', url);
-    setCfg_('jira_username', jsonFormData.jira_username);
-    setCfg_('jira_password', jsonFormData.jira_password);
+    setCfg_('authType', jsonFormData.authtype);
+    setCfg_('jira_username', _uname);
+    setCfg_('jira_password', _pwd);
 
     var test = this._testConnection(); // doesnt test authentification yet
-    setCfg_('server_type', (url.indexOf('atlassian.net') == -1) ? 'server' : 'onDemand');
+    var _isServer = (url.indexOf('atlassian.net') == -1 || jsonFormData.authtype == 'autht3');
+    setCfg_('server_type', _isServer ? 'server' : 'onDemand');
 
     // fetch user profile and save current users jira name and accountId
     var me = new MySelf();

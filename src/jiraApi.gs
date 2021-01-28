@@ -78,6 +78,7 @@ var httpErrorCodes = {
 function Request() {
   var statusCode, httpResponse, httpMethod, responseData,
       available, url, username, password,
+      authMethod = 'Basic',
       jiraMethod = null,
       jiraQueryParams = {};
 
@@ -85,6 +86,7 @@ function Request() {
     server_type = getCfg_('server_type') || 'onDemand';
     available = getCfg_('available');
     url = getCfg_('jira_url');
+    authMethod = (getCfg_('authType') == 'autht3' ? 'Bearer' : 'Basic');
     username = getCfg_('jira_username');
     password = getCfg_('jira_password');
     jiraMethod = null;
@@ -98,15 +100,21 @@ function Request() {
   this.getFetchArgs = function(args) {
     var fetchArgs = {
       contentType: "application/json",
-      headers: {"Authorization": "Basic "},
+      headers: {},
       method: httpMethod,
       muteHttpExceptions : true
     };
-    var encCred = Utilities.base64Encode(username + ":" + password);
 
-    fetchArgs.headers = {
-      "Authorization": "Basic " + encCred
-    };
+    if (authMethod == 'Bearer') {
+      fetchArgs.headers = {
+        "Authorization": "Bearer " + password
+      };
+    } else {
+      var encCred = Utilities.base64Encode(username + ":" + password);
+      fetchArgs.headers = {
+        "Authorization": "Basic " + encCred
+      };
+    }
 
     extend(fetchArgs, args);
 
