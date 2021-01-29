@@ -86,7 +86,7 @@ Best described here -> [How to obtain API Token](https://confluence.atlassian.co
 > It is recommended to use this Add-on only with an Jira Cloud/Server instance which runs via SSL (https).
 > This Add-on is using simple Basic Auth mechanism to authenticate with Jira, which means, user credentials are transmitted unencrypted when used without SSL.
 
-### (C) Personal Access Token
+#### (C) Personal Access Token
 Recent Jira Versions (starting Jira Core 8.14) allow users to create personal access tokens. One can create such token under Profile > Personal Access Tokens > Create. These tokens are available on Jira Core and Jira Software (On-Premise) in comparison to aforementioned Atlassian API Tokens (only available in cloud). [More Information on Personal Access Tokens](https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html)
 
 > This Add-on can use Bearer Auth mechanism to authenticate with Personal Access Tokens
