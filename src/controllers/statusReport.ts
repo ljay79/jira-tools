@@ -3,7 +3,7 @@
  */
 
 // Node required code block
-
+const JiraRequest = require('src/jiraApi.gs');
 const IssueHistory = require("src/models/jira/IssueHistory.gs");
 const getDialog = require("src/dialogs.gs").getDialog;
 const debug = require("src/debug.gs").debug;
@@ -219,7 +219,7 @@ class StatusReport_Controller_ {
         );
 
         // perform worklog request
-        var request = new Request();
+        var request = new JiraRequest();
         request.call('worklogOfIssue',{issueIdOrKey: issue.id})
           .withFailureHandler(function(resp, httpResp, status) {
             debug.error("Failed to retrieve worklogs for issue with status [%s]!\\n" + resp.errorMessages.join("\\n") + "Response: %s", status, resp);
