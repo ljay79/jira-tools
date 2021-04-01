@@ -1,5 +1,5 @@
 // Node required code block
-const BUILD = require("./Code.gs").BUILD;
+const BUILD = require("./Code.ts").BUILD;
 const Storage_ = require("./Storage.gs").Storage_;
 const UserStorage = require("src/models/gas/UserStorage.gs");
 const CustomFields = require("src/models/jira/CustomFields.gs");
@@ -56,7 +56,7 @@ function hasSettings(alert) {
   var authType = getCfg_('authType');
 
   if(available === undefined || !password || !url || (!username && authType != 'autht3')) {
-    if(alert) Browser.msgBox("Jira Error", 
+    if(alert) Browser.msgBox("Jira Error",
                    "Please configure the Jira Settings first!\\n\\n" +
                    '"Add-ons -> Project Aid for Jira -> Settings"', Browser.Buttons.OK);
     return false;
@@ -102,7 +102,7 @@ function initDefaults() {
   // migrate from 1.4.6
   if (null == UserStorage.getValue('only_my_filters'))
     UserStorage.setValue('only_my_filters', 1);
-    
+
   // migrate to 1.4.9
   var _authtype = getCfg_('authType');
   if (_authtype == null)
@@ -114,7 +114,7 @@ function initDefaults() {
 
 /**
  * @desc Helper for our Settings Dialogs HTML.
- * @return {object} 
+ * @return {object}
  */
 function getAddonConfig_() {
   return {

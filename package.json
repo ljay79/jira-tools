@@ -13,11 +13,10 @@
     "url": "git+https://github.com/ljay79/jira-tools.git"
   },
   "main": "Code.gs",
-  "dependencies": {
-    "@types/google-apps-script": "^0.0.35"
-  },
   "devDependencies": {
     "@google/clasp": "^2.3.0",
+    "@types/google-apps-script": "^1.0.30",
+    "@types/node": "^14.14.37",
     "del": "3.x",
     "directory-exists": "latest",
     "eslint-config-google": "^0.13.0",
