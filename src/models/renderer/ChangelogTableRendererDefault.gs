@@ -15,7 +15,7 @@ const IssueChangelogs = require('../jira/IssueChangelogs.gs');
  * @param {string} RendererClassName Classname of a ChangelogTableRenderer class
  * @return {object} An instance of type ChangelogTableRenderer_
  */
-function RendererFactory_(RendererClassName) {
+function ChangelogRendererFactory_(RendererClassName) {
   debug.log('RendererFactory_(%s)', RendererClassName);
   var name = 'RendererFactory_';
 
@@ -290,7 +290,7 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
 
 // Node required code block
 module.exports = {
-  RendererFactory_ : RendererFactory_,
+  ChangelogRendererFactory_ : ChangelogRendererFactory_,
   ChangelogTableRendererDefault_ : ChangelogTableRendererDefault_
 }
 // End of Node required code block

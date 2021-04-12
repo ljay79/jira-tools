@@ -52,7 +52,7 @@ test('menuJiraStatusMap', () => {
 test("history entries should be returned", () => {
   //jiraApiMock.setAllResponsesSuccesfull(200, mockFieldJiraApiResponse);
   jiraApiMock.setNextJiraResponse(200, "history", mockChangelogJiraApiResponse);
-  var callbackFetchAllHistories = require('src/controllers/changelogReport.gs').callbackFetchAllHistories;
+  var ChangelogTable = require('src/controllers/changelogReport.gs').ChangelogTable;
   var histories = callbackFetchAllHistories();
   // fields returned should only have custom fields from the mock data
   expect(histories.length).toBe(1);

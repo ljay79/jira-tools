@@ -3,7 +3,7 @@ const extend = require('../../jsLib.gs').extend;
 const getSheetById = require('../../jsLib.gs').getSheetById;
 const sheetIdPropertySafe = require('../../jiraCommon.gs').sheetIdPropertySafe;
 var SpreadsheetTriggers_ = require('../SpreadsheetTriggers.gs').SpreadsheetTriggers_;
-var IssueTableRendererDefault_ = require('../renderer/IssueTableRendererDefault.gs').IssueTableRendererDefault_;
+var ChangelogTableRendererDefault_ = require('../renderer/ChangelogTableRendererDefault.gs').ChangelogTableRendererDefault_;
 // End of Node required code block
 
 /**
@@ -31,7 +31,7 @@ function ChangelogTable_(attributes) {
         headerValues : [],               // sample: [Summary,Key,Status,Epic,P]
         filter: {id: 0, jql: null},      // sample: {id: 1234, jql: 'status = Done and project in ("JST")'}
         maxResults : null,               // sample: 10
-        renderer: null,                  // sample: IssueTableRendererDefault_
+        renderer: null,                  // sample: ChangelogTableRendererDefault_
         time_lastupdated : (new Date()).getTime() // sample: 1550871398921
       };
 
@@ -75,7 +75,7 @@ function ChangelogTable_(attributes) {
       }
 
       if (!attributes.hasOwnProperty('renderer')) {
-        throw new ReferenceError("{attributes.renderer} must be defined. Ie: of type 'IssueTableRendererDefault_' or string of class name.");
+        throw new ReferenceError("{attributes.renderer} must be defined. Ie: of type 'ChangelogTableRendererDefault_' or string of class name.");
       }
 
       /* ---- */
@@ -104,7 +104,7 @@ function ChangelogTable_(attributes) {
 
   /**
    * @desc Setting the table renderer
-   * @param {string|function} Classname or class of IssueTableRenderer
+   * @param {string|function} Classname or class of ChangelogTableRenderer
    * @return {ChangelogTable_}
    */
   that.setRenderer = function (rendererClass) {
@@ -239,14 +239,14 @@ function ChangelogTable_(attributes) {
   /**
    * @desc Calling the set renderer and render table
    * @throws ReferenceError
-   * @return {IssueTableRenderer_}
+   * @return {ChangelogTableRenderer_}
    */
   that.render = function () {
     debug.log('ChangelogTable_.render()');
-    var renderer = RendererFactory_.call(that, metaData.renderer);
+    var renderer = ChangelogRendererFactory_.call(that, metaData.renderer);
     if (typeof renderer !== 'object' || !renderer.hasOwnProperty('render')) {
       throw new ReferenceError("{renderer} must be an object/class but is '" + typeof renderer
-          + "'. Ie: of type 'IssueTableRendererDefault_'.");
+          + "'. Ie: of type 'ChangelogTableRendererDefault_'.");
     }
 
     renderer.render();
