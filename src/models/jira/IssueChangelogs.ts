@@ -1,16 +1,31 @@
 /**
  * Model class for interactions with JIRA changelogs
- * @todo Currently this just contains all of the functions used across the code base - needs to be factored into a class
+ *
  */
 
 // Node required code block
 const JiraRequest = require('src/jiraApi.gs');
 // End of Node required code block
 
+interface HistoryEntry {
+    /** The name of the field changed. */
+    field?: string;
+    /** The type of the field changed. */
+    fieldtype?: string;
+    /** The ID of the field changed. */
+    fieldId?: string;
+    /** The details of the original value. */
+    from?: string;
+    /** The details of the original value as a string. */
+    fromString?: string;
+    /** The details of the new value. */
+    to?: string;
+    /** The details of the new value as a string. */
+    toString?: string;
+}
 // namespace IssueChangelogs {
 
     function getAllChangelogs(successCallBack, errorCallBack) {
-        var changelogs;
         var request = new JiraRequest();
 
         var ok = function (respData, httpResp, status) {
@@ -38,11 +53,6 @@ const JiraRequest = require('src/jiraApi.gs');
         request.call("history")
             .withSuccessHandler(ok)
             .withFailureHandler(error);
-        if (changelogs == null) {
-            return [];
-        } else {
-            return changelogs;
-        }
     }
 // }
 
