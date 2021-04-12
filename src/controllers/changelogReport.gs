@@ -9,7 +9,6 @@ const getDialog = require("src/dialogs.gs").getDialog;
 const debug = require("src/debug.gs").debug;
 const unifyIssueAttrib = require('src/jiraCommon.gs').unifyIssueAttrib;
 const hasSettings = require("src/settings.gs").hasSettings;
-const findUser = require("src/userManager.gs").findUser;
 const getCfg_ = require("src/settings.gs").getCfg_;
 // End of Node required code block
 
@@ -17,7 +16,7 @@ const getCfg_ = require("src/settings.gs").getCfg_;
  * @desc Wrapper: Dialog for time report settings
  */
 function menuCreateStatusReport() {
-  StatusReport_Controller_.dialogOpen();
+  ChangelogReport_Controller_.dialogOpen();
 }
 
 /**
@@ -47,20 +46,20 @@ function callbackFetchAllHistories() {
  * @return void
  */
 function callbackCreateStatussheet(jsonFormData) {
-  return StatusReport_Controller_.createStatussheet(jsonFormData);
+  return ChangelogReport_Controller_.createStatussheet(jsonFormData);
 }
 
 
 /**
  * Creates a new IssueTableIndex_ object, which is used to persist IssueTables and related information.
  */
-class StatusReport_Controller_ {
-  // static name = 'StatusReport_Controller_'
+ChangelogReport_Controller_ = {
+  name : 'ChangelogReport_Controller_',
 
   /**
    * @desc Dialog to configure Jira custom fields
    */
-  static dialogOpen() {
+  dialogOpen : function () {
     debug.log(this.name + '.dialog()');
 
     if (!hasSettings(true))
@@ -73,15 +72,14 @@ class StatusReport_Controller_ {
     debug.log('Processed: %s', dialog);
 
     SpreadsheetApp.getUi().showModalDialog(dialog, 'Create status report');
-  }
+  },
 
   /**
    * @desc Fetch all active users and groups for dialog selection.
    * @return {object} Object({status: [boolean], response: [Array], message:[string]})
    */
-  static getAllHistories() {
-    debug.log(this.name + '.getAllHistories()');
-
+  getAllChangelogs: function () {
+    debug.log(this.name + '.getAllChangelogs()');
 
     var result = [], maxResults = 1000, response = {
       status : false,
@@ -89,36 +87,16 @@ class StatusReport_Controller_ {
       message : null
     };
 
-    result = findUser('', true, maxResults).filter(function (user) {
-      return user.active !== false;
-    });
-
-    // Jira Server Issue workaround (https://jira.atlassian.com/browse/JRASERVER-29069)
-    if (result.length == 0 && getCfg_('server_type') == 'server') {
-      // try it again with custom query param apparently working like %,+,*,.
-      result = findUser('.', true, maxResults).filter(function (user) {
-        return user.active !== false;
-      });
-    }
-
-    // workaround 2 as the param val appears to change
-    if (result.length == 0) {
-      // try it again with custom query param apparently working like %,+,*,.
-      result = findUser('', true, maxResults, 'userSearchV2').filter(function (user) {
-        return user.active !== false;
-      });
-    }
-
-    result.sort(function (a, b) {
-      // as we go over each user anyway, we extend it same time with our autocomplete value
-      a.value = a.displayName + ( (a.name.length > 0) ? ' (' + a.name + ')' : '' );
-      b.value = b.displayName + ( (b.name.length > 0) ? ' (' + b.name + ')' : '' );
-
-      return (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0);
-    });
+    // result.sort(function (a, b) {
+    //   // as we go over each user anyway, we extend it same time with our autocomplete value
+    //   a.value = a.displayName + ( (a.name.length > 0) ? ' (' + a.name + ')' : '' );
+    //   b.value = b.displayName + ( (b.name.length > 0) ? ' (' + b.name + ')' : '' );
+    //
+    //   return (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0);
+    // });
 
     if (result.length == 0) {
-      response.message = "No users were found. Check your JIRA permission.";
+      response.message = "No Changelogs were found.";
       SpreadsheetApp.getActiveSpreadsheet().toast(response.message, "Error", 10);
     }
 
@@ -129,14 +107,14 @@ class StatusReport_Controller_ {
     };
 
     return response;
-  }
+  },
 
   /**
    * @desc Form handler for dialogWorklog. Fetch worklog data and create table.
    * @param jsonFormData {object}  JSON Form object of all form values
    * @return void
    */
-  static createStatussheet(jsonFormData) {
+  createStatussheet: function (jsonFormData) {
     debug.log(this.name + '.createStatussheet(%s)', JSON.stringify(jsonFormData));
     jsonFormData = jsonFormData || {
       wlAuthorName: undefined,
@@ -165,7 +143,6 @@ class StatusReport_Controller_ {
     }
 
     var _d = wlDateFrom;
-    // @ts-ignore
     if( Date.parse(_d) > Date.parse(wlDateTo) ) {
       wlDateFrom = wlDateTo;
       wlDateTo   = _d;
@@ -194,8 +171,8 @@ class StatusReport_Controller_ {
       debug.log('%s %s %s', JSON.stringify(resp), status, errorMessage);
 
       if(resp.data.length == 0) {
-        Browser.msgBox("Jira Worklog",
-                       "Apparently there are no issues with worklogs available for \"" + authorName + "\" in the requested time period.",
+        Browser.msgBox("Jira Changelogs",
+                       "Apparently there are no issues with changelogs available in the requested time period.",
                        Browser.Buttons.OK);
         return;
       }
@@ -278,10 +255,3 @@ class StatusReport_Controller_ {
   }
 
 }
-
-// Node required code block
-module.exports = {
-  menuCreateStatusReport: menuCreateStatusReport,
-  callbackFetchAllHistories: callbackFetchAllHistories
-}
-// End of Node required code block
