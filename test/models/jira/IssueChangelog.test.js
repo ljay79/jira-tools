@@ -1,5 +1,5 @@
 let jiraApiMock = require('test/mocks/mockJiraApi.js');
-const IssueChangelogs = require("src/models/jira/IssueChangelogs");
+const IssueChangelogs = require("src/models/jira/IssueChangelogs.gs");
 
 beforeEach(() => {
   // IssueChangelog.clearCache_();
@@ -128,7 +128,7 @@ describe("Fetching all changelogs from JIRA", () => {
 
     const successCallBack = jest.fn();
     const errorCallBack = jest.fn();
-    var result = IssueChangelogs(successCallBack, errorCallBack);
+    var result = IssueChangelogs.getAllChangelogs(successCallBack, errorCallBack);
     expect(jiraApiMock.call.mock.calls.length).toBe(1);
     expect(successCallBack.mock.calls.length).toBe(1);
     expect(errorCallBack.mock.calls.length).toBe(0);

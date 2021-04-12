@@ -30,15 +30,15 @@ test('menuJiraStatusMap', () => {
   menuCreateStatusReport();
   expect(dialogCode.getDialog).toBeCalled();
   expect(dialogCode.getDialog.mock.calls[0][0]).toBe('views/dialogs/createStatusReport');
-  var params = dialogCode.getDialog.mock.calls[0][1];
-  expect(params.fieldMap).toBeDefined();
-  var fieldMap = params.fieldMap;
-  expect(fieldMap.length).toBe(mockChangelogJiraApiResponse.length);
-  expect(fieldMap[0].key).toBe("custom0ZZ");
-  expect(fieldMap[1].key).toBe("custom000");
-  expect(fieldMap[2].key).toBe("custom001");
-  expect(fieldMap[3].key).toBe("description");
-  expect(fieldMap[4].key).toBe("Epic_label_key");
+  // var params = dialogCode.getDialog.mock.calls[0][1];
+  // expect(params.fieldMap).toBeDefined();
+  // var fieldMap = params.fieldMap;
+  // expect(fieldMap.length).toBe(mockChangelogJiraApiResponse.length);
+  // expect(fieldMap[0].key).toBe("custom0ZZ");
+  // expect(fieldMap[1].key).toBe("custom000");
+  // expect(fieldMap[2].key).toBe("custom001");
+  // expect(fieldMap[3].key).toBe("description");
+  // expect(fieldMap[4].key).toBe("Epic_label_key");
 
   // expect(HtmlService.dialogMock.getContent).toBeCalled();
   // expect(HtmlService.createHtmlOutput).toBeCalled();
