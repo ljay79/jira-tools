@@ -30,7 +30,7 @@ test('Update Jira menu option appears based on feature switch', () => {
   onOpen(e);
   var addItemMock =  SpreadsheetApp.getUi().createAddonMenu().addItem.mock;
   var menuItemCount = addItemMock.calls.length;
-  expect(addItemMock.calls[menuItemCount-7][0]).toBe('Update Jira Issues');
-  expect(addItemMock.calls[menuItemCount-7][1]).toBe('menuUpdateJiraIssues');
+  expect(addItemMock.calls[menuItemCount-8][0]).toBe('Update Jira Issues');
+  expect(addItemMock.calls[menuItemCount-8][1]).toBe('menuUpdateJiraIssues');
   SpreadsheetApp.resetMocks();
 });

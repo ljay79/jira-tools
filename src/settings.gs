@@ -1,5 +1,5 @@
 // Node required code block
-const BUILD = require("./Code.ts").BUILD;
+const BUILD = require("./Code.gs").BUILD;
 const Storage_ = require("./Storage.gs").Storage_;
 const UserStorage = require("src/models/gas/UserStorage.gs");
 const CustomFields = require("src/models/jira/CustomFields.gs");

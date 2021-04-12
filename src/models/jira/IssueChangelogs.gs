@@ -7,23 +7,7 @@
 const JiraRequest = require('src/jiraApi.gs');
 // End of Node required code block
 
-interface HistoryEntry {
-    /** The name of the field changed. */
-    field?: string;
-    /** The type of the field changed. */
-    fieldtype?: string;
-    /** The ID of the field changed. */
-    fieldId?: string;
-    /** The details of the original value. */
-    from?: string;
-    /** The details of the original value as a string. */
-    fromString?: string;
-    /** The details of the new value. */
-    to?: string;
-    /** The details of the new value as a string. */
-    toString?: string;
-}
-// namespace IssueChangelogs {
+IssueChangelogs = (function () {
 
     function getAllChangelogs(successCallBack, errorCallBack) {
         var request = new JiraRequest();
@@ -54,9 +38,13 @@ interface HistoryEntry {
             .withSuccessHandler(ok)
             .withFailureHandler(error);
     }
-// }
+
+    return {
+        getAllChangelogs: getAllChangelogs
+    }
+})();
 
 
 // Node required code block
-module.exports = getAllChangelogs;
+module.exports = IssueChangelogs;
 // End of Node required code block

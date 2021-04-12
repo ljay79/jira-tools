@@ -4,7 +4,7 @@
 
 // Node required code block
 const JiraRequest = require('src/jiraApi.gs');
-const IssueHistory = require("src/models/jira/IssueHistory.gs");
+const IssueChangelog = require("src/models/jira/IssueChangelogs.gs");
 const getDialog = require("src/dialogs.gs").getDialog;
 const debug = require("src/debug.gs").debug;
 const unifyIssueAttrib = require('src/jiraCommon.gs').unifyIssueAttrib;
@@ -25,11 +25,11 @@ function menuCreateStatusReport() {
  * @return {Array}    Array of custom Jira Fields
  */
 function callbackFetchAllHistories() {
-  var customFields = [];
-  IssueHistory.getAllCustomFields(
+  var changelogs = [];
+  IssueChangelog.getAllChangelogs(
       // ok callback
-      function (customFieldsUnsorted) {
-        customFields = customFieldsUnsorted;
+      function (changelogsUnsorted) {
+        changelogs = changelogsUnsorted;
         // sorting by supported type and name
         // customFields.sort(sortCustomFields_);
       },
@@ -38,7 +38,7 @@ function callbackFetchAllHistories() {
         debug.error(message);
       }
   );
-  return customFields;
+  return changelogs;
 }
 
 /**

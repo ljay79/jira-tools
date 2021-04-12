@@ -25,7 +25,7 @@ Details layout of /src folder
 
 |File / Folder | Responsibilities |
 |------------|-----------|
-|`Code.ts` | Initialises menu and GAS lifecycle events|
+|`Code.gs` | Initialises menu and GAS lifecycle events|
 |`controllers` | One file per feature. Interacts with the sheet, models and updates views |
 |`views` | HTML files for the UI in the Google sheet |
 |`models` | Entities for the entities e.g Jira Objects, User preferences. Interacts with underlying Google services and Jira API |
@@ -88,14 +88,14 @@ Inside that file you would add functions based on this template
 
 function menuNewCoolFeature() {
   // do stuff when the menu item is clicked
-  // Add reference in Code.ts 
+  // Add reference in Code.gs 
   //  e.g. .addItem('New cool feature', 'menuNewCoolFeature')
   
 }
 
 function menuAnotherThingForNewCoolFeature() {
   // do stuff when the menu item is clicked
-  // Add reference in Code.ts 
+  // Add reference in Code.gs 
   //  e.g. .addItem('New cool feature 2' 'menuAnotherThingForNewCoolFeature')
 }
 
