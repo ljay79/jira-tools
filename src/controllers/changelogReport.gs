@@ -95,35 +95,17 @@ ChangelogReport_Controller_ = {
       } else {
         attributes.issues = resp.data;
 
-        var renderer, Table = new ChangelogTable_(attributes);
-        if (renderer = Table.render()) {
-          // toast with status message
-          var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
-            + " total found records.";
-          SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
-          debug.log(msg);
+        // prep new TimesheetTable then request actual worklogs
+        var changelogSheetRenderer = ChangelogRendererFactory_.call();
+        changelogSheetRenderer.addHeader("mario", 'changelog Sheet');
 
-          // add table to index
-          IssueTableIndex_.addTable(Table);
-
-          response.status = true;
-
-          // set trigger for index cleanup and modification detection
-          // that.setTriggerPruneIndex();
-          // that.setTriggerIssueTableModification();
-
-          // force sidebar update (refreshTableSchedule)
-          // UserStorage.setValue('refreshIssueTableforceSidebarReset', true);
-          // RefreshIssueTable_Controller_.sidebar();
-        }
-
-        (attributes.issues).forEach(function(issue, index) {
+         (attributes.issues).forEach(function(issue, index) {
           debug.log('============= (data || []).forEach() =================');
           debug.log('issue= icon:%s; key:%s; summary:%s; priority:%s ',
             unifyIssueAttrib('issuetype', issue),
-            unifyIssueAttrib('key', issue),
-            unifyIssueAttrib('summary', issue),
-            unifyIssueAttrib('priority', issue)
+            unifyIssueAttrib('key', issue)
+            // unifyIssueAttrib('summary', issue),
+            // unifyIssueAttrib('priority', issue)
           );
 
           // perform changelog request
@@ -137,38 +119,20 @@ ChangelogReport_Controller_ = {
                 message: resp.errorMessages.join("\\n"),
                 color: 'red'
               };
-              renderer.addRow(issue, []);
+              changelogSheetRenderer.addRow(issue, []);
             })
             .withSuccessHandler(function(resp, httpResp, status) {
               // we have all logs here for 1 jira issue
               if (!resp) {
                 return;
               }
+              changelogSheetRenderer.addRow(issue, resp);
 
-              renderer.addRow(issue, resp);
-
-              // if (renderer = Table.render()) {
-              //   // toast with status message
-              //   var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
-              //     + " total found records.";
-              //   SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
-              //   debug.log(msg);
-              //
-              //   // add table to index
-              //   IssueTableIndex_.addTable(Table);
-              //
-              //   response.status = true;
-              //
-              //   // set trigger for index cleanup and modification detection
-              //   that.setTriggerPruneIndex();
-              //   that.setTriggerIssueTableModification();
-              //
-              //   // force sidebar update (refreshTableSchedule)
-              //   // UserStorage.setValue('refreshIssueTableforceSidebarReset', true);
-              //   RefreshIssueTable_Controller_.sidebar();
-              // }
             }); // END: withSuccessHandler()
         })
+        // add table footer
+        changelogSheetRenderer.addFooter();
+        changelogSheetRenderer.onComplete();
       }
     };
 
