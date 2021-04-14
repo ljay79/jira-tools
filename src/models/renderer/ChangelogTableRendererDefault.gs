@@ -5,7 +5,6 @@ const sheetIdPropertySafe = require('../../jiraCommon.gs').sheetIdPropertySafe;
 const unifyIssueAttrib = require('../../jiraCommon.gs').unifyIssueAttrib;
 const UserStorage = require('../gas/UserStorage.gs');
 const ChangelogTable_ = require('../jira/ChangelogTable.gs');
-const IssueChangelogs = require('../jira/IssueChangelogs.gs');
 // End of Node required code block
 
 /**
