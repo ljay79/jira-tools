@@ -18,7 +18,7 @@ var ChangelogTableRendererDefault_ = require('../renderer/ChangelogTableRenderer
 function ChangelogTable_(attributes) {
   var that = this,
       Sheet,
-      issues = {},
+      data = [],
       metaData = {
         sheetId : sheetIdPropertySafe(), // sample: '6.02713257E8'
         tableId : null,                  // sample: 'table1_1550871398921'
@@ -85,7 +85,9 @@ function ChangelogTable_(attributes) {
         name : attributes.filter.name || '',
         jql : attributes.filter.jql
       });
-      that.setIssues(attributes.issues).setRenderer(attributes.renderer);
+      that.setData(attributes.issues);
+
+      that.setRenderer(attributes.renderer);
       that.setMeta('headerFields', attributes.columns);
 
       if (attributes.filter.hasOwnProperty('name')) {
@@ -124,19 +126,41 @@ function ChangelogTable_(attributes) {
    * @param {object} issuesJson
    * @return {ChangelogTable_}
    */
-  that.setIssues = function (issuesJson) {
-    issues = issuesJson || {};
-    metaData.time_lastupdated = (new Date()).getTime();
+  that.setData = function (issuesJson) {
+    data = [];
+    var row = {};
 
+    // loop over each resulted issue
+    for (var i = 0; i < issuesJson.length; i++) {
+      var issue = issuesJson[i];
+      //TODO: use unifyIssue method
+      row.key = issue.key;
+      row.issuetype = issue.fields.issuetype.name;
+      row.summary = issue.fields.summary;
+
+      for (var j = 0; j < issue.changelog.histories.length; j++) {
+        var history = issue.changelog.histories[j];
+        row.created = history.created;
+        for (var k = 0; k < history.items.length; j++) {
+          var item = history.items[k];
+          row.field = item.field;
+          row.fromString = item.fromString;
+          row.toString = item.toString;
+          break;
+        }
+      }
+      data.push(row);
+    }
+    metaData.time_lastupdated = (new Date()).getTime();
     return that;
-  };
+  }
 
   /**
    * @desc Get the Jira issues object
    * @return {array} issues
    */
-  that.getIssues = function () {
-    return issues;
+  that.getData = function () {
+    return data;
   };
 
   /**

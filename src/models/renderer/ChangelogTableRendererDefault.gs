@@ -1,246 +1,244 @@
 // Node required code block
-
+const getSheetById = require('../../jsLib.gs').getSheetById;
+const _sortKeysByRef = require('../../jsLib.gs')._sortKeysByRef;
+const sheetIdPropertySafe = require('../../jiraCommon.gs').sheetIdPropertySafe;
+const unifyIssueAttrib = require('../../jiraCommon.gs').unifyIssueAttrib;
+const UserStorage = require('../gas/UserStorage.gs');
+const ChangelogTable_ = require('../jira/ChangelogTable.gs');
+const IssueChangelogs = require('../jira/IssueChangelogs.gs');
 // End of Node required code block
 
 /**
- * @file Contains class for rendering jira timesheet tables
+ * @file Contains class for rendering jira changelog tables
  */
 
 /**
- * @desc Creates a new ChangelogTableRenderer_ instance (Default), which is used
- *       to insert an timesheet table.
- * @param options
- *          {object} { sheet: <active sheet to use for inserting table>,
- *          periodFrom: Date object of period starting date periodTo: Date
- *          object of period end date periodInterval: Interval to list period in
- *          columns ('day', 'week') periodFormat: Date format to use for period
- *          column headers }
- * @return {ChangelogTableRendererLayout01_}
+ * @desc Creates a new ChangelogTableRenderer instance (Default), which is used to insert an table of data into a sheet.
+ * @param {ChangelogTable_} ChangelogTable The instance of ChangelogTable_ to render table
  * @constructor
  */
-function ChangelogTableRendererDefault_(options) {
-  this.name = 'ChangelogTableRendererDefault_';
-  this.timezone = SpreadsheetApp.getActive().getSpreadsheetTimeZone();
+function ChangelogTableRendererDefault_(ChangelogTable) {
   var that = this, // clear encapsulation of scope's
-    sheet, initRange, currentRowIdx = 0, numIssueRows = 0,
-    dataRowFields = ['key', 'issuetype', 'field', 'created', 'from', 'to'],
-    numColumns = 0;
+    sheet, initRange,
+    data = [], selectedFields = [], headers = [],
+    rowIndex = 0, numColumns = 0,
+    info = {
+      totalInserted : 0,
+      finishRendering : false,
+      oRangeA1 : {
+        from : null,
+        to : null
+      },
+      headerRowOffset : 0
+    };
 
   /**
    * @desc Initialization, validation
    * @throws Error,ReferenceError
    * @throws ReferenceError
    */
-  init = function() {
-    debug.log(this.name + '.Init()');
-    sheet = options.sheet ? options.sheet : getTicketSheet();
-    initRange = sheet.getActiveCell();
-    currentRowIdx = initRange.getRow(), currentColIdx = initRange.getColumn();
+  init = function () {
+    // check data to rendering
+    if (typeof ChangelogTable !== 'object') {
+      throw new Error("{ChangelogTable} is not a valid instance of class ChangelogTable_.");
+    }
+    if (!ChangelogTable.hasOwnProperty('getMeta')) {
+      throw new ReferenceError("{ChangelogTable} is not a valid instance of class ChangelogTable_. Implementation of method 'getMeta' missing.");
+    }
+    if (!ChangelogTable.hasOwnProperty('getData')) {
+      throw new ReferenceError("{ChangelogTable} is not a valid instance of class ChangelogTable_. Implementation of method 'getData' missing.");
+    }
 
-    // number of columns our table with consist of
-    numColumns = dataRowFields.length + 1;
+    data = ChangelogTable.getData();
+    if (typeof data !== 'object') {
+      throw new Error("{ChangelogTable.getData()} must return an array but returned " + (typeof data) + ".");
+    }
+
+    selectedFields = ChangelogTable.getMeta('headerFields');
+
+    var sheetId = sheetIdPropertySafe(ChangelogTable.getSheetId(), true);
+    sheet = getSheetById(sheetId);
+    if (typeof sheet !== 'object') {
+      throw new ReferenceError("Could not find Sheet by given sheetId [" + sheetId + "].");
+    }
   };
 
   init();
 
+  /* -------- */
+
   /**
-   * @desc Header of table (2 lines)
-   * @param author
-   *          {String} Name of author we searched worklogs for
-   * @param title
-   *          {String} Table title; default:'Time Sheet'
-   * @return {this} Allow chaining
+   * @desc Rendering the data into a table in defined sheet.
+   * @return {ChangelogTableRendererDefault_}
    */
-  this.addHeader = function(author, title) {
-    debug.log(this.name + '.addHeader()');
-    title = title || 'Changelog Sheet';
+  that.render = function () {
+    debug.time('ChangelogTableRendererDefault_.render()');
 
-    var values = Array(numColumns - 1).fill(''); // empty row of values
-    values.unshift(title); // set title to 1st cell
-    var formats     = Array(numColumns).fill('bold'),
-      fontColors  = Array(numColumns).fill('#000'),
-      bgColors    = Array(numColumns).fill('#3399ff')
-    ;
+    prepareHeaderValues();
 
-    // header
-    range = sheet.getRange(currentRowIdx++, currentColIdx, 1, values.length);
-    range.clearContent()
-      .clearNote()
-      .clearFormat()
-      .setBackgrounds([ bgColors ])
-      .setFontColors([ fontColors ])
-      .setValues([ values ])
-      .setFontWeights([ formats ]);
+    if (null === ChangelogTable.getMeta('rangeA1')) {
+      initRange = sheet.getActiveRange();
+    } else {
+      initRange = sheet.setActiveSelection(ChangelogTable.getMeta('rangeA1'));
+    }
 
-    // 2. row - sub title
-    values = Array(dataRowFields.length - 1).fill('');
-    values.unshift('Summary for "' + author + '"');
+    // save the range coords for info object
+    info.oRangeA1.from = initRange.getCell(1, 1).getA1Notation();
+    info.oRangeA1.to = initRange.getCell(initRange.getNumRows(), initRange.getNumColumns()).getA1Notation();
 
-    // attach period head lines
-    // for ( var key in periodTotals) {
-    //   values.push(Utilities.formatDate(new Date(key + 'T00:00:00.000+0000'), this.timezone, periodCfg.format));
-    // }
-    values.push('Total');
+    if (filterName = ChangelogTable.getMeta('filter').name) {
+      that.addSummary("Filter: " + filterName);
+    }
 
-    bgColors = Array(numColumns).fill('#fff');
+    that.addHeader().fillTable();
 
-    range = sheet.getRange(currentRowIdx++, currentColIdx, 1, values.length);
-    range.clearContent()
-      .clearNote()
-      .clearFormat()
-      .setBackgrounds([ bgColors ])
-      .setValues([ values ])
-      .setFontWeights([ formats ]);
+    debug.timeEnd('ChangelogTableRendererDefault_.render()');
+    debug.log('ChangelogTableRendererDefault_.render() <- finished rendering %s data with %s columns.', info.totalInserted, numColumns);
 
-    // all period and total columns to be centered
-    sheet.getRange(currentRowIdx - 1, currentColIdx + dataRowFields.length - 1,
-      1, values.length - dataRowFields.length + 1).setHorizontalAlignment(
-      "center");
+    info.finishRendering = true;
 
-    // set cell widths
-    sheet.setColumnWidth(currentColIdx, 30);
-    sheet.setColumnWidth(currentColIdx + 1, 80);
-    sheet.setColumnWidth(currentColIdx + 2, 240);
-    sheet.setColumnWidth(currentColIdx + 3, 30);
-
-    SpreadsheetApp.flush();
-
-    return this;
+    return that;
   };
 
   /**
-   * @desc Add Table footer
-   * @return {this} Allow chaining
+   * @desc Adding a summary line
+   * @param {string} summary Text to be inserted as a table summary line
+   * @return this For chaining
    */
-  this.addFooter = function() {
-    debug.log(this.name + '.addFooter()');
-    var values = Array(dataRowFields.length - 1).fill('');
-    values.unshift('Total (' + numIssueRows + ' issues):');
-    var formats     = Array(numColumns).fill('bold'),
-      fontColors  = Array(numColumns).fill('#000'),
-      bgColors    = Array(numColumns).fill('#3399ff')
-    ;
-    debug.log('periodTotals: [%s]', periodTotals);
+  that.addSummary = function (summary) {
+    range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
 
-    // set totals on each period column + overall total column
-    var _totalTimeSpent = 0;
-    for ( var key in periodTotals) {
-      _totalTimeSpent += periodTotals[key];
-      values.push(worklogFormatFn(periodTotals[key]));
-    }
-    values.push(worklogFormatFn(_totalTimeSpent));
-
-    // footer
-    range = sheet.getRange(currentRowIdx++, currentColIdx, 1, values.length);
     range.clearContent()
       .clearNote()
       .clearFormat()
-      .setBackgrounds([ bgColors ])
-      .setFontColors([ fontColors ])
-      .setValues([ values ])
-      .setFontWeights([ formats ]);
+      .getCell(1, 1)
+      .setValue(summary);
 
-    // all period and total columns to be centered
-    sheet.getRange(currentRowIdx - 1, currentColIdx + dataRowFields.length - 1,
-      1, values.length - dataRowFields.length + 1).setHorizontalAlignment(
-      "center");
-    sheet.getRange(currentRowIdx - 1, values.length).setHorizontalAlignment(
-      "right");
+    info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
+    info.headerRowOffset = 1;
 
     SpreadsheetApp.flush();
 
-    // set width of period columns
-    for (var c = (dataRowFields.length + 1); c <= values.length; c++) {
-      sheet.setColumnWidth(c, 70);
-    }
-
-    return this;
-  }
+    return that;
+  };
 
   /**
-   * @desc Add individual timesheet/worklog row to table
-   * @param issue
-   *          {Object} JSON response object of an jira issue
-   * @param changelogs
-   *          {ArrayOfObjects} Array of JSON objects from Jira worklog search
-   *          response
-   * @return {this} Allow chaining
+   * @desc Add column headers into 1st/2nd row
+   * @return this For chaining
    */
-  this.addRow = function(issue, changelogs) {
-    debug.log(this.name + '.addRow()');
-    var rowTotal    = 0,
-      values      = [],
-      formats     = Array(numColumns).fill('@'),
-      fontColors  = Array(numColumns).fill('#000'),
-      bgColors    = Array(numColumns).fill( (currentRowIdx % 2) ? '#fff' : '#e6ffe6')
-    ;
+  that.addHeader = function () {
+    var values = [], formats = [];
 
-    // add timespent to issues period totals
-    changelogs.forEach(function(changelog) {
-      var _period = Utilities.formatDate(new Date(changelog.started), 'UTC',
-        'yyyy-MM-dd');
-    });
+    for (var i = 0; i < headers.length; i++) {
+      values.push(IssueFields.getHeaderName(headers[i]));
+      formats.push('bold');
+    }
 
-    // add jira issue data to first columns with some custom cell formatters
-    dataRowFields.forEach(function(field) {
-      var _val = unifyIssueAttrib(field, issue);
-      switch (field) {
-        case 'issuetype':
-        case 'key':
-          _val = '=HYPERLINK("' + _val.link + '";"' + _val.value + '")';
-          break;
-        default:
-          _val = _val.value;
-          break;
+    range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
+
+    range.clearContent()
+      .clearNote()
+      .clearFormat()
+      .setValues([values])
+      .setFontWeights([formats]);
+
+    info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
+    info.headers = values;
+
+    SpreadsheetApp.flush();
+
+    return that;
+  };
+
+  /**
+   * @desc Fill in all data into a sheet table with values and format
+   * @return this For chaining
+   */
+  that.fillTable = function () {
+    info.totalInserted = data.length;
+    var range = sheet.getRange(initRange.getRow(), initRange.getColumn(), 1, headers.length); // obsolete?
+
+    // loop over each resulted data (row)
+    for (var i = 0; i < data.length; i++) {
+      var row = data[i];
+      var values = [];
+      var formats = []; // http://www.blackcj.com/blog/2015/05/18/cell-number-formatting-with-google-apps-script/
+      range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
+
+      // loop over each header (column)
+      for (var j = 0; j < headers.length; j++) {
+        var headerEntry = headers[j];
+        values.push(row[headerEntry]);
+        formats.push('@');
+      } // END: header/columns loop
+
+      // just check if values (column) length is as we expect?!
+      if (values.length != numColumns) {
+        for (var l = 0; l < values.length; l++) {
+          values.push('');
+          formats.push('@');
+        }
       }
 
-      values.push(_val);
-    });
+      // set values and format to cells
+      range.clearContent()
+        .clearNote()
+        .clearFormat()
+        .setValues([values])
+        .setNumberFormats([formats])
+        .activate();
 
+      info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
 
-    values.push("foobar"); // row total
-    formats[formats.length - 1] = 'bold';
+      // flush sheet every 25 rows (to often is bad for performance, to less bad for UX)
+      if (i % 25 === 0) {
+        SpreadsheetApp.flush();
+      }
 
-    range = sheet.getRange(currentRowIdx++, currentColIdx, 1, values.length);
-    range.clearContent()
-      .clearNote()
-      .clearFormat()
-      .setBackgrounds([ bgColors ])
-      .setValues([ values ])
-      .setFontWeights([ formats ])
-      .activate();
+      issue = null;
 
-    if (issue.cellNote) {
-      // cell of summary text; add note and change color
-      range.getCell(1, 3).setNote(issue.cellNote.message || '').setFontColor(
-        issue.cellNote.color);
-    }
+    } // END: issue loop
 
-    // 1st col IssueTypeIcon align center
-    sheet.getRange(currentRowIdx - 1, 1, 1, 1).setHorizontalAlignment("center");
-    // all period and total columns to be centered
-    sheet.getRange(currentRowIdx - 1, currentColIdx + dataRowFields.length - 1,
-      1, values.length - dataRowFields.length).setHorizontalAlignment(
-      "center");
-    sheet.getRange(currentRowIdx - 1, values.length, 1, values.length)
-      .setHorizontalAlignment("right");
-
-    ++numIssueRows;
-
-    SpreadsheetApp.flush();
-
-    return this;
+    return that;
   };
 
   /**
-   * @desc onComplete - post creation activity like content sorting.
-   * @return {this} Allow chaining
+   * @desc Return Info object.
+   * @return {object} {totalInserted:<{number}>, ..}
    */
-  this.onComplete = function() {
-    debug.log(this.name + '.onComplete()');
-    return this;
+  that.getInfo = function () {
+    return info;
   };
 
+  /**
+   * @desc Sorting the header/columns based on definition/order in global var ISSUE_COLUMNS. Improves a consistent column listing/sorting
+   *       and defined fields first before alpha sorting the rest.
+   * @returns {ChangelogTableRendererDefault_}
+   */
+  prepareHeaderValues = function () {
+    // prep headers
+    if (null !== selectedFields) {
+      // selected fields are set from fitlers selected columns
+      for ( var k in selectedFields) {
+        if (selectedFields.hasOwnProperty(k) && EpicField.EPIC_KEY != selectedFields[k]) {
+          headers.push(selectedFields[k]);
+        }
+      }
+    } else {
+      // from first issue in result
+      for ( var k in data[0].fields) {
+        headers.push(k);
+      }
+    }
+
+    // sort fields based on defined order in IssueFields.getBuiltInJiraFields()
+    headers = _sortKeysByRef(headers, IssueFields.getBuiltInJiraFields());
+    headers.unshift('key');
+
+    numColumns = headers.length;
+
+    return that;
+  };
 }
 
 // Node required code block

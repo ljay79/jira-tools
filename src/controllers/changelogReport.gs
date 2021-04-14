@@ -4,18 +4,23 @@
 
 // Node required code block
 const JiraRequest = require('src/jiraApi.gs');
-const IssueChangelog = require("src/models/jira/IssueChangelogs.gs");
+const IssueSearch = require("src/models/jira/IssueSearch.gs");
 const getDialog = require("src/dialogs.gs").getDialog;
 const debug = require("src/debug.gs").debug;
 const unifyIssueAttrib = require('src/jiraCommon.gs').unifyIssueAttrib;
+const getTicketSheet = require("src/jiraCommon.gs").getTicketSheet;
 const hasSettings = require("src/settings.gs").hasSettings;
 const getCfg_ = require("src/settings.gs").getCfg_;
+const ChangelogTableRendererDefault_ = require('src/models/renderer/ChangelogTableRendererDefault.gs').ChangelogTableRendererDefault_;
+const IssueTableIndex_ = require('src/models/IssueTableIndex.gs');
+const ChangelogTable_ = require('src/models/jira/ChangelogTable.gs')
+const UserStorage = require('src/models/gas/UserStorage.gs')
 // End of Node required code block
 
 /**
  * @desc Wrapper: Dialog for time report settings
  */
-function menucreateChangelogReport() {
+function menuCreateChangelogReport() {
   ChangelogReport_Controller_.dialogOpen();
 }
 
@@ -73,7 +78,7 @@ ChangelogReport_Controller_ = {
     var attributes = {
       filter : jsonFormData['filter_id'] ? getFilter(parseInt(jsonFormData['filter_id'])) : {},
       maxResults : parseInt(jsonFormData['maxResults']) || 10000,
-      columns : ['id','key','issuetype','summary','toString', 'fromString', 'field','created'],
+      columns : ['key','issuetype','summary','created','field','fromString','toString'],
       issues : {},
       sheet : getTicketSheet(),
       renderer : ChangelogTableRendererDefault_
@@ -95,44 +100,27 @@ ChangelogReport_Controller_ = {
       } else {
         attributes.issues = resp.data;
 
-        // prep new TimesheetTable then request actual worklogs
-        var changelogSheetRenderer = ChangelogRendererFactory_.call();
-        changelogSheetRenderer.addHeader("mario", 'changelog Sheet');
+        var renderer, Table = new ChangelogTable_(attributes);
+        if (renderer = Table.render()) {
+          // toast with status message
+          var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
+            + " total found records.";
+          SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
+          debug.log(msg);
 
-         (attributes.issues).forEach(function(issue, index) {
-          debug.log('============= (data || []).forEach() =================');
-          debug.log('issue= icon:%s; key:%s; summary:%s; priority:%s ',
-            unifyIssueAttrib('issuetype', issue),
-            unifyIssueAttrib('key', issue)
-            // unifyIssueAttrib('summary', issue),
-            // unifyIssueAttrib('priority', issue)
-          );
+          // add table to index
+          IssueTableIndex_.addTable(Table);
 
-          // perform changelog request
-          var request = new Request();
-          request.call('history', {issueIdOrKey: issue.id})
-            .withFailureHandler(function(resp, httpResp, status) {
-              debug.error("Failed to retrieve changelog for issue with status [%s]!\\n" + resp.errorMessages.join("\\n") + "Response: %s", status, resp);
+          response.status = true;
 
-              // add issue to time report highlighted and with error message as cell note
-              issue.cellNote = {
-                message: resp.errorMessages.join("\\n"),
-                color: 'red'
-              };
-              changelogSheetRenderer.addRow(issue, []);
-            })
-            .withSuccessHandler(function(resp, httpResp, status) {
-              // we have all logs here for 1 jira issue
-              if (!resp) {
-                return;
-              }
-              changelogSheetRenderer.addRow(issue, resp);
+          // set trigger for index cleanup and modification detection
+          // that.setTriggerPruneIndex();
+          // that.setTriggerIssueTableModification();
 
-            }); // END: withSuccessHandler()
-        })
-        // add table footer
-        changelogSheetRenderer.addFooter();
-        changelogSheetRenderer.onComplete();
+          // force sidebar update (refreshTableSchedule)
+          // UserStorage.setValue('refreshIssueTableforceSidebarReset', true);
+          // RefreshIssueTable_Controller_.sidebar();
+        }
       }
     };
 
@@ -143,7 +131,8 @@ ChangelogReport_Controller_ = {
 
     var Search = new IssueSearch(attributes.filter.jql);
     Search
-      // .setOrderBy()
+      .setExpand(['changelog'])
+      .setOrderBy('updated', 'DESC')
       .setFields(attributes.columns)
       .setMaxResults(attributes.maxResults)
       .setStartAt(startAt)
@@ -155,3 +144,10 @@ ChangelogReport_Controller_ = {
   }
 
 }
+
+// Node required code block
+module.exports = {
+  callbackGetAllChangelogs: callbackGetAllChangelogs,
+  menuCreateChangelogReport: menuCreateChangelogReport
+}
+// End of Node required code block

@@ -46,7 +46,7 @@ function addMenu() {
     .addItem('Refresh IssueTable', 'menuRefreshIssueTable')
     .addItem('Create time report', 'menuCreateTimeReport')
     .addItem('Update Jira Issues', 'menuUpdateJiraIssues')
-    .addItem('Create changelog report', 'menucreateChangelogReport')
+    .addItem('Create changelog report', 'menuCreateChangelogReport')
     .addSeparator()
     .addItem('Update formulas in active sheet', 'recalcCustomFunctions')
     .addItem('Update issue key status...', 'dialogRefreshTicketsIds')

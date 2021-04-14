@@ -32,7 +32,6 @@ var restMethods = {
     'userSearchV2'  : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, query:''}},
     'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
     'field'         : {method: '/field'},
-    'history'       : {method: '/issue/{issueIdOrKey}/changelog'}
   },
   'server': {
     'dashboard'     : {method: '/dashboard', queryparams: {filter: 'my'}},
@@ -49,7 +48,6 @@ var restMethods = {
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'.'}},
     'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
     'field'         : {method: '/field'},
-    'history'       : {method: '/issue/{issueIdOrKey}/changelog'}
   }
 };
 

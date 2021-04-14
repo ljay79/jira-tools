@@ -17,7 +17,7 @@ beforeEach(() =>  {
   settingsMock = require('src/settings.gs');
 });
 
-test('menuJiraStatusMap', () => {
+test('menuJiraChangelogMap', () => {
   const dialogCode = require("src/dialogs.gs");
   dialogCode.getDialog = jest.fn().mockImplementation(()=> HtmlService.dialogMock);
   // jiraApiMock.setNextJiraResponse(200, 'history', mockFieldJiraApiResponse);
@@ -26,10 +26,10 @@ test('menuJiraStatusMap', () => {
   settingsMock.hasSettings.mockImplementationOnce(() => {
     return true;
   });
-  var menuCreateStatusReport = require('src/controllers/changelogReport.gs').menuCreateStatusReport;
-  menuCreateStatusReport();
+  var menuCreateChangelogReport = require('src/controllers/changelogReport.gs').menuCreateChangelogReport;
+  menuCreateChangelogReport();
   expect(dialogCode.getDialog).toBeCalled();
-  expect(dialogCode.getDialog.mock.calls[0][0]).toBe('views/dialogs/createStatusReport');
+  expect(dialogCode.getDialog.mock.calls[0][0]).toBe('views/dialogs/createChangelogReport');
   // var params = dialogCode.getDialog.mock.calls[0][1];
   // expect(params.fieldMap).toBeDefined();
   // var fieldMap = params.fieldMap;
@@ -51,9 +51,18 @@ test('menuJiraStatusMap', () => {
 
 test("history entries should be returned", () => {
   //jiraApiMock.setAllResponsesSuccesfull(200, mockFieldJiraApiResponse);
-  jiraApiMock.setNextJiraResponse(200, "history", mockChangelogJiraApiResponse);
-  var ChangelogTable = require('src/controllers/changelogReport.gs').ChangelogTable;
-  var histories = callbackFetchAllHistories();
+  jiraApiMock.setNextJiraResponse(200, "search", mockChangelogJiraApiResponse);
+  var callbackGetAllChangelogs = require('src/controllers/changelogReport.gs').callbackGetAllChangelogs;
+  var jsonFormData = {
+    filter: {
+      id: 1000,
+      jql: 'foobar'
+    },
+
+  }
+
+
+  var histories = callbackGetAllChangelogs(jsonFormData);
   // fields returned should only have custom fields from the mock data
   expect(histories.length).toBe(1);
   expect(histories[0].field).toBe("status");
