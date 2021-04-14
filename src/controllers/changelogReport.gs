@@ -12,7 +12,6 @@ const getTicketSheet = require("src/jiraCommon.gs").getTicketSheet;
 const hasSettings = require("src/settings.gs").hasSettings;
 const getCfg_ = require("src/settings.gs").getCfg_;
 const ChangelogTableRendererDefault_ = require('src/models/renderer/ChangelogTableRendererDefault.gs').ChangelogTableRendererDefault_;
-const IssueTableIndex_ = require('src/models/IssueTableIndex.gs');
 const ChangelogTable_ = require('src/models/jira/ChangelogTable.gs')
 const UserStorage = require('src/models/gas/UserStorage.gs')
 // End of Node required code block
@@ -33,7 +32,7 @@ function callbackGetAllChangelogs(jsonFormData) {
 }
 
 /**
- * Creates a new IssueTableIndex_ object, which is used to persist IssueTables and related information.
+ *
  */
 ChangelogReport_Controller_ = {
   name : 'ChangelogReport_Controller_',
@@ -46,9 +45,6 @@ ChangelogReport_Controller_ = {
 
     if (!hasSettings(true))
       return;
-
-    // prune table and check if user tries to overwrite/overlap with an existing IssueTable
-    IssueTableIndex_.prune();
 
     var only_my_filters = UserStorage.getValue('only_my_filters');
     var dialog = getDialog('views/dialogs/createChangelogReport',{
@@ -78,7 +74,7 @@ ChangelogReport_Controller_ = {
     var attributes = {
       filter : jsonFormData['filter_id'] ? getFilter(parseInt(jsonFormData['filter_id'])) : {},
       maxResults : parseInt(jsonFormData['maxResults']) || 10000,
-      columns : ['key','issuetype','summary','created','field','fromString','toString'],
+      columns : ['key','issuetype','created','field','fromString','toString'],
       issues : {},
       sheet : getTicketSheet(),
       renderer : ChangelogTableRendererDefault_
@@ -108,18 +104,8 @@ ChangelogReport_Controller_ = {
           SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
           debug.log(msg);
 
-          // add table to index
-          IssueTableIndex_.addTable(Table);
-
           response.status = true;
 
-          // set trigger for index cleanup and modification detection
-          // that.setTriggerPruneIndex();
-          // that.setTriggerIssueTableModification();
-
-          // force sidebar update (refreshTableSchedule)
-          // UserStorage.setValue('refreshIssueTableforceSidebarReset', true);
-          // RefreshIssueTable_Controller_.sidebar();
         }
       }
     };

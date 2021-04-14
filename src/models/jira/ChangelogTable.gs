@@ -127,31 +127,29 @@ function ChangelogTable_(attributes) {
    * @return {ChangelogTable_}
    */
   that.setData = function (issuesJson) {
+    debug.log('before ChangelogTable_.setData() <= %s', issuesJson);
     data = [];
-    var row = {};
 
     // loop over each resulted issue
     for (var i = 0; i < issuesJson.length; i++) {
       var issue = issuesJson[i];
-      //TODO: use unifyIssue method
-      row.key = issue.key;
-      row.issuetype = issue.fields.issuetype.name;
-      row.summary = issue.fields.summary;
-
       for (var j = 0; j < issue.changelog.histories.length; j++) {
         var history = issue.changelog.histories[j];
-        row.created = history.created;
-        for (var k = 0; k < history.items.length; j++) {
+        for (var k = 0; k < history.items.length; k++) {
           var item = history.items[k];
+          var row = {};
+          row.created = history.created;
+          row.key = issue.key;
+          row.issuetype = issue.fields.issuetype.name;
           row.field = item.field;
           row.fromString = item.fromString;
           row.toString = item.toString;
-          break;
+          data.push(row);
         }
       }
-      data.push(row);
     }
     metaData.time_lastupdated = (new Date()).getTime();
+    debug.log('after ChangelogTable_.setData() <= %s', data);
     return that;
   }
 

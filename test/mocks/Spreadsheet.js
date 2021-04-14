@@ -10,6 +10,9 @@ var Range = {
     getValues: jest.fn().mockImplementation(() => {
       return [];
     }),
+   getA1Notation: jest.fn().mockImplementation(() => {
+     return 'A1Notation';
+   }),
 };
 
 var Sheet = {
@@ -27,7 +30,8 @@ var Sheet = {
     return 'SheetName 0' + utils._randomNum(1, 10);
   }),
 
-  getActiveRange: jest.fn().mockImplementation(() => Range)
+  getActiveRange: jest.fn().mockImplementation(() => Range),
+  getActiveCell: jest.fn().mockImplementation(() => Range)
 }
 
 /*

@@ -19,7 +19,7 @@ const ChangelogTable_ = require('../jira/ChangelogTable.gs');
 function ChangelogTableRendererDefault_(ChangelogTable) {
   var that = this, // clear encapsulation of scope's
     sheet, initRange,
-    data = [], selectedFields = [], headers = [],
+    data = [], headers = [],
     rowIndex = 0, numColumns = 0,
     info = {
       totalInserted : 0,
@@ -53,8 +53,6 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
       throw new Error("{ChangelogTable.getData()} must return an array but returned " + (typeof data) + ".");
     }
 
-    selectedFields = ChangelogTable.getMeta('headerFields');
-
     var sheetId = sheetIdPropertySafe(ChangelogTable.getSheetId(), true);
     sheet = getSheetById(sheetId);
     if (typeof sheet !== 'object') {
@@ -85,38 +83,12 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
     info.oRangeA1.from = initRange.getCell(1, 1).getA1Notation();
     info.oRangeA1.to = initRange.getCell(initRange.getNumRows(), initRange.getNumColumns()).getA1Notation();
 
-    if (filterName = ChangelogTable.getMeta('filter').name) {
-      that.addSummary("Filter: " + filterName);
-    }
-
     that.addHeader().fillTable();
 
     debug.timeEnd('ChangelogTableRendererDefault_.render()');
     debug.log('ChangelogTableRendererDefault_.render() <- finished rendering %s data with %s columns.', info.totalInserted, numColumns);
 
     info.finishRendering = true;
-
-    return that;
-  };
-
-  /**
-   * @desc Adding a summary line
-   * @param {string} summary Text to be inserted as a table summary line
-   * @return this For chaining
-   */
-  that.addSummary = function (summary) {
-    range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
-
-    range.clearContent()
-      .clearNote()
-      .clearFormat()
-      .getCell(1, 1)
-      .setValue(summary);
-
-    info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
-    info.headerRowOffset = 1;
-
-    SpreadsheetApp.flush();
 
     return that;
   };
@@ -129,7 +101,7 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
     var values = [], formats = [];
 
     for (var i = 0; i < headers.length; i++) {
-      values.push(IssueFields.getHeaderName(headers[i]));
+      values.push(headers[i]);
       formats.push('bold');
     }
 
@@ -210,30 +182,10 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
   };
 
   /**
-   * @desc Sorting the header/columns based on definition/order in global var ISSUE_COLUMNS. Improves a consistent column listing/sorting
-   *       and defined fields first before alpha sorting the rest.
    * @returns {ChangelogTableRendererDefault_}
    */
   prepareHeaderValues = function () {
-    // prep headers
-    if (null !== selectedFields) {
-      // selected fields are set from fitlers selected columns
-      for ( var k in selectedFields) {
-        if (selectedFields.hasOwnProperty(k) && EpicField.EPIC_KEY != selectedFields[k]) {
-          headers.push(selectedFields[k]);
-        }
-      }
-    } else {
-      // from first issue in result
-      for ( var k in data[0].fields) {
-        headers.push(k);
-      }
-    }
-
-    // sort fields based on defined order in IssueFields.getBuiltInJiraFields()
-    headers = _sortKeysByRef(headers, IssueFields.getBuiltInJiraFields());
-    headers.unshift('key');
-
+    headers = ChangelogTable.getMeta('headerFields');
     numColumns = headers.length;
 
     return that;
