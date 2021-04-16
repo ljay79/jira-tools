@@ -137,14 +137,16 @@ function ChangelogTable_(attributes) {
         var history = issue.changelog.histories[j];
         for (var k = 0; k < history.items.length; k++) {
           var item = history.items[k];
-          var row = {};
-          row.created = history.created;
-          row.key = issue.key;
-          row.issuetype = issue.fields.issuetype.name;
-          row.field = item.field;
-          row.fromString = item.fromString;
-          row.toString = item.toString;
-          data.push(row);
+          if (item.field == "status") {
+            var row = {};
+            row.created = Utilities.formatDate(getDateFromIso(history.created), 'UTC', 'yyyy-MM-dd');
+            row.key = issue.key;
+            row.issuetype = issue.fields.issuetype.name;
+            row.field = item.field;
+            row.fromString = item.fromString;
+            row.toString = item.toString;
+            data.push(row);
+          }
         }
       }
     }
