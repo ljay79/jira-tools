@@ -166,24 +166,6 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
           formatsRow.push('@');
         }
       }
-
-      // // just check if values (column) length is as we expect?!
-      // if (valuesRow.length != numColumns) {
-      //   for (var l = 0; l < valuesRow.length; l++) {
-      //     valuesRow.push('');
-      //     formatsRow.push('@');
-      //   }
-      // }
-
-      // flush sheet every 25 rows (to often is bad for performance, to less bad for UX)
-      // if (i % 25 === 0) {
-      //   SpreadsheetApp.flush();
-      // }
-      // // if there are no more rows, it will be very slow to insert a single one => so we do it for the next 1000
-      // if (i === sheet.getLastRow()) {
-      //   sheet.insertRowsAfter(i, 1000);
-      // }
-
     } // END: issue loop
 
     // set values and format to cells
