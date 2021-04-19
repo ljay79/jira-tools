@@ -139,9 +139,14 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
       // loop over each header (column)
       for (var j = 0; j < headers.length; j++) {
         var headerEntry = headers[j];
-        values.push(row[headerEntry]);
-        formats.push('@');
-      } // END: header/columns loop
+        var rowEntry = row[headerEntry];
+        values.push(rowEntry);
+        if (rowEntry instanceof Date) {
+          formats.push('yyyy-MM-dd HH:mm');
+        } else {
+          formats.push('@');
+        }
+      }
 
       // just check if values (column) length is as we expect?!
       if (values.length != numColumns) {

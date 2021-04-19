@@ -727,6 +727,6 @@ test("saving data from response", () => {
 
   var data = table.getData();
   expect(data).not.toBeNull();
-  expect(data.length).toBe(24);
+  expect(data.length).toBe(6);
 
 });

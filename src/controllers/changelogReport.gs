@@ -72,7 +72,7 @@ ChangelogReport_Controller_ = {
       response = {status: false, message: ''};
 
     var attributes = {
-      filter : jsonFormData['filter_id'] ? getFilter(parseInt(jsonFormData['filter_id'])) : {},
+      filter : jsonFormData['filter_id'] ? getFilter(parseInt(jsonFormData['filter_id'])) : jsonFormData['filter'],
       maxResults : parseInt(jsonFormData['maxResults']) || 10000,
       columns : ['key','issuetype','created','field','fromString','toString'],
       issues : {},
@@ -118,7 +118,7 @@ ChangelogReport_Controller_ = {
     var Search = new IssueSearch(attributes.filter.jql);
     Search
       .setExpand(['changelog'])
-      .setOrderBy('updated', 'DESC')
+      //.setOrderBy('updated', 'DESC')
       .setFields(attributes.columns)
       .setMaxResults(attributes.maxResults)
       .setStartAt(startAt)

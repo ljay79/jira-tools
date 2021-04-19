@@ -1,5 +1,5 @@
 // Node required code block
-
+var ChangelogTableRendererDefault_ = require('../renderer/ChangelogTableRendererDefault.gs').ChangelogTableRendererDefault_;
 // End of Node required code block
 
 /**

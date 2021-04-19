@@ -3,7 +3,9 @@ const extend = require('../../jsLib.gs').extend;
 const getSheetById = require('../../jsLib.gs').getSheetById;
 const sheetIdPropertySafe = require('../../jiraCommon.gs').sheetIdPropertySafe;
 var SpreadsheetTriggers_ = require('../SpreadsheetTriggers.gs').SpreadsheetTriggers_;
-var ChangelogTableRendererDefault_ = require('../renderer/ChangelogTableRendererDefault.gs').ChangelogTableRendererDefault_;
+
+var getDateFromIso = require('../../jsLib.gs').getDateFromIso;
+var ChangelogRendererFactory_ = require('../renderer/ChangelogRendererFactory.gs').ChangelogRendererFactory_;
 // End of Node required code block
 
 /**
@@ -133,13 +135,17 @@ function ChangelogTable_(attributes) {
     // loop over each resulted issue
     for (var i = 0; i < issuesJson.length; i++) {
       var issue = issuesJson[i];
+      if (!issue.changelog || !issue.changelog.histories) {
+        debug.warn("issue response doesn't contains valid changelog data: <= %s", issuesJson);
+        return
+      }
       for (var j = 0; j < issue.changelog.histories.length; j++) {
         var history = issue.changelog.histories[j];
         for (var k = 0; k < history.items.length; k++) {
           var item = history.items[k];
           if (item.field == "status") {
             var row = {};
-            row.created = Utilities.formatDate(getDateFromIso(history.created), 'UTC', 'yyyy-MM-dd');
+            row.created = getDateFromIso(history.created);
             row.key = issue.key;
             row.issuetype = issue.fields.issuetype.name;
             row.field = item.field;
