@@ -273,7 +273,7 @@ function ChangelogTable_(attributes) {
    */
   that.render = function () {
     debug.log('ChangelogTable_.render()');
-    var renderer = ChangelogRendererFactory_.call(that, metaData.renderer);
+    var renderer = ChangelogRendererFactory_(that, metaData.renderer);
     if (typeof renderer !== 'object' || !renderer.hasOwnProperty('render')) {
       throw new ReferenceError("{renderer} must be an object/class but is '" + typeof renderer
           + "'. Ie: of type 'ChangelogTableRendererDefault_'.");

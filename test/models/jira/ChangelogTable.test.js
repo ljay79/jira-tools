@@ -8,31 +8,6 @@ beforeEach(() => {
 });
 
 test("saving data from response", () => {
-  var fieldList = [
-    {
-      key: "summary",
-      name: "Summary",
-      custom: false,
-      schemaType: 'string',
-      supported: true
-    },
-    {
-      key: "custom1234",
-      name: "My custom field",
-      custom: true,
-      schemaType: 'datetime',
-      supported: true
-
-    },
-    {
-      key: "custom5678",
-      name: "My custom field 2",
-      custom: true,
-      schemaType: 'datetime',
-      supported: true
-
-    }
-  ]
   var attributes = {
     filter : { id: 1000, jql: 'foobar'},
     maxResults : 10000,
@@ -48,17 +23,13 @@ test("saving data from response", () => {
       {
         "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
         "id": "259027",
-        "self": "https://jira.tarent.de/rest/api/2/issue/259027",
         "key": "TPORTAL-466",
         "fields": {
           "issuetype": {
-            "self": "https://jira.tarent.de/rest/api/2/issuetype/10100",
             "id": "10100",
             "description": "Eine Aufgabe, die erledigt werden muss.",
-            "iconUrl": "https://jira.tarent.de/secure/viewavatar?size=xsmall&avatarId=10500&avatarType=issuetype",
             "name": "Aufgabe",
             "subtask": false,
-            "avatarId": 10500
           },
         },
         "changelog": {
@@ -68,21 +39,6 @@ test("saving data from response", () => {
           "histories": [
             {
               "id": "1198967",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=bjung",
-                "name": "bjung",
-                "key": "JIRAUSER56901",
-                "emailAddress": "b.jung@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://www.gravatar.com/avatar/b8753768d92af2f122b99e37c882d1ac?d=mm&s=48",
-                  "24x24": "https://www.gravatar.com/avatar/b8753768d92af2f122b99e37c882d1ac?d=mm&s=24",
-                  "16x16": "https://www.gravatar.com/avatar/b8753768d92af2f122b99e37c882d1ac?d=mm&s=16",
-                  "32x32": "https://www.gravatar.com/avatar/b8753768d92af2f122b99e37c882d1ac?d=mm&s=32"
-                },
-                "displayName": "Benjamin Patrick Jung",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-12T09:55:08.000+0200",
               "items": [
                 {
@@ -97,21 +53,6 @@ test("saving data from response", () => {
             },
             {
               "id": "1199868",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=bjung",
-                "name": "bjung",
-                "key": "JIRAUSER56901",
-                "emailAddress": "b.jung@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://www.gravatar.com/avatar/b8753768d92af2f122b99e37c882d1ac?d=mm&s=48",
-                  "24x24": "https://www.gravatar.com/avatar/b8753768d92af2f122b99e37c882d1ac?d=mm&s=24",
-                  "16x16": "https://www.gravatar.com/avatar/b8753768d92af2f122b99e37c882d1ac?d=mm&s=16",
-                  "32x32": "https://www.gravatar.com/avatar/b8753768d92af2f122b99e37c882d1ac?d=mm&s=32"
-                },
-                "displayName": "Benjamin Patrick Jung",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-13T10:48:44.000+0200",
               "items": [
                 {
@@ -134,21 +75,6 @@ test("saving data from response", () => {
             },
             {
               "id": "1199938",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=cromme",
-                "name": "cromme",
-                "key": "JIRAUSER56100",
-                "emailAddress": "c.rommelfanger@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=JIRAUSER56100&avatarId=45400",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=JIRAUSER56100&avatarId=45400",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=JIRAUSER56100&avatarId=45400",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=JIRAUSER56100&avatarId=45400"
-                },
-                "displayName": "Christoph Rommelfanger",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-13T11:40:32.000+0200",
               "items": [
                 {
@@ -157,7 +83,7 @@ test("saving data from response", () => {
                   "from": null,
                   "fromString": null,
                   "to": "JIRAUSER56100",
-                  "toString": "Christoph Rommelfanger"
+                  "toString": "JIRAUSER56101"
                 },
                 {
                   "field": "status",
@@ -171,19 +97,6 @@ test("saving data from response", () => {
             },
             {
               "id": "1200005",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=cromme",
-                "name": "cromme",
-                "key": "JIRAUSER56100",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=JIRAUSER56100&avatarId=45400",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=JIRAUSER56100&avatarId=45400",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=JIRAUSER56100&avatarId=45400",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=JIRAUSER56100&avatarId=45400"
-                },
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-13T13:12:34.000+0200",
               "items": [
                 {
@@ -198,25 +111,13 @@ test("saving data from response", () => {
             },
             {
               "id": "1200006",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=cromme",
-                "key": "JIRAUSER56100",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=JIRAUSER56100&avatarId=45400",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=JIRAUSER56100&avatarId=45400",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=JIRAUSER56100&avatarId=45400",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=JIRAUSER56100&avatarId=45400"
-                },
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-13T13:12:43.000+0200",
               "items": [
                 {
                   "field": "assignee",
                   "fieldtype": "jira",
                   "from": "JIRAUSER56100",
-                  "fromString": "Christoph Rommelfanger",
+                  "fromString": "JIRAUSER56100",
                   "to": null,
                   "toString": null
                 }
@@ -224,21 +125,6 @@ test("saving data from response", () => {
             },
             {
               "id": "1200398",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=mmeltz",
-                "name": "mmeltz",
-                "key": "mmeltz",
-                "emailAddress": "m.meltzow@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=mmeltz&avatarId=27600",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=mmeltz&avatarId=27600",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=mmeltz&avatarId=27600",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=mmeltz&avatarId=27600"
-                },
-                "displayName": "Mario Meltzow",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-14T08:57:07.000+0200",
               "items": [
                 {
@@ -246,8 +132,8 @@ test("saving data from response", () => {
                   "fieldtype": "jira",
                   "from": null,
                   "fromString": null,
-                  "to": "mmeltz",
-                  "toString": "Mario Meltzow"
+                  "to": "foobar",
+                  "toString": "foobar"
                 }
               ]
             }
@@ -257,14 +143,11 @@ test("saving data from response", () => {
       {
         "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
         "id": "257381",
-        "self": "https://jira.tarent.de/rest/api/2/issue/257381",
         "key": "TPORTAL-435",
         "fields" : {
           "issuetype": {
-            "self": "https://jira.tarent.de/rest/api/2/issuetype/10001",
             "id": "10001",
             "description": "Created by Jira Agile - do not edit or delete. Issue type for a user story.",
-            "iconUrl": "https://jira.tarent.de/secure/viewavatar?size=xsmall&avatarId=10315&avatarType=issuetype",
             "name": "Story",
             "subtask": false,
             "avatarId": 10315
@@ -277,21 +160,6 @@ test("saving data from response", () => {
           "histories": [
             {
               "id": "1191061",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=mmeltz",
-                "name": "mmeltz",
-                "key": "mmeltz",
-                "emailAddress": "m.meltzow@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=mmeltz&avatarId=27600",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=mmeltz&avatarId=27600",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=mmeltz&avatarId=27600",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=mmeltz&avatarId=27600"
-                },
-                "displayName": "Mario Meltzow",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-03-30T11:01:35.000+0200",
               "items": [
                 {
@@ -306,21 +174,6 @@ test("saving data from response", () => {
             },
             {
               "id": "1191159",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=mmeltz",
-                "name": "mmeltz",
-                "key": "mmeltz",
-                "emailAddress": "m.meltzow@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=mmeltz&avatarId=27600",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=mmeltz&avatarId=27600",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=mmeltz&avatarId=27600",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=mmeltz&avatarId=27600"
-                },
-                "displayName": "Mario Meltzow",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-03-30T11:45:34.000+0200",
               "items": [
                 {
@@ -335,21 +188,6 @@ test("saving data from response", () => {
             },
             {
               "id": "1194137",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=mmeltz",
-                "name": "mmeltz",
-                "key": "mmeltz",
-                "emailAddress": "m.meltzow@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=mmeltz&avatarId=27600",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=mmeltz&avatarId=27600",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=mmeltz&avatarId=27600",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=mmeltz&avatarId=27600"
-                },
-                "displayName": "Mario Meltzow",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-01T10:24:26.000+0200",
               "items": [
                 {
@@ -364,21 +202,6 @@ test("saving data from response", () => {
             },
             {
               "id": "1194140",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=mmeltz",
-                "name": "mmeltz",
-                "key": "mmeltz",
-                "emailAddress": "m.meltzow@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=mmeltz&avatarId=27600",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=mmeltz&avatarId=27600",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=mmeltz&avatarId=27600",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=mmeltz&avatarId=27600"
-                },
-                "displayName": "Mario Meltzow",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-01T10:24:50.000+0200",
               "items": [
                 {
@@ -387,27 +210,12 @@ test("saving data from response", () => {
                   "from": null,
                   "fromString": "Umschaltung zwischen Deutsch / Englisch ermöglichen",
                   "to": null,
-                  "toString": "Umschaltung zwischen Deutsch / Englisch ermöglichen\r\n\r\n \r\n\r\nzu klären:\r\n * wollen wir das umsetzen?"
+                  "toString": "Umschaltung zwischen Deutsch / Englisch ermöglichen\r\n\r\n "
                 }
               ]
             },
             {
               "id": "1194141",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=mmeltz",
-                "name": "mmeltz",
-                "key": "mmeltz",
-                "emailAddress": "m.meltzow@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=mmeltz&avatarId=27600",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=mmeltz&avatarId=27600",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=mmeltz&avatarId=27600",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=mmeltz&avatarId=27600"
-                },
-                "displayName": "Mario Meltzow",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-01T10:24:57.000+0200",
               "items": [
                 {
@@ -422,137 +230,34 @@ test("saving data from response", () => {
             },
             {
               "id": "1194266",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=mmeltz",
-                "name": "mmeltz",
-                "key": "mmeltz",
-                "emailAddress": "m.meltzow@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=mmeltz&avatarId=27600",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=mmeltz&avatarId=27600",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=mmeltz&avatarId=27600",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=mmeltz&avatarId=27600"
-                },
-                "displayName": "Mario Meltzow",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-01T11:38:15.000+0200",
               "items": [
                 {
                   "field": "description",
                   "fieldtype": "jira",
                   "from": null,
-                  "fromString": "Umschaltung zwischen Deutsch / Englisch ermöglichen\r\n\r\n \r\n\r\nzu klären:\r\n * wollen wir das umsetzen?",
+                  "fromString": "Umschaltung zwischen Deutsch / Englisch ermöglichen\r\n\r\n ",
                   "to": null,
-                  "toString": "Umschaltung zwischen Deutsch / Englisch ermöglichen\r\n\r\n out of scope:\r\n * right2left Layouts / Sprache\r\n\r\nzu klären:\r\n * wollen wir das umsetzen?\r\n * Datumsformat, Zahlenformatierung => Internationalisation\r\n * nicht nur Sprache übersetzung"
+                  "toString": "Umschaltung zwischen Deutsch / Englisch ermöglichen"
                 }
               ]
             },
             {
               "id": "1194270",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=mmeltz",
-                "name": "mmeltz",
-                "key": "mmeltz",
-                "emailAddress": "m.meltzow@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=mmeltz&avatarId=27600",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=mmeltz&avatarId=27600",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=mmeltz&avatarId=27600",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=mmeltz&avatarId=27600"
-                },
-                "displayName": "Mario Meltzow",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-01T11:39:40.000+0200",
               "items": [
                 {
                   "field": "description",
                   "fieldtype": "jira",
                   "from": null,
-                  "fromString": "Umschaltung zwischen Deutsch / Englisch ermöglichen\r\n\r\n out of scope:\r\n * right2left Layouts / Sprache\r\n\r\nzu klären:\r\n * wollen wir das umsetzen?\r\n * Datumsformat, Zahlenformatierung => Internationalisation\r\n * nicht nur Sprache übersetzung",
+                  "fromString": "Umschaltung zwischen Deutsch / Englisch ermöglichen",
                   "to": null,
-                  "toString": "Umschaltung zwischen Deutsch / Englisch ermöglichen\r\n\r\n out of scope:\r\n * right2left Layouts / Sprache\r\n\r\nzu klären:\r\n * wollen wir das umsetzen?\r\n * Datumsformat, Zahlenformatierung => Internationalisation\r\n * nicht nur Sprache übersetzung\r\n * Sprache vom System auslesen"
-                }
-              ]
-            },
-            {
-              "id": "1194271",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=mmeltz",
-                "name": "mmeltz",
-                "key": "mmeltz",
-                "emailAddress": "m.meltzow@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=mmeltz&avatarId=27600",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=mmeltz&avatarId=27600",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=mmeltz&avatarId=27600",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=mmeltz&avatarId=27600"
-                },
-                "displayName": "Mario Meltzow",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
-              "created": "2021-04-01T11:40:19.000+0200",
-              "items": [
-                {
-                  "field": "description",
-                  "fieldtype": "jira",
-                  "from": null,
-                  "fromString": "Umschaltung zwischen Deutsch / Englisch ermöglichen\r\n\r\n out of scope:\r\n * right2left Layouts / Sprache\r\n\r\nzu klären:\r\n * wollen wir das umsetzen?\r\n * Datumsformat, Zahlenformatierung => Internationalisation\r\n * nicht nur Sprache übersetzung\r\n * Sprache vom System auslesen",
-                  "to": null,
-                  "toString": "Umschaltung zwischen Deutsch / Englisch ermöglichen\r\n\r\n out of scope:\r\n * right2left Layouts / Sprache\r\n\r\nsiehe [https://flutter.dev/docs/development/accessibility-and-localization/internationalization]\r\n\r\nzu klären:\r\n * wollen wir das umsetzen?\r\n * Datumsformat, Zahlenformatierung => Internationalisation\r\n * nicht nur Sprache übersetzung\r\n * Sprache vom System auslesen"
-                }
-              ]
-            },
-            {
-              "id": "1197736",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=mmeltz",
-                "name": "mmeltz",
-                "key": "mmeltz",
-                "emailAddress": "m.meltzow@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=mmeltz&avatarId=27600",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=mmeltz&avatarId=27600",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=mmeltz&avatarId=27600",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=mmeltz&avatarId=27600"
-                },
-                "displayName": "Mario Meltzow",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
-              "created": "2021-04-08T11:18:34.000+0200",
-              "items": [
-                {
-                  "field": "description",
-                  "fieldtype": "jira",
-                  "from": null,
-                  "fromString": "Umschaltung zwischen Deutsch / Englisch ermöglichen\r\n\r\n out of scope:\r\n * right2left Layouts / Sprache\r\n\r\nsiehe [https://flutter.dev/docs/development/accessibility-and-localization/internationalization]\r\n\r\nzu klären:\r\n * wollen wir das umsetzen?\r\n * Datumsformat, Zahlenformatierung => Internationalisation\r\n * nicht nur Sprache übersetzung\r\n * Sprache vom System auslesen",
-                  "to": null,
-                  "toString": "Umschaltung zwischen Deutsch / Englisch ermöglichen\r\n\r\n out of scope:\r\n * right2left Layouts / Sprache\r\n\r\nsiehe [https://flutter.dev/docs/development/accessibility-and-localization/internationalization]\r\n\r\nzu klären:\r\n * wollen wir das umsetzen?\r\n * Datumsformat, Zahlenformatierung => Internationalisation\r\n * nicht nur Sprache übersetzung\r\n * Sprache vom System auslesen\r\n * Fehlermeldung in entsprechender Sprache darstellen"
+                  "toString": "Umschaltung zwischen Deutsch / Englisch ermöglichen\r\n\r\n "
                 }
               ]
             },
             {
               "id": "1199871",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=mmeltz",
-                "name": "mmeltz",
-                "key": "mmeltz",
-                "emailAddress": "m.meltzow@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=mmeltz&avatarId=27600",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=mmeltz&avatarId=27600",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=mmeltz&avatarId=27600",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=mmeltz&avatarId=27600"
-                },
-                "displayName": "Mario Meltzow",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-13T10:50:03.000+0200",
               "items": [
                 {
@@ -567,21 +272,6 @@ test("saving data from response", () => {
             },
             {
               "id": "1200419",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=gbruec",
-                "name": "gbruec",
-                "key": "suw",
-                "emailAddress": "g.bruecher@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=suw&avatarId=17501",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=suw&avatarId=17501",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=suw&avatarId=17501",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=suw&avatarId=17501"
-                },
-                "displayName": "Gunnar Bruecher",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-14T09:04:19.000+0200",
               "items": [
                 {
@@ -596,21 +286,6 @@ test("saving data from response", () => {
             },
             {
               "id": "1200420",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=gbruec",
-                "name": "gbruec",
-                "key": "suw",
-                "emailAddress": "g.bruecher@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=suw&avatarId=17501",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=suw&avatarId=17501",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=suw&avatarId=17501",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=suw&avatarId=17501"
-                },
-                "displayName": "Gunnar Bruecher",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-14T09:04:19.000+0200",
               "items": [
                 {
@@ -625,21 +300,6 @@ test("saving data from response", () => {
             },
             {
               "id": "1200421",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=gbruec",
-                "name": "gbruec",
-                "key": "suw",
-                "emailAddress": "g.bruecher@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=suw&avatarId=17501",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=suw&avatarId=17501",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=suw&avatarId=17501",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=suw&avatarId=17501"
-                },
-                "displayName": "Gunnar Bruecher",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-14T09:04:22.000+0200",
               "items": [
                 {
@@ -654,21 +314,6 @@ test("saving data from response", () => {
             },
             {
               "id": "1200424",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=gbruec",
-                "name": "gbruec",
-                "key": "suw",
-                "emailAddress": "g.bruecher@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=suw&avatarId=17501",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=suw&avatarId=17501",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=suw&avatarId=17501",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=suw&avatarId=17501"
-                },
-                "displayName": "Gunnar Bruecher",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-14T09:04:51.000+0200",
               "items": [
                 {
@@ -677,7 +322,7 @@ test("saving data from response", () => {
                   "from": null,
                   "fromString": null,
                   "to": "suw",
-                  "toString": "Gunnar Bruecher"
+                  "toString": "Foo Bar"
                 },
                 {
                   "field": "status",
@@ -691,30 +336,15 @@ test("saving data from response", () => {
             },
             {
               "id": "1200425",
-              "author": {
-                "self": "https://jira.tarent.de/rest/api/2/user?username=gbruec",
-                "name": "gbruec",
-                "key": "suw",
-                "emailAddress": "g.bruecher@tarent.de",
-                "avatarUrls": {
-                  "48x48": "https://jira.tarent.de/secure/useravatar?ownerId=suw&avatarId=17501",
-                  "24x24": "https://jira.tarent.de/secure/useravatar?size=small&ownerId=suw&avatarId=17501",
-                  "16x16": "https://jira.tarent.de/secure/useravatar?size=xsmall&ownerId=suw&avatarId=17501",
-                  "32x32": "https://jira.tarent.de/secure/useravatar?size=medium&ownerId=suw&avatarId=17501"
-                },
-                "displayName": "Gunnar Bruecher",
-                "active": true,
-                "timeZone": "Europe/Berlin"
-              },
               "created": "2021-04-14T09:05:02.000+0200",
               "items": [
                 {
                   "field": "assignee",
                   "fieldtype": "jira",
                   "from": "suw",
-                  "fromString": "Gunnar Bruecher",
+                  "fromString": "Foo Bar",
                   "to": "JIRAUSER56901",
-                  "toString": "Benjamin Patrick Jung"
+                  "toString": "Foo Bar2"
                 }
               ]
             }

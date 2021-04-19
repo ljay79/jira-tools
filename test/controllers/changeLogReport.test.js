@@ -52,7 +52,8 @@ test('menuJiraChangelogMap', () => {
 test("history entries should be returned", () => {
   //jiraApiMock.setAllResponsesSuccesfull(200, mockFieldJiraApiResponse);
   jiraApiMock.setNextJiraResponse(200, "search", mockChangelogJiraApiResponse);
-  var callbackGetAllChangelogs = require('src/controllers/changelogReport.gs').callbackGetAllChangelogs;
+  var changelogReport = require('src/controllers/changelogReport.gs');
+  var callbackGetAllChangelogs = changelogReport.callbackGetAllChangelogs;
   var jsonFormData = {
     filter: {
       id: 1000,
@@ -60,8 +61,9 @@ test("history entries should be returned", () => {
     }
   }
 
-  const ChangelogRendererFactory_ = require('src/models/renderer/ChangelogRendererFactory.gs');
-  ChangelogRendererFactory_.ChangelogRendererFactory_ = jest.fn().mockImplementation(()=> HtmlService.dialogMock);
+  const changelogTableRendererDefault = require('src/models/renderer/ChangelogTableRendererDefault.gs');
+  changelogTableRendererDefault.ChangelogTableRendererDefault_ = jest.fn().mockImplementation(()=> HtmlService.dialogMock);
+  changelogReport.callbackSetRenderer(changelogTableRendererDefault);
 
   var histories = callbackGetAllChangelogs(jsonFormData);
   // fields returned should only have custom fields from the mock data

@@ -11,7 +11,7 @@ const unifyIssueAttrib = require('src/jiraCommon.gs').unifyIssueAttrib;
 const getTicketSheet = require("src/jiraCommon.gs").getTicketSheet;
 const hasSettings = require("src/settings.gs").hasSettings;
 const getCfg_ = require("src/settings.gs").getCfg_;
-const ChangelogTableRendererDefault_ = require('src/models/renderer/ChangelogTableRendererDefault.gs').ChangelogTableRendererDefault_;
+// const ChangelogTableRendererDefault_ = require('src/models/renderer/ChangelogTableRendererDefault.gs').ChangelogTableRendererDefault_;
 const ChangelogTable_ = require('src/models/jira/ChangelogTable.gs')
 const UserStorage = require('src/models/gas/UserStorage.gs')
 // End of Node required code block
@@ -31,11 +31,20 @@ function callbackGetAllChangelogs(jsonFormData) {
   return ChangelogReport_Controller_.getAllChangelogs(jsonFormData);
 }
 
+function callbackSetRenderer(renderer) {
+  ChangelogReport_Controller_.setRenderer(renderer)
+}
+
 /**
  *
  */
 ChangelogReport_Controller_ = {
   name : 'ChangelogReport_Controller_',
+  renderer : null,
+
+  setRenderer: function(renderer) {
+    this.renderer = renderer;
+  },
 
   /**
    * @desc Dialog to configure Jira custom fields
@@ -77,7 +86,7 @@ ChangelogReport_Controller_ = {
       columns : ['key','issuetype','created','field','fromString','toString'],
       issues : {},
       sheet : getTicketSheet(),
-      renderer : ChangelogTableRendererDefault_
+      renderer : "ChangelogTableRendererDefault_"
     };
 
     var ok = function (resp, status, errorMessage) {
@@ -96,17 +105,16 @@ ChangelogReport_Controller_ = {
       } else {
         attributes.issues = resp.data;
 
-        var renderer, Table = new ChangelogTable_(attributes);
-        if (renderer = Table.render()) {
+        var Table = new ChangelogTable_(attributes);
+        if (!that.renderer) {
+          this.renderer = Table.render();
           // toast with status message
           var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
             + " total found records.";
-          SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
+          SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 15);
           debug.log(msg);
-
-          response.status = true;
-
         }
+        response.status = true;
       }
     };
 
@@ -126,7 +134,7 @@ ChangelogReport_Controller_ = {
       .withSuccessHandler(ok)
       .withFailureHandler(error);
 
-    return response;
+    return attributes.issues;
   }
 
 }
@@ -134,6 +142,7 @@ ChangelogReport_Controller_ = {
 // Node required code block
 module.exports = {
   callbackGetAllChangelogs: callbackGetAllChangelogs,
-  menuCreateChangelogReport: menuCreateChangelogReport
+  menuCreateChangelogReport: menuCreateChangelogReport,
+  callbackSetRenderer: callbackSetRenderer
 }
 // End of Node required code block
