@@ -118,10 +118,10 @@ ChangelogReport_Controller_ = {
     var Search = new IssueSearch(attributes.filter.jql);
     Search
       .setExpand(['changelog'])
-      //.setOrderBy('updated', 'DESC')
       .setFields(attributes.columns)
       .setMaxResults(attributes.maxResults)
       .setStartAt(startAt)
+      .setMaxPerPage(100)
       .search()
       .withSuccessHandler(ok)
       .withFailureHandler(error);

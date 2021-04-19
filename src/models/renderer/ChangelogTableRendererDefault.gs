@@ -139,61 +139,62 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
    */
   that.fillTable = function () {
     info.totalInserted = data.length;
-    var range = sheet.getRange(initRange.getRow(), initRange.getColumn(), 1, headers.length); // obsolete?
+    var values = [];
+    var formats = []
+
+    var range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), data.length, headers.length);
 
     // loop over each resulted data (row)
     for (var i = 0; i < data.length; i++) {
       var row = data[i];
-      var values = [];
-      var formats = []; // http://www.blackcj.com/blog/2015/05/18/cell-number-formatting-with-google-apps-script/
-      range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
-
+      var valuesRow = [];
+      values.push(valuesRow);
+      var formatsRow = [];
+      formats.push(formatsRow);
       // loop over each header (column)
       for (var j = 0; j < headers.length; j++) {
         var headerEntry = headers[j];
         var rowEntry = row[headerEntry];
         if (rowEntry instanceof Date) {
-          values.push(rowEntry);
-          formats.push('yyyy-MM-dd HH:mm');
-        } else if (headerEntry == 'key') {
-          values.push('=HYPERLINK("' + getCfg_('jira_url') + '/browse/' + rowEntry + '";"' + rowEntry +'")');
-          formats.push('@');
+          valuesRow.push(rowEntry);
+          formatsRow.push('yyyy-MM-dd HH:mm');
+        } else if (headerEntry === 'key') {
+          valuesRow.push('=HYPERLINK("' + getCfg_('jira_url') + '/browse/' + rowEntry + '";"' + rowEntry +'")');
+          formatsRow.push('@');
         } else {
-          values.push(rowEntry);
-          formats.push('@');
+          valuesRow.push(rowEntry);
+          formatsRow.push('@');
         }
       }
 
-      // just check if values (column) length is as we expect?!
-      if (values.length != numColumns) {
-        for (var l = 0; l < values.length; l++) {
-          values.push('');
-          formats.push('@');
-        }
-      }
-
-      // set values and format to cells
-      range.clearContent()
-        .clearNote()
-        .clearFormat()
-        .setValues([values])
-        .setNumberFormats([formats])
-        .activate();
-
-      info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
+      // // just check if values (column) length is as we expect?!
+      // if (valuesRow.length != numColumns) {
+      //   for (var l = 0; l < valuesRow.length; l++) {
+      //     valuesRow.push('');
+      //     formatsRow.push('@');
+      //   }
+      // }
 
       // flush sheet every 25 rows (to often is bad for performance, to less bad for UX)
-      if (i % 25 === 0) {
-        SpreadsheetApp.flush();
-      }
-      // if there are no more rows, it will be very slow to insert a single one => so we do it for the next 1000
-      if (i === sheet.getLastRow()) {
-        sheet.insertRowsAfter(i, 1000);
-      }
-
-      issue = null;
+      // if (i % 25 === 0) {
+      //   SpreadsheetApp.flush();
+      // }
+      // // if there are no more rows, it will be very slow to insert a single one => so we do it for the next 1000
+      // if (i === sheet.getLastRow()) {
+      //   sheet.insertRowsAfter(i, 1000);
+      // }
 
     } // END: issue loop
+
+    // set values and format to cells
+    range.clearContent()
+      .clearNote()
+      .clearFormat()
+      .setValues(values)
+      .setNumberFormats(formats)
+      .activate();
+
+    info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
 
     return that;
   };
