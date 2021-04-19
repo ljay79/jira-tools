@@ -100,11 +100,23 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
   that.addHeader = function () {
     var values = [], formats = [];
 
+    // header first row
+    var filterName = ChangelogTable.getMeta('filter').name;
+    values.push("Filter: " + filterName);
+    formats.push('bold');
+    var range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, values.length);
+    range.clearContent()
+        .clearNote()
+        .clearFormat()
+        .setValues([ values ])
+        .setFontWeights([ formats ]);
+
+    //header 2.row
+    values = [], formats = [];
     for (var i = 0; i < headers.length; i++) {
       values.push(headers[i]);
       formats.push('bold');
     }
-
     range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
 
     range.clearContent()
@@ -140,10 +152,14 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
       for (var j = 0; j < headers.length; j++) {
         var headerEntry = headers[j];
         var rowEntry = row[headerEntry];
-        values.push(rowEntry);
         if (rowEntry instanceof Date) {
+          values.push(rowEntry);
           formats.push('yyyy-MM-dd HH:mm');
+        } else if (headerEntry == 'key') {
+          values.push('=HYPERLINK("' + getCfg_('jira_url') + '/browse/' + rowEntry + '";"' + rowEntry +'")');
+          formats.push('@');
         } else {
+          values.push(rowEntry);
           formats.push('@');
         }
       }
@@ -169,6 +185,10 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
       // flush sheet every 25 rows (to often is bad for performance, to less bad for UX)
       if (i % 25 === 0) {
         SpreadsheetApp.flush();
+      }
+      // if there are no more rows, it will be very slow to insert a single one => so we do it for the next 1000
+      if (i === sheet.getLastRow()) {
+        sheet.insertRowsAfter(i, 1000);
       }
 
       issue = null;

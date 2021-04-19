@@ -10,7 +10,7 @@
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
-var BUILD = '1.4.10b';
+var BUILD = '1.4.10c';
 
 /**
  * Add a nice menu option for the users.
