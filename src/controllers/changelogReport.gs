@@ -65,7 +65,7 @@ ChangelogReport_Controller_ = {
 
     debug.log('Processed: %s', dialog);
 
-    SpreadsheetApp.getUi().showModalDialog(dialog, 'Create changelog report');
+    SpreadsheetApp.getUi().showModalDialog(dialog, 'Create status report');
   },
 
   /**
