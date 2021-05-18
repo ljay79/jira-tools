@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.blue-green.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/styles.min.css?v=b149">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.0/dialog-polyfill.min.js"></script>
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.3.0/material.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <style>
+    .error-container { display: none; width: 50%; float: right; margin-bottom: 16px; padding: 5px 10px; text-align: center; color: #fff; }
+    .filter-select { border: 1px solid #dfdfdf; height: 154px; overflow-y: auto; line-height: 28px; }
+    .filter-select > div { padding-left: 3px; padding-right: 24px; }
+    .filter-select > div:nth-child(even) { background: #f7f8f9; }
+    .is-loading { text-align: center; animation: blink .5s infinite; }
+    @keyframes blink { 0% { color: #fff; } 50% { color: #777; } 100% { color: #fff; } }
+    .is-favourite label { font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <form name="issue-filter" action="" method="post">
+      <input type="hidden" name="filter_id" id="filter-id" value="" />
+
+      <div class="input-switch filter-my-only" <? if(server_type == 'server') { ?> style="display:none;"<? } ?> >
+        <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="only-my-filters">
+          <input type="checkbox" id="only-my-filters" name="only_my_filters" class="mdl-switch__input"
+            value="1" checked="checked" >
+          <span class="mdl-switch__label">My filters only</span>
+        </label>
+      </div>
+
+      <!-- container to place filter selection element into -->
+      <div class="block filter-select is-loading">loading filters ...</div>
+
+      <div class="block">
+        <button type="submit" class="action" disabled>Insert</button>
+        <button type="button" onclick="google.script.host.close()">Cancel</button>
+        <div id="response-message" class="error-container" role="dialog"></div>
+      </div>
+    </form>
+
+    <script>
+      /* global google */
+      var filter  = document.forms['issue-filter'];
+      var valid   = false;
+      var timeout = null;
+      var alert   = document.getElementById('response-message');
+      var input   = Array.prototype.slice.call(filter.elements).filter(function(el){ return el.nodeName === 'INPUT'; });
+      var action  = filter.querySelector('[type=submit]');
+      var filters = [];
+      var toggleOnlyMyFilters = $('#only-my-filters');
+
+      function hideAlert(){
+        if(timeout) timeout = clearTimeout(timeout);
+        alert.style.display = 'none';
+      }
+
+      function showAlert(text,type,time) {
+        alert.innerText = text;
+        alert.style.backgroundColor = type ? 'rgb(139,195,74)' : 'rgb(213,0,0)';
+        alert.style.display = 'block';
+        if (time) timeout = setTimeout(hideAlert,time);
+      }
+
+      function inputValidatyHandler() {
+        if (this.name === 'filter' && this.checked) filter.elements['filter_id'].value = this.value;
+        valid = filter.elements['filter_id'].value.length > 0;
+        action.disabled = valid ? false : 'disabled';
+      }
+
+      function onInitFilter(response) {
+        var filterSelect = filter.querySelector('.filter-select');
+            filterSelect.innerText = '';
+            filterSelect.classList.remove('is-loading');
+
+        if (!response.list.length) {
+          showAlert('No filters available!' + response.error);
+          // add Jira Server note to box
+          filterSelect.innerHTML = '<span class="inline grey">Note: If you are using a JIRA Server installation, this can show your <strong>*favorite*</strong> filters only.<br/>'
+            + 'For JIRA Cloud users it lists all your personal and your favorite ones. Make sure, you have at least one filter marked as favorite.'
+            + '</br>Read more at: <a target="_blank" href="https://confluence.atlassian.com/jiracoreserver073/saving-your-search-as-a-filter-861257224.html#Savingyoursearchasafilter-favorite_filters">Atlassian Support</a></span>';
+            + '</br></br><span class="inline grey">Still having problems? File a issue report with the author here: <a target="_blank" href="https://github.com/ljay79/jira-tools/issues">JST on Github</a></span>';
+          action.disabled = 'disabled';
+
+          return;
+        } else if('' != response.error) {
+          showAlert(response.error);
+          return;
+        }
+
+        response.list.forEach(function(option) {
+          var radio = document.createElement('div');
+          var radioInput = document.createElement('input');
+          var radioLabel = document.createElement('label');
+
+          radioInput.setAttribute('type', 'radio');
+          radioInput.setAttribute('name', 'filter');
+          radioInput.setAttribute('id', 'filter-id-'+option.id);
+          radioInput.setAttribute('value', option.id);
+          radioLabel.setAttribute('for', 'filter-id-'+option.id);
+          radioLabel.innerText = option.name + ' ('+option.owner+')';
+
+          if (option.favourite) radio.className = 'is-favourite';
+          radio.appendChild(radioInput);
+          radio.appendChild(radioLabel);
+
+          radioInput.addEventListener('change', inputValidatyHandler);
+
+          filters.push(radioInput);
+          filterSelect.appendChild(radio);
+        });
+
+        filters[0].checked = true;
+        filter.elements['filter_id'].value = filters[0].value;
+
+        window.dispatchEvent(new Event('load'));
+      }
+
+      function formSubmitHandler(event) {
+        if (event) event.preventDefault();
+        hideAlert();
+        if (!valid) return;
+        showAlert('inserting ...', 1);
+
+        var formData = {
+          filter_id: filter.elements['filter_id'].value,
+        };
+
+        google.script.run
+          .withSuccessHandler(onResponse)
+          .withFailureHandler(onResponse)
+          .callbackGetAllChangelogs(formData);
+      }
+
+      function onResponse(response) {
+        var done = response.status === true;
+        hideAlert();
+
+        if(done) google.script.host.close();
+        showAlert(response.message, done, 10000);
+      }
+
+      toggleOnlyMyFilters.change(function() {
+        var enabled = $(this).is(':checked');
+
+        // save setting
+        google.script.run
+          .withSuccessHandler(function(){
+            var filterBox = $('.filter-select');
+            filterBox.addClass('is-loading').html('loading filters ...');
+
+            google.script.run
+              .withSuccessHandler(onInitFilter)
+              .getMyFilters();
+          })
+          .callbackUpdateCfgMyFilter(enabled);
+      });
+
+      google.script.run
+        .withSuccessHandler(onInitFilter)
+        .getMyFilters();
+
+      filter.addEventListener('submit', formSubmitHandler);
+      input.forEach(function(el){ el.addEventListener('change', inputValidatyHandler); });
+      window.addEventListener('load', inputValidatyHandler);
+    </script>
+  </body>
+</html>

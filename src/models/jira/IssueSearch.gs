@@ -13,7 +13,8 @@ const EpicField = require("src/models/jira/EpicField.gs");
 function IssueSearch(searchQuery) {
   var fields = ['key'],
       startAt = 0, maxResults = 1000, maxPerPage = 50,
-      queryStr = searchQuery, orderBy = '', orderDir = 'ASC';
+      queryStr = searchQuery, orderBy = '', orderDir = 'ASC',
+      expand = false;
   var response = {
     'data' : [],
     'totalFoundRecords' : 0,
@@ -118,6 +119,18 @@ function IssueSearch(searchQuery) {
   };
 
   /**
+   * @desc Set expand
+   * @param sExpand {Array} Example: ['changelog']
+   * @return {this} Allow Chaining
+   */
+  this.setExpand = function (sExpand) {
+    expand = sExpand;
+    return this;
+  };
+
+
+
+  /**
    * @desc Callback Success handler
    * @param fn {function} Method to call on successfull request (statue=200)
    * @return {this} Allow chaining
@@ -197,13 +210,14 @@ function IssueSearch(searchQuery) {
       var _currPage = Math.ceil(_countTotalResults / maxPerPage) + 1;
       var _maxPage  = Math.ceil((_total<maxResults?_total:maxResults) / maxPerPage);
       SpreadsheetApp.getActiveSpreadsheet().toast(".. fetching result page "+_currPage+" / " + _maxPage, "Progress", 5);
-      
+
       var subSearch = new IssueSearch( queryStr );
       subSearch.setOrderBy( orderBy, orderDir )
                .setFields( fields )
                .setMaxPerPage( maxPerPage )
                .setMaxResults( maxResults )
-               .setStartAt( _countTotalResults );
+               .setStartAt( _countTotalResults )
+               .setExpand(expand);
 
       subSearch.search().withSuccessHandler(function(resp, status, errorMessage) {
         // append results to parent results
@@ -254,6 +268,10 @@ function IssueSearch(searchQuery) {
       startAt : startAt,
       maxResults : (maxResults < maxPerPage) ? maxResults : maxPerPage
     };
+
+    if (expand) {
+      data.expand = expand;
+    }
 
     var request = new Request();
     request.call('search', data, {'method' : 'post'})
