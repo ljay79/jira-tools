@@ -1,5 +1,5 @@
 // Node required code block
-var changelogTableRendererDefault_ = require('../renderer/ChangelogTableRendererDefault.gs').ChangelogTableRendererDefault_;
+var ChangelogTableRendererDefault_ = require('../renderer/ChangelogTableRendererDefault.gs').ChangelogTableRendererDefault_;
 // End of Node required code block
 
 /**
@@ -8,12 +8,12 @@ var changelogTableRendererDefault_ = require('../renderer/ChangelogTableRenderer
  * @param {string} RendererClassName Classname of a ChangelogTableRenderer class
  * @return {object} An instance of type ChangelogRendererFactory_
  */
-function ChangelogRendererFactory_(ChangelogeTable, RendererClassName) {
+function ChangelogRendererFactory_(ChangelogTable, RendererClassName) {
   debug.log('ChangelogRendererFactory_(%s)', RendererClassName);
   var name = 'ChangelogRendererFactory_';
 
   debug.log('Instantiate new ChangelogTableRendererDefault_');
-  return changelogTableRendererDefault_(ChangelogeTable);
+  return changelogTableRendererDefault_(ChangelogTable);
 }
 
 // Node required code block
