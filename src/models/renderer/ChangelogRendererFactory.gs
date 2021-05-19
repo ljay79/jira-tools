@@ -13,7 +13,7 @@ function ChangelogRendererFactory_(ChangelogTable, RendererClassName) {
   var name = 'ChangelogRendererFactory_';
 
   debug.log('Instantiate new ChangelogTableRendererDefault_');
-  return changelogTableRendererDefault_(ChangelogTable);
+  return new ChangelogTableRendererDefault_(ChangelogTable);
 }
 
 // Node required code block
