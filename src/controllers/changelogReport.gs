@@ -109,7 +109,7 @@ ChangelogReport_Controller_ = {
         if (!that.renderer) {
           this.renderer = Table.render();
           // toast with status message
-          var msg = "Finished inserting " + renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
+          var msg = "Finished inserting " + this.renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
             + " total found records.";
           SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 15);
           debug.log(msg);
