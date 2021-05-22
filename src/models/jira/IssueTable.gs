@@ -66,7 +66,7 @@ function IssueTable_(attributes) {
         throw new ReferenceError("{attributes.issues} must be an object. Jira api response object of type issues.");
       }
 
-      if (!attributes.hasOwnProperty('columns') || typeof attributes.issues !== 'object') {
+      if (!attributes.hasOwnProperty('columns') || typeof attributes.columns !== 'object') {
         throw new ReferenceError("{attributes.columns} must be an array. Jira field names used as table header.");
       }
 
