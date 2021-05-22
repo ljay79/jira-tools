@@ -175,7 +175,7 @@ TimeReport_Controller_ = {
       }
 
       // prep new TimesheetTable then request actual worklogs
-      var timeSheetRenderer = TimesheetRendererFactory_.call({
+      var timeSheetRenderer = RendererFactory_.call({
         periodFrom: wlDateFrom,
         periodTo:   wlDateTo
       }, jsonFormData.wlLayout);

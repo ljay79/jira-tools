@@ -9,28 +9,6 @@ const IssueFields = require('../jira/IssueFields.gs');
 // End of Node required code block
 
 /**
- * Factory class to instantiate different IssueTableRenderer classes.
- * 
- * @TOOD: probably move to own file
- * @param {string} RendererClassName Classname of a IssueTableRenderer class
- * @return {object} An instance of type IssueTableRenderer_
- */
-function RendererFactory_(RendererClassName) {
-  debug.log('RendererFactory_(%s)', RendererClassName);
-  var name = 'RendererFactory_';
-
-  switch (RendererClassName) {
-    case 'IssueTableRendererDefault_':
-      debug.log('Instantiate new IssueTableRendererDefault_');
-      return new IssueTableRendererDefault_(this);
-      break;
-    default:
-      throw new Error("{RendererClassName} is a unknown IssueTable Renderer.");
-      break;
-  }
-}
-
-/**
  * @file Contains class for rendering jira issue tables
  */
 
@@ -290,7 +268,6 @@ function IssueTableRendererDefault_(IssueTable) {
 
 // Node required code block
 module.exports = {
-  RendererFactory_ : RendererFactory_,
   IssueTableRendererDefault_ : IssueTableRendererDefault_
 }
 // End of Node required code block
