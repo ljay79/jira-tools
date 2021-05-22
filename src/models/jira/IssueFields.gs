@@ -293,9 +293,9 @@ IssueFields = (function () {
       lastViewed: 'Last Viewed',
       votes: 'Votes',
       watches: 'Watchers',
-      workratio: 'Work Ratio'
-      //subtasks:[{"id":"33351","key":"FF24-229","self":"...atlassian.net/rest/api/2/issue/33351","fields":{"summary":"QA - Feedback","status":{"self":"....atlassian.net/rest/api/2/status/6","description":"The issue is considered finished, the resolution is correct. Issues which are closed can be reopened.","iconUrl":"https://dyhltd.atlassian.net/images/icons/statuses/closed.png","name":"Closed","id":"6","statusCategory":{"self":"https://dyhltd.atlassian.net/rest/api/2/statuscategory/3","id":3,"key":"done","colorName":"green","name":"Done"}},"priority":{"self":"https://dyhltd.atlassian.net/rest/api/2/priority/1","iconUrl":"https://dyhltd.atlassian.net/images/icons/priorities/highest.svg","name":"Highest","id":"1"},"issuetype":{"self":"https://dyhltd.atlassian.net/rest/api/2/issuetype/10003","id":"10003","description":"The sub-task of the issue","iconUrl":"https://dyhltd.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype","name":"Sub-task","subtask":true,"avatarId":10316}}}]
-      //versions: [{"self": "https://dyhltd.atlassian.net/rest/api/2/version/14021","id": "14021","description": "","name": "Loan - Release v2.0.17","archived": false,"released": true,"releaseDate": "2018-03-21"}]
+      workratio: 'Work Ratio',
+      //subtasks:[{"id":"33351","key":"FF24-229","self":"...atlassian.net/rest/api/2/issue/33351","fields":{"summary":"QA - Feedback","status":{"self":"....atlassian.net/rest/api/2/status/6","description":"The issue is considered finished, the resolution is correct. Issues which are closed can be reopened.","iconUrl":"..atlassian.netimages/icons/statuses/closed.png","name":"Closed","id":"6","statusCategory":{"self":"..atlassian.netrest/api/2/statuscategory/3","id":3,"key":"done","colorName":"green","name":"Done"}},"priority":{"self":"..atlassian.netrest/api/2/priority/1","iconUrl":"..atlassian.netimages/icons/priorities/highest.svg","name":"Highest","id":"1"},"issuetype":{"self":"..atlassian.netrest/api/2/issuetype/10003","id":"10003","description":"The sub-task of the issue","iconUrl":"..atlassian.netsecure/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype","name":"Sub-task","subtask":true,"avatarId":10316}}}]
+      //versions: [{"self": "..atlassian.netrest/api/2/version/14021","id": "14021","description": "","name": "Loan - Release v2.0.17","archived": false,"released": true,"releaseDate": "2018-03-21"}]
       //aggregatetimeoriginalestimate: 288000
       //comment => "comment": {"comments": [{"self": "https://xxx.atlassian.net/rest/api/2/issue/32204/comment/35625","id": "35625","author": {},"body": "message text\r\n\r\n","updateAuthor": {},"created": "2017-08-16T16:39:14.516+0200","updated": "2017-08-16T16:39:14.516+0200","jsdPublic": true}, {"self": "https://xxx.atlassian.net/rest/api/2/issue/32204/comment/35626","id": "35626","author": {},"body": "lorem ispum","updateAuthor": {},"created": "2017-08-16T16:40:49.629+0200","updated": "2017-08-16T16:40:49.629+0200","jsdPublic": true}, {..}, {..}],"maxResults": 4,"total": 4,"startAt": 0}
       //issuelinks: [{"id": "29701","self": "https://xxx.atlassian.net/rest/api/2/issueLink/29701","type": {"id": "10201","name": "Problem/Incident","inward": "is caused by","outward": "causes","self": "https://xxx.atlassian.net/rest/api/2/issueLinkType/10201"},"inwardIssue": {"id": "30911","key": "BO-22","self": "https://xxx.atlassian.net/rest/api/2/issue/30911","fields": {"summary": "Change of Invoice biller for all Shops","status": {..},"priority": {..},"issuetype": {..}}}}]
@@ -303,6 +303,11 @@ IssueFields = (function () {
       //security
       //subtasks
       //timetracking: {"remainingEstimate": "0m","timeSpent": "30m","remainingEstimateSeconds": 0,"timeSpentSeconds": 1800}
+
+      // Changelog histories
+      field: 'Field',
+      fromString: 'Value Before',
+      toString: 'Value After'
     }
   }
 

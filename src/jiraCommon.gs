@@ -438,9 +438,13 @@ function unifyIssueAttrib(attrib, data) {
           link: getCfg_('jira_url') + "/browse/" + data.key
         };
         break;
+      // simple string value
       case 'summary':
       case 'description':
       case 'environment':
+      case 'fromString': // changelog fields.fromString
+      case 'toString':   // changelog fields.toString
+      case 'field':      // changelog fields.field
         resp.value = data.fields[attrib] || '';
         break;
       case 'issuetype':

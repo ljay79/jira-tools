@@ -1,11 +1,9 @@
 // Node required code block
 const extend = require('../../jsLib.gs').extend;
 const getSheetById = require('../../jsLib.gs').getSheetById;
+var getDateFromIso = require('../../jsLib.gs').getDateFromIso;
 const sheetIdPropertySafe = require('../../jiraCommon.gs').sheetIdPropertySafe;
 var SpreadsheetTriggers_ = require('../SpreadsheetTriggers.gs').SpreadsheetTriggers_;
-
-var getDateFromIso = require('../../jsLib.gs').getDateFromIso;
-var ChangelogRendererFactory_ = require('../renderer/ChangelogRendererFactory.gs').ChangelogRendererFactory_;
 // End of Node required code block
 
 /**
@@ -13,7 +11,7 @@ var ChangelogRendererFactory_ = require('../renderer/ChangelogRendererFactory.gs
  */
 
 /**
- * @desc Creates new ChangelogTable_ instance to reflect the meta data of a IssueTable in google sheets.
+ * @desc Creates new ChangelogTable_ instance to reflect the meta data of a ChangelogTable in google sheets.
  * @param {object} data Optional JSON representation of previously stored ChangelogTable data object.
  * @Constructor
  */
@@ -64,11 +62,11 @@ function ChangelogTable_(attributes) {
         throw new ReferenceError("{attributes.filter} must be an object of type 'Filter'. {id:{int}, jql: {strong}, ..}");
       }
 
-      if (!attributes.hasOwnProperty('issues') || typeof attributes.issues !== 'object') {
-        throw new ReferenceError("{attributes.issues} must be an object. Jira api response object of type issues.");
+      if (!attributes.hasOwnProperty('data') || typeof attributes.data !== 'object') {
+        throw new ReferenceError("{attributes.data} must be an object. Jira api response object.");
       }
 
-      if (!attributes.hasOwnProperty('columns') || typeof attributes.issues !== 'object') {
+      if (!attributes.hasOwnProperty('columns') || typeof attributes.columns !== 'object') {
         throw new ReferenceError("{attributes.columns} must be an array. Jira field names used as table header.");
       }
 
@@ -87,10 +85,9 @@ function ChangelogTable_(attributes) {
         name : attributes.filter.name || '',
         jql : attributes.filter.jql
       });
-      that.setData(attributes.issues);
-
-      that.setRenderer(attributes.renderer);
-      that.setMeta('headerFields', attributes.columns);
+      that.setData(attributes.data)
+	      .setRenderer(attributes.renderer)
+	      .setMeta('headerFields', attributes.columns);
 
       if (attributes.filter.hasOwnProperty('name')) {
         that.setMeta('name', attributes.filter.name);
@@ -124,46 +121,55 @@ function ChangelogTable_(attributes) {
   };
 
   /**
-   * @desc Set the Jira api response object "issues"
-   * @param {object} issuesJson
+   * @desc Set the Jira api response object "data"
+   * @param {object} dataJson
    * @return {ChangelogTable_}
    */
-  that.setData = function (issuesJson) {
-    debug.log('before ChangelogTable_.setData() <= %s', issuesJson);
+  that.setData = function (dataJson) {
     data = [];
+    var history = [],
+        issue = {},
+        item = {},
+        row = {};
 
     // loop over each resulted issue
-    for (var i = 0; i < issuesJson.length; i++) {
-      var issue = issuesJson[i];
+    for (var i = 0; i < dataJson.length; i++) {
+      issue = dataJson[i];
       if (!issue.changelog || !issue.changelog.histories) {
-        debug.warn("issue response doesn't contains valid changelog data: <= %s", issuesJson);
-        return
+        debug.warn("issue response doesn't contain valid changelog data: <= %s", dataJson);
+        continue;
       }
+
       for (var j = 0; j < issue.changelog.histories.length; j++) {
-        var history = issue.changelog.histories[j];
+        history = issue.changelog.histories[j];
         for (var k = 0; k < history.items.length; k++) {
-          var item = history.items[k];
-          if (item.field == "status") {
-            var row = {};
-            row.created = getDateFromIso(history.created);
-            row.key = issue.key;
-            row.issuetype = issue.fields.issuetype.name;
-            row.field = item.field;
-            row.fromString = item.fromString;
-            row.toString = item.toString;
+          item = history.items[k];
+          if (item.field == "status") {//@TODO; parameterize this field name
+            row = {
+              key       : issue.key,
+              fields: {
+                created   : history.created,
+                issuetype : issue.fields.issuetype,
+                field     : item.field,
+                fromString: item.fromString,
+                toString  : item['toString']
+              }
+            };
+
             data.push(row);
           }
         }
       }
     }
+
     metaData.time_lastupdated = (new Date()).getTime();
-    debug.log('after ChangelogTable_.setData() <= %s', data);
+
     return that;
-  }
+  };
 
   /**
-   * @desc Get the Jira issues object
-   * @return {array} issues
+   * @desc Get data object
+   * @return {array} dataJson
    */
   that.getData = function () {
     return data;
@@ -255,8 +261,8 @@ function ChangelogTable_(attributes) {
   };
 
   /**
-   * @desc Takes stringified JSON to parse into JSON object and use for initialize a IssueTable object.
-   * @param {string} json The JSON string to parse and load into a new IssueTable instance
+   * @desc Takes stringified JSON to parse into JSON object and use for initialize a ChangelogTable object.
+   * @param {string} json The JSON string to parse and load into a new ChangelogTable instance
    * @return {ChangelogTable_} A new instance of ChangelogTable_ with all data from [json] load into.
    */
   that.fromJson = function (json) {
@@ -273,7 +279,7 @@ function ChangelogTable_(attributes) {
    */
   that.render = function () {
     debug.log('ChangelogTable_.render()');
-    var renderer = ChangelogRendererFactory_(that, metaData.renderer);
+    var renderer = RendererFactory_.call(that, metaData.renderer);
     if (typeof renderer !== 'object' || !renderer.hasOwnProperty('render')) {
       throw new ReferenceError("{renderer} must be an object/class but is '" + typeof renderer
           + "'. Ie: of type 'ChangelogTableRendererDefault_'.");
@@ -281,7 +287,7 @@ function ChangelogTable_(attributes) {
 
     renderer.render();
 
-    // store render info to IssueTable meta data
+    // store render info to ChangelogTable meta data
     var renderInfo = renderer.getInfo();
     metaData.headerRowOffset = renderInfo.headerRowOffset;
     metaData.headerValues = renderInfo.headers;

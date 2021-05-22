@@ -5,6 +5,7 @@ const sheetIdPropertySafe = require('../../jiraCommon.gs').sheetIdPropertySafe;
 const unifyIssueAttrib = require('../../jiraCommon.gs').unifyIssueAttrib;
 const UserStorage = require('../gas/UserStorage.gs');
 const ChangelogTable_ = require('../jira/ChangelogTable.gs');
+const IssueFields = require('../jira/IssueFields.gs');
 // End of Node required code block
 
 /**
@@ -19,7 +20,7 @@ const ChangelogTable_ = require('../jira/ChangelogTable.gs');
 function ChangelogTableRendererDefault_(ChangelogTable) {
   var that = this, // clear encapsulation of scope's
     sheet, initRange,
-    data = [], headers = [],
+    data = [], selectedFields = [], headers = [],
     rowIndex = 0, numColumns = 0,
     info = {
       totalInserted : 0,
@@ -53,6 +54,12 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
       throw new Error("{ChangelogTable.getData()} must return an array but returned " + (typeof data) + ".");
     }
 
+    selectedFields = ChangelogTable.getMeta('headerFields');
+
+    if (!data[0].hasOwnProperty('fields')) {
+      throw new ReferenceError("{ChangelogTable.getData()} did not return a valid Jira data response object. [" + data + "]");
+    }
+
     var sheetId = sheetIdPropertySafe(ChangelogTable.getSheetId(), true);
     sheet = getSheetById(sheetId);
     if (typeof sheet !== 'object') {
@@ -83,6 +90,10 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
     info.oRangeA1.from = initRange.getCell(1, 1).getA1Notation();
     info.oRangeA1.to = initRange.getCell(initRange.getNumRows(), initRange.getNumColumns()).getA1Notation();
 
+    if (filterName = ChangelogTable.getMeta('filter').name) {
+      that.addSummary("Changelog: " + filterName);
+    }
+
     that.addHeader().fillTable();
 
     debug.timeEnd('ChangelogTableRendererDefault_.render()');
@@ -94,31 +105,40 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
   };
 
   /**
+   * @desc Adding a summary line
+   * @param {string} summary Text to be inserted as a table summary line
+   * @return {ChangelogTableRendererDefault_}
+   */
+  that.addSummary = function (summary) {
+    range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
+
+    range.clearContent()
+      .clearNote()
+      .clearFormat()
+      .getCell(1, 1)
+      .setValue(summary);
+
+    info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
+    info.headerRowOffset = 1;
+
+    SpreadsheetApp.flush();
+
+    return that;
+  };
+
+  /**
    * @desc Add column headers into 1st/2nd row
-   * @return this For chaining
+   * @return {ChangelogTableRendererDefault_}
    */
   that.addHeader = function () {
     var values = [], formats = [];
 
-    // header first row
-    var filterName = ChangelogTable.getMeta('filter').name;
-    values.push("Filter: " + filterName);
-    formats.push('bold');
-    var range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, values.length);
-    range.clearContent()
-        .clearNote()
-        .clearFormat()
-        .setValues([ values ])
-        .setFontWeights([ formats ]);
-
-    //header 2.row
-    values = [], formats = [];
     for (var i = 0; i < headers.length; i++) {
-      values.push(headers[i]);
+      values.push(IssueFields.getHeaderName(headers[i]));
       formats.push('bold');
     }
-    range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
 
+    range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
     range.clearContent()
       .clearNote()
       .clearFormat()
@@ -135,48 +155,76 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
 
   /**
    * @desc Fill in all data into a sheet table with values and format
-   * @return this For chaining
+   * @return {ChangelogTableRendererDefault_}
    */
   that.fillTable = function () {
     info.totalInserted = data.length;
-    var values = [];
-    var formats = []
-
-    var range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), data.length, headers.length);
+    var values = [],
+        formats = [],
+        row = {},
+        key = {},
+        range;
 
     // loop over each resulted data (row)
     for (var i = 0; i < data.length; i++) {
-      var row = data[i];
-      var valuesRow = [];
-      values.push(valuesRow);
-      var formatsRow = [];
-      formats.push(formatsRow);
+      row = data[i];
+      values = [];
+      formats = [];
+      range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
+
       // loop over each header (column)
       for (var j = 0; j < headers.length; j++) {
-        var headerEntry = headers[j];
-        var rowEntry = row[headerEntry];
-        if (rowEntry instanceof Date) {
-          valuesRow.push(rowEntry);
-          formatsRow.push('yyyy-MM-dd HH:mm');
-        } else if (headerEntry === 'key') {
-          valuesRow.push('=HYPERLINK("' + getCfg_('jira_url') + '/browse/' + rowEntry + '";"' + rowEntry +'")');
-          formatsRow.push('@');
-        } else {
-          valuesRow.push(rowEntry);
-          formatsRow.push('@');
+        key = unifyIssueAttrib(headers[j], row);
+
+        // for some custom formatting
+        switch (true) {
+          case key.hasOwnProperty('date'):
+            key.value = (key.value != null) ? key.date : '';
+            break;
+          case (key.hasOwnProperty('epic') && key.epic === true):
+            if (key.value != 'n/a') {
+              if (EpicField.isUsable()) {
+                key.value = '=HYPERLINK("' + key.link + '"; JST_EPICLABEL("' + key.value + '"))';
+              } else {
+                key.value = '=HYPERLINK("' + key.link + '"; "' + key.value + '")';
+              }
+            }
+            break;
+          case key.hasOwnProperty('link'):
+            key.value = '=HYPERLINK("' + key.link + '"; "' + key.value + '")';
+            break;
+        }
+
+        values.push(key.value);
+        formats.push(key.format || '@');
+      } // END: header/columns loop
+
+      // just check if values (column) length is as we expect?!
+      if (values.length != numColumns) {
+        for (var l = 0; l < values.length; l++) {
+          values.push('');
+          formats.push('@');
         }
       }
-    } // END: issue loop
 
-    // set values and format to cells
-    range.clearContent()
-      .clearNote()
-      .clearFormat()
-      .setValues(values)
-      .setNumberFormats(formats)
-      .activate();
+      // set values and format to cells
+      range.clearContent()
+        .clearNote()
+        .clearFormat()
+        .setValues([values])
+        .setNumberFormats([formats])
+        .activate();
 
-    info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
+      info.oRangeA1.to = range.getCell(range.getNumRows(), range.getNumColumns()).getA1Notation();
+
+      // flush sheet every 25 rows (to often is bad for performance, to less bad for UX)
+      if (i % 25 === 0) {
+        SpreadsheetApp.flush();
+      }
+
+      row = null;
+
+    } // END: row loop
 
     return that;
   };
@@ -190,10 +238,30 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
   };
 
   /**
+   * @desc Sorting the header/columns based on definition/order in global var ISSUE_COLUMNS. Improves a consistent column listing/sorting
+   *       and defined fields first before alpha sorting the rest.
    * @returns {ChangelogTableRendererDefault_}
    */
   prepareHeaderValues = function () {
-    headers = ChangelogTable.getMeta('headerFields');
+    // prep headers
+    if (null !== selectedFields) {
+      // selected fields are set from fitlers selected columns
+      for ( var k in selectedFields) {
+        if (selectedFields.hasOwnProperty(k) && EpicField.EPIC_KEY != selectedFields[k]) { 
+          headers.push(selectedFields[k]);
+        }
+      }
+    } else {
+      // from first issue in result
+      for ( var k in data[0].fields) {
+        headers.push(k);
+      }
+    }
+
+    // sort fields based on defined order in IssueFields.getBuiltInJiraFields()
+    headers = _sortKeysByRef(headers, IssueFields.getBuiltInJiraFields());
+    headers.unshift('key');
+
     numColumns = headers.length;
 
     return that;

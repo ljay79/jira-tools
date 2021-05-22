@@ -36,6 +36,25 @@
       <div class="block filter-select is-loading">loading filters ...</div>
 
       <div class="block">
+        <div class="inline" style="vertical-align: top; margin-right: 14px">
+          <label for="wlIssueField" class="block">Issue field:</label>
+          <input type="radio" id="wlIssueField" name="wlIssueField" value="1" checked />
+          <label for="wlIssueField" title="human readable">1d 7h 59m</label>
+        </div>
+        <div class="inline" style="vertical-align: top; width: 136px;">
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
+            <input type="text" value="" class="mdl-textfield__input" id="wlLayout" readonly>
+            <input type="hidden" value="" name="wlLayout" id="wlLayout_value">
+            <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
+            <label for="wlLayout" class="mdl-textfield__label">Layout</label>
+            <ul for="wlLayout" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+              <li class="mdl-menu__item" data-val="ChangelogTableRendererDefault_" data-selected="true">Default</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
         <button type="submit" class="action" disabled>Insert</button>
         <button type="button" onclick="google.script.host.close()">Cancel</button>
         <div id="response-message" class="error-container" role="dialog"></div>
@@ -65,7 +84,7 @@
         if (time) timeout = setTimeout(hideAlert,time);
       }
 
-      function inputValidatyHandler() {
+      function inputValidityHandler() {
         if (this.name === 'filter' && this.checked) filter.elements['filter_id'].value = this.value;
         valid = filter.elements['filter_id'].value.length > 0;
         action.disabled = valid ? false : 'disabled';
@@ -107,7 +126,7 @@
           radio.appendChild(radioInput);
           radio.appendChild(radioLabel);
 
-          radioInput.addEventListener('change', inputValidatyHandler);
+          radioInput.addEventListener('change', inputValidityHandler);
 
           filters.push(radioInput);
           filterSelect.appendChild(radio);
@@ -127,12 +146,13 @@
 
         var formData = {
           filter_id: filter.elements['filter_id'].value,
+          wlLayout: document.getElementById('wlLayout_value').value
         };
 
         google.script.run
           .withSuccessHandler(onResponse)
           .withFailureHandler(onResponse)
-          .callbackGetAllChangelogs(formData);
+          .callbackCreateChangelog(formData);
       }
 
       function onResponse(response) {
@@ -144,28 +164,28 @@
       }
 
       toggleOnlyMyFilters.change(function() {
-        var enabled = $(this).is(':checked');
+          var enabled = $(this).is(':checked');
 
-        // save setting
-        google.script.run
-          .withSuccessHandler(function(){
-            var filterBox = $('.filter-select');
-            filterBox.addClass('is-loading').html('loading filters ...');
+          // save setting
+          google.script.run
+            .withSuccessHandler(function(){
+              var filterBox = $('.filter-select');
+              filterBox.addClass('is-loading').html('loading filters ...');
 
-            google.script.run
-              .withSuccessHandler(onInitFilter)
-              .getMyFilters();
-          })
-          .callbackUpdateCfgMyFilter(enabled);
-      });
+              google.script.run
+                .withSuccessHandler(onInitFilter)
+                .getMyFilters();
+            })
+            .callbackUpdateCfgMyFilter(enabled);
+        });
 
       google.script.run
         .withSuccessHandler(onInitFilter)
         .getMyFilters();
 
       filter.addEventListener('submit', formSubmitHandler);
-      input.forEach(function(el){ el.addEventListener('change', inputValidatyHandler); });
-      window.addEventListener('load', inputValidatyHandler);
+      input.forEach(function(el){ el.addEventListener('change', inputValidityHandler); });
+      window.addEventListener('load', inputValidityHandler);
     </script>
   </body>
 </html>

@@ -2,20 +2,6 @@
  * @file Contains controller class and dialog/callback method for creating a time report from Jira worklog
  */
 
-// Node required code block
-const JiraRequest = require('src/jiraApi.gs');
-const IssueSearch = require("src/models/jira/IssueSearch.gs");
-const getDialog = require("src/dialogs.gs").getDialog;
-const debug = require("src/debug.gs").debug;
-const unifyIssueAttrib = require('src/jiraCommon.gs').unifyIssueAttrib;
-const getTicketSheet = require("src/jiraCommon.gs").getTicketSheet;
-const hasSettings = require("src/settings.gs").hasSettings;
-const getCfg_ = require("src/settings.gs").getCfg_;
-// const ChangelogTableRendererDefault_ = require('src/models/renderer/ChangelogTableRendererDefault.gs').ChangelogTableRendererDefault_;
-const ChangelogTable_ = require('src/models/jira/ChangelogTable.gs')
-const UserStorage = require('src/models/gas/UserStorage.gs')
-// End of Node required code block
-
 /**
  * @desc Wrapper: Dialog for time report settings
  */
@@ -24,27 +10,30 @@ function menuCreateChangelogReport() {
 }
 
 /**
- * @desc Dialog Helper to retrieve list of all available Jira Custom Fields from api.
- * @return {Array}    Array of custom Jira Fields
+ * @desc Dialog callback handler
+ * @param {integer} enabled
+ * @return void
  */
-function callbackGetAllChangelogs(jsonFormData) {
-  return ChangelogReport_Controller_.getAllChangelogs(jsonFormData);
-}
-
-function callbackSetRenderer(renderer) {
-  ChangelogReport_Controller_.setRenderer(renderer)
+function callbackUpdateCfgMyFilter(enabled) {
+  debug.log('callbackUpdateCfgMyFilter(%s)', (0+enabled));
+  UserStorage.setValue('only_my_filters', 0 + enabled);
 }
 
 /**
- *
+ * @desc Wrapper: Dialog callback handler
+ * @param jsonFormData {object}  JSON Form object of all form values
+ * @return {object} Object({status: [boolean], response: [string]})
+ */
+function callbackCreateChangelog(jsonFormData) {
+  return ChangelogReport_Controller_.createChangelog(jsonFormData);
+}
+
+
+/**
+ * Creates a new ChangelogReport_Controller object.
  */
 ChangelogReport_Controller_ = {
   name : 'ChangelogReport_Controller_',
-  renderer : null,
-
-  setRenderer: function(renderer) {
-    this.renderer = renderer;
-  },
 
   /**
    * @desc Dialog to configure Jira custom fields
@@ -61,7 +50,10 @@ ChangelogReport_Controller_ = {
       server_type: getCfg_('server_type')
     });
 
-    dialog.setWidth(360).setHeight(400).setSandboxMode(HtmlService.SandboxMode.IFRAME);
+    dialog
+      .setWidth(600)
+      .setHeight(400)
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 
     debug.log('Processed: %s', dialog);
 
@@ -69,32 +61,38 @@ ChangelogReport_Controller_ = {
   },
 
   /**
-   * @desc Fetch all active users and groups for dialog selection.
-   * @return {object} Object({status: [boolean], response: [Array], message:[string]})
+   * @desc Form handler for createChangelog. Retrieve changelog info for issues fields from 
+   *       given filter with specified columns from Jira and insert into
+   *       current active sheet.
+   * @param jsonFormData {object} JSON Form object of all form values
+   * @return {object} Object({status: [boolean], message: [string]})
    */
-  getAllChangelogs: function (jsonFormData) {
-    debug.log(this.name + '.getAllChangelogs() <= %s', JSON.stringify(jsonFormData));
+  createChangelog: function (jsonFormData) {
+    debug.log(this.name + '.callbackCreateChangelog() <= %s', JSON.stringify(jsonFormData));
 
-    jsonFormData = jsonFormData || {filter_id: 0};
+    jsonFormData = jsonFormData || {
+      filter_id: 0,
+      wlLayout : 'ChangelogTableRendererDefault_'
+    };
+
     var that = this,
-      startAt = parseInt(jsonFormData['startAt']) || 0,
-      response = {status: false, message: ''};
-
+        response = {status: false, message: ''};
     var attributes = {
       filter : jsonFormData['filter_id'] ? getFilter(parseInt(jsonFormData['filter_id'])) : jsonFormData['filter'],
       maxResults : parseInt(jsonFormData['maxResults']) || 10000,
-      columns : ['key','issuetype','created','field','fromString','toString'],
+      columns : ['issuetype','created','field','fromString','toString'],
       issues : {},
+      expand: ['changelog'],
       sheet : getTicketSheet(),
-      renderer : "ChangelogTableRendererDefault_"
+      renderer : jsonFormData['wlLayout'] ? jsonFormData['wlLayout'] : 'ChangelogTableRendererDefault_'
     };
 
-    var ok = function (resp, status, errorMessage) {
-      debug.log(that.name + '.ok() resp(len): %s; s: %s; msg: %s', resp.data.length, status, errorMessage);
+    var onSuccess = function (resp, status, errorMessage) {
+      debug.log(that.name + '.onSuccess() resp(len): %s; s: %s; msg: %s', resp.data.length, status, errorMessage);
 
       if (status !== 200) {
         // Something funky is up with the JSON response.
-        response.message = "Failed to retrieve jira issues!";
+        response.message = "Failed to retrieve data from jira!";
         Browser.msgBox(response.message, Browser.Buttons.OK);
       } else if (resp.data.length === 0) {
         // any issues in result?
@@ -103,46 +101,52 @@ ChangelogReport_Controller_ = {
 
         return;
       } else {
-        attributes.issues = resp.data;
+        attributes.data = resp.data;
 
-        var Table = new ChangelogTable_(attributes);
-        if (!that.renderer) {
-          this.renderer = Table.render();
+        var renderer,
+            Table = new ChangelogTable_(attributes);
+
+        if (renderer = Table.render()) {
           // toast with status message
-          var msg = "Finished inserting " + this.renderer.getInfo().totalInserted + " Jira issues out of " + resp.totalFoundRecords
-            + " total found records.";
-          SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 15);
+          var msg = "Finished inserting " + renderer.getInfo().totalInserted + " records.";
+          SpreadsheetApp.getActiveSpreadsheet().toast(msg, "Status", 10);
           debug.log(msg);
+
+          // add table to index
+          //IssueTableIndex_.addTable(Table);
+
+          response.status = true;
+
+          // set trigger for index cleanup and modification detection
+          //that.setTriggerPruneIndex();
+          //that.setTriggerIssueTableModification();
+
+          // force sidebar update (refreshTableSchedule)
+          //UserStorage.setValue('refreshIssueTableforceSidebarReset', true);
+          //RefreshIssueTable_Controller_.sidebar();
         }
-        response.status = true;
       }
     };
 
-    var error = function (resp, status, errorMessage) {
-      response.message = "Failed to retrieve jira issues from filter with status [" + status + "]!\\n" + errorMessage;
-      Browser.msgBox(response.message, Browser.Buttons.OK);
+    var onFailure = function(resp, status, errorMessage) {
+      debug.error(that.name + '.onFailure: resp:%s status:%s msg:%s', resp, status, errorMessage);
+      Browser.msgBox("Jira Worklog",
+                     "Failure during request to Jira server.\\nStatus:" + (status||-1) + " \\nMessage:'" + errorMessage + "'", 
+                     Browser.Buttons.OK);
     };
 
     var Search = new IssueSearch(attributes.filter.jql);
     Search
-      .setExpand(['changelog'])
+      .setExpand(attributes.expand)
       .setFields(attributes.columns)
       .setMaxResults(attributes.maxResults)
-      .setStartAt(startAt)
+      .setStartAt(0)
       .setMaxPerPage(100)
       .search()
-      .withSuccessHandler(ok)
-      .withFailureHandler(error);
+      .withSuccessHandler(onSuccess)
+      .withFailureHandler(onFailure);
 
-    return attributes.issues;
+    return response;
   }
 
 }
-
-// Node required code block
-module.exports = {
-  callbackGetAllChangelogs: callbackGetAllChangelogs,
-  menuCreateChangelogReport: menuCreateChangelogReport,
-  callbackSetRenderer: callbackSetRenderer
-}
-// End of Node required code block
