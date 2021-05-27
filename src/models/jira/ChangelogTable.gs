@@ -29,6 +29,7 @@ function ChangelogTable_(attributes) {
         headerRowOffset : 0,             // sample: 1
         headerFields : [],               // sample: [summary,key,status,epic,priotiry]
         headerValues : [],               // sample: [Summary,Key,Status,Epic,P]
+        historyField: 'status',
         filter: {id: 0, jql: null},      // sample: {id: 1234, jql: 'status = Done and project in ("JST")'}
         maxResults : null,               // sample: 10
         renderer: null,                  // sample: ChangelogTableRendererDefault_
@@ -85,9 +86,9 @@ function ChangelogTable_(attributes) {
         name : attributes.filter.name || '',
         jql : attributes.filter.jql
       });
-      that.setData(attributes.data)
-	      .setRenderer(attributes.renderer)
-	      .setMeta('headerFields', attributes.columns);
+      that.setRenderer(attributes.renderer)
+	    .setMeta('headerFields', attributes.columns)
+        .setMeta('historyField', attributes.historyField);
 
       if (attributes.filter.hasOwnProperty('name')) {
         that.setMeta('name', attributes.filter.name);
@@ -99,7 +100,8 @@ function ChangelogTable_(attributes) {
 
       Sheet = attributes.sheet;
       that.setMeta('sheetId', sheetIdPropertySafe(Sheet.getSheetId()))
-        .setMeta('rangeA1', Sheet.getActiveCell().getA1Notation());
+        .setMeta('rangeA1', Sheet.getActiveCell().getA1Notation())
+        .setData(attributes.data);
     }
   };
 
@@ -144,7 +146,7 @@ function ChangelogTable_(attributes) {
         history = issue.changelog.histories[j];
         for (var k = 0; k < history.items.length; k++) {
           item = history.items[k];
-          if (item.field == "status") {//@TODO; parameterize this field name
+          if (item.field == metaData.historyField) {
             row = {
               key       : issue.key,
               fields: {

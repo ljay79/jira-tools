@@ -56,6 +56,10 @@ function ChangelogTableRendererDefault_(ChangelogTable) {
 
     selectedFields = ChangelogTable.getMeta('headerFields');
 
+    if (data.length === 0) {
+      throw new Error("Changelog has no data for selected history field '" + ChangelogTable.getMeta('historyField') + "'.");
+    }
+
     if (!data[0].hasOwnProperty('fields')) {
       throw new ReferenceError("{ChangelogTable.getData()} did not return a valid Jira data response object. [" + data + "]");
     }

@@ -6,7 +6,7 @@
  * @desc Wrapper: Dialog for time report settings
  */
 function menuCreateChangelogReport() {
-  ChangelogReport_Controller_.dialogOpen();
+  ChangelogReport_Controller_.sidebarOpen();
 }
 
 /**
@@ -45,9 +45,11 @@ ChangelogReport_Controller_ = {
       return;
 
     var only_my_filters = UserStorage.getValue('only_my_filters');
+    var jiraFields = IssueFields.getBuiltInJiraFields(); // @TODO: filter unsupported fields
     var dialog = getDialog('views/dialogs/createChangelogReport',{
       only_my_filters: only_my_filters,
-      server_type: getCfg_('server_type')
+      server_type: getCfg_('server_type'),
+      jiraFields: jiraFields
     });
 
     dialog
@@ -61,6 +63,33 @@ ChangelogReport_Controller_ = {
   },
 
   /**
+   * @desc Sidebar for creating a changelog report
+   */
+  sidebarOpen: function () {
+    debug.log(this.name + '.sidebarOpen()');
+
+    if (!hasSettings(true))
+      return;
+
+    var only_my_filters = UserStorage.getValue('only_my_filters');
+    var jiraFields = IssueFields.getBuiltInJiraFields(); // @TODO: filter unsupported fields
+    var sidebar = getDialog('views/sidebar/changelogReport', {
+      only_my_filters: only_my_filters,
+      server_type: getCfg_('server_type'),
+      jiraFields: jiraFields
+    });
+
+    debug.log('Processed: %s', sidebar);
+
+    var html = HtmlService.createHtmlOutput(sidebar.getContent())
+      .setTitle('Create changelog report')
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    ;
+
+    SpreadsheetApp.getUi().showSidebar(html);
+  },
+
+  /**
    * @desc Form handler for createChangelog. Retrieve changelog info for issues fields from 
    *       given filter with specified columns from Jira and insert into
    *       current active sheet.
@@ -71,20 +100,20 @@ ChangelogReport_Controller_ = {
     debug.log(this.name + '.callbackCreateChangelog() <= %s', JSON.stringify(jsonFormData));
 
     jsonFormData = jsonFormData || {
-      filter_id: 0,
-      wlLayout : 'ChangelogTableRendererDefault_'
+      filter_id: 0
     };
 
     var that = this,
         response = {status: false, message: ''};
     var attributes = {
-      filter : jsonFormData['filter_id'] ? getFilter(parseInt(jsonFormData['filter_id'])) : jsonFormData['filter'],
+      filter : getFilter(parseInt(jsonFormData['filter_id'])),
       maxResults : parseInt(jsonFormData['maxResults']) || 10000,
       columns : ['issuetype','created','field','fromString','toString'],
-      issues : {},
-      expand: ['changelog'],
+      data : {},
+      expand : ['changelog'],
       sheet : getTicketSheet(),
-      renderer : jsonFormData['wlLayout'] ? jsonFormData['wlLayout'] : 'ChangelogTableRendererDefault_'
+      renderer : jsonFormData['wlLayout'] ? jsonFormData['wlLayout'] : 'ChangelogTableRendererDefault_',
+      historyField: jsonFormData['wlIssueField'] ? jsonFormData['wlIssueField'] : 'status'
     };
 
     var onSuccess = function (resp, status, errorMessage) {
@@ -95,7 +124,7 @@ ChangelogReport_Controller_ = {
         response.message = "Failed to retrieve data from jira!";
         Browser.msgBox(response.message, Browser.Buttons.OK);
       } else if (resp.data.length === 0) {
-        // any issues in result?
+        // any data in result?
         response.message = "No issues were found to match your search.";
         Browser.msgBox(response.message, Browser.Buttons.OK);
 
