@@ -77,7 +77,7 @@ text-align: start;
 
 /*!
  * Project Aid for Jira
- * @version v1.4.0
+ * @version v1.4.10
  * @license GNU GENERAL PUBLIC LICENSE v3.
  * @copyright 2017-2019, Jens Rosemeier. All rights reserved.
  * @link https://github.com/ljay79/jira-tools
@@ -262,6 +262,32 @@ fieldset p a:visited {
     transform: rotate(360deg);
   }
 }
+
+.mt10 {
+  margin-top: 10px !important;
+}
+.mt20 {
+  margin-top: 20px !important;
+}
+.mt30 {
+  margin-top: 30px !important;
+}
+.mt40 {
+  margin-top: 40px !important;
+}
+.mb10 {
+  margin-bottom: 10px !important;
+}
+.mb20 {
+  margin-bottom: 20px !important;
+}
+.mb30 {
+  margin-bottom: 30px !important;
+}
+.mb40 {
+  margin-bottom: 40px !important;
+}
+
 
 .sidebar {
   padding: 0;
@@ -528,7 +554,7 @@ dialog {
   font-size: 13px;
 }
 
-.mdl-js fieldset.input-switch {
+#addon-options-panel fieldset.input-switch {
   padding-bottom: 50px;
 }
 .mdl-js fieldset.input-switch > .mdl-switch {
@@ -546,4 +572,10 @@ dialog {
 
 div.filter-my-only {
   margin-bottom: 10px;
+}
+
+#changelogReport .getmdl-select .mdl-menu__container .mdl-menu.filter-select .mdl-menu__item {
+  display: inline-flex;
+  height: 20px;
+  line-height: 20px;
 }

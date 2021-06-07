@@ -438,9 +438,13 @@ function unifyIssueAttrib(attrib, data) {
           link: getCfg_('jira_url') + "/browse/" + data.key
         };
         break;
+      // simple string value
       case 'summary':
       case 'description':
       case 'environment':
+      case 'fromString': // changelog fields.fromString
+      case 'toString':   // changelog fields.toString
+      case 'field':      // changelog fields.field
         resp.value = data.fields[attrib] || '';
         break;
       case 'issuetype':
@@ -656,6 +660,7 @@ function getIssue(issueKey, fields) {
 // Node required code block
 module.exports = {
   getIssue: getIssue,
+  getFilter: getFilter,
   unifyIssueAttrib: unifyIssueAttrib,
   getTicketSheet: getTicketSheet,
   sheetIdPropertySafe: sheetIdPropertySafe

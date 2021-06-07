@@ -1,18 +1,18 @@
 /**
- * @copyright Copyright (c) 2017-2020, Jens Rosemeier. All rights reserved.
+ * @copyright Copyright (c) 2017-2021, Jens Rosemeier. All rights reserved.
  *            Copyrights licensed under GNU GENERAL PUBLIC LICENSE v3.
- * 
+ *
  * @github  https://github.com/ljay79/jira-tools
  * @author  Jens Rosemeier <github@jens79.de> - https://github.com/ljay79
  * @author  Paul Lemon - https://github.com/paul-lemon
  * @author  Daniel Kulbe - https://github.com/DanielKulbe
- * 
+ *
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
-var BUILD = '1.4.9';
+var BUILD = '1.4.10';
 
-/** 
+/**
  * Add a nice menu option for the users.
  */
 function onOpen(e) {
@@ -46,6 +46,7 @@ function addMenu() {
     .addItem('Refresh IssueTable', 'menuRefreshIssueTable')
     .addItem('Create time report', 'menuCreateTimeReport')
     .addItem('Update Jira Issues', 'menuUpdateJiraIssues')
+    .addItem('Create changelog report', 'menuCreateChangelogReport')
     .addSeparator()
     .addItem('Update formulas in active sheet', 'recalcCustomFunctions')
     .addItem('Update issue key status...', 'dialogRefreshTicketsIds')
