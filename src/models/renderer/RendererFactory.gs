@@ -1,3 +1,6 @@
+// Node required code block
+const ChangelogTableRendererDefault_ = require('src/models/renderer/ChangelogTableRendererDefault.gs').ChangelogTableRendererDefault_;
+// End of Node required code block
 
 /**
  * Factory class to instantiate different Renderer classes.

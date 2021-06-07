@@ -660,6 +660,7 @@ function getIssue(issueKey, fields) {
 // Node required code block
 module.exports = {
   getIssue: getIssue,
+  getFilter: getFilter,
   unifyIssueAttrib: unifyIssueAttrib,
   getTicketSheet: getTicketSheet,
   sheetIdPropertySafe: sheetIdPropertySafe

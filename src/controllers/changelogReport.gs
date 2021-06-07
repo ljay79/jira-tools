@@ -1,3 +1,15 @@
+// Node required code block
+const hasSettings = require("src/settings.gs").hasSettings;
+const getCfg_ = require("src/settings.gs").getCfg_;
+const UserStorage = require("src/models/gas/UserStorage.gs");
+const IssueFields = require("src/models/jira/IssueFields.gs");
+const IssueSearch = require('src/models/jira/IssueSearch.gs')
+const getTicketSheet = require("src/jiraCommon.gs").getTicketSheet;
+const getDialog = require("src/dialogs.gs").getDialog;
+const getFilter = require('src/jiraCommon.gs').getFilter;
+const ChangelogTable_ = require('src/models/jira/ChangelogTable.gs');
+// End of Node required code block
+
 /**
  * @file Contains controller class and dialog/callback method for creating a time report from Jira worklog
  */
@@ -34,33 +46,6 @@ function callbackCreateChangelog(jsonFormData) {
  */
 ChangelogReport_Controller_ = {
   name : 'ChangelogReport_Controller_',
-
-  /**
-   * @desc Dialog to configure Jira custom fields
-   */
-  dialogOpen : function () {
-    debug.log(this.name + '.dialog()');
-
-    if (!hasSettings(true))
-      return;
-
-    var only_my_filters = UserStorage.getValue('only_my_filters');
-    var jiraFields = IssueFields.getBuiltInJiraFields(); // @TODO: filter unsupported fields
-    var dialog = getDialog('views/dialogs/createChangelogReport',{
-      only_my_filters: only_my_filters,
-      server_type: getCfg_('server_type'),
-      jiraFields: jiraFields
-    });
-
-    dialog
-      .setWidth(600)
-      .setHeight(400)
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-
-    debug.log('Processed: %s', dialog);
-
-    SpreadsheetApp.getUi().showModalDialog(dialog, 'Create status report');
-  },
 
   /**
    * @desc Sidebar for creating a changelog report
@@ -179,3 +164,12 @@ ChangelogReport_Controller_ = {
   }
 
 }
+
+
+// Node required code block
+module.exports = {
+  menuCreateChangelogReport: menuCreateChangelogReport,
+  callbackUpdateCfgMyFilter: callbackUpdateCfgMyFilter,
+  callbackCreateChangelog: callbackCreateChangelog,
+}
+// End of Node required code block

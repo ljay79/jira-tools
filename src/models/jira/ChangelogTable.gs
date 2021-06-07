@@ -4,6 +4,7 @@ const getSheetById = require('../../jsLib.gs').getSheetById;
 var getDateFromIso = require('../../jsLib.gs').getDateFromIso;
 const sheetIdPropertySafe = require('../../jiraCommon.gs').sheetIdPropertySafe;
 var SpreadsheetTriggers_ = require('../SpreadsheetTriggers.gs').SpreadsheetTriggers_;
+const RendererFactory_ = require('src/models/renderer/RendererFactory.gs').RendererFactory_;
 // End of Node required code block
 
 /**
