@@ -1,5 +1,5 @@
 /**
- * @copyright Copyright (c) 2017-2020, Jens Rosemeier. All rights reserved.
+ * @copyright Copyright (c) 2017-2021, Jens Rosemeier. All rights reserved.
  *            Copyrights licensed under GNU GENERAL PUBLIC LICENSE v3.
  *
  * @github  https://github.com/ljay79/jira-tools
