@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top" />
+<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/add-ons1.min.css?v=b1410" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.blue-green.min.css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/styles.min.css?v=b1410" />
+<link rel="stylesheet" href="https://s3.eu-central-1.amazonaws.com/jira-tools/custom.min.css?v=b1410" />
+</head>
+<body>
+<div class="sidebar branding-below" id="changelogReport">
+
+    <div class="block">
+        <form name="changelog-report" action="" method="post">
+            <fieldset class="input-switch" <? if(server_type == 'server') { ?> style="display:none;"<? } ?>>
+                <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="only-my-filters">
+                    <input type="checkbox" id="only-my-filters" name="only_my_filters" class="mdl-switch__input" 
+                      value="1"<? if (only_my_filters == 1) { ?> checked="checked" <? } ?> >
+                    <span class="mdl-switch__label">My filters only</span>
+                </label>
+            </fieldset>
+            <fieldset class="fix-mdl-select">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
+                    <input type="text" value="loading filters ..." class="mdl-textfield__input is-loading" id="filter-id" readonly>
+                    <input type="hidden" value="" name="filter_id" id="wlFilterId_value" required>
+                    <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
+                    <label class="mdl-textfield__label" for="filter-id">Filter</label>
+                    <ul for="filter-id" class="mdl-menu mdl-menu--bottom-left mdl-js-menu filter-select">
+                    </ul>
+                </div>
+            </fieldset>
+            <fieldset class="fix-mdl-select">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
+                    <input type="text" value="" class="mdl-textfield__input" id="wlIssueField" readonly>
+                    <input type="hidden" value="" name="wlIssueField" id="wlIssueField_value" required>
+                    <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
+                    <label class="mdl-textfield__label" for="wlIssueField">Field</label>
+                    <ul for="wlIssueField" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                        <? for (var id in jiraFields) { ?>
+                        <li class="mdl-menu__item" data-val="<?= id ?>"<? if(id == 'status') { ?> data-selected="true"<? } ?>><?= jiraFields[id] ?></li>
+                        <? } ?>
+                    </ul>
+                </div>
+            </fieldset>
+            <fieldset class="fix-mdl-select">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
+                    <input type="text" value="" class="mdl-textfield__input" id="wlLayout" readonly>
+                    <input type="hidden" value="" name="wlLayout" id="wlLayout_value" required>
+                    <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
+                    <label class="mdl-textfield__label" for="wlLayout">Layout</label>
+                    <ul for="wlLayout" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                        <li class="mdl-menu__item" data-val="ChangelogTableRendererDefault_" data-selected="true">Default</li>
+                    </ul>
+                </div>
+            </fieldset>
+
+            <div id="response-message" class="message-container" role="dialog"></div>
+
+            <div class="block actions">
+                <button type="submit" class="green" id="changelogreport--create" disabled>Create</button>
+            </div>
+        </form>
+
+        <br />
+
+        <div id="box-tip" class="mt40"></div>
+    </div>
+
+</div>
+<!-- class="sidebar branding-below" //-->
+
+<div class="sidebar bottom"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.5.0/dialog-polyfill.min.js"></script>
+<script src="https://storage.googleapis.com/code.getmdl.io/1.3.0/material.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://s3.eu-central-1.amazonaws.com/jira-tools/custom.min.js?v=b1410"></script>
+<script>
+var formChangelogReport = document.forms['changelog-report'];
+var filterSelect = formChangelogReport.querySelector('.filter-select');
+var input   = Array.prototype.slice.call(formChangelogReport.elements).filter(function(el){ return el.nodeName === 'INPUT'; });
+var action  = formChangelogReport.querySelector('[type=submit]');
+var valid   = false;
+var boxTip  = $('#box-tip').hide();
+
+// checkbox toggle MyFilterOnly on/off
+var toggleOnlyMyFilters = $('#only-my-filters');
+toggleOnlyMyFilters.change(function() {
+  var enabled = $(this).is(':checked');
+
+  google.script.run
+    .withSuccessHandler(function() {
+      filterSelect.innerHTML = '';
+      $('#filter-id').addClass('is-loading').val('loading filters ...');
+      $('#wlFilterId_value').val('');
+
+      google.script.run
+        .withSuccessHandler(onInitFilter)
+        .getMyFilters();
+    })
+    .callbackUpdateCfgMyFilter(enabled);
+});
+
+/* response messages */
+var message = document.getElementById('response-message');
+var timeout = null;
+
+function hideMessage() {
+  if (timeout)
+    timeout = clearTimeout(timeout);
+  message.style.display = 'none';
+}
+
+function showMessage(text, error, time) {
+  message.innerText = text;
+  message.style.backgroundColor = error ? 'rgb(213,0,0)' : 'rgb(139,195,74)';
+  message.style.display = 'block';
+  if (time)
+    timeout = setTimeout(hideMessage, time);
+}
+/* --- */
+
+function inputValidityHandler(elements, action) {
+  var validaty = true;
+  elements.forEach(function(el) {
+    switch (el.name) {
+      default:
+        validaty = validaty && (validaty = (el.nodeName !== 'INPUT' || (el.required ? el.value.length > 0 : true)));
+        break;
+    }
+    return validaty;
+  });
+  valid = validaty;
+  action.disabled = valid ? false : 'disabled';
+}
+
+function onInitFilter(response) {
+  $('#box-tip').hide()
+  filterSelect.innerHTML = '';
+
+  if (!response.list.length) {
+	showMessage('No filters available!' + response.error, true, 5000);
+    // add Jira Server note to box
+    boxTip.html('<span class="inline grey">Note: If you are using a JIRA Server installation, this can show your <strong>*favorite*</strong> filters only.<br/>'
+      + 'For JIRA Cloud users it lists all your personal and your favorite ones. Make sure, you have at least one filter marked as favorite.'
+      + '</br>Read more at: <a target="_blank" href="https://confluence.atlassian.com/jiracoreserver073/saving-your-search-as-a-filter-861257224.html#Savingyoursearchasafilter-favorite_filters">Atlassian Support</a></span>'
+      + '</br></br><span class="inline grey">Still having problems? File a issue report with the author here: <a target="_blank" href="https://github.com/ljay79/jira-tools/issues">JST on Github</a></span>');
+    boxTip.show();
+    action.disabled = 'disabled';
+
+    return;
+  } else if('' != response.error) {
+	showMessage(response.error, true, 5000);
+    return;
+  }
+
+  response.list.forEach(function(item) {
+    var li = document.createElement('li');
+    li.setAttribute('class', 'mdl-menu__item');
+    li.setAttribute('data-val', item.id);
+    li.innerText = item.name + ' (' + item.owner + ')';
+    if (item.favourite) li.setAttribute('class', 'mdl-menu__item is-favourite');
+
+    filterSelect.appendChild(li);
+  });
+
+  $('#filter-id').removeClass('is-loading').val('');
+  $('#wlFilterId_value').val('');
+  window.dispatchEvent(new Event('load'));
+}
+
+function formSubmitHandler(event) {
+  if (event) event.preventDefault();
+  hideMessage();
+  if (!valid) return;
+
+  var formData = {
+    filter_id: document.getElementById('wlFilterId_value').value,
+    wlLayout: document.getElementById('wlLayout_value').value,
+    wlIssueField: document.getElementById('wlIssueField_value').value
+  };
+
+  showMessage('loading ...', false, 2500);
+
+  google.script.run
+    .withSuccessHandler(onResponse)
+    .withFailureHandler(onResponse)
+    .callbackCreateChangelog(formData);
+}
+
+function onResponse(response) {
+  var done = response.status === true;
+  hideMessage();
+
+  if (done) google.script.host.close();
+  showMessage(response.message, done, 10000);
+}
+
+google.script.run
+  .withSuccessHandler(onInitFilter)
+  .getMyFilters();
+
+formChangelogReport.addEventListener('submit', formSubmitHandler);
+window.addEventListener('load', inputValidityHandler(input, action));
+input.forEach(function(el) {
+  el.addEventListener('change', inputValidityHandler.bind(null, input, action));
+});
+</script>
+</body>
+</html>

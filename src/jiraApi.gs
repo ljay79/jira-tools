@@ -31,7 +31,7 @@ var restMethods = {
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:''}},
     'userSearchV2'  : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, query:''}},
     'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
-    'field'         : {method: '/field'}
+    'field'         : {method: '/field'},
   },
   'server': {
     'dashboard'     : {method: '/dashboard', queryparams: {filter: 'my'}},
@@ -47,7 +47,7 @@ var restMethods = {
     'myFilters'     : {method: '/filter/favourite'},
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'.'}},
     'groupSearch'   : {method: '/groups/picker', queryparams: {maxResults: 250, query: ''}},
-    'field'         : {method: '/field'}
+    'field'         : {method: '/field'},
   }
 };
 
@@ -148,7 +148,7 @@ function Request() {
   }
   /**
    * @desc Call method, perform API request
-   * @param method {string}    Name of method to call on api, see restMethods[] 
+   * @param method {string}    Name of method to call on api, see restMethods[]
    *     for implemented api methods
    * @param data {mixed}    (prepared for later payload)
    * @param fetchArgs {object}    Optional object of additional fetchArgs (see UrlFetchApp.fetch())
@@ -180,7 +180,7 @@ function Request() {
       jiraMethod = restMethods[server_type][method];
       jiraQueryParams = {};
     }
-    
+
     var fetchArgs = fetchArgs || {}, urlParams = {};
     this.prepareParams(urlParams, jiraQueryParams);
 
@@ -188,7 +188,7 @@ function Request() {
     var fetchUrl = url + '/rest/api/2' + jiraMethod;
 
     // data payload vs. url params handling
-    var temp, 
+    var temp,
         payload = {};
 
     // fill URL placeholders with attributes from data object if passed and available
@@ -216,7 +216,7 @@ function Request() {
     // do not add empty payload
     if(fetchArgs.payload == '{}') { delete fetchArgs['payload']; }
 
-    // build full fetch URL    
+    // build full fetch URL
     fetchUrl = buildUrl(fetchUrl, urlParams);
     debug.log('fetchUrl: %s', fetchUrl);
     debug.log('fetchArgs: %s', fetchArgs);

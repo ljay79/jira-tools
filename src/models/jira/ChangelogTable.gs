@@ -1,24 +1,25 @@
 // Node required code block
 const extend = require('../../jsLib.gs').extend;
 const getSheetById = require('../../jsLib.gs').getSheetById;
+var getDateFromIso = require('../../jsLib.gs').getDateFromIso;
 const sheetIdPropertySafe = require('../../jiraCommon.gs').sheetIdPropertySafe;
 var SpreadsheetTriggers_ = require('../SpreadsheetTriggers.gs').SpreadsheetTriggers_;
-var IssueTableRendererDefault_ = require('../renderer/IssueTableRendererDefault.gs').IssueTableRendererDefault_;
+const RendererFactory_ = require('src/models/renderer/RendererFactory.gs').RendererFactory_;
 // End of Node required code block
 
 /**
- * @file Contains class which is used to reflect a Jira IssueTable's meta data for google sheet tables.
+ * @file Contains class which is used to reflect a Jira ChangelogTable's meta data for google sheet tables.
  */
 
 /**
- * @desc Creates new IssueTable_ instance to reflect the meta data of a IssueTable in google sheets.
- * @param {object} data Optional JSON representation of previously stored IssueTable data object.
+ * @desc Creates new ChangelogTable_ instance to reflect the meta data of a ChangelogTable in google sheets.
+ * @param {object} data Optional JSON representation of previously stored ChangelogTable data object.
  * @Constructor
  */
-function IssueTable_(attributes) {
+function ChangelogTable_(attributes) {
   var that = this,
       Sheet,
-      issues = {},
+      data = [],
       metaData = {
         sheetId : sheetIdPropertySafe(), // sample: '6.02713257E8'
         tableId : null,                  // sample: 'table1_1550871398921'
@@ -29,20 +30,21 @@ function IssueTable_(attributes) {
         headerRowOffset : 0,             // sample: 1
         headerFields : [],               // sample: [summary,key,status,epic,priotiry]
         headerValues : [],               // sample: [Summary,Key,Status,Epic,P]
+        historyField: 'status',
         filter: {id: 0, jql: null},      // sample: {id: 1234, jql: 'status = Done and project in ("JST")'}
         maxResults : null,               // sample: 10
-        renderer: null,                  // sample: IssueTableRendererDefault_
+        renderer: null,                  // sample: ChangelogTableRendererDefault_
         time_lastupdated : (new Date()).getTime() // sample: 1550871398921
       };
 
   /**
    * @desc Initialize anything necessary for the class object
-   * @param {object} initData Optional JSON representation of an IssueTable_ data set to load into instance
+   * @param {object} initData Optional JSON representation of an ChangelogTable_ data set to load into instance
    * @throws ReferenceError
    * @return void
    */
   init = function (attributes) {
-    debug.log('IssueTable_.init() <= %s', attributes);
+    debug.log('ChangelogTable_.init() <= %s', attributes);
     attributes = attributes || {
       metaData : {}
     };
@@ -62,8 +64,8 @@ function IssueTable_(attributes) {
         throw new ReferenceError("{attributes.filter} must be an object of type 'Filter'. {id:{int}, jql: {strong}, ..}");
       }
 
-      if (!attributes.hasOwnProperty('issues') || typeof attributes.issues !== 'object') {
-        throw new ReferenceError("{attributes.issues} must be an object. Jira api response object of type issues.");
+      if (!attributes.hasOwnProperty('data') || typeof attributes.data !== 'object') {
+        throw new ReferenceError("{attributes.data} must be an object. Jira api response object.");
       }
 
       if (!attributes.hasOwnProperty('columns') || typeof attributes.columns !== 'object') {
@@ -75,7 +77,7 @@ function IssueTable_(attributes) {
       }
 
       if (!attributes.hasOwnProperty('renderer')) {
-        throw new ReferenceError("{attributes.renderer} must be defined. Ie: of type 'IssueTableRendererDefault_' or string of class name.");
+        throw new ReferenceError("{attributes.renderer} must be defined. Ie: of type 'ChangelogTableRendererDefault_' or string of class name.");
       }
 
       /* ---- */
@@ -85,8 +87,9 @@ function IssueTable_(attributes) {
         name : attributes.filter.name || '',
         jql : attributes.filter.jql
       });
-      that.setIssues(attributes.issues).setRenderer(attributes.renderer);
-      that.setMeta('headerFields', attributes.columns);
+      that.setRenderer(attributes.renderer)
+	    .setMeta('headerFields', attributes.columns)
+        .setMeta('historyField', attributes.historyField);
 
       if (attributes.filter.hasOwnProperty('name')) {
         that.setMeta('name', attributes.filter.name);
@@ -98,17 +101,18 @@ function IssueTable_(attributes) {
 
       Sheet = attributes.sheet;
       that.setMeta('sheetId', sheetIdPropertySafe(Sheet.getSheetId()))
-        .setMeta('rangeA1', Sheet.getActiveCell().getA1Notation());
+        .setMeta('rangeA1', Sheet.getActiveCell().getA1Notation())
+        .setData(attributes.data);
     }
   };
 
   /**
    * @desc Setting the table renderer
-   * @param {string|function} Classname or class of IssueTableRenderer
-   * @return {IssueTable_}
+   * @param {string|function} Classname or class of ChangelogTableRenderer
+   * @return {ChangelogTable_}
    */
   that.setRenderer = function (rendererClass) {
-    debug.log('IssueTable_.setRenderer() <= %s', rendererClass);
+    debug.log('ChangelogTable_.setRenderer() <= %s', rendererClass);
     if (typeof rendererClass === 'string') {
       metaData.renderer = rendererClass;
     } else {
@@ -120,30 +124,65 @@ function IssueTable_(attributes) {
   };
 
   /**
-   * @desc Set the Jira api response object "issues"
-   * @param {object} issuesJson
-   * @return {IssueTable_}
+   * @desc Set the Jira api response object "data"
+   * @param {object} dataJson
+   * @return {ChangelogTable_}
    */
-  that.setIssues = function (issuesJson) {
-    issues = issuesJson || {};
+  that.setData = function (dataJson) {
+    data = [];
+    var history = [],
+        issue = {},
+        item = {},
+        row = {};
+
+    // loop over each resulted issue
+    for (var i = 0; i < dataJson.length; i++) {
+      issue = dataJson[i];
+      if (!issue.changelog || !issue.changelog.histories) {
+        debug.warn("issue response doesn't contain valid changelog data: <= %s", dataJson);
+        continue;
+      }
+
+      for (var j = 0; j < issue.changelog.histories.length; j++) {
+        history = issue.changelog.histories[j];
+        for (var k = 0; k < history.items.length; k++) {
+          item = history.items[k];
+          if (item.field == metaData.historyField) {
+            row = {
+              key       : issue.key,
+              fields: {
+                created   : history.created,
+                issuetype : issue.fields.issuetype,
+                field     : item.field,
+                fromString: item.fromString,
+                toString  : item['toString']
+              }
+            };
+
+            data.push(row);
+          }
+        }
+      }
+    }
+
     metaData.time_lastupdated = (new Date()).getTime();
 
     return that;
   };
 
   /**
-   * @desc Get the Jira issues object
-   * @return {array} issues
+   * @desc Get data object
+   * @return {array} dataJson
    */
-  that.getIssues = function () {
-    return issues;
+  that.getData = function () {
+    return data;
   };
 
   /**
    * @desc Setting a key/value pair to internal data object
    * @param {string} key Name/Key of value to store
    * @param {mixed} value The value for key
-   * @return {IssueTable_}
+   * @return {ChangelogTable_}
    */
   that.setMeta = function (key, value) {
     if (metaData.hasOwnProperty(key) && metaData[key] === value) {
@@ -225,13 +264,13 @@ function IssueTable_(attributes) {
   };
 
   /**
-   * @desc Takes stringified JSON to parse into JSON object and use for initialize a IssueTable object.
-   * @param {string} json The JSON string to parse and load into a new IssueTable instance
-   * @return {IssueTable_} A new instance of IssueTable_ with all data from [json] load into.
+   * @desc Takes stringified JSON to parse into JSON object and use for initialize a ChangelogTable object.
+   * @param {string} json The JSON string to parse and load into a new ChangelogTable instance
+   * @return {ChangelogTable_} A new instance of ChangelogTable_ with all data from [json] load into.
    */
   that.fromJson = function (json) {
     var metaData = JSON.parse(json); // Parsing the json string.
-    return new IssueTable_({
+    return new ChangelogTable_({
       metaData : metaData
     });
   };
@@ -239,19 +278,19 @@ function IssueTable_(attributes) {
   /**
    * @desc Calling the set renderer and render table
    * @throws ReferenceError
-   * @return {IssueTableRenderer_}
+   * @return {ChangelogTableRenderer_}
    */
   that.render = function () {
-    debug.log('IssueTable_.render()');
+    debug.log('ChangelogTable_.render()');
     var renderer = RendererFactory_.call(that, metaData.renderer);
     if (typeof renderer !== 'object' || !renderer.hasOwnProperty('render')) {
       throw new ReferenceError("{renderer} must be an object/class but is '" + typeof renderer
-          + "'. Ie: of type 'IssueTableRendererDefault_'.");
+          + "'. Ie: of type 'ChangelogTableRendererDefault_'.");
     }
 
     renderer.render();
 
-    // store render info to IssueTable meta data
+    // store render info to ChangelogTable meta data
     var renderInfo = renderer.getInfo();
     metaData.headerRowOffset = renderInfo.headerRowOffset;
     metaData.headerValues = renderInfo.headers;
@@ -265,10 +304,10 @@ function IssueTable_(attributes) {
   /**
    * @desc Setting relevant range information and store them in metaData.
    * @param {string} rangeA1 A1 notation of a range
-   * @return {IssueTable_}
+   * @return {ChangelogTable_}
    */
   setRange = function (rangeA1) {
-    debug.log('IssueTable_.setRange() <= %s', rangeA1);
+    debug.log('ChangelogTable_.setRange() <= %s', rangeA1);
     metaData.rangeA1 = rangeA1;
     // setting named range
     var _rangeName = 'pa4j_s' + Sheet.getSheetId() + '_';
@@ -287,5 +326,5 @@ function IssueTable_(attributes) {
 }
 
 // Node required code block
-module.exports = IssueTable_;
+module.exports = ChangelogTable_;
 // End of Node required code block

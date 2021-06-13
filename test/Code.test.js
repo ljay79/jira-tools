@@ -20,17 +20,3 @@ test('onOpen builds menu', () => {
   expect(SpreadsheetApp.getUi().createAddonMenu().addItem.mock.calls.length).toBeGreaterThan(1);
   expect(SpreadsheetApp.getUi().createAddonMenu().addSeparator.mock.calls.length).toBeGreaterThan(1);
 });
-
-test('Update Jira menu option appears based on feature switch', () => {
-  SpreadsheetApp.resetMocks();
-  var onOpen = require('../src/Code.gs').onOpen;
-  var e = {
-    authMode: ScriptApp.AuthMode.LIMITED
-  }
-  onOpen(e);
-  var addItemMock =  SpreadsheetApp.getUi().createAddonMenu().addItem.mock;
-  var menuItemCount = addItemMock.calls.length;
-  expect(addItemMock.calls[menuItemCount-7][0]).toBe('Update Jira Issues');
-  expect(addItemMock.calls[menuItemCount-7][1]).toBe('menuUpdateJiraIssues');
-  SpreadsheetApp.resetMocks();
-});

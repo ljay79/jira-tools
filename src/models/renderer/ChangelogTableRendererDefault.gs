@@ -4,24 +4,23 @@ const _sortKeysByRef = require('../../jsLib.gs')._sortKeysByRef;
 const sheetIdPropertySafe = require('../../jiraCommon.gs').sheetIdPropertySafe;
 const unifyIssueAttrib = require('../../jiraCommon.gs').unifyIssueAttrib;
 const UserStorage = require('../gas/UserStorage.gs');
-const IssueTable_ = require('../jira/IssueTable.gs');
+const ChangelogTable_ = require('../jira/ChangelogTable.gs');
 const IssueFields = require('../jira/IssueFields.gs');
 // End of Node required code block
 
 /**
- * @file Contains class for rendering jira issue tables
+ * @file Contains class for rendering jira changelog tables
  */
 
 /**
- * @desc Creates a new IssueTableRenderer instance (Default), which is used to insert an table of issues into a sheet.
- * @param {IssueTable_} IssueTable The instance of IssueTable_ to render table
+ * @desc Creates a new ChangelogTableRenderer instance (Default), which is used to insert an table of data into a sheet.
+ * @param {ChangelogTable_} ChangelogTable The instance of ChangelogTable_ to render table
  * @constructor
  */
-function IssueTableRendererDefault_(IssueTable) {
+function ChangelogTableRendererDefault_(ChangelogTable) {
   var that = this, // clear encapsulation of scope's
     sheet, initRange,
-    epicField = UserStorage.getValue('jst_epic'),
-    issues = [], selectedFields = [], headers = [],
+    data = [], selectedFields = [], headers = [],
     rowIndex = 0, numColumns = 0,
     info = {
       totalInserted : 0,
@@ -40,28 +39,32 @@ function IssueTableRendererDefault_(IssueTable) {
    */
   init = function () {
     // check data to rendering
-    if (typeof IssueTable !== 'object') {
-      throw new Error("{IssueTable} is not a valid instance of class IssueTable_.");
+    if (typeof ChangelogTable !== 'object') {
+      throw new Error("{ChangelogTable} is not a valid instance of class ChangelogTable_.");
     }
-    if (!IssueTable.hasOwnProperty('getMeta')) {
-      throw new ReferenceError("{IssueTable} is not a valid instance of class IssueTable_. Implementation of method 'getMeta' missing.");
+    if (!ChangelogTable.hasOwnProperty('getMeta')) {
+      throw new ReferenceError("{ChangelogTable} is not a valid instance of class ChangelogTable_. Implementation of method 'getMeta' missing.");
     }
-    if (!IssueTable.hasOwnProperty('getIssues')) {
-      throw new ReferenceError("{IssueTable} is not a valid instance of class IssueTable_. Implementation of method 'getIssues' missing.");
-    }
-
-    issues = IssueTable.getIssues();
-    if (typeof issues !== 'object') {
-      throw new Error("{IssueTable.getIssues()} must return an array but returned " + (typeof issues) + ".");
+    if (!ChangelogTable.hasOwnProperty('getData')) {
+      throw new ReferenceError("{ChangelogTable} is not a valid instance of class ChangelogTable_. Implementation of method 'getData' missing.");
     }
 
-    selectedFields = IssueTable.getMeta('headerFields');
-
-    if (!issues[0].hasOwnProperty('fields')) {
-      throw new ReferenceError("{IssueTable.getIssues()} did not return a valid Jira issues response object. [" + issues + "]");
+    data = ChangelogTable.getData();
+    if (typeof data !== 'object') {
+      throw new Error("{ChangelogTable.getData()} must return an array but returned " + (typeof data) + ".");
     }
 
-    var sheetId = sheetIdPropertySafe(IssueTable.getSheetId(), true);
+    selectedFields = ChangelogTable.getMeta('headerFields');
+
+    if (data.length === 0) {
+      throw new Error("Changelog has no data for selected history field '" + ChangelogTable.getMeta('historyField') + "'.");
+    }
+
+    if (!data[0].hasOwnProperty('fields')) {
+      throw new ReferenceError("{ChangelogTable.getData()} did not return a valid Jira data response object. [" + data + "]");
+    }
+
+    var sheetId = sheetIdPropertySafe(ChangelogTable.getSheetId(), true);
     sheet = getSheetById(sheetId);
     if (typeof sheet !== 'object') {
       throw new ReferenceError("Could not find Sheet by given sheetId [" + sheetId + "].");
@@ -73,32 +76,32 @@ function IssueTableRendererDefault_(IssueTable) {
   /* -------- */
 
   /**
-   * @desc Rendering the issues into a table in defined sheet.
-   * @return {IssueTableRendererDefault_}
+   * @desc Rendering the data into a table in defined sheet.
+   * @return {ChangelogTableRendererDefault_}
    */
   that.render = function () {
-    debug.time('IssueTableRendererDefault_.render()');
+    debug.time('ChangelogTableRendererDefault_.render()');
 
     prepareHeaderValues();
 
-    if (null === IssueTable.getMeta('rangeA1')) {
+    if (null === ChangelogTable.getMeta('rangeA1')) {
       initRange = sheet.getActiveRange();
     } else {
-      initRange = sheet.setActiveSelection(IssueTable.getMeta('rangeA1'));
+      initRange = sheet.setActiveSelection(ChangelogTable.getMeta('rangeA1'));
     }
 
     // save the range coords for info object
     info.oRangeA1.from = initRange.getCell(1, 1).getA1Notation();
     info.oRangeA1.to = initRange.getCell(initRange.getNumRows(), initRange.getNumColumns()).getA1Notation();
 
-    if (filterName = IssueTable.getMeta('filter').name) {
-      that.addSummary("Filter: " + filterName);
+    if (filterName = ChangelogTable.getMeta('filter').name) {
+      that.addSummary("Changelog: " + filterName);
     }
 
     that.addHeader().fillTable();
 
-    debug.timeEnd('IssueTableRendererDefault_.render()');
-    debug.log('IssueTableRendererDefault_.render() <- finished rendering %s issues with %s columns.', info.totalInserted, numColumns);
+    debug.timeEnd('ChangelogTableRendererDefault_.render()');
+    debug.log('ChangelogTableRendererDefault_.render() <- finished rendering %s data with %s columns.', info.totalInserted, numColumns);
 
     info.finishRendering = true;
 
@@ -108,7 +111,7 @@ function IssueTableRendererDefault_(IssueTable) {
   /**
    * @desc Adding a summary line
    * @param {string} summary Text to be inserted as a table summary line
-   * @return this For chaining
+   * @return {ChangelogTableRendererDefault_}
    */
   that.addSummary = function (summary) {
     range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
@@ -129,7 +132,7 @@ function IssueTableRendererDefault_(IssueTable) {
 
   /**
    * @desc Add column headers into 1st/2nd row
-   * @return this For chaining
+   * @return {ChangelogTableRendererDefault_}
    */
   that.addHeader = function () {
     var values = [], formats = [];
@@ -140,7 +143,6 @@ function IssueTableRendererDefault_(IssueTable) {
     }
 
     range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
-
     range.clearContent()
       .clearNote()
       .clearFormat()
@@ -157,22 +159,26 @@ function IssueTableRendererDefault_(IssueTable) {
 
   /**
    * @desc Fill in all data into a sheet table with values and format
-   * @return this For chaining
+   * @return {ChangelogTableRendererDefault_}
    */
   that.fillTable = function () {
-    info.totalInserted = issues.length;
-    var range = sheet.getRange(initRange.getRow(), initRange.getColumn(), 1, headers.length); // obsolete?
+    info.totalInserted = data.length;
+    var values = [],
+        formats = [],
+        row = {},
+        key = {},
+        range;
 
-    // loop over each resulted issue (row)
-    for (var i = 0; i < issues.length; i++) {
-      var issue = issues[i];
-      var values = [];
-      var formats = []; // http://www.blackcj.com/blog/2015/05/18/cell-number-formatting-with-google-apps-script/
+    // loop over each resulted data (row)
+    for (var i = 0; i < data.length; i++) {
+      row = data[i];
+      values = [];
+      formats = [];
       range = sheet.getRange(initRange.getRow() + rowIndex++, initRange.getColumn(), 1, headers.length);
 
       // loop over each header (column)
       for (var j = 0; j < headers.length; j++) {
-        var key = unifyIssueAttrib(headers[j], issue);
+        key = unifyIssueAttrib(headers[j], row);
 
         // for some custom formatting
         switch (true) {
@@ -220,9 +226,9 @@ function IssueTableRendererDefault_(IssueTable) {
         SpreadsheetApp.flush();
       }
 
-      issue = null;
+      row = null;
 
-    } // END: issue loop
+    } // END: row loop
 
     return that;
   };
@@ -238,7 +244,7 @@ function IssueTableRendererDefault_(IssueTable) {
   /**
    * @desc Sorting the header/columns based on definition/order in global var ISSUE_COLUMNS. Improves a consistent column listing/sorting
    *       and defined fields first before alpha sorting the rest.
-   * @returns {IssueTableRendererDefault_}
+   * @returns {ChangelogTableRendererDefault_}
    */
   prepareHeaderValues = function () {
     // prep headers
@@ -251,7 +257,7 @@ function IssueTableRendererDefault_(IssueTable) {
       }
     } else {
       // from first issue in result
-      for ( var k in issues[0].fields) {
+      for ( var k in data[0].fields) {
         headers.push(k);
       }
     }
@@ -268,6 +274,6 @@ function IssueTableRendererDefault_(IssueTable) {
 
 // Node required code block
 module.exports = {
-  IssueTableRendererDefault_ : IssueTableRendererDefault_
+  ChangelogTableRendererDefault_ : ChangelogTableRendererDefault_
 }
 // End of Node required code block

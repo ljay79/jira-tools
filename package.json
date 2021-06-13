@@ -13,9 +13,6 @@
     "url": "git+https://github.com/ljay79/jira-tools.git"
   },
   "main": "Code.gs",
-  "dependencies": {
-    "@types/google-apps-script": "^0.0.35"
-  },
   "devDependencies": {
     "@google/clasp": "^2.3.0",
     "del": "3.x",
@@ -27,7 +24,7 @@
     "gulp-eslint": "^5.0.0",
     "gulp-rename": "latest",
     "gulp-replace": "latest",
-    "jest": "^24.8.0",
+    "jest": "^26.6.3",
     "yargs": "^12.0.5"
   },
   "scripts": {
