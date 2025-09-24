@@ -76,10 +76,10 @@ function JST_getTotalForSearchResult(JQL) {
   };
 
   response = request.call('search/approximate-count', data, {'method' : 'post'}).getResponse();
-  if(response.statusCode === 200 && response.respData && response.respData.total >= 0) {
+  if(response.statusCode === 200 && response.respData && response.respData.count >= 0) {
     debug.log("JST_getTotalForSearchResult [%s]: response: %s", response.statusCode, response);
     StorageCounter.log();
-    return parseInt(response.respData.total || 0);
+    return parseInt(response.respData.count || 0);
   } else {
     var msg = response.respData.errorMessages ? (response.respData.errorMessages.join(",") || response.respData.errorMessages) : response;
     msg = JSON.stringify(msg);
