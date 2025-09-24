@@ -75,7 +75,7 @@ function JST_getTotalForSearchResult(JQL) {
     maxResults : 1
   };
 
-  response = request.call('search', data, {'method' : 'post'}).getResponse();
+  response = request.call('search/approximate-count', data, {'method' : 'post'}).getResponse();
   if(response.statusCode === 200 && response.respData && response.respData.total >= 0) {
     debug.log("JST_getTotalForSearchResult [%s]: response: %s", response.statusCode, response);
     StorageCounter.log();
