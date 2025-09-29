@@ -25,6 +25,7 @@ var restMethods = {
     'filter'        : {method: '/filter/{filterId}'},
     //'search': {method: '/search', queryparams: {jql:'', fields: [], properties: [], maxResults: 100, validateQuery: 'strict'}} // GET
     'search'        : {method: '/search'}, // POST
+    'count'        : {method: '/search/approximate-count'}, // POST
     // https://developer.atlassian.com/cloud/jira/platform/rest/v2/#api-rest-api-2-filter-search-get
     'myFilters'     : {method: '/filter/search', queryparams: {accountId: '', expand: 'favourite,jql,owner', startAt:0, maxResults: 100, orderBy: 'IS_FAVOURITE'}},
     // https://SITENAME.atlassian.net/rest/api/2/user/search?startAt=0&maxResults=1000&query=
@@ -43,6 +44,7 @@ var restMethods = {
     'worklogOfIssue': {method: '/issue/{issueIdOrKey}/worklog'},
     'filter'        : {method: '/filter/{filterId}'},
     'search'        : {method: '/search'}, // POST
+    'count'        : {method: '/search/approximate-count'}, // POST
     // server api doesnt support /filter/my
     'myFilters'     : {method: '/filter/favourite'},
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:'.'}},

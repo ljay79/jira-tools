@@ -70,16 +70,14 @@ function JST_getTotalForSearchResult(JQL) {
 
   var request   = new Request();
   var response  = {}, data = {
-    jql        : JQL, 
-    fields     : ['summary'], 
-    maxResults : 1
+    jql: JQL
   };
 
   response = request.call('search', data, {'method' : 'post'}).getResponse();
-  if(response.statusCode === 200 && response.respData && response.respData.total >= 0) {
+  if(response.statusCode === 200 && response.respData && response.respData.count >= 0) {
     debug.log("JST_getTotalForSearchResult [%s]: response: %s", response.statusCode, response);
     StorageCounter.log();
-    return parseInt(response.respData.total || 0);
+    return parseInt(response.respData.count || 0);
   } else {
     var msg = response.respData.errorMessages ? (response.respData.errorMessages.join(",") || response.respData.errorMessages) : response;
     msg = JSON.stringify(msg);
@@ -102,6 +100,9 @@ function JST_getTotalForSearchResult(JQL) {
  */
 function JST_search(JQL, Fields, Limit, StartAt) {
   customFunctionAllowed_();
+
+  //@TODO: requires upgrade to API v3
+  throw new CustomFunctionErrorException("`JST_search` is currently not supported by this version of the add-on.");
 
   // - checks - 
   if (undefined == JQL || JQL == '') {
