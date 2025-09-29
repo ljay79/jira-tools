@@ -73,7 +73,7 @@ function JST_getTotalForSearchResult(JQL) {
     jql: JQL
   };
 
-  response = request.call('search', data, {'method' : 'post'}).getResponse();
+  response = request.call('count', data, {'method' : 'post'}).getResponse();
   if(response.statusCode === 200 && response.respData && response.respData.count >= 0) {
     debug.log("JST_getTotalForSearchResult [%s]: response: %s", response.statusCode, response);
     StorageCounter.log();
