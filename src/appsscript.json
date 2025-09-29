@@ -1,7 +1,6 @@
 {
   "timeZone": "Europe/Berlin",
-  "dependencies": {
-  },
+  "dependencies": {},
   "exceptionLogging": "STACKDRIVER",
   "oauthScopes": [
     "https://www.googleapis.com/auth/script.container.ui",
@@ -10,6 +9,6 @@
     "https://www.googleapis.com/auth/script.webapp.deploy",
     "https://www.googleapis.com/auth/spreadsheets.currentonly"
   ],
-  "sheets": {
-  }
+  "sheets": {},
+  "runtimeVersion": "V8"
 }
