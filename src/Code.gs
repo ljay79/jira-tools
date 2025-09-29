@@ -1,5 +1,5 @@
 /**
- * @copyright Copyright (c) 2017-2021, Jens Rosemeier. All rights reserved.
+ * @copyright Copyright (c) 2017-2025, Jens Rosemeier. All rights reserved.
  *            Copyrights licensed under GNU GENERAL PUBLIC LICENSE v3.
  *
  * @github  https://github.com/ljay79/jira-tools
@@ -10,7 +10,7 @@
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
-var BUILD = '1.4.10';
+var BUILD = '1.4.11';
 
 /**
  * Add a nice menu option for the users.

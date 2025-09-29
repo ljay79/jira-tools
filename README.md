@@ -317,23 +317,23 @@ To enable Google-Apps-Script (GAS) build, deployment and running unit test on lo
 
 Installing `node` will differ from your environment, see install instructions on https://nodejs.org/ .
 
-Assuming `node` is already installed, first install `gulp`:
+Assuming `node` is already installed, first install `gulp` and `gulp-cli`:
 
 ```sh
-sudo npm install gulp-cli -g
-sudo npm install gulp -D
+npm install gulp -D
+npm install gulp-cli -g
 ```
 
 Now you can install `clasp`:
 ```sh
-sudo npm i @google/clasp -g
+npm i @google/clasp
 ```
 
 Then enable Apps Script API: https://script.google.com/home/usersettings
 
 (If that fails, run this:)
 ```sh
-sudo npm i -g grpc @google/clasp --unsafe-perm
+npm i grpc @google/clasp --unsafe-perm
 ```
 
 ## Checkout and Setup
@@ -438,7 +438,7 @@ THIS WHOLE BLOCK WILL BE COMMENTED WHEN DEPLOYED BY THE GULP SCRIPT
 > https://github.com/mzagorny/gas-local
 
 ## Testing and deploying to GAS
-### Set up and linking to your project using `clasp`
+### Set up and linking to your project using `clasp` (v2.x !)
 Enabling your local project to deploy and test in a Google project requires you to link either an existing Google project using `clasp clone <scriptId>` or *recommended* creating a new Google project with `clasp create`.
 
 Details and options for `clasp clone` you can find here: https://github.com/google/clasp#clone
@@ -447,26 +447,26 @@ for `clasp create` please see here https://github.com/google/clasp#create
 
 In both cases, you must login to GAS first and go through the authorisation:
 ```sh
-clasp login
+npx clasp login
 ```
 
 you should see something like
 ```markdown
-Logging in globally...
-  Authorize clasp by visiting this url:
-https://accounts.google.com/o/oauth2/v2/auth?...
-  
+Logging in globally…
+� Authorize clasp by visiting this url:
+https://accounts.google.com/o/oauth2/v2/auth?access_type=offline&scope=https%3A%2F%2Fwww.google ..
+..
 Authorization successful.
 
-Default credentials saved to: ~/.clasprc.json (/.clasprc.json).
+Default credentials saved to: /home/jrosemeier/.clasprc.json.
 ```
 
 #### 1. Create and deploy to a new Google project
 ```sh
 cd ./src
-clasp create --type sheets --title "Project Aid for Jira - Devel"
+npx clasp create --type sheets --title "Project Aid for Jira - Devel"
 cd ..
-gulp deploy
+npx gulp deploy
 ```
 
 #### 2. You already have a existing Google project
@@ -478,14 +478,17 @@ Once you have the correct projects script ID;
 
 ```sh
 cd ./src
-clasp clone <scriptId>
+npx clasp clone <scriptId>
 cd ..
 ```
 
-check you have a _.clasp.json_ file in your _./src/.clasp.json_ folder then perform your first deploy
+check you have a _.clasp.json_ file in your _./src/.clasp.json_ folder then perform your first deploy.
 ```sh
-gulp deploy
+npx gulp deploy
 ```
+
+> Note: This project is not yet upgraded to clasp 3.x.
+> Use *clasp v2.x* for compatibility and make sure to add/edit `"fileExtension": "gs"` in the `src/.clasp.json` file before first pulling.
 
 ### Testing unit tests
 In the folder _./test_ are already a few unit test defined to verify the projects functionality.
@@ -536,15 +539,16 @@ npx jest --coverage
 Using the following gulp task will clean the export and require statements and push the code to the configured GAS project.
 
 ```sh
-gulp deploy
+npx gulp deploy
 ```
 
 This task does actually 4 steps as one; `clean`, `build`, `set-environment-config` and `clasp-push`.
 The deployment will update the configuration using one for the files in _/config/test_ or _/config/production_. This will overwrite the default configuration file _./src/environmentConfiguration.gs_ .By default the _production_ folder is used but you can specify the environment you wish by using the following tasks
 
 ```sh
-gulp deploy --test
-gulp deploy-test
+npx gulp deploy --test
+.. or
+npx gulp deploy-test
 ```
 Both commands above will use the test config file. The second task being a shortcut to avoid entering the parameter.
 
@@ -553,7 +557,7 @@ Both commands above will use the test config file. The second task being a short
 If you make changes to the code in the google project web interface you can pull those changes down onto your local machine.
 
 ```sh
-gulp pull
+npx gulp pull
 ```
 
 Use this script if you have changed the source code within the GAS editors while testing on the GAS envrironment.

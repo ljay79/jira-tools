@@ -43,7 +43,7 @@ test("IssueTable_ accessibility test",()=> {
   table.setMeta('tableId', tableId);
   table.setMeta('random_data_key', 'random Data Value');
 
-  // lasupdated should now be greater than earlier
+  // lastupdated should now be greater than earlier
   expect(table.getMeta('time_lastupdated')).toBeGreaterThan(currentTime);
 
   tableData = table.getMeta();
