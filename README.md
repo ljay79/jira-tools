@@ -464,9 +464,9 @@ Default credentials saved to: /home/jrosemeier/.clasprc.json.
 #### 1. Create and deploy to a new Google project
 ```sh
 cd ./src
-clasp create --type sheets --title "Project Aid for Jira - Devel"
+npx clasp create --type sheets --title "Project Aid for Jira - Devel"
 cd ..
-gulp deploy
+npx gulp deploy
 ```
 
 #### 2. You already have a existing Google project
