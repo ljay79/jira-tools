@@ -112,7 +112,7 @@ test('a basic request should be handloed with password and username included', (
   })
   expect(Browser.msgBox.mock.calls.length).toBe(0);
   expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
-  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/issue/PBI-2?fields=status");
+  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/3/issue/PBI-2?fields=status");
   expect(UrlFetchApp.fetch.mock.calls[0][1]).not.toBeNull();
   expect(UrlFetchApp.fetch.mock.calls[0][1]["method"]).not.toBeNull();
   expect(UrlFetchApp.fetch.mock.calls[0][1]["method"]).toBe("get");
@@ -160,7 +160,7 @@ test('query parameters should be added to the url for user search method', () =>
   var result = requestObj.getResponse();
 
   expect(Browser.msgBox.mock.calls.length).toBe(0);
-  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/user/search?startAt=0&maxResults=250&username=paul");
+  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/3/user/search?startAt=0&maxResults=250&username=paul");
   expect(result.statusCode).toBe(200);
   expect(result.respData).not.toBeNull();
   expect(result.method).toBe('get');
@@ -190,7 +190,7 @@ test('a jira dashboard request is made correctly', () => {
   requestObj.call("dashboard", {})
   var result = requestObj.getResponse();
   expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
-  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/dashboard?filter=my");
+  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/3/dashboard?filter=my");
   expect(result.statusCode).toBe(200);
   expect(result.respData).not.toBeNull();
   expect(result.respData.errorMessages).toBeUndefined();
@@ -226,7 +226,7 @@ test('a PUT request is made for updating issues', () => {
   });
   var result = requestObj.getResponse();
   expect(UrlFetchApp.fetch.mock.calls.length).toBe(1);
-  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/2/issue/PBI-2");
+  expect(UrlFetchApp.fetch.mock.calls[0][0]).toBe("https://jiraserver/rest/api/3/issue/PBI-2");
   expect(UrlFetchApp.fetch.mock.calls[0][1]["method"]).not.toBeNull();
   expect(UrlFetchApp.fetch.mock.calls[0][1]["method"]).toBe("put");
   expect(UrlFetchApp.fetch.mock.calls[0][1]["payload"]).not.toBeNull();

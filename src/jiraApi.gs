@@ -10,14 +10,14 @@ const extend = require("./jsLib.gs").extend;
 
 /**
  * Available/Supported REST calls for JIRA rest api.
- * Reference: https://docs.atlassian.com/jira/REST/cloud/
+ * Reference: https://developer.atlassian.com/cloud/jira/platform/rest/v3
  * @object
  */
 var restMethods = {
   'onDemand': {
-    'dashboard'     : {method: '/dashboard', queryparams: {filter: 'my'}},
-    'myself'        : {method: '/myself'},
-    'issueStatus'   : {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
+    /*v3*/'dashboard'     : {method: '/dashboard', queryparams: {filter: 'my'}},
+    /*v3*/'myself'        : {method: '/myself'},
+    /*v3*/'issueStatus'   : {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
     'issueUpdate'   : {method: '/issue/{issueIdOrKey}', httpMethod: 'put'},
     'issueTransitions': {method: '/issue/{issueIdOrKey}/transitions'},
     'issueTransitionUpdate': {method: '/issue/{issueIdOrKey}/transitions', httpMethod: 'post'},
@@ -82,7 +82,8 @@ function Request() {
       available, url, username, password,
       authMethod = 'Basic',
       jiraMethod = null,
-      jiraQueryParams = {};
+      jiraQueryParams = {},
+      basePath = '/rest/api/3';
 
   this.init = function() {
     server_type = getCfg_('server_type') || 'onDemand';
@@ -187,7 +188,7 @@ function Request() {
     this.prepareParams(urlParams, jiraQueryParams);
 
     // RESTfull URL to request
-    var fetchUrl = url + '/rest/api/2' + jiraMethod;
+    var fetchUrl = url + basePath + jiraMethod;
 
     // data payload vs. url params handling
     var temp,

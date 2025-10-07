@@ -1,0 +1,1475 @@
+{
+	"info" : {
+		"_postman_id" : "a04f0cd2-af42-4dde-ad6b-01dc44bdef46",
+		"name" : "Jira REST API v2",
+		"schema" : "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item" : [{
+			"name" : "Filters",
+			"item" : [{
+					"name" : "Search for filters",
+					"request" : {
+						"auth" : {
+							"type" : "basic",
+							"basic" : [{
+									"key" : "username",
+									"value" : "{{username}}",
+									"type" : "string"
+								}, {
+									"key" : "password",
+									"value" : "{{apiToken}}",
+									"type" : "string"
+								}
+							]
+						},
+						"method" : "GET",
+						"header" : [{
+								"key" : "Accept",
+								"value" : "application/json"
+							}
+						],
+						"url" : {
+							"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/filter/search",
+							"protocol" : "{{protocol}}",
+							"host" : [
+								"{{host}}"
+							],
+							"path" : [
+								"{{basePath}}rest",
+								"api",
+								"2",
+								"filter",
+								"search"
+							],
+							"query" : [{
+									"key" : "filterName",
+									"value" : "{{filterName}}",
+									"description" : "String used to perform a case-insensitive partial match with `name`.",
+									"disabled" : true
+								}, {
+									"key" : "accountId",
+									"value" : "{{accountId}}",
+									"description" : "User account ID used to return filters with the matching `owner.accountId`. This parameter cannot be used with `owner`.",
+									"disabled" : true
+								}, {
+									"key" : "owner",
+									"value" : "{{owner}}",
+									"description" : "This parameter is deprecated because of privacy changes. Use `accountId` instead. See the [migration guide](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details. User name used to return filters with the matching `owner.name`. This parameter cannot be used with `accountId`.",
+									"disabled" : true
+								}, {
+									"key" : "groupname",
+									"value" : "{{groupname}}",
+									"description" : "As a group's name can change, use of `groupId` is recommended to identify a group. Group name used to returns filters that are shared with a group that matches `sharePermissions.group.groupname`. This parameter cannot be used with the `groupId` parameter.",
+									"disabled" : true
+								}, {
+									"key" : "groupId",
+									"value" : "{{groupId}}",
+									"description" : "Group ID used to returns filters that are shared with a group that matches `sharePermissions.group.groupId`. This parameter cannot be used with the `groupname` parameter.",
+									"disabled" : true
+								}, {
+									"key" : "projectId",
+									"value" : "{{projectId}}",
+									"description" : "Project ID used to returns filters that are shared with a project that matches `sharePermissions.project.id`.",
+									"disabled" : true
+								}, {
+									"key" : "id",
+									"value" : "{{id}}",
+									"description" : "The list of filter IDs. To include multiple IDs, provide an ampersand-separated list. For example, `id=10000&id=10001`. Do not exceed 200 filter IDs.",
+									"disabled" : true
+								}, {
+									"key" : "orderBy",
+									"value" : "{{orderBy}}",
+									"description" : "[Order](#ordering) the results by a field:\n\n *  `description` Sorts by filter description. Note that this sorting works independently of whether the expand to display the description field is in use.\n *  `favourite_count` Sorts by the count of how many users have this filter as a favorite.\n *  `is_favourite` Sorts by whether the filter is marked as a favorite.\n *  `id` Sorts by filter ID.\n *  `name` Sorts by filter name.\n *  `owner` Sorts by the ID of the filter owner.\n *  `is_shared` Sorts by whether the filter is shared.",
+									"disabled" : true
+								}, {
+									"key" : "startAt",
+									"value" : "{{startAt}}",
+									"description" : "The index of the first item to return in a page of results (page offset).",
+									"disabled" : true
+								}, {
+									"key" : "maxResults",
+									"value" : "{{maxResults}}",
+									"description" : "The maximum number of items to return per page.",
+									"disabled" : true
+								}, {
+									"key" : "expand",
+									"value" : "{{expand}}",
+									"description" : "Use [expand](#expansion) to include additional information about filter in the response. This parameter accepts a comma-separated list. Expand options include:\n\n *  `description` Returns the description of the filter.\n *  `favourite` Returns an indicator of whether the user has set the filter as a favorite.\n *  `favouritedCount` Returns a count of how many users have set this filter as a favorite.\n *  `jql` Returns the JQL query that the filter uses.\n *  `owner` Returns the owner of the filter.\n *  `searchUrl` Returns a URL to perform the filter's JQL query.\n *  `sharePermissions` Returns the share permissions defined for the filter.\n *  `editPermissions` Returns the edit permissions defined for the filter.\n *  `isWritable` Returns whether the current user has permission to edit the filter.\n *  `approximateLastUsed` \\[Experimental\\] Returns the approximate date and time when the filter was last evaluated.\n *  `subscriptions` Returns the users that are subscribed to the filter.\n *  `viewUrl` Returns a URL to view the filter.",
+									"disabled" : true
+								}, {
+									"key" : "overrideSharePermissions",
+									"value" : "{{overrideSharePermissions}}",
+									"description" : "EXPERIMENTAL: Whether share permissions are overridden to enable filters with any share permissions to be returned. Available to users with *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+									"disabled" : true
+								}, {
+									"key" : "isSubstringMatch",
+									"value" : "{{isSubstringMatch}}",
+									"description" : "When `true` this will perform a case-insensitive substring match for the provided `filterName`. When `false` the filter name will be searched using [full text search syntax](https://support.atlassian.com/jira-software-cloud/docs/search-for-issues-using-the-text-field/).",
+									"disabled" : true
+								}
+							]
+						},
+						"description" : "Returns a [paginated](#pagination) list of filters. Use this operation to get:\n\n *  specific filters, by defining `id` only.\n *  filters that match all of the specified attributes. For example, all filters for a user with a particular word in their name. When multiple attributes are specified only filters matching all attributes are returned.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** None, however, only the following filters that match the query parameters are returned:\n\n *  filters owned by the user.\n *  filters shared with a group that the user is a member of.\n *  filters shared with a private project that the user has *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for.\n *  filters shared with a public project.\n *  filters shared with the public."
+					},
+					"response" : []
+				}, {
+					"name" : "Get filter",
+					"request" : {
+						"auth" : {
+							"type" : "basic",
+							"basic" : [{
+									"key" : "username",
+									"value" : "{{username}}",
+									"type" : "string"
+								}, {
+									"key" : "password",
+									"value" : "{{apiToken}}",
+									"type" : "string"
+								}
+							]
+						},
+						"method" : "GET",
+						"header" : [{
+								"key" : "Accept",
+								"value" : "application/json"
+							}
+						],
+						"url" : {
+							"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/filter/:id",
+							"protocol" : "{{protocol}}",
+							"host" : [
+								"{{host}}"
+							],
+							"path" : [
+								"{{basePath}}rest",
+								"api",
+								"2",
+								"filter",
+								":id"
+							],
+							"query" : [{
+									"key" : "expand",
+									"value" : "{{expand}}",
+									"description" : "Use [expand](#expansion) to include additional information about filter in the response. This parameter accepts a comma-separated list. Expand options include:\n\n *  `sharedUsers` Returns the users that the filter is shared with. This includes users that can browse projects that the filter is shared with. If you don't specify `sharedUsers`, then the `sharedUsers` object is returned but it doesn't list any users. The list of users returned is limited to 1000, to access additional users append `[start-index:end-index]` to the expand request. For example, to access the next 1000 users, use `?expand=sharedUsers[1001:2000]`.\n *  `subscriptions` Returns the users that are subscribed to the filter. If you don't specify `subscriptions`, the `subscriptions` object is returned but it doesn't list any subscriptions. The list of subscriptions returned is limited to 1000, to access additional subscriptions append `[start-index:end-index]` to the expand request. For example, to access the next 1000 subscriptions, use `?expand=subscriptions[1001:2000]`.",
+									"disabled" : true
+								}, {
+									"key" : "overrideSharePermissions",
+									"value" : "{{overrideSharePermissions}}",
+									"description" : "EXPERIMENTAL: Whether share permissions are overridden to enable filters with any share permissions to be returned. Available to users with *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+									"disabled" : true
+								}
+							],
+							"variable" : [{
+									"key" : "id",
+									"value" : "{{id}}",
+									"description" : "The ID of the filter to return."
+								}
+							]
+						},
+						"description" : "Returns a filter.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** None, however, the filter is only returned where it is:\n\n *  owned by the user.\n *  shared with a group that the user is a member of.\n *  shared with a private project that the user has *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for.\n *  shared with a public project.\n *  shared with the public."
+					},
+					"response" : []
+				}
+			]
+		}, {
+			"name" : "User search",
+			"item" : [{
+					"name" : "Find users assignable to projects",
+					"request" : {
+						"auth" : {
+							"type" : "basic",
+							"basic" : [{
+									"key" : "username",
+									"value" : "{{username}}",
+									"type" : "string"
+								}, {
+									"key" : "password",
+									"value" : "{{apiToken}}",
+									"type" : "string"
+								}
+							]
+						},
+						"method" : "GET",
+						"header" : [{
+								"key" : "Accept",
+								"value" : "application/json"
+							}
+						],
+						"url" : {
+							"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/user/assignable/multiProjectSearch?projectKeys={{projectKeys}}",
+							"protocol" : "{{protocol}}",
+							"host" : [
+								"{{host}}"
+							],
+							"path" : [
+								"{{basePath}}rest",
+								"api",
+								"2",
+								"user",
+								"assignable",
+								"multiProjectSearch"
+							],
+							"query" : [{
+									"key" : "query",
+									"value" : "{{query}}",
+									"description" : "A query string that is matched against user attributes, such as `displayName` and `emailAddress`, to find relevant users. The string can match the prefix of the attribute's value. For example, *query=john* matches a user with a `displayName` of *John Smith* and a user with an `emailAddress` of *johnson@example.com*. Required, unless `accountId` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "username",
+									"value" : "{{username}}",
+									"description" : "This parameter is no longer available. See the [deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details.",
+									"disabled" : true
+								}, {
+									"key" : "accountId",
+									"value" : "{{accountId}}",
+									"description" : "A query string that is matched exactly against user `accountId`. Required, unless `query` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "projectKeys",
+									"value" : "{{projectKeys}}",
+									"description" : "A list of project keys (case sensitive). This parameter accepts a comma-separated list."
+								}, {
+									"key" : "startAt",
+									"value" : "{{startAt}}",
+									"description" : "The index of the first item to return in a page of results (page offset).",
+									"disabled" : true
+								}, {
+									"key" : "maxResults",
+									"value" : "{{maxResults}}",
+									"description" : "The maximum number of items to return per page.",
+									"disabled" : true
+								}
+							]
+						},
+						"description" : "Returns a list of users who can be assigned issues in one or more projects. The list may be restricted to users whose attributes match a string.\n\nThis operation takes the users in the range defined by `startAt` and `maxResults`, up to the thousandth user, and then returns only the users from that range that can be assigned issues in the projects. This means the operation usually returns fewer users than specified in `maxResults`. To get all the users who can be assigned issues in the projects, use [Get all users](#api-rest-api-2-users-search-get) and filter the records in your code.\n\nPrivacy controls are applied to the response based on the users' preferences. This could mean, for example, that the user's email address is hidden. See the [Profile visibility overview](https://developer.atlassian.com/cloud/jira/platform/profile-visibility/) for more details.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Browse Projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for each project specified in `projectKeys`."
+					},
+					"response" : []
+				}, {
+					"name" : "Find users assignable to issues",
+					"request" : {
+						"auth" : {
+							"type" : "basic",
+							"basic" : [{
+									"key" : "username",
+									"value" : "{{username}}",
+									"type" : "string"
+								}, {
+									"key" : "password",
+									"value" : "{{apiToken}}",
+									"type" : "string"
+								}
+							]
+						},
+						"method" : "GET",
+						"header" : [{
+								"key" : "Accept",
+								"value" : "application/json"
+							}
+						],
+						"url" : {
+							"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/user/assignable/search",
+							"protocol" : "{{protocol}}",
+							"host" : [
+								"{{host}}"
+							],
+							"path" : [
+								"{{basePath}}rest",
+								"api",
+								"2",
+								"user",
+								"assignable",
+								"search"
+							],
+							"query" : [{
+									"key" : "query",
+									"value" : "{{query}}",
+									"description" : "A query string that is matched against user attributes, such as `displayName`, and `emailAddress`, to find relevant users. The string can match the prefix of the attribute's value. For example, *query=john* matches a user with a `displayName` of *John Smith* and a user with an `emailAddress` of *johnson@example.com*. Required, unless `username` or `accountId` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "sessionId",
+									"value" : "{{sessionId}}",
+									"description" : "The sessionId of this request. SessionId is the same until the assignee is set.",
+									"disabled" : true
+								}, {
+									"key" : "username",
+									"value" : "{{username}}",
+									"description" : "This parameter is no longer available. See the [deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details.",
+									"disabled" : true
+								}, {
+									"key" : "accountId",
+									"value" : "{{accountId}}",
+									"description" : "A query string that is matched exactly against user `accountId`. Required, unless `query` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "project",
+									"value" : "{{project}}",
+									"description" : "The project ID or project key (case sensitive). Required, unless `issueKey` or `issueId` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "issueKey",
+									"value" : "{{issueKey}}",
+									"description" : "The key of the issue. Required, unless `issueId` or `project` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "issueId",
+									"value" : "{{issueId}}",
+									"description" : "The ID of the issue. Required, unless `issueKey` or `project` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "startAt",
+									"value" : "{{startAt}}",
+									"description" : "The index of the first item to return in a page of results (page offset).",
+									"disabled" : true
+								}, {
+									"key" : "maxResults",
+									"value" : "{{maxResults}}",
+									"description" : "The maximum number of items to return. This operation may return less than the maximum number of items even if more are available. The operation fetches users up to the maximum and then, from the fetched users, returns only the users that can be assigned to the issue.",
+									"disabled" : true
+								}, {
+									"key" : "actionDescriptorId",
+									"value" : "{{actionDescriptorId}}",
+									"description" : "The ID of the transition.",
+									"disabled" : true
+								}, {
+									"key" : "recommend",
+									"value" : "{{recommend}}",
+									"disabled" : true
+								}
+							]
+						},
+						"description" : "Returns a list of users that can be assigned to an issue. Use this operation to find the list of users who can be assigned to:\n\n *  a new issue, by providing the `projectKeyOrId`.\n *  an updated issue, by providing the `issueKey` or `issueId`.\n *  to an issue during a transition (workflow action), by providing the `issueKey` or `issueId` and the transition id in `actionDescriptorId`. You can obtain the IDs of an issue's valid transitions using the `transitions` option in the `expand` parameter of [ Get issue](#api-rest-api-2-issue-issueIdOrKey-get).\n\nIn all these cases, you can pass an account ID to determine if a user can be assigned to an issue. The user is returned in the response if they can be assigned to the issue or issue transition.\n\nThis operation takes the users in the range defined by `startAt` and `maxResults`, up to the thousandth user, and then returns only the users from that range that can be assigned the issue. This means the operation usually returns fewer users than specified in `maxResults`. To get all the users who can be assigned the issue, use [Get all users](#api-rest-api-2-users-search-get) and filter the records in your code.\n\nPrivacy controls are applied to the response based on the users' preferences. This could mean, for example, that the user's email address is hidden. See the [Profile visibility overview](https://developer.atlassian.com/cloud/jira/platform/profile-visibility/) for more details.\n\n**[Permissions](#permissions) required:** *Browse users and groups* [global permission](https://confluence.atlassian.com/x/x4dKLg) or *Assign issues* [project permission](https://confluence.atlassian.com/x/yodKLg)"
+					},
+					"response" : []
+				}, {
+					"name" : "Find users with permissions",
+					"request" : {
+						"auth" : {
+							"type" : "basic",
+							"basic" : [{
+									"key" : "username",
+									"value" : "{{username}}",
+									"type" : "string"
+								}, {
+									"key" : "password",
+									"value" : "{{apiToken}}",
+									"type" : "string"
+								}
+							]
+						},
+						"method" : "GET",
+						"header" : [{
+								"key" : "Accept",
+								"value" : "application/json"
+							}
+						],
+						"url" : {
+							"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/user/permission/search?permissions={{permissions}}",
+							"protocol" : "{{protocol}}",
+							"host" : [
+								"{{host}}"
+							],
+							"path" : [
+								"{{basePath}}rest",
+								"api",
+								"2",
+								"user",
+								"permission",
+								"search"
+							],
+							"query" : [{
+									"key" : "query",
+									"value" : "{{query}}",
+									"description" : "A query string that is matched against user attributes, such as `displayName` and `emailAddress`, to find relevant users. The string can match the prefix of the attribute's value. For example, *query=john* matches a user with a `displayName` of *John Smith* and a user with an `emailAddress` of *johnson@example.com*. Required, unless `accountId` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "username",
+									"value" : "{{username}}",
+									"description" : "This parameter is no longer available. See the [deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details.",
+									"disabled" : true
+								}, {
+									"key" : "accountId",
+									"value" : "{{accountId}}",
+									"description" : "A query string that is matched exactly against user `accountId`. Required, unless `query` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "permissions",
+									"value" : "{{permissions}}",
+									"description" : "A comma separated list of permissions. Permissions can be specified as any:\n\n *  permission returned by [Get all permissions](#api-rest-api-2-permissions-get).\n *  custom project permission added by Connect apps.\n *  (deprecated) one of the following:\n    \n     *  ASSIGNABLE\\_USER\n     *  ASSIGN\\_ISSUE\n     *  ATTACHMENT\\_DELETE\\_ALL\n     *  ATTACHMENT\\_DELETE\\_OWN\n     *  BROWSE\n     *  CLOSE\\_ISSUE\n     *  COMMENT\\_DELETE\\_ALL\n     *  COMMENT\\_DELETE\\_OWN\n     *  COMMENT\\_EDIT\\_ALL\n     *  COMMENT\\_EDIT\\_OWN\n     *  COMMENT\\_ISSUE\n     *  CREATE\\_ATTACHMENT\n     *  CREATE\\_ISSUE\n     *  DELETE\\_ISSUE\n     *  EDIT\\_ISSUE\n     *  LINK\\_ISSUE\n     *  MANAGE\\_WATCHER\\_LIST\n     *  MODIFY\\_REPORTER\n     *  MOVE\\_ISSUE\n     *  PROJECT\\_ADMIN\n     *  RESOLVE\\_ISSUE\n     *  SCHEDULE\\_ISSUE\n     *  SET\\_ISSUE\\_SECURITY\n     *  TRANSITION\\_ISSUE\n     *  VIEW\\_VERSION\\_CONTROL\n     *  VIEW\\_VOTERS\\_AND\\_WATCHERS\n     *  VIEW\\_WORKFLOW\\_READONLY\n     *  WORKLOG\\_DELETE\\_ALL\n     *  WORKLOG\\_DELETE\\_OWN\n     *  WORKLOG\\_EDIT\\_ALL\n     *  WORKLOG\\_EDIT\\_OWN\n     *  WORK\\_ISSUE"
+								}, {
+									"key" : "issueKey",
+									"value" : "{{issueKey}}",
+									"description" : "The issue key for the issue.",
+									"disabled" : true
+								}, {
+									"key" : "projectKey",
+									"value" : "{{projectKey}}",
+									"description" : "The project key for the project (case sensitive).",
+									"disabled" : true
+								}, {
+									"key" : "startAt",
+									"value" : "{{startAt}}",
+									"description" : "The index of the first item to return in a page of results (page offset).",
+									"disabled" : true
+								}, {
+									"key" : "maxResults",
+									"value" : "{{maxResults}}",
+									"description" : "The maximum number of items to return per page.",
+									"disabled" : true
+								}
+							]
+						},
+						"description" : "Returns a list of users who fulfill these criteria:\n\n *  their user attributes match a search string.\n *  they have a set of permissions for a project or issue.\n\nIf no search string is provided, a list of all users with the permissions is returned.\n\nThis operation takes the users in the range defined by `startAt` and `maxResults`, up to the thousandth user, and then returns only the users from that range that match the search string and have permission for the project or issue. This means the operation usually returns fewer users than specified in `maxResults`. To get all the users who match the search string and have permission for the project or issue, use [Get all users](#api-rest-api-2-users-search-get) and filter the records in your code.\n\nPrivacy controls are applied to the response based on the users' preferences. This could mean, for example, that the user's email address is hidden. See the [Profile visibility overview](https://developer.atlassian.com/cloud/jira/platform/profile-visibility/) for more details.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg), to get users for any project.\n *  *Administer Projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for a project, to get users for that project."
+					},
+					"response" : []
+				}, {
+					"name" : "Find users for picker",
+					"request" : {
+						"auth" : {
+							"type" : "basic",
+							"basic" : [{
+									"key" : "username",
+									"value" : "{{username}}",
+									"type" : "string"
+								}, {
+									"key" : "password",
+									"value" : "{{apiToken}}",
+									"type" : "string"
+								}
+							]
+						},
+						"method" : "GET",
+						"header" : [{
+								"key" : "Accept",
+								"value" : "application/json"
+							}
+						],
+						"url" : {
+							"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/user/picker?query={{query}}",
+							"protocol" : "{{protocol}}",
+							"host" : [
+								"{{host}}"
+							],
+							"path" : [
+								"{{basePath}}rest",
+								"api",
+								"2",
+								"user",
+								"picker"
+							],
+							"query" : [{
+									"key" : "query",
+									"value" : "{{query}}",
+									"description" : "A query string that is matched against user attributes, such as `displayName`, and `emailAddress`, to find relevant users. The string can match the prefix of the attribute's value. For example, *query=john* matches a user with a `displayName` of *John Smith* and a user with an `emailAddress` of *johnson@example.com*."
+								}, {
+									"key" : "maxResults",
+									"value" : "{{maxResults}}",
+									"description" : "The maximum number of items to return. The total number of matched users is returned in `total`.",
+									"disabled" : true
+								}, {
+									"key" : "showAvatar",
+									"value" : "{{showAvatar}}",
+									"description" : "Include the URI to the user's avatar.",
+									"disabled" : true
+								}, {
+									"key" : "exclude",
+									"value" : "{{exclude}}",
+									"description" : "This parameter is no longer available. See the [deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details.",
+									"disabled" : true
+								}, {
+									"key" : "excludeAccountIds",
+									"value" : "{{excludeAccountIds}}",
+									"description" : "A list of account IDs to exclude from the search results. This parameter accepts a comma-separated list. Multiple account IDs can also be provided using an ampersand-separated list. For example, `excludeAccountIds=5b10a2844c20165700ede21g,5b10a0effa615349cb016cd8&excludeAccountIds=5b10ac8d82e05b22cc7d4ef5`. Cannot be provided with `exclude`.",
+									"disabled" : true
+								}, {
+									"key" : "avatarSize",
+									"value" : "{{avatarSize}}",
+									"disabled" : true
+								}, {
+									"key" : "excludeConnectUsers",
+									"value" : "{{excludeConnectUsers}}",
+									"disabled" : true
+								}
+							]
+						},
+						"description" : "Returns a list of users whose attributes match the query term. The returned object includes the `html` field where the matched query term is highlighted with the HTML strong tag. A list of account IDs can be provided to exclude users from the results.\n\nThis operation takes the users in the range defined by `maxResults`, up to the thousandth user, and then returns only the users from that range that match the query term. This means the operation usually returns fewer users than specified in `maxResults`. To get all the users who match the query term, use [Get all users](#api-rest-api-2-users-search-get) and filter the records in your code.\n\nPrivacy controls are applied to the response based on the users' preferences. This could mean, for example, that the user's email address is hidden. See the [Profile visibility overview](https://developer.atlassian.com/cloud/jira/platform/profile-visibility/) for more details.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Browse users and groups* [global permission](https://confluence.atlassian.com/x/x4dKLg). Anonymous calls and calls by users without the required permission return search results for an exact name match only."
+					},
+					"response" : []
+				}, {
+					"name" : "Find users",
+					"request" : {
+						"auth" : {
+							"type" : "basic",
+							"basic" : [{
+									"key" : "username",
+									"value" : "{{username}}",
+									"type" : "string"
+								}, {
+									"key" : "password",
+									"value" : "{{apiToken}}",
+									"type" : "string"
+								}
+							]
+						},
+						"method" : "GET",
+						"header" : [{
+								"key" : "Accept",
+								"value" : "application/json"
+							}
+						],
+						"url" : {
+							"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/user/search",
+							"protocol" : "{{protocol}}",
+							"host" : [
+								"{{host}}"
+							],
+							"path" : [
+								"{{basePath}}rest",
+								"api",
+								"2",
+								"user",
+								"search"
+							],
+							"query" : [{
+									"key" : "query",
+									"value" : "{{query}}",
+									"description" : "A query string that is matched against user attributes ( `displayName`, and `emailAddress`) to find relevant users. The string can match the prefix of the attribute's value. For example, *query=john* matches a user with a `displayName` of *John Smith* and a user with an `emailAddress` of *johnson@example.com*. Required, unless `accountId` or `property` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "username",
+									"value" : "{{username}}",
+									"disabled" : true
+								}, {
+									"key" : "accountId",
+									"value" : "{{accountId}}",
+									"description" : "A query string that is matched exactly against a user `accountId`. Required, unless `query` or `property` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "startAt",
+									"value" : "{{startAt}}",
+									"description" : "The index of the first item to return in a page of filtered results (page offset).",
+									"disabled" : true
+								}, {
+									"key" : "maxResults",
+									"value" : "{{maxResults}}",
+									"description" : "The maximum number of items to return per page.",
+									"disabled" : true
+								}, {
+									"key" : "property",
+									"value" : "{{property}}",
+									"description" : "A query string used to search properties. Property keys are specified by path, so property keys containing dot (.) or equals (=) characters cannot be used. The query string cannot be specified using a JSON object. Example: To search for the value of `nested` from `{\"something\":{\"nested\":1,\"other\":2}}` use `thepropertykey.something.nested=1`. Required, unless `accountId` or `query` is specified.",
+									"disabled" : true
+								}
+							]
+						},
+						"description" : "Returns a list of active users that match the search string and property.\n\nThis operation first applies a filter to match the search string and property, and then takes the filtered users in the range defined by `startAt` and `maxResults`, up to the thousandth user. To get all the users who match the search string and property, use [Get all users](#api-rest-api-2-users-search-get) and filter the records in your code.\n\nThis operation can be accessed anonymously.\n\nPrivacy controls are applied to the response based on the users' preferences. This could mean, for example, that the user's email address is hidden. See the [Profile visibility overview](https://developer.atlassian.com/cloud/jira/platform/profile-visibility/) for more details.\n\n**[Permissions](#permissions) required:** *Browse users and groups* [global permission](https://confluence.atlassian.com/x/x4dKLg). Anonymous calls or calls by users without the required permission return empty search results."
+					},
+					"response" : []
+				}, {
+					"name" : "Find users by query",
+					"request" : {
+						"auth" : {
+							"type" : "basic",
+							"basic" : [{
+									"key" : "username",
+									"value" : "{{username}}",
+									"type" : "string"
+								}, {
+									"key" : "password",
+									"value" : "{{apiToken}}",
+									"type" : "string"
+								}
+							]
+						},
+						"method" : "GET",
+						"header" : [{
+								"key" : "Accept",
+								"value" : "application/json"
+							}
+						],
+						"url" : {
+							"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/user/search/query?query={{query}}",
+							"protocol" : "{{protocol}}",
+							"host" : [
+								"{{host}}"
+							],
+							"path" : [
+								"{{basePath}}rest",
+								"api",
+								"2",
+								"user",
+								"search",
+								"query"
+							],
+							"query" : [{
+									"key" : "query",
+									"value" : "{{query}}",
+									"description" : "The search query."
+								}, {
+									"key" : "startAt",
+									"value" : "{{startAt}}",
+									"description" : "The index of the first item to return in a page of results (page offset).",
+									"disabled" : true
+								}, {
+									"key" : "maxResults",
+									"value" : "{{maxResults}}",
+									"description" : "The maximum number of items to return per page.",
+									"disabled" : true
+								}
+							]
+						},
+						"description" : "Finds users with a structured query and returns a [paginated](#pagination) list of user details.\n\nThis operation takes the users in the range defined by `startAt` and `maxResults`, up to the thousandth user, and then returns only the users from that range that match the structured query. This means the operation usually returns fewer users than specified in `maxResults`. To get all the users who match the structured query, use [Get all users](#api-rest-api-2-users-search-get) and filter the records in your code.\n\n**[Permissions](#permissions) required:** *Browse users and groups* [global permission](https://confluence.atlassian.com/x/x4dKLg).\n\nThe query statements are:\n\n *  `is assignee of PROJ` Returns the users that are assignees of at least one issue in project *PROJ*.\n *  `is assignee of (PROJ-1, PROJ-2)` Returns users that are assignees on the issues *PROJ-1* or *PROJ-2*.\n *  `is reporter of (PROJ-1, PROJ-2)` Returns users that are reporters on the issues *PROJ-1* or *PROJ-2*.\n *  `is watcher of (PROJ-1, PROJ-2)` Returns users that are watchers on the issues *PROJ-1* or *PROJ-2*.\n *  `is voter of (PROJ-1, PROJ-2)` Returns users that are voters on the issues *PROJ-1* or *PROJ-2*.\n *  `is commenter of (PROJ-1, PROJ-2)` Returns users that have posted a comment on the issues *PROJ-1* or *PROJ-2*.\n *  `is transitioner of (PROJ-1, PROJ-2)` Returns users that have performed a transition on issues *PROJ-1* or *PROJ-2*.\n *  `[propertyKey].entity.property.path is \"property value\"` Returns users with the entity property value. For example, if user property `location` is set to value `{\"office\": {\"country\": \"AU\", \"city\": \"Sydney\"}}`, then it's possible to use `[location].office.city is \"Sydney\"` to match the user.\n\nThe list of issues can be extended as needed, as in *(PROJ-1, PROJ-2, ... PROJ-n)*. Statements can be combined using the `AND` and `OR` operators to form more complex queries. For example:\n\n`is assignee of PROJ AND [propertyKey].entity.property.path is \"property value\"`"
+					},
+					"response" : []
+				}, {
+					"name" : "Find user keys by query",
+					"request" : {
+						"auth" : {
+							"type" : "basic",
+							"basic" : [{
+									"key" : "username",
+									"value" : "{{username}}",
+									"type" : "string"
+								}, {
+									"key" : "password",
+									"value" : "{{apiToken}}",
+									"type" : "string"
+								}
+							]
+						},
+						"method" : "GET",
+						"header" : [{
+								"key" : "Accept",
+								"value" : "application/json"
+							}
+						],
+						"url" : {
+							"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/user/search/query/key?query={{query}}",
+							"protocol" : "{{protocol}}",
+							"host" : [
+								"{{host}}"
+							],
+							"path" : [
+								"{{basePath}}rest",
+								"api",
+								"2",
+								"user",
+								"search",
+								"query",
+								"key"
+							],
+							"query" : [{
+									"key" : "query",
+									"value" : "{{query}}",
+									"description" : "The search query."
+								}, {
+									"key" : "startAt",
+									"value" : "{{startAt}}",
+									"description" : "The index of the first item to return in a page of results (page offset).",
+									"disabled" : true
+								}, {
+									"key" : "maxResult",
+									"value" : "{{maxResult}}",
+									"description" : "The maximum number of items to return per page.",
+									"disabled" : true
+								}
+							]
+						},
+						"description" : "Finds users with a structured query and returns a [paginated](#pagination) list of user keys.\n\nThis operation takes the users in the range defined by `startAt` and `maxResults`, up to the thousandth user, and then returns only the users from that range that match the structured query. This means the operation usually returns fewer users than specified in `maxResults`. To get all the users who match the structured query, use [Get all users](#api-rest-api-2-users-search-get) and filter the records in your code.\n\n**[Permissions](#permissions) required:** *Browse users and groups* [global permission](https://confluence.atlassian.com/x/x4dKLg).\n\nThe query statements are:\n\n *  `is assignee of PROJ` Returns the users that are assignees of at least one issue in project *PROJ*.\n *  `is assignee of (PROJ-1, PROJ-2)` Returns users that are assignees on the issues *PROJ-1* or *PROJ-2*.\n *  `is reporter of (PROJ-1, PROJ-2)` Returns users that are reporters on the issues *PROJ-1* or *PROJ-2*.\n *  `is watcher of (PROJ-1, PROJ-2)` Returns users that are watchers on the issues *PROJ-1* or *PROJ-2*.\n *  `is voter of (PROJ-1, PROJ-2)` Returns users that are voters on the issues *PROJ-1* or *PROJ-2*.\n *  `is commenter of (PROJ-1, PROJ-2)` Returns users that have posted a comment on the issues *PROJ-1* or *PROJ-2*.\n *  `is transitioner of (PROJ-1, PROJ-2)` Returns users that have performed a transition on issues *PROJ-1* or *PROJ-2*.\n *  `[propertyKey].entity.property.path is \"property value\"` Returns users with the entity property value. For example, if user property `location` is set to value `{\"office\": {\"country\": \"AU\", \"city\": \"Sydney\"}}`, then it's possible to use `[location].office.city is \"Sydney\"` to match the user.\n\nThe list of issues can be extended as needed, as in *(PROJ-1, PROJ-2, ... PROJ-n)*. Statements can be combined using the `AND` and `OR` operators to form more complex queries. For example:\n\n`is assignee of PROJ AND [propertyKey].entity.property.path is \"property value\"`"
+					},
+					"response" : []
+				}, {
+					"name" : "Find users with browse permission",
+					"request" : {
+						"auth" : {
+							"type" : "basic",
+							"basic" : [{
+									"key" : "username",
+									"value" : "{{username}}",
+									"type" : "string"
+								}, {
+									"key" : "password",
+									"value" : "{{apiToken}}",
+									"type" : "string"
+								}
+							]
+						},
+						"method" : "GET",
+						"header" : [{
+								"key" : "Accept",
+								"value" : "application/json"
+							}
+						],
+						"url" : {
+							"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/user/viewissue/search",
+							"protocol" : "{{protocol}}",
+							"host" : [
+								"{{host}}"
+							],
+							"path" : [
+								"{{basePath}}rest",
+								"api",
+								"2",
+								"user",
+								"viewissue",
+								"search"
+							],
+							"query" : [{
+									"key" : "query",
+									"value" : "{{query}}",
+									"description" : "A query string that is matched against user attributes, such as `displayName` and `emailAddress`, to find relevant users. The string can match the prefix of the attribute's value. For example, *query=john* matches a user with a `displayName` of *John Smith* and a user with an `emailAddress` of *johnson@example.com*. Required, unless `accountId` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "username",
+									"value" : "{{username}}",
+									"description" : "This parameter is no longer available. See the [deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details.",
+									"disabled" : true
+								}, {
+									"key" : "accountId",
+									"value" : "{{accountId}}",
+									"description" : "A query string that is matched exactly against user `accountId`. Required, unless `query` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "issueKey",
+									"value" : "{{issueKey}}",
+									"description" : "The issue key for the issue. Required, unless `projectKey` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "projectKey",
+									"value" : "{{projectKey}}",
+									"description" : "The project key for the project (case sensitive). Required, unless `issueKey` is specified.",
+									"disabled" : true
+								}, {
+									"key" : "startAt",
+									"value" : "{{startAt}}",
+									"description" : "The index of the first item to return in a page of results (page offset).",
+									"disabled" : true
+								}, {
+									"key" : "maxResults",
+									"value" : "{{maxResults}}",
+									"description" : "The maximum number of items to return per page.",
+									"disabled" : true
+								}
+							]
+						},
+						"description" : "Returns a list of users who fulfill these criteria:\n\n *  their user attributes match a search string.\n *  they have permission to browse issues.\n\nUse this resource to find users who can browse:\n\n *  an issue, by providing the `issueKey`.\n *  any issue in a project, by providing the `projectKey`.\n\nThis operation takes the users in the range defined by `startAt` and `maxResults`, up to the thousandth user, and then returns only the users from that range that match the search string and have permission to browse issues. This means the operation usually returns fewer users than specified in `maxResults`. To get all the users who match the search string and have permission to browse issues, use [Get all users](#api-rest-api-2-users-search-get) and filter the records in your code.\n\nPrivacy controls are applied to the response based on the users' preferences. This could mean, for example, that the user's email address is hidden. See the [Profile visibility overview](https://developer.atlassian.com/cloud/jira/platform/profile-visibility/) for more details.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Browse users and groups* [global permission](https://confluence.atlassian.com/x/x4dKLg). Anonymous calls and calls by users without the required permission return empty search results."
+					},
+					"response" : []
+				}
+			],
+			"description" : "This resource represents various ways to search for and find users. Use it to obtain list of users including users assignable to projects and issues, users with permissions, user lists for pickup fields, and user lists generated using structured queries. Note that the operations in this resource only return users found within the first 1000 users."
+		}, {
+			"name" : "Get all dashboards",
+			"request" : {
+				"auth" : {
+					"type" : "basic",
+					"basic" : [{
+							"key" : "username",
+							"value" : "{{username}}",
+							"type" : "string"
+						}, {
+							"key" : "password",
+							"value" : "{{apiToken}}",
+							"type" : "string"
+						}
+					]
+				},
+				"method" : "GET",
+				"header" : [{
+						"key" : "Accept",
+						"value" : "application/json"
+					}
+				],
+				"url" : {
+					"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/dashboard",
+					"protocol" : "{{protocol}}",
+					"host" : [
+						"{{host}}"
+					],
+					"path" : [
+						"{{basePath}}rest",
+						"api",
+						"2",
+						"dashboard"
+					],
+					"query" : [{
+							"key" : "filter",
+							"value" : "{{filter}}",
+							"description" : "The filter applied to the list of dashboards. Valid values are:\n\n *  `favourite` Returns dashboards the user has marked as favorite.\n *  `my` Returns dashboards owned by the user.",
+							"disabled" : true
+						}, {
+							"key" : "startAt",
+							"value" : "{{startAt}}",
+							"description" : "The index of the first item to return in a page of results (page offset).",
+							"disabled" : true
+						}, {
+							"key" : "maxResults",
+							"value" : "{{maxResults}}",
+							"description" : "The maximum number of items to return per page.",
+							"disabled" : true
+						}
+					]
+				},
+				"description" : "Returns a list of dashboards owned by or shared with the user. The list may be filtered to include only favorite or owned dashboards.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** None."
+			},
+			"response" : []
+		}, {
+			"name" : "Get current user",
+			"request" : {
+				"auth" : {
+					"type" : "basic",
+					"basic" : [{
+							"key" : "username",
+							"value" : "{{username}}",
+							"type" : "string"
+						}, {
+							"key" : "password",
+							"value" : "{{apiToken}}",
+							"type" : "string"
+						}
+					]
+				},
+				"method" : "GET",
+				"header" : [{
+						"key" : "Accept",
+						"value" : "application/json"
+					}
+				],
+				"url" : {
+					"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/myself",
+					"protocol" : "{{protocol}}",
+					"host" : [
+						"{{host}}"
+					],
+					"path" : [
+						"{{basePath}}rest",
+						"api",
+						"2",
+						"myself"
+					],
+					"query" : [{
+							"key" : "expand",
+							"value" : "{{expand}}",
+							"description" : "Use [expand](#expansion) to include additional information about user in the response. This parameter accepts a comma-separated list. Expand options include:\n\n *  `groups` Returns all groups, including nested groups, the user belongs to.\n *  `applicationRoles` Returns the application roles the user is assigned to.",
+							"disabled" : true
+						}
+					]
+				},
+				"description" : "Returns details for the current user.\n\n**[Permissions](#permissions) required:** Permission to access Jira."
+			},
+			"response" : []
+		}, {
+			"name" : "Find groups",
+			"request" : {
+				"auth" : {
+					"type" : "basic",
+					"basic" : [{
+							"key" : "username",
+							"value" : "{{username}}",
+							"type" : "string"
+						}, {
+							"key" : "password",
+							"value" : "{{apiToken}}",
+							"type" : "string"
+						}
+					]
+				},
+				"method" : "GET",
+				"header" : [{
+						"key" : "Accept",
+						"value" : "application/json"
+					}
+				],
+				"url" : {
+					"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/groups/picker",
+					"protocol" : "{{protocol}}",
+					"host" : [
+						"{{host}}"
+					],
+					"path" : [
+						"{{basePath}}rest",
+						"api",
+						"2",
+						"groups",
+						"picker"
+					],
+					"query" : [{
+							"key" : "accountId",
+							"value" : "{{accountId}}",
+							"description" : "This parameter is deprecated, setting it does not affect the results. To find groups containing a particular user, use [Get user groups](#api-rest-api-2-user-groups-get).",
+							"disabled" : true
+						}, {
+							"key" : "query",
+							"value" : "{{query}}",
+							"description" : "The string to find in group names.",
+							"disabled" : true
+						}, {
+							"key" : "exclude",
+							"value" : "{{exclude}}",
+							"description" : "As a group's name can change, use of `excludeGroupIds` is recommended to identify a group.  \nA group to exclude from the result. To exclude multiple groups, provide an ampersand-separated list. For example, `exclude=group1&exclude=group2`. This parameter cannot be used with the `excludeGroupIds` parameter.",
+							"disabled" : true
+						}, {
+							"key" : "excludeId",
+							"value" : "{{excludeId}}",
+							"description" : "A group ID to exclude from the result. To exclude multiple groups, provide an ampersand-separated list. For example, `excludeId=group1-id&excludeId=group2-id`. This parameter cannot be used with the `excludeGroups` parameter.",
+							"disabled" : true
+						}, {
+							"key" : "maxResults",
+							"value" : "{{maxResults}}",
+							"description" : "The maximum number of groups to return. The maximum number of groups that can be returned is limited by the system property `jira.ajax.autocomplete.limit`.",
+							"disabled" : true
+						}, {
+							"key" : "caseInsensitive",
+							"value" : "{{caseInsensitive}}",
+							"description" : "Whether the search for groups should be case insensitive.",
+							"disabled" : true
+						}, {
+							"key" : "userName",
+							"value" : "{{userName}}",
+							"description" : "This parameter is no longer available. See the [deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details.",
+							"disabled" : true
+						}, {
+							"key" : "includeTeams",
+							"value" : "{{includeTeams}}",
+							"disabled" : true
+						}
+					]
+				},
+				"description" : "Returns a list of groups whose names contain a query string. A list of group names can be provided to exclude groups from the results.\n\nThe primary use case for this resource is to populate a group picker suggestions list. To this end, the returned object includes the `html` field where the matched query term is highlighted in the group name with the HTML strong tag. Also, the groups list is wrapped in a response object that contains a header for use in the picker, specifically *Showing X of Y matching groups*.\n\nThe list returns with the groups sorted. If no groups match the list criteria, an empty list is returned.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg). Anonymous calls and calls by users without the required permission return an empty list.\n\n*Browse users and groups* [global permission](https://confluence.atlassian.com/x/x4dKLg). Without this permission, calls where query is not an exact match to an existing group will return an empty list."
+			},
+			"response" : []
+		}, {
+			"name" : "Get fields",
+			"request" : {
+				"auth" : {
+					"type" : "basic",
+					"basic" : [{
+							"key" : "username",
+							"value" : "{{username}}",
+							"type" : "string"
+						}, {
+							"key" : "password",
+							"value" : "{{apiToken}}",
+							"type" : "string"
+						}
+					]
+				},
+				"method" : "GET",
+				"header" : [{
+						"key" : "Accept",
+						"value" : "application/json"
+					}
+				],
+				"url" : {
+					"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/field",
+					"protocol" : "{{protocol}}",
+					"host" : [
+						"{{host}}"
+					],
+					"path" : [
+						"{{basePath}}rest",
+						"api",
+						"2",
+						"field"
+					]
+				},
+				"description" : "Returns system and custom issue fields according to the following rules:\n\n *  Fields that cannot be added to the issue navigator are always returned.\n *  Fields that cannot be placed on an issue screen are always returned.\n *  Fields that depend on global Jira settings are only returned if the setting is enabled. That is, timetracking fields, subtasks, votes, and watches.\n *  For all other fields, this operation only returns the fields that the user has permission to view (that is, the field is used in at least one project that the user has *Browse Projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for.)\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** None."
+			},
+			"response" : []
+		}, {
+			"name" : "Currently being removed. Search for issues using JQL (POST)",
+			"request" : {
+				"auth" : {
+					"type" : "basic",
+					"basic" : [{
+							"key" : "username",
+							"value" : "{{username}}",
+							"type" : "string"
+						}, {
+							"key" : "password",
+							"value" : "{{apiToken}}",
+							"type" : "string"
+						}
+					]
+				},
+				"method" : "POST",
+				"header" : [{
+						"key" : "Content-Type",
+						"value" : "application/json"
+					}, {
+						"key" : "Accept",
+						"value" : "application/json"
+					}
+				],
+				"body" : {
+					"mode" : "raw",
+					"raw" : "{\n  \"expand\": [\n    \"names\",\n    \"schema\",\n    \"operations\"\n  ],\n  \"fields\": [\n    \"summary\",\n    \"status\",\n    \"assignee\"\n  ],\n  \"fieldsByKeys\": false,\n  \"jql\": \"project = HSP\",\n  \"maxResults\": 15,\n  \"startAt\": 0\n}"
+				},
+				"url" : {
+					"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/search",
+					"protocol" : "{{protocol}}",
+					"host" : [
+						"{{host}}"
+					],
+					"path" : [
+						"{{basePath}}rest",
+						"api",
+						"2",
+						"search"
+					]
+				},
+				"description" : "Endpoint is currently being removed. [More details](https://developer.atlassian.com/changelog/#CHANGE-2046)\n\nSearches for issues using [JQL](https://confluence.atlassian.com/x/egORLQ).\n\nThere is a [GET](#api-rest-api-2-search-get) version of this resource that can be used for smaller JQL query expressions.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** Issues are included in the response where the user has:\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project containing the issue.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue."
+			},
+			"response" : []
+		}, {
+			"name" : "Count issues using JQL",
+			"request" : {
+				"auth" : {
+					"type" : "basic",
+					"basic" : [{
+							"key" : "username",
+							"value" : "{{username}}",
+							"type" : "string"
+						}, {
+							"key" : "password",
+							"value" : "{{apiToken}}",
+							"type" : "string"
+						}
+					]
+				},
+				"method" : "POST",
+				"header" : [{
+						"key" : "Content-Type",
+						"value" : "application/json"
+					}, {
+						"key" : "Accept",
+						"value" : "application/json"
+					}
+				],
+				"body" : {
+					"mode" : "raw",
+					"raw" : "{\n  \"jql\": \"project = HSP\"\n}"
+				},
+				"url" : {
+					"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/search/approximate-count",
+					"protocol" : "{{protocol}}",
+					"host" : [
+						"{{host}}"
+					],
+					"path" : [
+						"{{basePath}}rest",
+						"api",
+						"2",
+						"search",
+						"approximate-count"
+					]
+				},
+				"description" : "Provide an estimated count of the issues that match the [JQL](https://confluence.atlassian.com/x/egORLQ). Recent updates might not be immediately visible in the returned output. This endpoint requires JQL to be bounded.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** Issues are included in the response where the user has:\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project containing the issue.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue."
+			},
+			"response" : []
+		}, {
+			"name" : "Get issue worklogs",
+			"request" : {
+				"auth" : {
+					"type" : "basic",
+					"basic" : [{
+							"key" : "username",
+							"value" : "{{username}}",
+							"type" : "string"
+						}, {
+							"key" : "password",
+							"value" : "{{apiToken}}",
+							"type" : "string"
+						}
+					]
+				},
+				"method" : "GET",
+				"header" : [{
+						"key" : "Accept",
+						"value" : "application/json"
+					}
+				],
+				"url" : {
+					"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/issue/:issueIdOrKey/worklog",
+					"protocol" : "{{protocol}}",
+					"host" : [
+						"{{host}}"
+					],
+					"path" : [
+						"{{basePath}}rest",
+						"api",
+						"2",
+						"issue",
+						":issueIdOrKey",
+						"worklog"
+					],
+					"query" : [{
+							"key" : "startAt",
+							"value" : "{{startAt}}",
+							"description" : "The index of the first item to return in a page of results (page offset).",
+							"disabled" : true
+						}, {
+							"key" : "maxResults",
+							"value" : "{{maxResults}}",
+							"description" : "The maximum number of items to return per page.",
+							"disabled" : true
+						}, {
+							"key" : "startedAfter",
+							"value" : "{{startedAfter}}",
+							"description" : "The worklog start date and time, as a UNIX timestamp in milliseconds, after which worklogs are returned.",
+							"disabled" : true
+						}, {
+							"key" : "startedBefore",
+							"value" : "{{startedBefore}}",
+							"description" : "The worklog start date and time, as a UNIX timestamp in milliseconds, before which worklogs are returned.",
+							"disabled" : true
+						}, {
+							"key" : "expand",
+							"value" : "{{expand}}",
+							"description" : "Use [expand](#expansion) to include additional information about worklogs in the response. This parameter accepts`properties`, which returns worklog properties.",
+							"disabled" : true
+						}
+					],
+					"variable" : [{
+							"key" : "issueIdOrKey",
+							"value" : "{{issueIdOrKey}}",
+							"description" : "The ID or key of the issue."
+						}
+					]
+				},
+				"description" : "Returns worklogs for an issue (ordered by created time), starting from the oldest worklog or from the worklog started on or after a date and time.\n\nTime tracking must be enabled in Jira, otherwise this operation returns an error. For more information, see [Configuring time tracking](https://confluence.atlassian.com/x/qoXKM).\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** Workloads are only returned where the user has:\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.\n *  If the worklog has visibility restrictions, belongs to the group or has the role visibility is restricted to."
+			},
+			"response" : []
+		}, {
+			"name" : "Get issue",
+			"request" : {
+				"auth" : {
+					"type" : "basic",
+					"basic" : [{
+							"key" : "username",
+							"value" : "{{username}}",
+							"type" : "string"
+						}, {
+							"key" : "password",
+							"value" : "{{apiToken}}",
+							"type" : "string"
+						}
+					]
+				},
+				"method" : "GET",
+				"header" : [{
+						"key" : "Accept",
+						"value" : "application/json"
+					}
+				],
+				"url" : {
+					"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/issue/:issueIdOrKey",
+					"protocol" : "{{protocol}}",
+					"host" : [
+						"{{host}}"
+					],
+					"path" : [
+						"{{basePath}}rest",
+						"api",
+						"2",
+						"issue",
+						":issueIdOrKey"
+					],
+					"query" : [{
+							"key" : "fields",
+							"value" : "{{fields}}",
+							"description" : "A list of fields to return for the issue. This parameter accepts a comma-separated list. Use it to retrieve a subset of fields. Allowed values:\n\n *  `*all` Returns all fields.\n *  `*navigable` Returns navigable fields.\n *  Any issue field, prefixed with a minus to exclude.\n\nExamples:\n\n *  `summary,comment` Returns only the summary and comments fields.\n *  `-description` Returns all (default) fields except description.\n *  `*navigable,-comment` Returns all navigable fields except comment.\n\nThis parameter may be specified multiple times. For example, `fields=field1,field2& fields=field3`.\n\nNote: All fields are returned by default. This differs from [Search for issues using JQL (GET)](#api-rest-api-2-search-get) and [Search for issues using JQL (POST)](#api-rest-api-2-search-post) where the default is all navigable fields.",
+							"disabled" : true
+						}, {
+							"key" : "fieldsByKeys",
+							"value" : "{{fieldsByKeys}}",
+							"description" : "Whether fields in `fields` are referenced by keys rather than IDs. This parameter is useful where fields have been added by a connect app and a field's key may differ from its ID.",
+							"disabled" : true
+						}, {
+							"key" : "expand",
+							"value" : "{{expand}}",
+							"description" : "Use [expand](#expansion) to include additional information about the issues in the response. This parameter accepts a comma-separated list. Expand options include:\n\n *  `renderedFields` Returns field values rendered in HTML format.\n *  `names` Returns the display name of each field.\n *  `schema` Returns the schema describing a field type.\n *  `transitions` Returns all possible transitions for the issue.\n *  `editmeta` Returns information about how each field can be edited.\n *  `changelog` Returns a list of recent updates to an issue, sorted by date, starting from the most recent.\n *  `versionedRepresentations` Returns a JSON array for each version of a field's value, with the highest number representing the most recent version. Note: When included in the request, the `fields` parameter is ignored.",
+							"disabled" : true
+						}, {
+							"key" : "properties",
+							"value" : "{{properties}}",
+							"description" : "A list of issue properties to return for the issue. This parameter accepts a comma-separated list. Allowed values:\n\n *  `*all` Returns all issue properties.\n *  Any issue property key, prefixed with a minus to exclude.\n\nExamples:\n\n *  `*all` Returns all properties.\n *  `*all,-prop1` Returns all properties except `prop1`.\n *  `prop1,prop2` Returns `prop1` and `prop2` properties.\n\nThis parameter may be specified multiple times. For example, `properties=prop1,prop2& properties=prop3`.",
+							"disabled" : true
+						}, {
+							"key" : "updateHistory",
+							"value" : "{{updateHistory}}",
+							"description" : "Whether the project in which the issue is created is added to the user's **Recently viewed** project list, as shown under **Projects** in Jira. This also populates the [JQL issues search](#api-rest-api-2-search-get) `lastViewed` field.",
+							"disabled" : true
+						}, {
+							"key" : "failFast",
+							"value" : "{{failFast}}",
+							"description" : "Whether to fail the request quickly in case of an error while loading fields for an issue. For `failFast=true`, if one field fails, the entire operation fails. For `failFast=false`, the operation will continue even if a field fails. It will return a valid response, but without values for the failed field(s).",
+							"disabled" : true
+						}
+					],
+					"variable" : [{
+							"key" : "issueIdOrKey",
+							"value" : "{{issueIdOrKey}}",
+							"description" : "The ID or key of the issue."
+						}
+					]
+				},
+				"description" : "Returns the details for an issue.\n\nThe issue is identified by its ID or key, however, if the identifier doesn't match an issue, a case-insensitive search and check for moved issues is performed. If a matching issue is found its details are returned, a 302 or other redirect is **not** returned. The issue key returned in the response is the key of the issue found.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue."
+			},
+			"response" : []
+		}, {
+			"name" : "Edit issue",
+			"request" : {
+				"auth" : {
+					"type" : "basic",
+					"basic" : [{
+							"key" : "username",
+							"value" : "{{username}}",
+							"type" : "string"
+						}, {
+							"key" : "password",
+							"value" : "{{apiToken}}",
+							"type" : "string"
+						}
+					]
+				},
+				"method" : "PUT",
+				"header" : [{
+						"key" : "Content-Type",
+						"value" : "application/json"
+					}, {
+						"key" : "Accept",
+						"value" : "application/json"
+					}
+				],
+				"body" : {
+					"mode" : "raw",
+					"raw" : "{\n  \"fields\": {\n    \"customfield_10000\": \"Investigation underway\",\n    \"customfield_10010\": 1,\n    \"summary\": \"Completed orders still displaying in pending\"\n  },\n  \"historyMetadata\": {\n    \"activityDescription\": \"Complete order processing\",\n    \"actor\": {\n      \"avatarUrl\": \"http://mysystem/avatar/tony.jpg\",\n      \"displayName\": \"Tony\",\n      \"id\": \"tony\",\n      \"type\": \"mysystem-user\",\n      \"url\": \"http://mysystem/users/tony\"\n    },\n    \"cause\": {\n      \"id\": \"myevent\",\n      \"type\": \"mysystem-event\"\n    },\n    \"description\": \"From the order testing process\",\n    \"extraData\": {\n      \"Iteration\": \"10a\",\n      \"Step\": \"4\"\n    },\n    \"generator\": {\n      \"id\": \"mysystem-1\",\n      \"type\": \"mysystem-application\"\n    },\n    \"type\": \"myplugin:type\"\n  },\n  \"properties\": [\n    {\n      \"key\": \"key1\",\n      \"value\": \"Order number 10784\"\n    },\n    {\n      \"key\": \"key2\",\n      \"value\": \"Order number 10923\"\n    }\n  ],\n  \"update\": {\n    \"components\": [\n      {\n        \"set\": \"\"\n      }\n    ],\n    \"labels\": [\n      {\n        \"add\": \"triaged\"\n      },\n      {\n        \"remove\": \"blocker\"\n      }\n    ],\n    \"summary\": [\n      {\n        \"set\": \"Bug in business logic\"\n      }\n    ],\n    \"timetracking\": [\n      {\n        \"edit\": {\n          \"originalEstimate\": \"1w 1d\",\n          \"remainingEstimate\": \"4d\"\n        }\n      }\n    ]\n  }\n}"
+				},
+				"url" : {
+					"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/issue/:issueIdOrKey",
+					"protocol" : "{{protocol}}",
+					"host" : [
+						"{{host}}"
+					],
+					"path" : [
+						"{{basePath}}rest",
+						"api",
+						"2",
+						"issue",
+						":issueIdOrKey"
+					],
+					"query" : [{
+							"key" : "notifyUsers",
+							"value" : "{{notifyUsers}}",
+							"description" : "Whether a notification email about the issue update is sent to all watchers. To disable the notification, administer Jira or administer project permissions are required. If the user doesn't have the necessary permission the request is ignored.",
+							"disabled" : true
+						}, {
+							"key" : "overrideScreenSecurity",
+							"value" : "{{overrideScreenSecurity}}",
+							"description" : "Whether screen security is overridden to enable hidden fields to be edited. Available to Connect app users with *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg) and Forge apps acting on behalf of users with *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+							"disabled" : true
+						}, {
+							"key" : "overrideEditableFlag",
+							"value" : "{{overrideEditableFlag}}",
+							"description" : "Whether screen security is overridden to enable uneditable fields to be edited. Available to Connect app users with *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg) and Forge apps acting on behalf of users with *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg).",
+							"disabled" : true
+						}, {
+							"key" : "returnIssue",
+							"value" : "{{returnIssue}}",
+							"description" : "Whether the response should contain the issue with fields edited in this request. The returned issue will have the same format as in the [Get issue API](#api-rest-api-3-issue-issueidorkey-get).",
+							"disabled" : true
+						}, {
+							"key" : "expand",
+							"value" : "{{expand}}",
+							"description" : "The Get issue API expand parameter to use in the response if the `returnIssue` parameter is `true`.",
+							"disabled" : true
+						}
+					],
+					"variable" : [{
+							"key" : "issueIdOrKey",
+							"value" : "{{issueIdOrKey}}",
+							"description" : "The ID or key of the issue."
+						}
+					]
+				},
+				"description" : "Edits an issue. Issue properties may be updated as part of the edit. Please note that issue transition is not supported and is ignored here. To transition an issue, please use [Transition issue](#api-rest-api-2-issue-issueIdOrKey-transitions-post).\n\nThe edits to the issue's fields are defined using `update` and `fields`. The fields that can be edited are determined using [ Get edit issue metadata](#api-rest-api-2-issue-issueIdOrKey-editmeta-get).\n\nThe parent field may be set by key or ID. For standard issue types, the parent may be removed by setting `update.parent.set.none` to *true*.\n\nConnect apps having an app user with *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg), and Forge apps acting on behalf of users with *Administer Jira* [global permission](https://confluence.atlassian.com/x/x4dKLg), can override the screen security configuration using `overrideScreenSecurity` and `overrideEditableFlag`.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* and *Edit issues* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue."
+			},
+			"response" : []
+		}, {
+			"name" : "Get transitions",
+			"request" : {
+				"auth" : {
+					"type" : "basic",
+					"basic" : [{
+							"key" : "username",
+							"value" : "{{username}}",
+							"type" : "string"
+						}, {
+							"key" : "password",
+							"value" : "{{apiToken}}",
+							"type" : "string"
+						}
+					]
+				},
+				"method" : "GET",
+				"header" : [{
+						"key" : "Accept",
+						"value" : "application/json"
+					}
+				],
+				"url" : {
+					"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/issue/:issueIdOrKey/transitions",
+					"protocol" : "{{protocol}}",
+					"host" : [
+						"{{host}}"
+					],
+					"path" : [
+						"{{basePath}}rest",
+						"api",
+						"2",
+						"issue",
+						":issueIdOrKey",
+						"transitions"
+					],
+					"query" : [{
+							"key" : "expand",
+							"value" : "{{expand}}",
+							"description" : "Use [expand](#expansion) to include additional information about transitions in the response. This parameter accepts `transitions.fields`, which returns information about the fields in the transition screen for each transition. Fields hidden from the screen are not returned. Use this information to populate the `fields` and `update` fields in [Transition issue](#api-rest-api-2-issue-issueIdOrKey-transitions-post).",
+							"disabled" : true
+						}, {
+							"key" : "transitionId",
+							"value" : "{{transitionId}}",
+							"description" : "The ID of the transition.",
+							"disabled" : true
+						}, {
+							"key" : "skipRemoteOnlyCondition",
+							"value" : "{{skipRemoteOnlyCondition}}",
+							"description" : "Whether transitions with the condition *Hide From User Condition* are included in the response.",
+							"disabled" : true
+						}, {
+							"key" : "includeUnavailableTransitions",
+							"value" : "{{includeUnavailableTransitions}}",
+							"description" : "Whether details of transitions that fail a condition are included in the response",
+							"disabled" : true
+						}, {
+							"key" : "sortByOpsBarAndStatus",
+							"value" : "{{sortByOpsBarAndStatus}}",
+							"description" : "Whether the transitions are sorted by ops-bar sequence value first then category order (Todo, In Progress, Done) or only by ops-bar sequence value.",
+							"disabled" : true
+						}
+					],
+					"variable" : [{
+							"key" : "issueIdOrKey",
+							"value" : "{{issueIdOrKey}}",
+							"description" : "The ID or key of the issue."
+						}
+					]
+				},
+				"description" : "Returns either all transitions or a transition that can be performed by the user on an issue, based on the issue's status.\n\nNote, if a request is made for a transition that does not exist or cannot be performed on the issue, given its status, the response will return any empty transitions list.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required: A list or transition is returned only when the user has:**\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.\n\nHowever, if the user does not have the *Transition issues* [ project permission](https://confluence.atlassian.com/x/yodKLg) the response will not list any transitions."
+			},
+			"response" : []
+		}, {
+			"name" : "Transition issue",
+			"request" : {
+				"auth" : {
+					"type" : "basic",
+					"basic" : [{
+							"key" : "username",
+							"value" : "{{username}}",
+							"type" : "string"
+						}, {
+							"key" : "password",
+							"value" : "{{apiToken}}",
+							"type" : "string"
+						}
+					]
+				},
+				"method" : "POST",
+				"header" : [{
+						"key" : "Content-Type",
+						"value" : "application/json"
+					}
+				],
+				"body" : {
+					"mode" : "raw",
+					"raw" : "{\n  \"fields\": {\n    \"assignee\": {\n      \"name\": \"Will\"\n    },\n    \"resolution\": {\n      \"name\": \"Fixed\"\n    }\n  },\n  \"historyMetadata\": {\n    \"activityDescription\": \"Complete order processing\",\n    \"actor\": {\n      \"avatarUrl\": \"http://mysystem/avatar/tony.jpg\",\n      \"displayName\": \"Tony\",\n      \"id\": \"tony\",\n      \"type\": \"mysystem-user\",\n      \"url\": \"http://mysystem/users/tony\"\n    },\n    \"cause\": {\n      \"id\": \"myevent\",\n      \"type\": \"mysystem-event\"\n    },\n    \"description\": \"From the order testing process\",\n    \"extraData\": {\n      \"Iteration\": \"10a\",\n      \"Step\": \"4\"\n    },\n    \"generator\": {\n      \"id\": \"mysystem-1\",\n      \"type\": \"mysystem-application\"\n    },\n    \"type\": \"myplugin:type\"\n  },\n  \"transition\": {\n    \"id\": \"5\"\n  },\n  \"update\": {\n    \"comment\": [\n      {\n        \"add\": {\n          \"body\": \"Bug has been fixed.\"\n        }\n      }\n    ]\n  }\n}"
+				},
+				"url" : {
+					"raw" : "{{protocol}}://{{host}}/{{basePath}}rest/api/2/issue/:issueIdOrKey/transitions",
+					"protocol" : "{{protocol}}",
+					"host" : [
+						"{{host}}"
+					],
+					"path" : [
+						"{{basePath}}rest",
+						"api",
+						"2",
+						"issue",
+						":issueIdOrKey",
+						"transitions"
+					],
+					"variable" : [{
+							"key" : "issueIdOrKey",
+							"value" : "{{issueIdOrKey}}",
+							"description" : "The ID or key of the issue."
+						}
+					]
+				},
+				"description" : "Performs an issue transition and, if the transition has a screen, updates the fields from the transition screen.\n\nsortByCategory To update the fields on the transition screen, specify the fields in the `fields` or `update` parameters in the request body. Get details about the fields using [ Get transitions](#api-rest-api-2-issue-issueIdOrKey-transitions-get) with the `transitions.fields` expand.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* and *Transition issues* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue."
+			},
+			"response" : []
+		}
+	],
+	"auth" : {
+		"type" : "basic",
+		"basic" : [{
+				"key" : "password",
+				"value" : "{{Jira Api Token}}",
+				"type" : "string"
+			}, {
+				"key" : "username",
+				"value" : "{{Jira User Email}}",
+				"type" : "string"
+			}
+		]
+	},
+	"event" : [{
+			"listen" : "prerequest",
+			"script" : {
+				"type" : "text/javascript",
+				"packages" : {},
+				"requests" : {},
+				"exec" : [
+					""
+				]
+			}
+		}, {
+			"listen" : "test",
+			"script" : {
+				"type" : "text/javascript",
+				"packages" : {},
+				"requests" : {},
+				"exec" : [
+					""
+				]
+			}
+		}
+	],
+	"variable" : [{
+			"key" : "protocol",
+			"value" : "",
+			"description" : "The HTTP Protocol that should be used for this REST API."
+		}, {
+			"key" : "host",
+			"value" : "",
+			"description" : "The HTTP host that should be used for this REST API."
+		}, {
+			"key" : "basePath",
+			"value" : "",
+			"description" : "The path, after the host, of the base of the REST API."
+		}, {
+			"key" : "maxResults",
+			"value" : ""
+		}
+	]
+}

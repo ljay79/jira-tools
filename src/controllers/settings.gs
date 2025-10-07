@@ -89,6 +89,9 @@ Settings_Controller_ = {
     var _isServer = (url.indexOf('atlassian.net') == -1 || jsonFormData.authtype == 'autht3');
     setCfg_('server_type', _isServer ? 'server' : 'onDemand');
 
+    // For stats analysing use of server types (onDemand vs server)
+    console.log('Settings saved; server_type:' + (_isServer ? 'server' : 'onDemand') + ', authType:' + jsonFormData.authtype);
+
     // fetch user profile and save current users jira name and accountId
     var me = new MySelf();
     me.fetch();

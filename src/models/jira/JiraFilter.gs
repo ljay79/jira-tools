@@ -29,7 +29,7 @@ function JiraFilter(argument) {
       jql: '',  
       name: '', 
       viewUrl: null, 
-      //self: 'https://<name>.atlassian.net/rest/api/2/filter/14415', 
+      //self: 'https://<name>.atlassian.net/rest/api/3/filter/14415', 
       id: null,
       favourite: null
   };
