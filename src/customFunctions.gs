@@ -102,9 +102,9 @@ function JST_search(JQL, Fields, Limit, StartAt) {
   customFunctionAllowed_();
 
   //@TODO: requires upgrade to API v3
-  throw new CustomFunctionErrorException("`JST_search` is currently not supported by this version of the add-on.");
+  //throw new CustomFunctionErrorException("`JST_search` is currently not supported by this version of the add-on.");
 
-  // - checks - 
+  // - checks -
   if (undefined == JQL || JQL == '') {
     throw new CustomFunctionErrorException("{JQL} can not be empty.");
   }
@@ -119,7 +119,7 @@ function JST_search(JQL, Fields, Limit, StartAt) {
   if (Limit > 100) {
     throw new CustomFunctionErrorException("{Limit} must be between 1 and 100.");
   }
-  
+
   StartAt = parseInt(StartAt) || 0;
 
   debug.log("JST_search([%s]; [%s]; [%s])", JQL, Fields, Limit);
@@ -136,13 +136,12 @@ function JST_search(JQL, Fields, Limit, StartAt) {
     jql        : JQL, 
     fields     : aFields, 
     maxResults : Limit,
-    startAt    : StartAt
+    //startAt    : StartAt
   };
 
   response = request.call('search', data, {'method' : 'post'}).getResponse();
 
-  if(response.statusCode === 200 && response.respData && response.respData.total >= 0) {
-    //debug.log("JST_search [%s], Total: %s: response: %s", response.statusCode, response.respData.total, response);
+  if (response.statusCode === 200 && response.respData) {
     debug.log("JST_search [%s], Total: %s", response.statusCode, response.respData.total);
 
     var issue = null, key = null, rowValues = [], results = [];
