@@ -7,6 +7,10 @@ const buildUrl = require("./jsLib.gs").buildUrl;
 const extend = require("./jsLib.gs").extend;
 // End of Node required code block
 
+var apiBasePath = {
+  'onDemand': '/rest/api/3',
+  'server': '/rest/api/2'
+};
 
 /**
  * Available/Supported REST calls for JIRA rest api.
@@ -15,18 +19,17 @@ const extend = require("./jsLib.gs").extend;
  */
 var restMethods = {
   'onDemand': {
-    /*v3*/'dashboard'     : {method: '/dashboard', queryparams: {filter: 'my'}},
-    /*v3*/'myself'        : {method: '/myself'},
-    /*v3*/'issueStatus'   : {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
+    'dashboard'     : {method: '/dashboard', queryparams: {filter: 'my'}},
+    'myself'        : {method: '/myself'},
+    'issueStatus'   : {method: '/issue/{issueIdOrKey}', queryparams:{fields: ['status']}},
     'issueUpdate'   : {method: '/issue/{issueIdOrKey}', httpMethod: 'put'},
     'issueTransitions': {method: '/issue/{issueIdOrKey}/transitions'},
     'issueTransitionUpdate': {method: '/issue/{issueIdOrKey}/transitions', httpMethod: 'post'},
     'worklogOfIssue': {method: '/issue/{issueIdOrKey}/worklog'},
     'filter'        : {method: '/filter/{filterId}'},
     //'search': {method: '/search', queryparams: {jql:'', fields: [], properties: [], maxResults: 100, validateQuery: 'strict'}} // GET
-    'search'        : {method: '/search'}, // POST
-    'count'        : {method: '/search/approximate-count'}, // POST
-    // https://developer.atlassian.com/cloud/jira/platform/rest/v2/#api-rest-api-2-filter-search-get
+    'search'        : {method: '/search/jql'}, // POST
+    'count'         : {method: '/search/approximate-count'}, // POST
     'myFilters'     : {method: '/filter/search', queryparams: {accountId: '', expand: 'favourite,jql,owner', startAt:0, maxResults: 100, orderBy: 'IS_FAVOURITE'}},
     // https://SITENAME.atlassian.net/rest/api/2/user/search?startAt=0&maxResults=1000&query=
     'userSearch'    : {method: '/user/search', queryparams: {startAt:0, maxResults: 250, username:''}},
@@ -93,6 +96,7 @@ function Request() {
     username = getCfg_('jira_username');
     password = getCfg_('jira_password');
     jiraMethod = null;
+    basePath = apiBasePath[server_type] || apiBasePath['onDemand'];
   };
 
   /**
@@ -175,7 +179,7 @@ function Request() {
     httpMethod = "get";
     if (typeof jiraMethodConfig === 'object') {
       jiraMethod = jiraMethodConfig.method;
-      jiraQueryParams =  jiraMethodConfig.queryparams;
+      jiraQueryParams = jiraMethodConfig.queryparams;
       if (jiraMethodConfig['httpMethod'] != null) {
         httpMethod = jiraMethodConfig['httpMethod'];
       }
@@ -222,7 +226,7 @@ function Request() {
     // build full fetch URL
     fetchUrl = buildUrl(fetchUrl, urlParams);
     debug.log('fetchUrl: %s', fetchUrl);
-    debug.log('fetchArgs: %s', fetchArgs);
+    debug.log('fetchArgs: %o', fetchArgs);
 
     responseData = null;
     try {
