@@ -40,6 +40,7 @@ function callbackRefreshIssueTable_getResetSidebar() {
 }
 
 /**
+ * @TODO: requires refactoring for new api pagination scheme "nextPageToken"
  * Creates a new RefreshIssueTable_Controller_ object, controller for multiple actions.
  */
 RefreshIssueTable_Controller_ = {
@@ -158,6 +159,7 @@ RefreshIssueTable_Controller_ = {
       .setFields(Table.getMeta('headerFields'))
       .setMaxResults(Table.getMeta('maxResults') || 1000)
       .setStartAt(0)
+      .setPaginationTokenBased(true)
       .search()
       .withSuccessHandler(ok)
     ;

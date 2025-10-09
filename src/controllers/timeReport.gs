@@ -36,7 +36,7 @@ TimeReport_Controller_ = {
   /**
    * @desc Dialog to configure Jira custom fields
    */
-  dialogOpen : function () {
+  dialogOpen : function() {
     debug.log(this.name + '.dialog()');
 
     if (!hasSettings(true))
@@ -55,7 +55,7 @@ TimeReport_Controller_ = {
    * @desc Fetch all active users and groups for dialog selection.
    * @return {object} Object({status: [boolean], response: [Array], message:[string]})
    */
-  getAllUsers : function () {
+  getAllUsers : function() {
     debug.log(this.name + '.getAllUsers()');
 
     var result = [], maxResults = 1000, response = {
@@ -64,14 +64,14 @@ TimeReport_Controller_ = {
       message : null
     };
 
-    result = findUser('', true, maxResults).filter(function (user) {
+    result = findUser('', true, maxResults).filter(function(user) {
       return user.active !== false;
     });
 
     // Jira Server Issue workaround (https://jira.atlassian.com/browse/JRASERVER-29069)
     if (result.length == 0 && getCfg_('server_type') == 'server') {
       // try it again with custom query param apparently working like %,+,*,.
-      result = findUser('.', true, maxResults).filter(function (user) {
+      result = findUser('.', true, maxResults).filter(function(user) {
         return user.active !== false;
       });
     }
@@ -79,7 +79,7 @@ TimeReport_Controller_ = {
     // workaround 2 as the param val appears to change
     if (result.length == 0) {
       // try it again with custom query param apparently working like %,+,*,.
-      result = findUser('', true, maxResults, 'userSearchV2').filter(function (user) {
+      result = findUser('', true, maxResults, 'userSearchV2').filter(function(user) {
         return user.active !== false;
       });
     }
@@ -111,7 +111,7 @@ TimeReport_Controller_ = {
    * @param jsonFormData {object}  JSON Form object of all form values
    * @return void
    */
-  createTimesheet: function (jsonFormData) {
+  createTimesheet: function(jsonFormData) {
     debug.log(this.name + '.createTimesheet(%s)', JSON.stringify(jsonFormData));
     jsonFormData = jsonFormData || {
       wlAuthorName: undefined,
@@ -243,7 +243,8 @@ TimeReport_Controller_ = {
     // indiv. per issue later in iterated requests - see onSuccess handler
     var search = new IssueSearch(wlQuery);
     search.setOrderBy('created', 'DESC')
-          .setFields(['id','key','issuetype','priority','status','summary']);
+          .setFields(['id', 'key', 'issuetype', 'priority', 'status', 'summary'])
+          .setPaginationTokenBased(true);
 
     search.search()
       .withSuccessHandler(onSuccess)

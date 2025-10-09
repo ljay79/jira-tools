@@ -6,6 +6,8 @@ const EpicField = require("src/models/jira/EpicField.gs");
 // End of Node required code block
 
 /**
+ * @TODO: requires refactoring for new api pagination scheme "nextPageToken"
+ * 
  * @desc Class 'IssueSearch' API abstraction with pagination handling.
  *       Performs a JQL POST search request to JIRA Rest API.
  * @param searchQuery {String}    JQL Query statement
@@ -13,8 +15,8 @@ const EpicField = require("src/models/jira/EpicField.gs");
 function IssueSearch(searchQuery) {
   var fields = ['key'],
       startAt = 0, maxResults = 1000, maxPerPage = 50,
-      queryStr = searchQuery, orderBy = '', orderDir = 'ASC',
-      expand = false;
+      queryStr = searchQuery, orderBy = '', orderDir = 'ASC', fieldsByKeys = true,
+      expand = false, paginationTokenBased = false;
   var response = {
     'data' : [],
     'totalFoundRecords' : 0,
@@ -120,14 +122,27 @@ function IssueSearch(searchQuery) {
 
   /**
    * @desc Set expand
-   * @param sExpand {Array} Example: ['changelog']
+   * @param aExpand {Array|String} Example: ['changelog', 'status'] or 'changelog'
    * @return {this} Allow Chaining
    */
-  this.setExpand = function (sExpand) {
-    expand = sExpand;
+  this.setExpand = function (aExpand) {
+    if (Array.isArray(aExpand)) {
+        expand = aExpand.join(',');
+    } else {
+        expand = aExpand;
+    }
     return this;
   };
 
+  /**
+   * @desc Set current search to use token based pagination of responses. @TODO: Not yet fully implemented.
+   * @param bTokenBased {Boolean}
+   * @return {this} Allow Chaining
+   */
+  this.setPaginationTokenBased = function (bTokenBased) {
+    paginationTokenBased = bTokenBased;
+    return this;
+  };
 
 
   /**
@@ -265,8 +280,9 @@ function IssueSearch(searchQuery) {
     var data = {
       jql : getJql(),
       fields : fields,
-      startAt : startAt,
-      maxResults : (maxResults < maxPerPage) ? maxResults : maxPerPage
+      ...(!paginationTokenBased ? { startAt: startAt } : {}),
+      maxResults : (maxResults < maxPerPage) ? maxResults : maxPerPage,
+      fieldsByKeys: fieldsByKeys,
     };
 
     if (expand) {

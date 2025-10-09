@@ -28,6 +28,7 @@ function callbackUpdateCfgMyFilter(enabled) {
 }
 
 /**
+ * @TODO: requires refactoring for new api pagination scheme "nextPageToken"
  * Creates a new IssueTableIndex_ object, which is used to persist IssueTables and related information.
  */
 InsertIssueTable_Controller_ = {
@@ -153,6 +154,7 @@ InsertIssueTable_Controller_ = {
       .setFields(attributes.columns)
       .setMaxResults(attributes.maxResults)
       .setStartAt(startAt)
+      .setPaginationTokenBased(true)
       .search()      
       .withSuccessHandler(ok)
       .withFailureHandler(error);

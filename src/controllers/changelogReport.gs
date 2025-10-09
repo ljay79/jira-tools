@@ -43,6 +43,7 @@ function callbackCreateChangelog(jsonFormData) {
 
 /**
  * Creates a new ChangelogReport_Controller object.
+ * @TODO: requires refactoring for new api pagination scheme "nextPageToken"
  */
 ChangelogReport_Controller_ = {
   name : 'ChangelogReport_Controller_',
@@ -93,9 +94,9 @@ ChangelogReport_Controller_ = {
     var attributes = {
       filter : getFilter(parseInt(jsonFormData['filter_id'])),
       maxResults : parseInt(jsonFormData['maxResults']) || 10000,
-      columns : ['issuetype','created','field','fromString','toString'],
+      columns : ['issuetype', 'created', 'field', 'fromString', 'toString'],
       data : {},
-      expand : ['changelog'],
+      expand : 'changelog',
       sheet : getTicketSheet(),
       renderer : jsonFormData['wlLayout'] ? jsonFormData['wlLayout'] : 'ChangelogTableRendererDefault_',
       historyField: jsonFormData['wlIssueField'] ? jsonFormData['wlIssueField'] : 'status'
@@ -156,6 +157,7 @@ ChangelogReport_Controller_ = {
       .setMaxResults(attributes.maxResults)
       .setStartAt(0)
       .setMaxPerPage(100)
+      .setPaginationTokenBased(true)
       .search()
       .withSuccessHandler(onSuccess)
       .withFailureHandler(onFailure);
