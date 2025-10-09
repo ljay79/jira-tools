@@ -171,7 +171,7 @@ button.pika-button {
 
         // no users to load
         if (response.response.length == 0) {
-          search.attr("placeholder", "No userss found. Check settings -> JIRA Access");
+          search.attr("placeholder", "No users found. Check settings -> JIRA Access");
         }
       }
 
@@ -196,7 +196,10 @@ button.pika-button {
         // dont wait for response - bubble up all states not possible
         // instead, show loading animation for 2sec and then close dialog
         // success/error feedback handled inside sheet.
-        google.script.host.close();
+        setTimeout(() => {
+          // necessary - race condition; google.script.run.FUNCTION() isnt sent to server before .close() is cancelling request already  
+          google.script.host.close();
+        }, 500);
       }
 
       /**
@@ -232,6 +235,7 @@ button.pika-button {
           return date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
         }
       });
+
       var pickerTo = new Pikaday({
         field: frmWorklog.wlEndDate, 
         format: 'yyyy-MM-dd',
