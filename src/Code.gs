@@ -10,7 +10,7 @@
  * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
-var BUILD = '1.4.11';
+var BUILD = '1.5.2-beta';
 
 /**
  * Add a nice menu option for the users.
@@ -57,6 +57,40 @@ function addMenu() {
     .addItem('About', 'dialogAbout')
     .addToUi();
 }
+
+/**
+ * Deprecation notice to "server" users
+ * @OnlyCurrentDoc
+ */
+function DeprecationNotice_() {
+  debug.time('[DeprecationNotice_]');
+
+  if (!hasSettings(false)) {
+    return;
+  }
+  if (getCfg_('server_type') == 'onDemand') {
+    return;
+  }
+
+  var key_count = 'DEPRECATION_NOTICE_SHOWN_COUNT';
+  var docProps  = CacheService.getDocumentCache();
+  var count     = docProps.get(key_count) || 0;
+  var dialog    = getDialog('views/dialogs/dialogDeprecationNotice', {});
+
+  if (count <= 0) {
+    dialog
+      .setWidth(480)
+      .setHeight(400)
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+
+    SpreadsheetApp.getUi().showModalDialog(dialog, 'Notice! Important!');
+
+    docProps.put(key_count, 1);
+  }
+
+  debug.timeEnd('[DeprecationNotice_]');
+}
+// --
 
 // Node required code block
 module.exports = {

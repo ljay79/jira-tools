@@ -37,7 +37,7 @@ var SpreadsheetTriggers_ = {
 
     // check for proper event "onXXX"
     if (_events.indexOf(event) === -1) {
-      throw new Error("{event} has a not supported. Value must be one of: " + _events.join(','));
+      throw new Error("{event} is not supported. Value must be one of: " + _events.join(','));
     }
 
     var _trigger = this.get(handlerFunction);

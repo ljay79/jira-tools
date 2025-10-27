@@ -601,6 +601,22 @@ function unifyIssueAttrib(attrib, data) {
         resp.value = data[attrib] || data.fields[attrib];
         break;
     }
+
+    // new ADF format fields
+    // regular fields
+    switch (attrib) {
+      case 'body':
+      case 'comments':
+      case 'description':
+      case 'environment':
+        var f = data?.fields?.[attrib];
+        if (f?.type === 'doc' && f?.content) {
+          resp.value = getAdfParser_().toString(f);
+        }
+
+        break;
+    }
+
   } catch (e) {
     debug.error("Error in unifyIssueAttrib field '" + attrib + "' exception " + e);
     debug.log(JSON.stringify(e));

@@ -62,6 +62,8 @@ RefreshIssueTable_Controller_ = {
     ;
 
     SpreadsheetApp.getUi().showSidebar(html);
+    
+    DeprecationNotice_(); //@TODO: temp
   },
 
   /**

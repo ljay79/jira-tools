@@ -223,7 +223,6 @@ Fields: `Jira issue field IDs. e.g.: "key,summary,status"` _(*required)_
 
 Limit: `Number of results to return. 1 to 100. Default: 1` _(*optional)_
 
-StartAt: `The index of the first result to return (0-based)` _(*optional)_
 
 Little but quite powerful function to search for Jira issues and fill your sheet with the results.
 Using JQL ([Jira Query Language](https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html#Advancedsearching-ConstructingJQLqueries)) queries as you would inside Jira.
@@ -267,6 +266,33 @@ In cell `A1` put in `JST_formatDuration(60*60)`
 2 | 1h
 ```
 357878 = `12d 3h 24m 38s`
+
+
+### JST_ADF_TO_TEXT
+Sample: `JST_ADF_TO_TEXT(A1)`
+Sample: `JST_ADF_TO_TEXT(A1; CHAR(10))`
+Sample: `JST_ADF_TO_TEXT(A1; CHAR(13)&CHAR(10))`
+
+Description: `Convert one Jira's Atlassian ADF document to plain text.`
+
+input: `String of ADF Json format or reference to cell with ADF content.` _(*required)_
+
+lineBreak: `Optional line break override (e.g., CHAR(10) = "\n")` _(*optional)_
+
+Use this custom function whenever you like convert Atlassians new ADF formatted text field values into plaintext.
+
+
+### JST_ADF_BATCH_TO_TEXT
+Sample: `JST_ADF_BATCH_TO_TEXT(A1:B10)`
+Sample: `JST_ADF_BATCH_TO_TEXT(A1:B10; CHAR(10))`
+
+Description: `Convert a range/list of ADFs to plain text. Preserves the input range shape (2D arrays in, 2D arrays out).`
+
+rangeOrJsons: `ADF JSON String or reference to cell or range of cells with ADF content.` _(*required)_
+
+lineBreak: `Optional line break override (e.g., CHAR(10) = "\n")` _(*optional)_
+
+Use this custom function whenever you like convert multiple Atlassian new ADF formatted text field values into plaintext.
 
 
 # Known Limitations
